@@ -50,10 +50,10 @@ reArm        = input.bool(true, "Rearmar tras un barrido mas profundo", group = 
 
 fvgTF        = input.timeframe("15", "Temporalidad del FVG", group = G2)
 mssLookback  = input.int(20, "Velas atras para el nivel de referencia (MSS)", minval = 5, maxval = 100, group = G2)
-useSwing     = input.bool(false, "Usar ultimo swing fractal en vez del extremo de N velas",
+useSwing     = input.bool(true, "Usar ultimo swing fractal en vez del extremo de N velas",
      tooltip = "El extremo de N velas exige romper el minimo/maximo de toda la ventana: es mucho mas restrictivo que un swing real.", group = G2)
 maxSetupBars = input.int(300, "Vida maxima del setup (velas del grafico)", minval = 20, maxval = 2000, group = G2)
-expireNewRng = input.bool(true, "Caducar setup sin MSS al abrir rango HTF nuevo", group = G2)
+expireNewRng = input.bool(false, "Caducar setup sin MSS al abrir rango HTF nuevo", group = G2)
 rMultiple    = input.float(3.0, "Multiplo R del objetivo", minval = 0.5, maxval = 10.0, step = 0.5, group = G2)
 minRiskPips  = input.float(3.0, "Riesgo minimo aceptable (pips)", minval = 0.1, maxval = 50.0, group = G2)
 maxRiskPips  = input.float(80.0, "Riesgo maximo aceptable (pips)", minval = 1.0, maxval = 500.0, group = G2)
