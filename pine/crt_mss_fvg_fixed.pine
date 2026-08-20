@@ -1,0 +1,337 @@
+//@version=6
+// ═════════════════════════════════════════════════════════════════════════════
+//  CRT MSS+FVG · STRATEGY  —  versión corregida tras auditoría estática
+//
+//  Cambios respecto al original (ver AUDITORIA.md para el detalle):
+//   F1  El extremo del sweep se COPIA dentro del setup; el reset de rango HTF
+//       ya no lo borra a na (era el cero garantizado de operaciones).
+//   F2  El flanco del sweep se evalúa ANTES de mutar el estado y DESPUÉS del
+//       reset de rango (el original usaba sweptHi[1], valor de la vela previa,
+//       anterior al reset -> se tragaba el sweep de la vela de apertura HTF).
+//   F3  El setup deja de bloquear indefinidamente: caduca por velas y, opcional,
+//       al abrir un rango HTF nuevo sin MSS confirmado.
+//   F4  La kill zone se aplica a la CONFIRMACIÓN del MSS, no al instante del
+//       sweep (es lo que dice el propio texto del input).
+//   F5  El FVG usa las 3 últimas velas CERRADAS del TF de FVG (offsets 0 y 2),
+//       no 1 y 3, que apuntaban a velas 2 y 4 y nunca veían el hueco fresco.
+//   F6  Entrada como orden LÍMITE en el borde del FVG + SL/TP adjuntos en la
+//       misma llamada: el precio de ejecución coincide con el usado en el
+//       cálculo de riesgo y el stop deja de colocarse una vela tarde.
+//   F7  Tamaño de pip y valor de punto derivados del símbolo, no 0.0001 fijo.
+//   F8  Panel de diagnóstico con el embudo completo (sweeps/armados/MSS/FVG/
+//       órdenes) para localizar en 5 segundos dónde muere la cadena.
+// ═════════════════════════════════════════════════════════════════════════════
+strategy(title                   = "CRT MSS+FVG [Backtest FIX]",
+     shorttitle              = "CRT MSSFVG FIX",
+     overlay                 = true,
+     initial_capital         = 10000,
+     default_qty_type        = strategy.fixed,
+     default_qty_value       = 1,
+     slippage                = 6,
+     commission_type         = strategy.commission.percent,
+     commission_value        = 0.0,
+     calc_on_every_tick      = false,
+     process_orders_on_close = true,
+     max_boxes_count         = 200, max_labels_count = 500, max_lines_count = 200)
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  INPUTS
+// ═════════════════════════════════════════════════════════════════════════════
+G1 = "Rango / Sweep"
+G2 = "MSS + FVG"
+G3 = "Ventana de trading"
+G4 = "Gestion de riesgo"
+G5 = "Diagnostico"
+
+htf          = input.timeframe("240", "Temporalidad del rango (HTF)", group = G1)
+slBufferATR  = input.float(0.50, "Colchon del SL (x ATR HTF)", minval = 0.0, step = 0.05, group = G1)
+minRangeATR  = input.float(0.50, "Tamano minimo del rango (x ATR HTF)", minval = 0.0, step = 0.05, group = G1)
+reArm        = input.bool(true, "Rearmar tras un barrido mas profundo", group = G1)
+
+fvgTF        = input.timeframe("15", "Temporalidad del FVG", group = G2)
+mssLookback  = input.int(20, "Velas atras para el nivel de referencia (MSS)", minval = 5, maxval = 100, group = G2)
+useSwing     = input.bool(false, "Usar ultimo swing fractal en vez del extremo de N velas",
+     tooltip = "El extremo de N velas exige romper el minimo/maximo de toda la ventana: es mucho mas restrictivo que un swing real.", group = G2)
+maxSetupBars = input.int(300, "Vida maxima del setup (velas del grafico)", minval = 20, maxval = 2000, group = G2)
+expireNewRng = input.bool(true, "Caducar setup sin MSS al abrir rango HTF nuevo", group = G2)
+rMultiple    = input.float(3.0, "Multiplo R del objetivo", minval = 0.5, maxval = 10.0, step = 0.5, group = G2)
+minRiskPips  = input.float(3.0, "Riesgo minimo aceptable (pips)", minval = 0.1, maxval = 50.0, group = G2)
+maxRiskPips  = input.float(80.0, "Riesgo maximo aceptable (pips)", minval = 1.0, maxval = 500.0, group = G2)
+
+onlyKZ       = input.bool(true, "Confirmar el MSS solo dentro de kill zone", group = G3)
+kzSess1      = input.session("0700-1000", "Kill zone 1 (Londres)", group = G3)
+kzSess2      = input.session("1230-1500", "Kill zone 2 (Nueva York)", group = G3)
+kzTZ         = input.string("GMT+0", "Zona horaria de las kill zones",
+     options = ["GMT+0", "GMT+1", "GMT+2", "GMT+3", "GMT-4", "GMT-5", "America/New_York", "Europe/London"],
+     tooltip = "El original usaba la zona del EXCHANGE del simbolo, que en muchos brokers FX es America/New_York. Fijala aqui explicitamente.", group = G3)
+oneTrade     = input.bool(true, "Una operacion a la vez", group = G3)
+oneDir       = input.bool(true, "Una sola direccion por rango", group = G3)
+
+riskPercent  = input.float(1.0, "Riesgo por operacion (% del equity)", minval = 0.1, maxval = 5.0, step = 0.1, group = G4)
+pipOverride  = input.float(0.0, "Tamano del pip (0 = automatico)", minval = 0.0, step = 0.00001,
+     tooltip = "Automatico = syminfo.mintick * 10, correcto en feeds FX de 5 y 3 decimales. En un feed de 4 decimales ponlo a mano.", group = G4)
+
+showDebug    = input.bool(true, "Panel de diagnostico", group = G5)
+showDraw     = input.bool(true, "Dibujar rango / sweeps / MSS / FVG", group = G5)
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  DATOS HTF — una sola request.security con tupla.
+//  ta.atr(14) va escrito DENTRO de la expresion, no pasado como argumento de
+//  una funcion de usuario: asi no hay duda de en que contexto se instancia.
+//  Patron antirrepintado: expresion desplazada [1] + lookahead_on.
+// ═════════════════════════════════════════════════════════════════════════════
+[rangeHigh, rangeLow, htfATR, htfBarTime] = request.security(syminfo.tickerid, htf,
+     [high[1], low[1], ta.atr(14)[1], time], lookahead = barmerge.lookahead_on)
+
+newRange = bar_index > 0 and nz(htfBarTime) != nz(htfBarTime[1])
+
+rangeSize = rangeHigh - rangeLow
+rangeOK   = not na(htfATR) and not na(rangeSize) and rangeSize >= minRangeATR * htfATR
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  DATOS DEL TF DE FVG — offsets 0 y 2 = las 3 ultimas velas YA CERRADAS.
+//  Con lookahead_off el valor de offset 0 solo se entrega cuando esa vela del
+//  TF superior ha cerrado, asi que no hay repintado ni vela en formacion.
+// ═════════════════════════════════════════════════════════════════════════════
+[fHigh0, fLow0, fHigh2, fLow2, fBarTime] = request.security(syminfo.tickerid, fvgTF,
+     [high, low, high[2], low[2], time], lookahead = barmerge.lookahead_off)
+
+newFvgBar = bar_index > 0 and nz(fBarTime) != nz(fBarTime[1])
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  KILL ZONES — zona horaria explicita, no la del exchange
+// ═════════════════════════════════════════════════════════════════════════════
+inKZ1 = not na(time(timeframe.period, kzSess1, kzTZ))
+inKZ2 = not na(time(timeframe.period, kzSess2, kzTZ))
+kzOK  = not onlyKZ or inKZ1 or inKZ2
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  TAMANO DE PIP / VALOR DE PUNTO
+// ═════════════════════════════════════════════════════════════════════════════
+pipSize = pipOverride > 0 ? pipOverride : syminfo.mintick * 10
+ptValue = syminfo.pointvalue <= 0 ? 1.0 : syminfo.pointvalue
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  NIVELES DE REFERENCIA PARA EL MSS
+//  Todas las ta.* se llaman en ambito global, en cada vela, sin condicion.
+// ═════════════════════════════════════════════════════════════════════════════
+extLow  = ta.lowest(low, mssLookback)
+extHigh = ta.highest(high, mssLookback)
+pvtLow  = ta.pivotlow(low, 3, 3)
+pvtHigh = ta.pivothigh(high, 3, 3)
+
+var float lastPvtLow  = na
+var float lastPvtHigh = na
+if not na(pvtLow)
+    lastPvtLow := pvtLow
+if not na(pvtHigh)
+    lastPvtHigh := pvtHigh
+
+refLowNow  = useSwing ? nz(lastPvtLow,  extLow[1])  : extLow[1]
+refHighNow = useSwing ? nz(lastPvtHigh, extHigh[1]) : extHigh[1]
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  ESTADO DEL RANGO / SWEEP
+// ═════════════════════════════════════════════════════════════════════════════
+var bool  sweptHi   = false
+var bool  sweptLo   = false
+var float sweepHiPx = na
+var float sweepLoPx = na
+var bool  dirDone   = false
+
+// El reset va ANTES de evaluar el flanco, y el flanco se lee del estado vivo
+// (no de [1]), de modo que un sweep en la propia vela de apertura del rango
+// se detecta correctamente.  <-- F2
+if newRange
+    sweptHi   := false
+    sweptLo   := false
+    sweepHiPx := na
+    sweepLoPx := na
+    dirDone   := false
+
+sweepUp   = not na(rangeHigh) and high > rangeHigh
+sweepDown = not na(rangeLow)  and low  < rangeLow
+
+firstSweepUp = sweepUp   and not sweptHi
+firstSweepDn = sweepDown and not sweptLo
+
+if sweepUp
+    if not sweptHi
+        sweptHi   := true
+        sweepHiPx := high
+    else if reArm and high > nz(sweepHiPx, high)
+        sweepHiPx := high
+if sweepDown
+    if not sweptLo
+        sweptLo   := true
+        sweepLoPx := low
+    else if reArm and low < nz(sweepLoPx, low)
+        sweepLoPx := low
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  ESTADO DEL SETUP
+//  sSweepPx y sATR son COPIAS: el reset de rango HTF no puede dejarlas en na
+//  mientras el setup sigue vivo.  <-- F1
+// ═════════════════════════════════════════════════════════════════════════════
+var bool  sPend    = false
+var int   sDir     = 0
+var float sRefLv   = na
+var float sSweepPx = na
+var float sATR     = na
+var bool  sMssDone = false
+var float sFvgNear = na
+var float sFvgFar  = na
+var int   sAge     = 0
+var bool  sOrdered = false
+
+var int nSweeps = 0
+var int nArmed  = 0
+var int nMss    = 0
+var int nFvg    = 0
+var int nOrders = 0
+
+if firstSweepUp or firstSweepDn
+    nSweeps := nSweeps + 1
+
+flat   = strategy.position_size == 0
+canArm = rangeOK and (not oneDir or not dirDone) and (not oneTrade or flat)
+
+// --- armado (sin filtro de kill zone: el filtro va en la confirmacion) -------
+if not sPend and canArm
+    if firstSweepUp
+        sPend    := true
+        sDir     := -1
+        sRefLv   := refLowNow
+        sSweepPx := high
+        sATR     := htfATR
+        sMssDone := false
+        sFvgNear := na
+        sFvgFar  := na
+        sAge     := 0
+        sOrdered := false
+        nArmed   := nArmed + 1
+    else if firstSweepDn
+        sPend    := true
+        sDir     := 1
+        sRefLv   := refHighNow
+        sSweepPx := low
+        sATR     := htfATR
+        sMssDone := false
+        sFvgNear := na
+        sFvgFar  := na
+        sAge     := 0
+        sOrdered := false
+        nArmed   := nArmed + 1
+
+// --- ciclo de vida ----------------------------------------------------------
+expired = false
+if sPend
+    sAge := sAge + 1
+    if sAge > maxSetupBars
+        expired := true
+    else if expireNewRng and newRange and not sMssDone and sAge > 1
+        expired := true
+
+// --- MSS: cierre mas alla del nivel, confirmado dentro de kill zone  <-- F4 --
+if sPend and not expired and not sMssDone and not na(sRefLv)
+    mssUp = sDir ==  1 and close > sRefLv
+    mssDn = sDir == -1 and close < sRefLv
+    if (mssUp or mssDn) and kzOK
+        sMssDone := true
+        nMss     := nMss + 1
+        if showDraw
+            label.new(bar_index, close, "MSS",
+                 style     = mssUp ? label.style_label_up : label.style_label_down,
+                 color     = color.new(color.aqua, 20), textcolor = color.black, size = size.tiny)
+
+// --- FVG: 3 ultimas velas cerradas del TF de FVG  <-- F5 --------------------
+if sPend and not expired and sMssDone and na(sFvgNear) and newFvgBar
+    bullGap = not na(fLow0) and not na(fHigh2) and fLow0 > fHigh2
+    bearGap = not na(fHigh0) and not na(fLow2) and fHigh0 < fLow2
+    if sDir == 1 and bullGap
+        sFvgNear := fLow0
+        sFvgFar  := fHigh2
+    else if sDir == -1 and bearGap
+        sFvgNear := fHigh0
+        sFvgFar  := fLow2
+    if not na(sFvgNear)
+        nFvg := nFvg + 1
+        if showDraw
+            box.new(bar_index, math.max(sFvgNear, sFvgFar), bar_index + 30, math.min(sFvgNear, sFvgFar),
+                 bgcolor      = sDir == 1 ? color.new(color.lime, 82) : color.new(color.red, 82),
+                 border_color = sDir == 1 ? color.lime : color.red, border_width = 1)
+
+// --- Orden limite en el borde cercano + SL/TP adjuntos  <-- F6 --------------
+if sPend and not expired and not sOrdered and not na(sFvgNear)
+    entryPx  = sFvgNear
+    slAnchor = sDir == 1 ? math.min(nz(sSweepPx, sFvgFar), sFvgFar) : math.max(nz(sSweepPx, sFvgFar), sFvgFar)
+    slPx     = sDir == 1 ? slAnchor - slBufferATR * nz(sATR, 0) : slAnchor + slBufferATR * nz(sATR, 0)
+    riskPx   = math.abs(entryPx - slPx)
+    riskPips = riskPx / pipSize
+    if riskPx > 0 and riskPips >= minRiskPips and riskPips <= maxRiskPips
+        tpPx = entryPx + sDir * rMultiple * riskPx
+        qty  = (strategy.equity * riskPercent / 100.0) / (riskPx * ptValue)
+        if qty > 0
+            if sDir == 1
+                strategy.entry("Long", strategy.long, qty = qty, limit = entryPx)
+                strategy.exit("SalidaLong", "Long", stop = slPx, limit = tpPx)
+            else
+                strategy.entry("Short", strategy.short, qty = qty, limit = entryPx)
+                strategy.exit("SalidaShort", "Short", stop = slPx, limit = tpPx)
+            sOrdered := true
+            dirDone  := true
+            nOrders  := nOrders + 1
+    else
+        expired := true
+
+// --- cierre del ciclo: relleno, invalidacion o caducidad --------------------
+if sPend
+    invalidated = not na(sFvgFar) and (sDir == 1 ? close < sFvgFar : close > sFvgFar)
+    if not flat and sOrdered
+        sPend    := false
+        sOrdered := false
+    else if expired or (sOrdered and invalidated)
+        if sOrdered
+            strategy.cancel(sDir == 1 ? "Long" : "Short")
+        sPend    := false
+        sOrdered := false
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  VISUAL
+// ═════════════════════════════════════════════════════════════════════════════
+var box liveBox = na
+if showDraw
+    if na(liveBox)
+        liveBox := box.new(bar_index - 20, rangeHigh, bar_index, rangeLow,
+             border_color = color.new(color.gray, 60), bgcolor = color.new(color.gray, 92))
+    else
+        box.set_lefttop(liveBox, bar_index - 20, rangeHigh)
+        box.set_rightbottom(liveBox, bar_index, rangeLow)
+
+plotshape(showDraw and firstSweepUp, title = "Sweep alto", style = shape.diamond, location = location.abovebar, color = color.orange, size = size.tiny)
+plotshape(showDraw and firstSweepDn, title = "Sweep bajo", style = shape.diamond, location = location.belowbar, color = color.orange, size = size.tiny)
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  PANEL DE DIAGNOSTICO — el embudo completo. Si un contador se queda a 0,
+//  ese es exactamente el eslabon que rompe la cadena.
+// ═════════════════════════════════════════════════════════════════════════════
+var table dbg = table.new(position.top_right, 2, 9, bgcolor = color.new(color.black, 20), border_width = 1)
+if showDebug and barstate.islast
+    table.cell(dbg, 0, 0, "sweeps 1o",      text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 0, str.tostring(nSweeps), text_color = color.orange, text_size = size.tiny)
+    table.cell(dbg, 0, 1, "armados",        text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 1, str.tostring(nArmed),  text_color = color.orange, text_size = size.tiny)
+    table.cell(dbg, 0, 2, "MSS",            text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 2, str.tostring(nMss),    text_color = color.aqua,   text_size = size.tiny)
+    table.cell(dbg, 0, 3, "FVG",            text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 3, str.tostring(nFvg),    text_color = color.lime,   text_size = size.tiny)
+    table.cell(dbg, 0, 4, "ordenes",        text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 4, str.tostring(nOrders), text_color = color.yellow, text_size = size.tiny)
+    table.cell(dbg, 0, 5, "rangeOK ahora",  text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 5, str.tostring(rangeOK), text_color = rangeOK ? color.lime : color.red, text_size = size.tiny)
+    table.cell(dbg, 0, 6, "htfATR",         text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 6, str.tostring(htfATR, "#.#####"), text_color = na(htfATR) ? color.red : color.lime, text_size = size.tiny)
+    table.cell(dbg, 0, 7, "kzOK ahora",     text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 7, str.tostring(kzOK), text_color = kzOK ? color.lime : color.red, text_size = size.tiny)
+    table.cell(dbg, 0, 8, "pip",            text_color = color.white, text_size = size.tiny)
+    table.cell(dbg, 1, 8, str.tostring(pipSize, "#.#####"), text_color = color.gray, text_size = size.tiny)
