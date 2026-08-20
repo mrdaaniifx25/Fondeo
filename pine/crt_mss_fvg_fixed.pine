@@ -348,3 +348,21 @@ plot(nFvg,             "DBG FVG",     display = display.data_window + display.st
 plot(nOrders,          "DBG ordenes", display = display.data_window + display.status_line)
 plot(rangeOK ? 1 : 0,  "DBG rangeOK", display = display.data_window + display.status_line)
 plot(htfATR,           "DBG htfATR",  display = display.data_window + display.status_line)
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  DIAGNOSTICO A PRUEBA DE BALAS — usa label.new, el mismo mecanismo de dibujo
+//  que los rombos de sweep. Si se ven los rombos, este cartel se ve seguro.
+// ═════════════════════════════════════════════════════════════════════════════
+var label dbgLbl = na
+if barstate.islast
+    label.delete(dbgLbl)
+    dbgLbl := label.new(bar_index, high,
+         "sweeps "  + str.tostring(nSweeps) +
+         "\narmados " + str.tostring(nArmed) +
+         "\nMSS "     + str.tostring(nMss) +
+         "\nFVG "     + str.tostring(nFvg) +
+         "\nordenes " + str.tostring(nOrders) +
+         "\nrangeOK " + str.tostring(rangeOK) +
+         "\nhtfATR "  + str.tostring(htfATR, "#.#####"),
+         style = label.style_label_left, color = color.yellow,
+         textcolor = color.black, size = size.large)
