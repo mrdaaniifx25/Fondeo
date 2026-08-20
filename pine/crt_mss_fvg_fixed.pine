@@ -335,3 +335,16 @@ if showDebug and barstate.islast
     table.cell(dbg, 1, 7, str.tostring(kzOK), text_color = kzOK ? color.lime : color.red, text_size = size.tiny)
     table.cell(dbg, 0, 8, "pip",            text_color = color.white, text_size = size.tiny)
     table.cell(dbg, 1, 8, str.tostring(pipSize, "#.#####"), text_color = color.gray, text_size = size.tiny)
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  DIAGNOSTICO ALTERNATIVO — por si la tabla no renderiza.
+//  No dibujan nada en el grafico: solo exponen los contadores en la linea de
+//  estado (junto al nombre del script) y en la ventana de datos (Ctrl+Shift+D).
+// ═════════════════════════════════════════════════════════════════════════════
+plot(nSweeps,          "DBG sweeps",  display = display.data_window + display.status_line)
+plot(nArmed,           "DBG armados", display = display.data_window + display.status_line)
+plot(nMss,             "DBG MSS",     display = display.data_window + display.status_line)
+plot(nFvg,             "DBG FVG",     display = display.data_window + display.status_line)
+plot(nOrders,          "DBG ordenes", display = display.data_window + display.status_line)
+plot(rangeOK ? 1 : 0,  "DBG rangeOK", display = display.data_window + display.status_line)
+plot(htfATR,           "DBG htfATR",  display = display.data_window + display.status_line)
