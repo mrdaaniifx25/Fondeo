@@ -1,4 +1,4 @@
-<title>Verificación CRT · Puro y Fibonacci</title>
+<title>Verificación CRT · 2025-2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -133,14 +133,28 @@ section{margin-top:40px}
 .pn-b{background:var(--ac-s);color:var(--ac)}
 .pd{color:var(--tx2);max-width:64ch;margin-top:8px}
 .pd b{color:var(--tx)}
+
+.vent{display:flex;flex-direction:column;gap:7px;background:var(--sf2);
+ border:1px solid var(--bd2);border-radius:4px;padding:12px 14px}
+.vf{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+.vl{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;
+ padding:3px 7px;border-radius:3px;white-space:nowrap;min-width:132px}
+.vl1{background:var(--bd2);color:var(--tx2)}
+.vl2{background:var(--st-s);color:var(--st)}
+.vl3{background:var(--ac-s);color:var(--ac)}
+.vf b{font-family:"JetBrains Mono",monospace;font-size:.86rem;font-weight:400;
+ font-variant-numeric:tabular-nums}
+.rej2{background:var(--ac-s);border:1px solid var(--bd);border-radius:4px;
+ padding:14px 18px;margin-top:14px;color:var(--tx2);font-size:.93rem;max-width:64ch}
 </style>
 
 <div class="w">
 <header class="top">
- <p class="eyebrow">EURUSD · hora española</p>
+ <p class="eyebrow">EURUSD · 2025-2026 · hora española</p>
  <h1>Verificación CRT</h1>
- <p class="lede">Dos partes separadas, porque comprueban cosas distintas. La primera es el CRT tal cual lo enseña la guía, sin nada añadido. La segunda solo mira si calculo bien el retroceso de Fibonacci.</p>
+ <p class="lede">Todo dentro del alcance de tu gráfico. Las tres partes comprueban cosas distintas y van en orden: primero el patrón, después la ejecución, y al final el Fibonacci.</p>
  <div class="regla"><b>Marca solo lo que esté BIEN.</b> Lo que dejes sin marcar lo leeré como que está mal. Si algo falla, apunta qué ves — eso es lo que más me sirve.</div>
+ <div class="rej2"><b>La rejilla H4 de la guía, en hora española:</b> las velas abren a las <b>03:00 · 07:00 · 11:00 · 15:00 · 19:00 · 23:00</b>. Tu plataforma seguramente las dibuja ancladas a las 00:00 de su servidor, así que probablemente <b>no coincidan</b>. Mide el rango a mano entre las horas que te doy en cada tarjeta.</div>
 </header>
 
 <div class="barra">
@@ -150,417 +164,371 @@ section{margin-top:40px}
 </div>
 
 <section class="parte">
- <div class="ph"><span class="pn pn-a">Parte A</span><h2>CRT puro</h2></div>
- <p class="pd">Rejilla <b>H4 anclada a la 01:00 de Nueva York</b> — las velas de 1am y 5am EST del modelo 4H de la guía. Vela 1 marca el rango, Vela 2 lo barre y cierra dentro, y durante la Vela 3 entra una <b>orden stop en el extremo de la Vela 2</b>. Stop tras la mecha, objetivo en el extremo opuesto. <b>Sin Fibonacci.</b> Esto es lo que de verdad importa: si el patrón está mal detectado, todo lo demás sobra.</p>
- <div class="ops"><article class="op" id="A1" data-n="A1">
+ <div class="ph"><span class="pn pn-a">Parte A</span><h2>CRT puro · las operaciones</h2></div>
+ <p class="pd">Las <b>cinco únicas</b> operaciones de CRT puro que existen desde 2025. No es una muestra, es la población entera. Orden stop en el extremo de la Vela 2, stop tras la mecha, objetivo en el extremo opuesto. <b>Sin Fibonacci.</b></p>
+ <div class="ops"><article class="op" id="A1">
  <div class="cab">
-  <div class="num">A01</div>
-  <div class="ide"><b>04/01/2021</b><span>15:56 · hora española</span></div>
-  <div class="lado l-v">VENTA</div>
+  <div class="num">A1</div>
+  <div class="ide"><b>06/02/2025</b><span>15:10 · hora española</span></div>
+  <div class="lado l-c">COMPRA</div>
   <div class="est"><span class="pill" data-pill="A1">sin revisar</span></div>
  </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>06/02/2025 07:00 – 10:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>06/02/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>06/02/2025 15:00 – 18:59</b></div>
+  </div>
  <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.22862</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.23070</b><i>20.8 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.22420</b><i>44.2 pips · 2.13R</i></div>
+  <div class="pr pr-e"><span>Entrada</span><b>1.03676</b><i>orden stop</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.03513</b><i>16.3 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.03923</b><i>24.7 pips · 1.52R</i></div>
  </div>
  <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.22420 — 1.23005</b></div>
-  <div><span>Barrido hasta (A)</span><b>1.23060</b></div>
-  <div><span>Extremo de la Vela 2</span><b>1.22862</b></div>
-  <div><span>Vela 3 abre</span><b>04/01 15:00</b></div>
+  <div><span>Rango de la Vela 1</span><b>1.03559 — 1.03923</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.03523</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.03676</b></div>
  </div>
  <div class="ver">
   <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A1" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A1" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A1" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A1" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
+  <label><input type="checkbox" data-t="A1" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A1" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A1" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A1" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
   <div class="nota"><input type="text" data-nota="A1" placeholder="Si algo falla, dime qué ves"></div>
  </div>
-</article><article class="op" id="A2" data-n="A2">
+</article><article class="op" id="A2">
  <div class="cab">
-  <div class="num">A02</div>
-  <div class="ide"><b>20/01/2021</b><span>09:31 · hora española</span></div>
+  <div class="num">A2</div>
+  <div class="ide"><b>19/05/2025</b><span>15:00 · hora española</span></div>
   <div class="lado l-v">VENTA</div>
   <div class="est"><span class="pill" data-pill="A2">sin revisar</span></div>
  </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>19/05/2025 07:00 – 10:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>19/05/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>19/05/2025 15:00 – 18:59</b></div>
+  </div>
  <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.21396</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.21502</b><i>10.6 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.21228</b><i>16.8 pips · 1.58R</i></div>
- </div>
- <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.21228 — 1.21463</b></div>
-  <div><span>Barrido hasta (A)</span><b>1.21492</b></div>
-  <div><span>Extremo de la Vela 2</span><b>1.21396</b></div>
-  <div><span>Vela 3 abre</span><b>20/01 07:00</b></div>
- </div>
- <div class="ver">
-  <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A2" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A2" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A2" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A2" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A2" placeholder="Si algo falla, dime qué ves"></div>
- </div>
-</article><article class="op" id="A3" data-n="A3">
- <div class="cab">
-  <div class="num">A03</div>
-  <div class="ide"><b>19/02/2021</b><span>15:03 · hora española</span></div>
-  <div class="lado l-v">VENTA</div>
-  <div class="est"><span class="pill" data-pill="A3">sin revisar</span></div>
- </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.21260</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.21454</b><i>19.4 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.20904</b><i>35.6 pips · 1.84R</i></div>
- </div>
- <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.20904 — 1.21413</b></div>
-  <div><span>Barrido hasta (A)</span><b>1.21444</b></div>
-  <div><span>Extremo de la Vela 2</span><b>1.21260</b></div>
-  <div><span>Vela 3 abre</span><b>19/02 15:00</b></div>
- </div>
- <div class="ver">
-  <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A3" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A3" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A3" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A3" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A3" placeholder="Si algo falla, dime qué ves"></div>
- </div>
-</article><article class="op" id="A4" data-n="A4">
- <div class="cab">
-  <div class="num">A04</div>
-  <div class="ide"><b>23/09/2022</b><span>15:08 · hora española</span></div>
-  <div class="lado l-c">COMPRA</div>
-  <div class="est"><span class="pill" data-pill="A4">sin revisar</span></div>
- </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>0.97714</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>0.97351</b><i>36.3 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>0.98380</b><i>66.6 pips · 1.83R</i></div>
- </div>
- <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>0.97509 — 0.98380</b></div>
-  <div><span>Barrido hasta (A)</span><b>0.97361</b></div>
-  <div><span>Extremo de la Vela 2</span><b>0.97714</b></div>
-  <div><span>Vela 3 abre</span><b>23/09 15:00</b></div>
- </div>
- <div class="ver">
-  <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A4" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A4" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A4" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A4" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A4" placeholder="Si algo falla, dime qué ves"></div>
- </div>
-</article><article class="op" id="A5" data-n="A5">
- <div class="cab">
-  <div class="num">A05</div>
-  <div class="ide"><b>03/01/2023</b><span>15:10 · hora española</span></div>
-  <div class="lado l-c">COMPRA</div>
-  <div class="est"><span class="pill" data-pill="A5">sin revisar</span></div>
- </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.05697</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.05184</b><i>51.3 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.06676</b><i>97.9 pips · 1.91R</i></div>
- </div>
- <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.05339 — 1.06676</b></div>
-  <div><span>Barrido hasta (A)</span><b>1.05194</b></div>
-  <div><span>Extremo de la Vela 2</span><b>1.05697</b></div>
-  <div><span>Vela 3 abre</span><b>03/01 15:00</b></div>
- </div>
- <div class="ver">
-  <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A5" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A5" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A5" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A5" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A5" placeholder="Si algo falla, dime qué ves"></div>
- </div>
-</article><article class="op" id="A6" data-n="A6">
- <div class="cab">
-  <div class="num">A06</div>
-  <div class="ide"><b>24/03/2023</b><span>15:03 · hora española</span></div>
-  <div class="lado l-c">COMPRA</div>
-  <div class="est"><span class="pill" data-pill="A6">sin revisar</span></div>
- </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.07521</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.07121</b><i>40.0 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.08353</b><i>83.2 pips · 2.08R</i></div>
- </div>
- <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.07213 — 1.08353</b></div>
-  <div><span>Barrido hasta (A)</span><b>1.07131</b></div>
-  <div><span>Extremo de la Vela 2</span><b>1.07521</b></div>
-  <div><span>Vela 3 abre</span><b>24/03 15:00</b></div>
- </div>
- <div class="ver">
-  <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A6" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A6" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A6" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A6" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A6" placeholder="Si algo falla, dime qué ves"></div>
- </div>
-</article><article class="op" id="A7" data-n="A7">
- <div class="cab">
-  <div class="num">A07</div>
-  <div class="ide"><b>17/05/2024</b><span>15:04 · hora española</span></div>
-  <div class="lado l-c">COMPRA</div>
-  <div class="est"><span class="pill" data-pill="A7">sin revisar</span></div>
- </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.08467</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.08346</b><i>12.1 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.08683</b><i>21.6 pips · 1.79R</i></div>
- </div>
- <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.08415 — 1.08683</b></div>
-  <div><span>Barrido hasta (A)</span><b>1.08356</b></div>
-  <div><span>Extremo de la Vela 2</span><b>1.08467</b></div>
-  <div><span>Vela 3 abre</span><b>17/05 15:00</b></div>
- </div>
- <div class="ver">
-  <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A7" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A7" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A7" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A7" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A7" placeholder="Si algo falla, dime qué ves"></div>
- </div>
-</article><article class="op" id="A8" data-n="A8">
- <div class="cab">
-  <div class="num">A08</div>
-  <div class="ide"><b>17/07/2024</b><span>17:07 · hora española</span></div>
-  <div class="lado l-v">VENTA</div>
-  <div class="est"><span class="pill" data-pill="A8">sin revisar</span></div>
- </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.09289</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.09460</b><i>17.1 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.08950</b><i>33.9 pips · 1.98R</i></div>
- </div>
- <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.08950 — 1.09437</b></div>
-  <div><span>Barrido hasta (A)</span><b>1.09450</b></div>
-  <div><span>Extremo de la Vela 2</span><b>1.09289</b></div>
-  <div><span>Vela 3 abre</span><b>17/07 15:00</b></div>
- </div>
- <div class="ver">
-  <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A8" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A8" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A8" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A8" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A8" placeholder="Si algo falla, dime qué ves"></div>
- </div>
-</article><article class="op" id="A9" data-n="A9">
- <div class="cab">
-  <div class="num">A09</div>
-  <div class="ide"><b>16/12/2024</b><span>08:53 · hora española</span></div>
-  <div class="lado l-v">VENTA</div>
-  <div class="est"><span class="pill" data-pill="A9">sin revisar</span></div>
- </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.05097</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.05238</b><i>14.1 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.04847</b><i>25.0 pips · 1.77R</i></div>
- </div>
- <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.04847 — 1.05213</b></div>
-  <div><span>Barrido hasta (A)</span><b>1.05228</b></div>
-  <div><span>Extremo de la Vela 2</span><b>1.05097</b></div>
-  <div><span>Vela 3 abre</span><b>16/12 07:00</b></div>
- </div>
- <div class="ver">
-  <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A9" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A9" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A9" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A9" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A9" placeholder="Si algo falla, dime qué ves"></div>
- </div>
-</article><article class="op" id="A10" data-n="A10">
- <div class="cab">
-  <div class="num">A10</div>
-  <div class="ide"><b>19/05/2025</b><span>15:00 · hora española</span></div>
-  <div class="lado l-v">VENTA</div>
-  <div class="est"><span class="pill" data-pill="A10">sin revisar</span></div>
- </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.12548</b><i>&nbsp;</i></div>
+  <div class="pr pr-e"><span>Entrada</span><b>1.12548</b><i>orden stop</i></div>
   <div class="pr pr-s"><span>Stop loss</span><b>1.12889</b><i>34.1 pips</i></div>
   <div class="pr pr-t"><span>Take profit</span><b>1.11761</b><i>78.7 pips · 2.31R</i></div>
  </div>
  <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.11761 — 1.12591</b></div>
+  <div><span>Rango de la Vela 1</span><b>1.11761 — 1.12591</b></div>
   <div><span>Barrido hasta (A)</span><b>1.12879</b></div>
   <div><span>Extremo de la Vela 2</span><b>1.12548</b></div>
-  <div><span>Vela 3 abre</span><b>19/05 15:00</b></div>
  </div>
  <div class="ver">
   <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A10" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A10" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A10" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A10" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A10" placeholder="Si algo falla, dime qué ves"></div>
+  <label><input type="checkbox" data-t="A2" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A2" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A2" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A2" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A2" placeholder="Si algo falla, dime qué ves"></div>
  </div>
-</article><article class="op" id="A11" data-n="A11">
+</article><article class="op" id="A3">
  <div class="cab">
-  <div class="num">A11</div>
+  <div class="num">A3</div>
   <div class="ide"><b>02/06/2025</b><span>15:25 · hora española</span></div>
   <div class="lado l-v">VENTA</div>
-  <div class="est"><span class="pill" data-pill="A11">sin revisar</span></div>
+  <div class="est"><span class="pill" data-pill="A3">sin revisar</span></div>
  </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>02/06/2025 07:00 – 10:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>02/06/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>02/06/2025 15:00 – 18:59</b></div>
+  </div>
  <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.14092</b><i>&nbsp;</i></div>
+  <div class="pr pr-e"><span>Entrada</span><b>1.14092</b><i>orden stop</i></div>
   <div class="pr pr-s"><span>Stop loss</span><b>1.14378</b><i>28.6 pips</i></div>
   <div class="pr pr-t"><span>Take profit</span><b>1.13635</b><i>45.7 pips · 1.6R</i></div>
  </div>
  <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.13635 — 1.14367</b></div>
+  <div><span>Rango de la Vela 1</span><b>1.13635 — 1.14367</b></div>
   <div><span>Barrido hasta (A)</span><b>1.14368</b></div>
   <div><span>Extremo de la Vela 2</span><b>1.14092</b></div>
-  <div><span>Vela 3 abre</span><b>02/06 15:00</b></div>
  </div>
  <div class="ver">
   <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A11" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A11" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A11" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A11" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A11" placeholder="Si algo falla, dime qué ves"></div>
+  <label><input type="checkbox" data-t="A3" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A3" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A3" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A3" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A3" placeholder="Si algo falla, dime qué ves"></div>
  </div>
-</article><article class="op" id="A12" data-n="A12">
+</article><article class="op" id="A4">
  <div class="cab">
-  <div class="num">A12</div>
+  <div class="num">A4</div>
+  <div class="ide"><b>20/02/2026</b><span>08:08 · hora española</span></div>
+  <div class="lado l-c">COMPRA</div>
+  <div class="est"><span class="pill" data-pill="A4">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>19/02/2026 23:00 – 02:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>20/02/2026 03:00 – 06:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>20/02/2026 07:00 – 10:59</b></div>
+  </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.17597</b><i>orden stop</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.17491</b><i>10.6 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.17757</b><i>16.0 pips · 1.51R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.17551 — 1.17757</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.17501</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.17597</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Marca solo lo que esté <b>bien</b></p>
+  <label><input type="checkbox" data-t="A4" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A4" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A4" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A4" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A4" placeholder="Si algo falla, dime qué ves"></div>
+ </div>
+</article><article class="op" id="A5">
+ <div class="cab">
+  <div class="num">A5</div>
   <div class="ide"><b>13/04/2026</b><span>08:42 · hora española</span></div>
   <div class="lado l-v">VENTA</div>
-  <div class="est"><span class="pill" data-pill="A12">sin revisar</span></div>
+  <div class="est"><span class="pill" data-pill="A5">sin revisar</span></div>
  </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>12/04/2026 23:00 – 02:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>13/04/2026 03:00 – 06:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>13/04/2026 07:00 – 10:59</b></div>
+  </div>
  <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.16804</b><i>&nbsp;</i></div>
+  <div class="pr pr-e"><span>Entrada</span><b>1.16804</b><i>orden stop</i></div>
   <div class="pr pr-s"><span>Stop loss</span><b>1.16911</b><i>10.7 pips</i></div>
   <div class="pr pr-t"><span>Take profit</span><b>1.16638</b><i>16.6 pips · 1.55R</i></div>
  </div>
  <div class="apoyo">
-  <div><span>Rango Vela 1</span><b>1.16638 — 1.16874</b></div>
+  <div><span>Rango de la Vela 1</span><b>1.16638 — 1.16874</b></div>
   <div><span>Barrido hasta (A)</span><b>1.16901</b></div>
   <div><span>Extremo de la Vela 2</span><b>1.16804</b></div>
-  <div><span>Vela 3 abre</span><b>13/04 07:00</b></div>
  </div>
  <div class="ver">
   <p class="vt">Marca solo lo que esté <b>bien</b></p>
-  <label><input type="checkbox" data-t="A12" data-c="rango"><span>El <b>rango de la Vela 1</b> (H4 anterior) coincide con tu gráfico</span></label>
-  <label><input type="checkbox" data-t="A12" data-c="barrido"><span>La <b>Vela 2 barrió</b> hasta A y <b>cerró de vuelta dentro</b> del rango</span></label>
-  <label><input type="checkbox" data-t="A12" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2 (orden stop)</span></label>
-  <label><input type="checkbox" data-t="A12" data-c="sltp"><span>El <b>SL</b> va tras la mecha del barrido y el <b>TP</b> en el extremo opuesto</span></label>
-  <div class="nota"><input type="text" data-nota="A12" placeholder="Si algo falla, dime qué ves"></div>
+  <label><input type="checkbox" data-t="A5" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A5" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A5" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A5" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A5" placeholder="Si algo falla, dime qué ves"></div>
  </div>
 </article></div>
 </section>
 
 <section class="parte">
- <div class="ph"><span class="pn pn-b">Parte B</span><h2>La capa del Fibonacci</h2></div>
- <p class="pd">Solo cuatro, y con <b>una sola pregunta</b>. Aquí el patrón ya lo has validado en la Parte A. Lo único que cambia es de dónde sale el precio de entrada: en vez de la orden stop, una <b>orden limitada al 50 % del rebote</b> entre el barrido (A) y el máximo del rebote (B). Te doy el punto medio calculado para que compares.</p>
- <div class="ops"><article class="op" id="B1" data-n="B1">
+ <div class="ph"><span class="pn pn-a">Parte B</span><h2>CRT puro · solo el patrón</h2></div>
+ <p class="pd">Cinco setups que mi código <b>sí detectó como CRT válidos</b> pero que no llegaron a operarse. Aquí no hay entrada ni stop: la única pregunta es si <b>tú los habrías marcado como CRT</b>. Esta parte aísla la detección del patrón de todo lo demás, y con cinco operaciones en la Parte A me hacen falta estos ejemplos extra.</p>
+ <div class="ops"><article class="op" id="B1">
  <div class="cab">
-  <div class="num">B01</div>
-  <div class="ide"><b>08/04/2021</b><span>09:10 · hora española</span></div>
-  <div class="lado l-v">VENTA</div>
+  <div class="num">B1</div>
+  <div class="ide"><b>Setup alcista</b><span>detectado, no operado</span></div>
   <div class="est"><span class="pill" data-pill="B1">sin revisar</span></div>
  </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.18909</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.19157</b><i>24.8 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.17951</b><i>95.8 pips · 3.86R</i></div>
- </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>21/02/2025 07:00 – 10:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>21/02/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>21/02/2025 15:00 – 18:59</b></div>
+  </div>
  <div class="apoyo">
-  <div><span>Barrido (A)</span><b>1.19147</b></div>
-  <div><span>Rebote hasta (B)</span><b>1.18671</b></div>
-  <div><span>Punto medio A–B</span><b>1.18909</b></div>
-  <div><span>Vela 3 abre</span><b>08/04 07:00</b></div>
+  <div><span>Rango de la Vela 1</span><b>1.04665 — 1.04994</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.04592</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.04779</b></div>
  </div>
  <div class="ver">
-  <p class="vt">Aquí solo hay <b>una</b> pregunta</p>
-  <label><input type="checkbox" data-t="B1" data-c="fib"><span>La <b>entrada</b> (1.18909) cae aproximadamente a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
-  <div class="nota"><input type="text" data-nota="B1" placeholder="Si no, ¿dónde debería estar?"></div>
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B1" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B1" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B1" placeholder="¿Tú lo habrías marcado como CRT?"></div>
  </div>
-</article><article class="op" id="B2" data-n="B2">
+</article><article class="op" id="B2">
  <div class="cab">
-  <div class="num">B02</div>
-  <div class="ide"><b>08/06/2021</b><span>13:05 · hora española</span></div>
-  <div class="lado l-v">VENTA</div>
+  <div class="num">B2</div>
+  <div class="ide"><b>Setup bajista</b><span>detectado, no operado</span></div>
   <div class="est"><span class="pill" data-pill="B2">sin revisar</span></div>
  </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.21829</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.22027</b><i>19.8 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.21039</b><i>79.0 pips · 4.0R</i></div>
- </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>16/04/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>16/04/2025 15:00 – 18:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>16/04/2025 19:00 – 22:59</b></div>
+  </div>
  <div class="apoyo">
-  <div><span>Barrido (A)</span><b>1.22017</b></div>
-  <div><span>Rebote hasta (B)</span><b>1.21642</b></div>
-  <div><span>Punto medio A–B</span><b>1.21829</b></div>
-  <div><span>Vela 3 abre</span><b>08/06 07:00</b></div>
+  <div><span>Rango de la Vela 1</span><b>1.13403 — 1.13775</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.13868</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.13496</b></div>
  </div>
  <div class="ver">
-  <p class="vt">Aquí solo hay <b>una</b> pregunta</p>
-  <label><input type="checkbox" data-t="B2" data-c="fib"><span>La <b>entrada</b> (1.21829) cae aproximadamente a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
-  <div class="nota"><input type="text" data-nota="B2" placeholder="Si no, ¿dónde debería estar?"></div>
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B2" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B2" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B2" placeholder="¿Tú lo habrías marcado como CRT?"></div>
  </div>
-</article><article class="op" id="B3" data-n="B3">
+</article><article class="op" id="B3">
  <div class="cab">
-  <div class="num">B03</div>
-  <div class="ide"><b>29/12/2021</b><span>08:15 · hora española</span></div>
-  <div class="lado l-c">COMPRA</div>
+  <div class="num">B3</div>
+  <div class="ide"><b>Setup bajista</b><span>detectado, no operado</span></div>
   <div class="est"><span class="pill" data-pill="B3">sin revisar</span></div>
  </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.12978</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.12885</b><i>9.3 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.13344</b><i>36.6 pips · 3.96R</i></div>
- </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>17/04/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>17/04/2025 15:00 – 18:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>17/04/2025 19:00 – 22:59</b></div>
+  </div>
  <div class="apoyo">
-  <div><span>Barrido (A)</span><b>1.12895</b></div>
-  <div><span>Rebote hasta (B)</span><b>1.13060</b></div>
-  <div><span>Punto medio A–B</span><b>1.12977</b></div>
-  <div><span>Vela 3 abre</span><b>29/12 07:00</b></div>
+  <div><span>Rango de la Vela 1</span><b>1.13349 — 1.13807</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.13855</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.13383</b></div>
  </div>
  <div class="ver">
-  <p class="vt">Aquí solo hay <b>una</b> pregunta</p>
-  <label><input type="checkbox" data-t="B3" data-c="fib"><span>La <b>entrada</b> (1.12978) cae aproximadamente a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
-  <div class="nota"><input type="text" data-nota="B3" placeholder="Si no, ¿dónde debería estar?"></div>
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B3" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B3" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B3" placeholder="¿Tú lo habrías marcado como CRT?"></div>
  </div>
-</article><article class="op" id="B4" data-n="B4">
+</article><article class="op" id="B4">
  <div class="cab">
-  <div class="num">B04</div>
-  <div class="ide"><b>02/10/2023</b><span>08:55 · hora española</span></div>
-  <div class="lado l-v">VENTA</div>
+  <div class="num">B4</div>
+  <div class="ide"><b>Setup alcista</b><span>detectado, no operado</span></div>
   <div class="est"><span class="pill" data-pill="B4">sin revisar</span></div>
  </div>
- <div class="precios">
-  <div class="pr pr-e"><span>Entrada</span><b>1.05885</b><i>&nbsp;</i></div>
-  <div class="pr pr-s"><span>Stop loss</span><b>1.06179</b><i>29.4 pips</i></div>
-  <div class="pr pr-t"><span>Take profit</span><b>1.04910</b><i>97.5 pips · 3.32R</i></div>
- </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>15/05/2025 15:00 – 18:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>15/05/2025 19:00 – 22:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>15/05/2025 23:00 – 02:59</b></div>
+  </div>
  <div class="apoyo">
-  <div><span>Barrido (A)</span><b>1.06169</b></div>
-  <div><span>Rebote hasta (B)</span><b>1.05601</b></div>
-  <div><span>Punto medio A–B</span><b>1.05885</b></div>
-  <div><span>Vela 3 abre</span><b>02/10 07:00</b></div>
+  <div><span>Rango de la Vela 1</span><b>1.11724 — 1.12236</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.11700</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.11888</b></div>
  </div>
  <div class="ver">
-  <p class="vt">Aquí solo hay <b>una</b> pregunta</p>
-  <label><input type="checkbox" data-t="B4" data-c="fib"><span>La <b>entrada</b> (1.05885) cae aproximadamente a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
-  <div class="nota"><input type="text" data-nota="B4" placeholder="Si no, ¿dónde debería estar?"></div>
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B4" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B4" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B4" placeholder="¿Tú lo habrías marcado como CRT?"></div>
+ </div>
+</article><article class="op" id="B5">
+ <div class="cab">
+  <div class="num">B5</div>
+  <div class="ide"><b>Setup alcista</b><span>detectado, no operado</span></div>
+  <div class="est"><span class="pill" data-pill="B5">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>27/03/2026 18:00 – 20:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>29/03/2026 23:00 – 02:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>30/03/2026 03:00 – 06:59</b></div>
+  </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.15052 — 1.15207</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.14877</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.15127</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B5" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B5" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B5" placeholder="¿Tú lo habrías marcado como CRT?"></div>
+ </div>
+</article></div>
+</section>
+
+<section class="parte">
+ <div class="ph"><span class="pn pn-b">Parte C</span><h2>La capa del Fibonacci</h2></div>
+ <p class="pd">Cuatro operaciones y <b>una sola pregunta</b>. Aquí el patrón ya lo validaste antes. Lo único que cambia es de dónde sale el precio de entrada: una orden limitada al <b>50 % del rebote</b> entre el barrido (A) y el máximo del rebote (B). Te doy el punto medio ya calculado.</p>
+ <div class="ops"><article class="op" id="C1">
+ <div class="cab">
+  <div class="num">C1</div>
+  <div class="ide"><b>19/02/2025</b><span>09:25 · hora española</span></div>
+  <div class="lado l-c">COMPRA</div>
+  <div class="est"><span class="pill" data-pill="C1">sin revisar</span></div>
+ </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.04482</b><i>orden limitada</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.04340</b><i>14.2 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.04953</b><i>47.1 pips · 3.33R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Barrido (A)</span><b>1.04350</b></div>
+  <div><span>Rebote hasta (B)</span><b>1.04613</b></div>
+  <div><span>Punto medio A–B</span><b>1.04482</b></div>
+  <div><span>Vela 3</span><b>19/02/2025 07:00 – 06:59</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Una <b>sola</b> pregunta</p>
+  <label><input type="checkbox" data-t="C1" data-c="fib"><span>La entrada cae a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
+  <div class="nota"><input type="text" data-nota="C1" placeholder="Si no, ¿dónde debería estar?"></div>
+ </div>
+</article><article class="op" id="C2">
+ <div class="cab">
+  <div class="num">C2</div>
+  <div class="ide"><b>26/03/2025</b><span>08:20 · hora española</span></div>
+  <div class="lado l-c">COMPRA</div>
+  <div class="est"><span class="pill" data-pill="C2">sin revisar</span></div>
+ </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.07852</b><i>orden limitada</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.07757</b><i>9.5 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.08579</b><i>72.7 pips · 7.61R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Barrido (A)</span><b>1.07767</b></div>
+  <div><span>Rebote hasta (B)</span><b>1.07938</b></div>
+  <div><span>Punto medio A–B</span><b>1.07852</b></div>
+  <div><span>Vela 3</span><b>26/03/2025 06:00 – 05:59</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Una <b>sola</b> pregunta</p>
+  <label><input type="checkbox" data-t="C2" data-c="fib"><span>La entrada cae a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
+  <div class="nota"><input type="text" data-nota="C2" placeholder="Si no, ¿dónde debería estar?"></div>
+ </div>
+</article><article class="op" id="C3">
+ <div class="cab">
+  <div class="num">C3</div>
+  <div class="ide"><b>10/04/2025</b><span>09:55 · hora española</span></div>
+  <div class="lado l-v">VENTA</div>
+  <div class="est"><span class="pill" data-pill="C3">sin revisar</span></div>
+ </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.10286</b><i>orden limitada</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.10958</b><i>67.2 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.08886</b><i>140.0 pips · 2.08R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Barrido (A)</span><b>1.10948</b></div>
+  <div><span>Rebote hasta (B)</span><b>1.09624</b></div>
+  <div><span>Punto medio A–B</span><b>1.10286</b></div>
+  <div><span>Vela 3</span><b>10/04/2025 07:00 – 06:59</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Una <b>sola</b> pregunta</p>
+  <label><input type="checkbox" data-t="C3" data-c="fib"><span>La entrada cae a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
+  <div class="nota"><input type="text" data-nota="C3" placeholder="Si no, ¿dónde debería estar?"></div>
+ </div>
+</article><article class="op" id="C4">
+ <div class="cab">
+  <div class="num">C4</div>
+  <div class="ide"><b>10/04/2026</b><span>13:00 · hora española</span></div>
+  <div class="lado l-v">VENTA</div>
+  <div class="est"><span class="pill" data-pill="C4">sin revisar</span></div>
+ </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.17128</b><i>orden limitada</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.17244</b><i>11.6 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.16433</b><i>69.5 pips · 5.99R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Barrido (A)</span><b>1.17234</b></div>
+  <div><span>Rebote hasta (B)</span><b>1.17022</b></div>
+  <div><span>Punto medio A–B</span><b>1.17128</b></div>
+  <div><span>Vela 3</span><b>10/04/2026 07:00 – 22:59</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Una <b>sola</b> pregunta</p>
+  <label><input type="checkbox" data-t="C4" data-c="fib"><span>La entrada cae a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
+  <div class="nota"><input type="text" data-nota="C4" placeholder="Si no, ¿dónde debería estar?"></div>
  </div>
 </article></div>
 </section>
@@ -578,117 +546,91 @@ section{margin-top:40px}
   <p style="color:var(--tx3);font-size:.85rem">Si el botón no funciona, pincha dentro del recuadro, Ctrl+A y Ctrl+C.</p>
  </div>
 </section>
-
-<section>
- <h2>Y lo que mi código descartó</h2>
- <p style="color:var(--tx2);margin-top:6px;max-width:62ch">Si crees que alguno de estos motivos descarta operaciones que tú sí tomarías, dímelo también.</p>
- <div class="sc"><table>
-  <thead><tr><th>Motivo del descarte</th><th class="n">Veces</th></tr></thead>
-  <tbody><tr><td>el precio nunca volvio al nivel del 50%</td><td class="n">94</td></tr><tr><td>operacion anterior aun abierta</td><td class="n">59</td></tr><tr><td>toco el nivel fuera de killzone</td><td class="n">27</td></tr><tr><td>el rebote no llego al 20% del rango</td><td class="n">14</td></tr></tbody>
- </table></div>
-</section>
 </div>
 
 <script>
 (function(){
- var A = [{"id": "A1", "f": "04/01/2021", "h": "15:56", "d": "VENTA"}, {"id": "A2", "f": "20/01/2021", "h": "09:31", "d": "VENTA"}, {"id": "A3", "f": "19/02/2021", "h": "15:03", "d": "VENTA"}, {"id": "A4", "f": "23/09/2022", "h": "15:08", "d": "COMPRA"}, {"id": "A5", "f": "03/01/2023", "h": "15:10", "d": "COMPRA"}, {"id": "A6", "f": "24/03/2023", "h": "15:03", "d": "COMPRA"}, {"id": "A7", "f": "17/05/2024", "h": "15:04", "d": "COMPRA"}, {"id": "A8", "f": "17/07/2024", "h": "17:07", "d": "VENTA"}, {"id": "A9", "f": "16/12/2024", "h": "08:53", "d": "VENTA"}, {"id": "A10", "f": "19/05/2025", "h": "15:00", "d": "VENTA"}, {"id": "A11", "f": "02/06/2025", "h": "15:25", "d": "VENTA"}, {"id": "A12", "f": "13/04/2026", "h": "08:42", "d": "VENTA"}], B = [{"id": "B1", "f": "08/04/2021", "h": "09:10", "d": "VENTA"}, {"id": "B2", "f": "08/06/2021", "h": "13:05", "d": "VENTA"}, {"id": "B3", "f": "29/12/2021", "h": "08:15", "d": "COMPRA"}, {"id": "B4", "f": "02/10/2023", "h": "08:55", "d": "VENTA"}];
- var CH_A = ["rango","barrido","entrada","sltp"], CH_B = ["fib"];
- var NOM = {rango:"rango", barrido:"barrido", entrada:"entrada", sltp:"SL/TP", fib:"nivel fib"};
- var K = "crt-verif-v3", st = {};
- try { st = JSON.parse(localStorage.getItem(K) || "{}"); } catch(e){ st = {}; }
- function guarda(){ try{ localStorage.setItem(K, JSON.stringify(st)); }catch(e){} }
-
- function estado(id, chs){
-  var m = 0, f = [];
-  for (var i=0;i<chs.length;i++){
-   if (st[id + "|" + chs[i]]) m++; else f.push(NOM[chs[i]]);
-  }
-  return { m:m, f:f, total:chs.length };
+ var A=[{"id": "A1", "f": "06/02/2025", "h": "15:10", "d": "COMPRA"}, {"id": "A2", "f": "19/05/2025", "h": "15:00", "d": "VENTA"}, {"id": "A3", "f": "02/06/2025", "h": "15:25", "d": "VENTA"}, {"id": "A4", "f": "20/02/2026", "h": "08:08", "d": "COMPRA"}, {"id": "A5", "f": "13/04/2026", "h": "08:42", "d": "VENTA"}], B=[{"id": "B1", "f": "21/02/2025", "h": "", "d": "setup alcista"}, {"id": "B2", "f": "16/04/2025", "h": "", "d": "setup bajista"}, {"id": "B3", "f": "17/04/2025", "h": "", "d": "setup bajista"}, {"id": "B4", "f": "15/05/2025", "h": "", "d": "setup alcista"}, {"id": "B5", "f": "30/03/2026", "h": "", "d": "setup alcista"}], C=[{"id": "C1", "f": "19/02/2025", "h": "09:25", "d": "COMPRA"}, {"id": "C2", "f": "26/03/2025", "h": "08:20", "d": "COMPRA"}, {"id": "C3", "f": "10/04/2025", "h": "09:55", "d": "VENTA"}, {"id": "C4", "f": "10/04/2026", "h": "13:00", "d": "VENTA"}];
+ var CA=["rango","barrido","entrada","sltp"], CB=["rango","barrido"], CC=["fib"];
+ var NOM={rango:"rango",barrido:"barrido",entrada:"entrada",sltp:"SL/TP",fib:"nivel fib"};
+ var K="crt-2025-v1", st={};
+ try{ st=JSON.parse(localStorage.getItem(K)||"{}"); }catch(e){ st={}; }
+ function guarda(){ try{ localStorage.setItem(K,JSON.stringify(st)); }catch(e){} }
+ function estado(id,chs){
+  var m=0,f=[];
+  for(var i=0;i<chs.length;i++){ if(st[id+"|"+chs[i]]) m++; else f.push(NOM[chs[i]]); }
+  return {m:m,f:f,total:chs.length};
  }
-
  function pinta(){
-  var hechas = 0, max = 0;
-  var todo = [[A,CH_A],[B,CH_B]];
-  for (var g=0; g<todo.length; g++){
-   var lista = todo[g][0], chs = todo[g][1];
-   for (var i=0;i<lista.length;i++){
-    var id = lista[i].id, e = estado(id, chs);
-    hechas += e.m; max += e.total;
-    var card = document.getElementById(id);
-    var pill = document.querySelector('[data-pill="'+id+'"]');
+  var h=0,mx=0, todo=[[A,CA],[B,CB],[C,CC]];
+  for(var g=0;g<todo.length;g++){
+   var li=todo[g][0], chs=todo[g][1];
+   for(var i=0;i<li.length;i++){
+    var id=li[i].id, e=estado(id,chs); h+=e.m; mx+=e.total;
+    var card=document.getElementById(id), pill=document.querySelector('[data-pill="'+id+'"]');
+    if(!card) continue;
     card.classList.remove("done","fail"); pill.classList.remove("ok","no");
-    if (e.m === e.total){ card.classList.add("done"); pill.classList.add("ok"); pill.textContent="correcta"; }
-    else if (e.m > 0){ card.classList.add("fail"); pill.classList.add("no"); pill.textContent="falla: "+e.f.join(", "); }
-    else { pill.textContent = "sin revisar"; }
+    if(e.m===e.total){ card.classList.add("done"); pill.classList.add("ok"); pill.textContent="correcta"; }
+    else if(e.m>0){ card.classList.add("fail"); pill.classList.add("no"); pill.textContent="falla: "+e.f.join(", "); }
+    else { pill.textContent="sin revisar"; }
    }
   }
-  document.getElementById("pi").style.width = (hechas/max*100) + "%";
-  document.getElementById("pc").textContent = hechas + " de " + max + " comprobaciones";
+  document.getElementById("pi").style.width=(h/mx*100)+"%";
+  document.getElementById("pc").textContent=h+" de "+mx+" comprobaciones";
   texto();
  }
-
- function bloque(titulo, lista, chs){
-  var ok = 0, rev = 0, lin = [];
-  for (var i=0;i<lista.length;i++){
-   var o = lista[i], e = estado(o.id, chs), nota = st[o.id + "|nota"] || "", etq;
-   if (e.m === e.total){ etq = "OK"; ok++; rev++; }
-   else if (e.m > 0 || nota){ etq = "FALLA -> " + e.f.join(", "); rev++; }
-   else { etq = "sin revisar"; }
-   var l = o.id + ". " + o.f + " " + o.h + " " + o.d + "  " + etq;
-   if (nota) l += "\n     nota: " + nota;
-   lin.push(l);
+ function bloque(t,li,chs){
+  var ok=0,rev=0,ln=[];
+  for(var i=0;i<li.length;i++){
+   var o=li[i], e=estado(o.id,chs), nt=st[o.id+"|nota"]||"", et;
+   if(e.m===e.total){ et="OK"; ok++; rev++; }
+   else if(e.m>0||nt){ et="FALLA -> "+e.f.join(", "); rev++; }
+   else { et="sin revisar"; }
+   var l=o.id+". "+o.f+(o.h?" "+o.h:"")+" "+o.d+"  "+et;
+   if(nt) l+="\n     nota: "+nt;
+   ln.push(l);
   }
-  return titulo + "  (correctas " + ok + "/" + lista.length +
-   ", revisadas " + rev + "/" + lista.length + ")\n" + lin.join("\n");
+  return t+"  (correctas "+ok+"/"+li.length+", revisadas "+rev+"/"+li.length+")\n"+ln.join("\n");
  }
-
  function texto(){
-  var t = "VERIFICACION CRT - EURUSD\n";
-  t += "==========================================\n";
-  t += bloque("PARTE A - CRT PURO", A, CH_A);
-  t += "\n\n" + bloque("PARTE B - CAPA FIBONACCI", B, CH_B);
-  document.getElementById("salida").value = t;
+  var t="VERIFICACION CRT - EURUSD 2025-2026\n";
+  t+="=========================================\n";
+  t+=bloque("PARTE A - CRT PURO, OPERACIONES",A,CA);
+  t+="\n\n"+bloque("PARTE B - CRT PURO, SOLO PATRON",B,CB);
+  t+="\n\n"+bloque("PARTE C - CAPA FIBONACCI",C,CC);
+  document.getElementById("salida").value=t;
  }
-
- var cbs = document.querySelectorAll('input[type=checkbox][data-t]');
- for (var i=0;i<cbs.length;i++){
-  (function(c){
-   var k = c.dataset.t + "|" + c.dataset.c;
-   if (st[k]) c.checked = true;
-   c.addEventListener("change", function(){ st[k] = c.checked; guarda(); pinta(); });
-  })(cbs[i]);
- }
- var nts = document.querySelectorAll('input[data-nota]');
- for (var j=0;j<nts.length;j++){
-  (function(nn){
-   var k = nn.dataset.nota + "|nota";
-   if (st[k]) nn.value = st[k];
-   nn.addEventListener("input", function(){ st[k] = nn.value; guarda(); texto(); });
-  })(nts[j]);
- }
-
- document.getElementById("copiar").addEventListener("click", function(){
-  var ta = document.getElementById("salida"), av = document.getElementById("aviso");
-  ta.removeAttribute("readonly"); ta.select(); ta.setSelectionRange(0, 99999);
-  var hecho = false;
-  try { hecho = document.execCommand("copy"); } catch(e){}
+ var cbs=document.querySelectorAll('input[type=checkbox][data-t]');
+ for(var i=0;i<cbs.length;i++){(function(c){
+  var k=c.dataset.t+"|"+c.dataset.c;
+  if(st[k]) c.checked=true;
+  c.addEventListener("change",function(){ st[k]=c.checked; guarda(); pinta(); });
+ })(cbs[i]);}
+ var nts=document.querySelectorAll('input[data-nota]');
+ for(var j=0;j<nts.length;j++){(function(nn){
+  var k=nn.dataset.nota+"|nota";
+  if(st[k]) nn.value=st[k];
+  nn.addEventListener("input",function(){ st[k]=nn.value; guarda(); texto(); });
+ })(nts[j]);}
+ document.getElementById("copiar").addEventListener("click",function(){
+  var ta=document.getElementById("salida"), av=document.getElementById("aviso");
+  ta.removeAttribute("readonly"); ta.select(); ta.setSelectionRange(0,99999);
+  var h=false; try{ h=document.execCommand("copy"); }catch(e){}
   ta.setAttribute("readonly","");
-  if (navigator.clipboard && !hecho){
+  if(navigator.clipboard&&!h){
    navigator.clipboard.writeText(ta.value).then(function(){
-    av.textContent = "Copiado"; setTimeout(function(){ av.textContent=""; }, 2200);
-   }).catch(function(){ av.textContent = "Copia con Ctrl+C"; });
-  } else {
-   av.textContent = hecho ? "Copiado" : "Copia con Ctrl+C";
-   setTimeout(function(){ av.textContent=""; }, 2200);
-  }
+    av.textContent="Copiado"; setTimeout(function(){av.textContent="";},2200);
+   }).catch(function(){ av.textContent="Copia con Ctrl+C"; });
+  } else { av.textContent=h?"Copiado":"Copia con Ctrl+C";
+   setTimeout(function(){av.textContent="";},2200); }
  });
- document.getElementById("limpiar").addEventListener("click", function(){
-  if (!confirm("Se borran todas las marcas y notas. ¿Seguro?")) return;
-  st = {}; guarda();
-  var a = document.querySelectorAll('input[type=checkbox][data-t]');
-  for (var i=0;i<a.length;i++) a[i].checked = false;
-  var b = document.querySelectorAll('input[data-nota]');
-  for (var j=0;j<b.length;j++) b[j].value = "";
+ document.getElementById("limpiar").addEventListener("click",function(){
+  if(!confirm("Se borran todas las marcas y notas. ¿Seguro?")) return;
+  st={}; guarda();
+  var a=document.querySelectorAll('input[type=checkbox][data-t]');
+  for(var i=0;i<a.length;i++) a[i].checked=false;
+  var b=document.querySelectorAll('input[data-nota]');
+  for(var j=0;j<b.length;j++) b[j].value="";
   pinta();
  });
  pinta();
