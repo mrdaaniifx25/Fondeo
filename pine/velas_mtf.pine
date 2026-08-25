@@ -56,7 +56,9 @@ idD  = math.floor((tLocal - (diaAncla ? anclaH : 0) * MS_H1) / MS_D)
 // ═══ VELAS H4 ═══════════════════════════════════════════════════════════════
 var array<box>  cajas4 = array.new<box>()
 var array<line> mechas4 = array.new<line>()
-var float o4 = na, h4 = na, l4 = na
+var float o4 = na
+var float h4 = na
+var float l4 = na
 var int   i4 = na
 var box   cj4 = na
 var line  mc4 = na
@@ -64,7 +66,10 @@ var line  mc4 = na
 if verH4
     nuevo = na(idH4[1]) or idH4 != idH4[1]
     if nuevo
-        o4 := open, h4 := high, l4 := low, i4 := bar_index
+        o4 := open
+        h4 := high
+        l4 := low
+        i4 := bar_index
         cj4 := box.new(bar_index, high, bar_index, low, border_width = 1)
         mc4 := line.new(bar_index, high, bar_index, low, width = 2)
         array.push(cajas4, cj4)
@@ -88,7 +93,9 @@ if verH4
 // ═══ VELAS H1 ═══════════════════════════════════════════════════════════════
 var array<box>  cajas1 = array.new<box>()
 var array<line> mechas1 = array.new<line>()
-var float o1 = na, h1 = na, l1 = na
+var float o1 = na
+var float h1 = na
+var float l1 = na
 var int   i1 = na
 var box   cj1 = na
 var line  mc1 = na
@@ -96,7 +103,10 @@ var line  mc1 = na
 if verH1
     nuevo = na(idH1[1]) or idH1 != idH1[1]
     if nuevo
-        o1 := open, h1 := high, l1 := low, i1 := bar_index
+        o1 := open
+        h1 := high
+        l1 := low
+        i1 := bar_index
         cj1 := box.new(bar_index, high, bar_index, low, border_width = 1)
         mc1 := line.new(bar_index, high, bar_index, low, width = 1)
         array.push(cajas1, cj1)
@@ -118,11 +128,15 @@ if verH1
     line.set_color(mc1, color.new(col, 55))
 
 // ═══ MÁXIMO Y MÍNIMO DEL DÍA ANTERIOR ══════════════════════════════════════
-var float dh = na, dl = na          // día en curso
-var float pdh = na, pdl = na        // día anterior, ya cerrado
+var float dh = na                   // día en curso
+var float dl = na
+var float pdh = na                  // día anterior, ya cerrado
+var float pdl = na
 var int   iDia = na
-var line  lH = na, lL = na
-var label eH = na, eL = na
+var line  lH = na
+var line  lL = na
+var label eH = na
+var label eL = na
 
 nuevoDia = na(idD[1]) or idD != idD[1]
 if nuevoDia
