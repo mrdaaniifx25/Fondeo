@@ -1,0 +1,195 @@
+//@version=6
+// ─────────────────────────────────────────────────────────────────────────────
+//  VELAS MTF + DÍA ANTERIOR
+//
+//  Dibuja las velas de H1 y H4 encima del gráfico de M5, y marca el máximo y el
+//  mínimo del día anterior.
+//
+//  Lo importante: la rejilla H4 es CONFIGURABLE. Por defecto va anclada a la
+//  01:00 de Nueva York, que es la de la guía CRT (velas de 1am y 5am EST). En
+//  hora española eso son las 03:00, 07:00, 11:00, 15:00, 19:00 y 23:00.
+//  Si lo dejas así, las velas que veas son las mismas que usa el backtest.
+// ─────────────────────────────────────────────────────────────────────────────
+indicator("Velas MTF + Día anterior", "MTF + PD", overlay = true,
+     max_boxes_count  = 500,
+     max_lines_count  = 500,
+     max_labels_count = 100)
+
+// ── entradas ────────────────────────────────────────────────────────────────
+gV = "Velas MTF"
+verH4  = input.bool(true,  "Velas H4",  group = gV, inline = "tf")
+verH1  = input.bool(true,  "Velas H1",  group = gV, inline = "tf")
+nVelas = input.int(24, "Cuántas mostrar de cada una", minval = 3, maxval = 150, group = gV)
+tCuer  = input.int(82, "Transparencia del cuerpo", minval = 0, maxval = 95, group = gV)
+
+gA = "Rejilla H4"
+anclaH = input.int(1, "El bloque H4 empieza a las", minval = 0, maxval = 23, group = gA,
+     tooltip = "1 con huso de Nueva York = la rejilla de la guía CRT (01,05,09,13,17,21 NY). En hora española: 03,07,11,15,19,23.")
+tzRef  = input.string("America/New_York", "Huso de referencia", group = gA,
+     options = ["America/New_York", "Europe/Madrid", "UTC"])
+
+gD = "Día anterior"
+verDia   = input.bool(true,  "Marcar máximo y mínimo", group = gD)
+diaAncla = input.bool(false, "Cortar el día con el mismo anclaje que la rejilla H4", group = gD)
+verEtiq  = input.bool(true,  "Mostrar etiquetas con el precio", group = gD)
+
+gC = "Colores"
+cAl  = input.color(#2E9E85, "Alcista", group = gC, inline = "c1")
+cBa  = input.color(#C0563A, "Bajista", group = gC, inline = "c1")
+cDia = input.color(#C9821B, "Día anterior", group = gC)
+
+gP = "Panel"
+verPanel = input.bool(true, "Mostrar horas de la vela en curso", group = gP)
+
+// ── troceado por husos: reconstruye la hora local como marca temporal ───────
+tLocal = timestamp("UTC", year(time, tzRef), month(time, tzRef), dayofmonth(time, tzRef),
+     hour(time, tzRef), minute(time, tzRef), 0)
+
+MS_H1 = 3600000
+MS_H4 = 14400000
+MS_D  = 86400000
+
+idH1 = math.floor(tLocal / MS_H1)
+idH4 = math.floor((tLocal - anclaH * MS_H1) / MS_H4)
+idD  = math.floor((tLocal - (diaAncla ? anclaH : 0) * MS_H1) / MS_D)
+
+// ═══ VELAS H4 ═══════════════════════════════════════════════════════════════
+var array<box>  cajas4 = array.new<box>()
+var array<line> mechas4 = array.new<line>()
+var float o4 = na, h4 = na, l4 = na
+var int   i4 = na
+var box   cj4 = na
+var line  mc4 = na
+
+if verH4
+    nuevo = na(idH4[1]) or idH4 != idH4[1]
+    if nuevo
+        o4 := open, h4 := high, l4 := low, i4 := bar_index
+        cj4 := box.new(bar_index, high, bar_index, low, border_width = 1)
+        mc4 := line.new(bar_index, high, bar_index, low, width = 2)
+        array.push(cajas4, cj4)
+        array.push(mechas4, mc4)
+        if array.size(cajas4) > nVelas
+            box.delete(array.shift(cajas4))
+            line.delete(array.shift(mechas4))
+    else
+        h4 := math.max(h4, high)
+        l4 := math.min(l4, low)
+    col = close >= o4 ? cAl : cBa
+    mid = math.round(math.avg(i4, bar_index))
+    box.set_lefttop(cj4, i4, math.max(o4, close))
+    box.set_rightbottom(cj4, bar_index, math.min(o4, close))
+    box.set_bgcolor(cj4, color.new(col, tCuer))
+    box.set_border_color(cj4, color.new(col, 25))
+    line.set_xy1(mc4, mid, h4)
+    line.set_xy2(mc4, mid, l4)
+    line.set_color(mc4, color.new(col, 25))
+
+// ═══ VELAS H1 ═══════════════════════════════════════════════════════════════
+var array<box>  cajas1 = array.new<box>()
+var array<line> mechas1 = array.new<line>()
+var float o1 = na, h1 = na, l1 = na
+var int   i1 = na
+var box   cj1 = na
+var line  mc1 = na
+
+if verH1
+    nuevo = na(idH1[1]) or idH1 != idH1[1]
+    if nuevo
+        o1 := open, h1 := high, l1 := low, i1 := bar_index
+        cj1 := box.new(bar_index, high, bar_index, low, border_width = 1)
+        mc1 := line.new(bar_index, high, bar_index, low, width = 1)
+        array.push(cajas1, cj1)
+        array.push(mechas1, mc1)
+        if array.size(cajas1) > nVelas
+            box.delete(array.shift(cajas1))
+            line.delete(array.shift(mechas1))
+    else
+        h1 := math.max(h1, high)
+        l1 := math.min(l1, low)
+    col = close >= o1 ? cAl : cBa
+    mid = math.round(math.avg(i1, bar_index))
+    box.set_lefttop(cj1, i1, math.max(o1, close))
+    box.set_rightbottom(cj1, bar_index, math.min(o1, close))
+    box.set_bgcolor(cj1, color.new(col, math.min(tCuer + 10, 95)))
+    box.set_border_color(cj1, color.new(col, 55))
+    line.set_xy1(mc1, mid, h1)
+    line.set_xy2(mc1, mid, l1)
+    line.set_color(mc1, color.new(col, 55))
+
+// ═══ MÁXIMO Y MÍNIMO DEL DÍA ANTERIOR ══════════════════════════════════════
+var float dh = na, dl = na          // día en curso
+var float pdh = na, pdl = na        // día anterior, ya cerrado
+var int   iDia = na
+var line  lH = na, lL = na
+var label eH = na, eL = na
+
+nuevoDia = na(idD[1]) or idD != idD[1]
+if nuevoDia
+    pdh := dh
+    pdl := dl
+    dh  := high
+    dl  := low
+    iDia := bar_index
+else
+    dh := math.max(dh, high)
+    dl := math.min(dl, low)
+
+if verDia and not na(pdh) and not na(pdl)
+    if nuevoDia or na(lH)
+        // se corta la extension de las del dia anterior para que no se acumulen
+        if not na(lH)
+            line.set_extend(lH, extend.none)
+            line.set_extend(lL, extend.none)
+            line.set_color(lH, color.new(cDia, 65))
+            line.set_color(lL, color.new(cDia, 65))
+            if verEtiq and not na(eH)
+                label.delete(eH)
+                label.delete(eL)
+        lH := line.new(iDia, pdh, bar_index, pdh, color = cDia, width = 1,
+             style = line.style_dashed, extend = extend.right)
+        lL := line.new(iDia, pdl, bar_index, pdl, color = cDia, width = 1,
+             style = line.style_dashed, extend = extend.right)
+        if verEtiq
+            eH := label.new(bar_index, pdh, "PDH " + str.tostring(pdh, format.mintick),
+                 style = label.style_label_left, color = color.new(cDia, 88),
+                 textcolor = cDia, size = size.small)
+            eL := label.new(bar_index, pdl, "PDL " + str.tostring(pdl, format.mintick),
+                 style = label.style_label_left, color = color.new(cDia, 88),
+                 textcolor = cDia, size = size.small)
+    else
+        line.set_x2(lH, bar_index)
+        line.set_x2(lL, bar_index)
+        if verEtiq
+            label.set_x(eH, bar_index)
+            label.set_x(eL, bar_index)
+
+// ═══ PANEL: en qué vela estás ══════════════════════════════════════════════
+// tLocal ya lleva la hora local metida dentro de una marca etiquetada como UTC,
+// asi que aqui se lee en UTC. Convertir otra vez desplazaria el doble.
+f_hhmm(int t) =>
+    str.format("{0,number,00}:{1,number,00}", hour(t, "UTC"), minute(t, "UTC"))
+
+var table tb = table.new(position.top_right, 2, 4, border_width = 1,
+     frame_width = 1, frame_color = color.new(color.gray, 60))
+if verPanel and barstate.islast
+    ini4 = (idH4 * MS_H4) + anclaH * MS_H1
+    ini1 = idH1 * MS_H1
+    table.cell(tb, 0, 0, "Huso", text_size = size.small,
+         bgcolor = color.new(color.gray, 80))
+    table.cell(tb, 1, 0, tzRef, text_size = size.small,
+         bgcolor = color.new(color.gray, 80))
+    table.cell(tb, 0, 1, "Vela H4", text_size = size.small)
+    table.cell(tb, 1, 1, f_hhmm(ini4) + " – " + f_hhmm(ini4 + MS_H4 - 60000),
+         text_size = size.small, text_color = cAl)
+    table.cell(tb, 0, 2, "Vela H1", text_size = size.small)
+    table.cell(tb, 1, 2, f_hhmm(ini1) + " – " + f_hhmm(ini1 + MS_H1 - 60000),
+         text_size = size.small)
+    table.cell(tb, 0, 3, "Día anterior", text_size = size.small)
+    table.cell(tb, 1, 3, na(pdl) ? "—" :
+         str.tostring(pdl, format.mintick) + " / " + str.tostring(pdh, format.mintick),
+         text_size = size.small, text_color = cDia)
+
+// ── alertas de barrido del día anterior, por si te sirven ───────────────────
+alertcondition(not na(pdh) and ta.crossover(high, pdh),  "Barrido del máximo del día anterior")
+alertcondition(not na(pdl) and ta.crossunder(low, pdl),  "Barrido del mínimo del día anterior")
