@@ -1,159 +1,193 @@
-# Ampliación del CRT · conceptos recibidos de Instagram
+# Ampliación del CRT · material de Instagram
 
-Transcripción fiel de lo que dicen las publicaciones, convertida a reglas
-mecánicas. **Nada de esto está medido todavía** salvo donde se indica.
-Fuentes: `@bctrades__` (el grueso, y lo más nuevo) y `@trader.derivados`
-(definiciones generales). Entrada del 25 de agosto de 2026, pendiente de
-completar con más material.
+Transcripción de 32 publicaciones de `@bctrades__` (el grueso) y
+`@trader.derivados` (definiciones generales), pasadas a reglas mecánicas.
+Recibido el 25 de agosto de 2026. **Nada medido todavía** salvo donde se dice.
+
+Con el segundo bloque ya no son piezas sueltas: hay un **modelo completo y
+ejecutable de arriba abajo**. Se escribe primero entero, y después qué parte
+está probada y qué parte no.
 
 ---
 
-## A · La estructura del rango en tres fases  (bctrades)
+# 1 · El modelo completo, de arriba abajo
 
-> «Las tres fases principales de la estructura de un rango en 4H. Primero la
-> acumulación y la creación de la **vela base**. Después la **manipulación**,
-> donde el precio liquida esa vela base y cierra dentro del cuerpo creando un
-> rango. Y finalmente la **distribución**, donde el mercado desarrolla el
-> desplazamiento hasta completar la estructura de 4H.»
+## Paso 1 · Diaria (1D) — la dirección
+
+> «Lo primero es tener una visión clara del mercado. Identificamos la dirección
+> principal.»
+
+Y una regla concreta para deducirla de las dos últimas velas diarias, en tres
+casillas: **COMPRA**, **VENTA**, **INVÁLIDO**, con tres configuraciones cada una.
+
+*Nota: el pie de esa publicación viene cortado en la captura. Por la forma de
+los diagramas y por coherencia con el resto del material, la lectura es que se
+aplica el CRT a la diaria: la vela 1 define el rango, la vela 2 toma un extremo
+y cierra dentro → dirección contraria al barrido; si cierra fuera, inválido.
+**Es una inferencia mía, no su texto.** Hace falta el pie completo para fijarla.*
+
+## Paso 2 · 4H — el rango y el objetivo principal
+
+> «Una vez definida la dirección diaria, buscamos un rango en 4H que esté
+> alineado con esa tendencia.»
+> «Buscamos que en 4H el precio barra liquidez en la dirección que tenemos
+> marcada.»
+
+De aquí sale el **OBJETIVO 4H**: el extremo opuesto de la vela base.
+
+## Paso 3 · 2H — confirmación y segundo objetivo
+
+> «Afinamos aún más el análisis. En 2H confirmamos la estructura intradía y
+> validamos nuestro sesgo. SEGUNDO OBJETIVO IDENTIFICADO.»
+
+**2H es una temporalidad que no he usado nunca.** Todo mi trabajo ha ido con
+H1 y H4.
+
+## Paso 4 · 1H — el order block
+
+> «Esperamos que, tras la liquidez tomada a favor nuestro y la creación de otro
+> rango, se forme un Order Block en 1H.»
+> **«Punto clave: al aparecer el Order Block en 1H y completar el rango, en 5
+> min suele darse un cambio de estructura.»**
+
+## Paso 5 · M15 (o M5) — el gatillo y los dos objetivos
+
+> «Tenemos un rango en 15 min creado, buscamos como **primer objetivo el rango
+> de 2H** y como **segundo objetivo el rango de 4H**.»
+> «Tras liquidar el mínimo en 1H, bajamos a 15M para buscar confirmación y
+> creación de rango. Con esa estructura, entramos buscando nuestro objetivo de 4H.»
+> «La clave no es entrar rápido, sino entrar con confirmación.»
 
 ```
-VELA BASE          →   CREACIÓN DE RANGO        →   RANGO COMPLETADO
-(acumulación)          (manipulación:               (distribución:
-                        liquida la base y            desplazamiento hasta
-                        cierra DENTRO del cuerpo)    el objetivo)
+1D  dirección
+ └─ 4H   rango alineado + barrido de liquidez        →  OBJETIVO 4H  (TP2)
+     └─ 2H   confirma estructura intradía            →  OBJETIVO 2H  (TP1)
+         └─ 1H   order block + rango completado
+             └─ M15 / M5   rango creado / CHoCH      →  ENTRADA
 ```
 
-Esto es el CRT que ya conozco, con un matiz que **no había implementado**: el
-cierre de vuelta tiene que quedar dentro del **cuerpo** de la vela base, no solo
-dentro de su rango. Mi motor usa el rango. Es una diferencia medible.
-
-Añade además el desarrollo interno: cada fase de 4H se construye con velas de
-1H, y cuatro velas de 4H con el mismo cierre pueden tener recorridos internos
-completamente distintos. Enlaza con lo que ya medí de rangos internos: el 17,2 %
-de las velas H4 son internas y el rango efectivo es 2,11× más ancho cuando las hay.
+**Dos objetivos escalonados, no uno.** Esa es la gestión, y es lo que más se
+aleja de todo lo que he probado: siempre he salido en un solo punto.
 
 ---
 
-## B · Liquidez simple, doble y triple  ← **lo más interesante de todo**
+# 2 · Las reglas de detalle
 
-> «La liquidez no siempre se toma una sola vez. El precio puede tomar la
-> liquidez las veces que quiera mientras siga cerrando dentro de la vela base.
-> La doble y la triple liquidez ocurren cuando al precio le falta una activación
-> de rango en otra temporalidad.»
+## 2.1 · Las tres fases del rango
 
-| | qué pasa | qué afirma |
-|---|---|---|
-| **simple** | el precio abre fuera, toma el extremo de la vela base y vuelve a cerrar dentro | crea el rango y define el objetivo |
-| **doble** | toma el extremo **dos veces** y sigue cerrando dentro | «confirmando la estructura y **aumentando la probabilidad**» |
-| **triple** | tres o más veces, cerrando siempre dentro | «reforzando la estructura y aumentando **todavía más** la probabilidad» |
+> «Primero la acumulación y la creación de la **vela base**. Después la
+> **manipulación**, donde el precio liquida esa vela base y **cierra dentro del
+> cuerpo** creando un rango. Y finalmente la **distribución**.»
 
-**Esto es una afirmación de probabilidad, concreta, mecánica y contrastable.** Es
-un contador: cuántas veces el precio cruzó el extremo de la vela base antes de la
-vuelta. Todo lo que he probado hasta ahora usaba barrido simple, sin contar. Si
-el efecto existe, tiene que aparecer como un gradiente 1 → 2 → 3.
+Mi motor comprueba el cierre dentro del **rango** (`crt_canonico.py`, opción
+`cierre_estricto`). Ellos dicen **cuerpo**. Es más restrictivo y es medible.
 
-Es la pieza que más merece medirse de todo el material.
+## 2.2 · Liquidez simple, doble y triple  ← la afirmación más contrastable
 
----
+> «El precio puede tomar la liquidez las veces que quiera mientras siga cerrando
+> dentro de la vela base. La doble y la triple ocurren cuando al precio le falta
+> una activación de rango en otra temporalidad.»
 
-## C · Rango reiniciado y rango descartado
+| | qué afirman |
+|---|---|
+| **simple** | crea el rango y define el objetivo |
+| **doble** | «confirmando la estructura y **aumentando la probabilidad**» |
+| **triple** | «reforzando la estructura y aumentando **todavía más** la probabilidad» |
 
-> «Rango bajista creado: el precio toma el máximo de la vela y cierra dentro.
-> Rango bajista **reiniciado**: el precio toma el mínimo de la vela que origina
-> el rango, reiniciándolo y generando un rango alcista en contra de la dirección.
+Es un contador sobre el motor que ya existe, y trae una predicción explícita:
+un gradiente ordenado 1 → 2 → 3. Si el gradiente no aparece, se cae sola.
+
+## 2.3 · Rango reiniciado y descartado
+
+> «Rango bajista **reiniciado**: el precio toma el mínimo de la vela que origina
+> el rango, reiniciándolo y generando un rango alcista en contra.
 > Rango bajista **descartado**: queda invalidado tras su reinicio y el precio
 > confirma cerrando fuera.
 > **Tras un reinicio, el rango solo se descarta si el precio confirma con un
 > cierre fuera del rango principal.**»
 
-Regla de invalidación en tres estados, no en dos. Mi motor solo tenía «vivo» o
-«muerto». Esto dice que tomar el extremo contrario **no mata** el setup: lo da la
-vuelta. Solo lo mata un cierre fuera del rango principal.
+Invalidación en tres estados. Mi motor solo tenía vivo o muerto. Aquí tomar el
+extremo contrario **no mata el setup: lo da la vuelta**.
 
-Es exactamente el tipo de regla que cambia cuántas operaciones sobreviven, y es
-implementable tal cual.
-
----
-
-## D · PO3 (Power of Three) en continuaciones
+## 2.4 · PO3 en continuaciones
 
 > «Barrida H4 → Rango M15 → Expansión → Objetivo H4»
+> «Cada vela de 4H tiene una operación oculta de 15 min.»
 
-1. **Barrida en 4H** — el precio toma la liquidez del mínimo de la vela base y
-   activa el movimiento. El objetivo queda definido: el máximo de esa vela de 4H.
-2. **Creación de rango en M15** — dentro del PO3 de esa vela de 4H, el precio
-   crea un rango en M15 y muestra el cambio de estructura.
-3. **Expansión del primer rango** — primera entrada en M15, tras la barrida,
-   en dirección al objetivo de 4H.
-4. **Continuación en el PO3** — segunda entrada en M15, esta vez dentro de la
-   **mecha de la segunda vela de 4H**, hacia el mismo objetivo.
+1. Barrida en 4H: toma la liquidez del extremo de la vela base, activa el
+   movimiento y define el objetivo en el extremo opuesto.
+2. Rango en M15 dentro del PO3 de esa vela.
+3. Expansión: **primera entrada** en M15.
+4. Continuación en el PO3 de la **segunda** vela de 4H, en su mecha: **segunda
+   entrada** hacia el mismo objetivo.
 
-Dos entradas por estructura, no una. El objetivo no es 1:1 ni un múltiplo fijo:
-es **el extremo opuesto de la vela base de 4H**. Eso cambia el perfil por
-completo — objetivo estructural en vez de razón fija.
+Dos entradas por estructura.
 
----
-
-## E · CRT + Order Block, confirmación de continuidad
+## 2.5 · CRT + order block
 
 > «15M completa rango y 1H crea order block.»
 
-Alcista: se completa el CRT en M15 **y** la vela de 1H deja un order block.
-Bajista: lo mismo al revés. Es una confluencia de dos marcos, uno que cierra la
-estructura y otro que deja la zona de entrada.
+## 2.6 · Correlaciones positivas
+
+XAU–XAG · EURUSD–GBPUSD · AUDUSD–NZDUSD · EURJPY–GBPJPY · USDCHF–USDJPY ·
+US500–NAS100 · NAS100–US30 · UKOIL–WTI · BTC–ETH.
+«Cuando uno sube o baja, el otro suele acompañarlo.»
+
+## 2.7 · Definiciones generales (trader.derivados)
+
+**Order Block:** «la última vela antes de un movimiento muy fuerte en la
+dirección opuesta». Marcar su rango y **esperar a que el precio vuelva**.
+
+Ojo: **no es la definición del vídeo de liquidez**, donde el order block era la
+propia vela envolvente y la entrada era inmediata. Dos modelos con el mismo
+nombre. Aquí se usa el de bctrades: OB en 1H, y el gatillo llega después en M5.
+
+**FVG:** hueco sin negociar al que el precio tiende a volver. *(Publicación
+marcada como «Contenido generado con IA».)*
+
+**Patrones de confirmación:** envolvente, martillo y estrella de la mañana en
+compra; envolvente, estrella fugaz y estrella de la tarde en venta.
 
 ---
 
-## F · Definiciones generales  (trader.derivados)
+# 3 · Qué está medido y qué no
 
-**Order Block.** «La última vela antes de un movimiento muy fuerte en la
-dirección opuesta.» Cómo identificarlo: 1) movimiento fuerte y claro en una
-dirección, 2) la última vela opuesta antes de ese impulso, 3) marcar esa vela y
-extender el OB en la zona de su rango, 4) esperar que el precio regrese y buscar
-rechazo.
-
-Ojo: **esta definición no es la del vídeo de liquidez.** Allí el order block era
-la propia vela envolvente y la entrada era inmediata. Aquí es la vela previa al
-impulso y la entrada llega **cuando el precio vuelve**. Son dos modelos
-distintos con el mismo nombre, y hay que decidir cuál se prueba.
-
-**Fair Value Gap.** Zona donde el precio se movió tan rápido que dejó un hueco
-sin negociar; tiende a volver a rellenarla. *(La publicación va marcada como
-«Contenido generado con IA».)*
-
-**Patrones de vela de confirmación.** Envolvente, martillo y estrella de la
-mañana en compra; envolvente, estrella fugaz y estrella de la tarde en venta.
-Uso propuesto: zona clave → cambio de estructura (BOS/MSS) → pullback a EMA 9/20,
-VWAP u order block → vela de confirmación → entrada con gestión de riesgo.
-
----
-
-## Qué de esto es nuevo de verdad
-
-| pieza | ¿medido ya? |
+| pieza | estado |
 |---|---|
-| CRT de tres velas, barrido simple | sí, `RESULTADOS_crt_canonico.md` |
-| Rangos internos en H4 | medidos (17,2 %, 2,11×), nunca metidos en el motor |
-| Envolvente como gatillo | sí, `RESULTADOS_ls_nasdaq.md` |
-| FVG como zona de entrada | sí, `RESULTADOS_crt_fib.md` |
-| **Cierre dentro del CUERPO, no del rango** | **no** |
-| **Liquidez doble y triple** | **no** |
-| **Rango reiniciado / descartado** | **no** |
-| **PO3 con dos entradas y objetivo estructural** | **no** |
-| **CRT M15 + OB en H1** | **no** |
+| Patrón CRT de tres velas | medido · `RESULTADOS_crt_canonico.md` |
+| **Objetivo en el extremo opuesto de la vela base** | **medido** — `crt_canonico.py:96` ya usa `tp = r.r_hi / r.r_lo`, no razón fija |
+| Cierre de vuelta dentro del **rango** | medido (opción `cierre_estricto`) |
+| Killzones | medido |
+| Entrada por Fibonacci en M5 | medido · `RESULTADOS_crt_fib.md` |
+| CRT anidado en M15 | medido · `RESULTADOS_crt_confluencias.md` |
+| Envolvente como gatillo | medido · `RESULTADOS_ls_nasdaq.md` |
+| FVG como zona | medido · `RESULTADOS_crt_fib.md` |
+| Rangos internos en H4 | medidos (17,2 %, rango 2,11× más ancho) pero nunca metidos en el motor |
+| «Daily Bias» | medido, **pero con otra definición**: el motor NSBE de swings de Multi Bias, no la regla de dos velas diarias de aquí |
+| | |
+| **Cierre dentro del CUERPO, no del rango** | **sin medir** |
+| **Liquidez doble y triple** | **sin medir** |
+| **Rango reiniciado / descartado** | **sin medir** |
+| **Regla de dos velas diarias (compra/venta/inválido)** | **sin medir** (y falta su pie de foto) |
+| **Temporalidad 2H** | **sin usar nunca** |
+| **Dos objetivos escalonados (TP1 en 2H, TP2 en 4H)** | **sin medir** — siempre he salido en un punto |
+| **Order block en 1H + cambio de estructura en M5** | **sin medir** |
+| **PO3 con dos entradas** | **sin medir** |
+| Correlaciones | trivial de comprobar, no es una estrategia |
 
-Cinco piezas nuevas. Las tres primeras son variantes del motor que ya existe;
-las dos últimas son modelos de ejecución distintos.
+Ocho piezas nuevas. Dos de ellas —los dos objetivos escalonados y las dos
+entradas del PO3— **no son variantes del motor: cambian la gestión**, que es la
+única dimensión que no he tocado en toda la semana.
 
-## Orden de prueba propuesto
+# 4 · Orden de prueba propuesto
 
-1. **Liquidez doble y triple.** Es un contador sobre el motor que ya está
-   escrito, y es la única afirmación del material que viene con una predicción
-   explícita («aumenta la probabilidad»). Si el gradiente no aparece, se cae.
-2. **Cierre en el cuerpo** y **rango reiniciado**. Dos cambios de regla sobre el
-   mismo motor.
-3. **PO3 con objetivo estructural.** Es lo que más se aleja de todo lo probado:
-   objetivo en el extremo de la vela base en vez de razón fija. Merece motor
-   propio.
+1. **Liquidez doble y triple.** Un contador sobre el motor que ya existe, y la
+   única afirmación del material con una predicción explícita.
+2. **Cierre en el cuerpo** y **rango reiniciado**. Dos cambios de regla, mismo motor.
+3. **Los dos objetivos escalonados.** Es lo que más se aparta de todo lo probado.
+   Mismas señales, salida distinta: parcial en el rango de 2H, resto en el de 4H.
+4. **La cadena entera 1D → 4H → 2H → 1H → M15.** Motor nuevo. Se deja para el
+   final porque encadenar seis filtros ya sabemos cómo acaba: la última vez que
+   apilé seis condiciones quedaron 4 operaciones en seis años.
 
-Pendiente de más material antes de tocar nada.
+Pendiente: el pie de la publicación de las dos velas diarias.
