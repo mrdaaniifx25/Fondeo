@@ -81,7 +81,7 @@ if verH4
         h4 := math.max(h4, high)
         l4 := math.min(l4, low)
     col = close >= o4 ? cAl : cBa
-    mid = math.round(math.avg(i4, bar_index))
+    mid = int(math.avg(i4, bar_index))
     box.set_lefttop(cj4, i4, math.max(o4, close))
     box.set_rightbottom(cj4, bar_index, math.min(o4, close))
     box.set_bgcolor(cj4, color.new(col, tCuer))
@@ -118,7 +118,7 @@ if verH1
         h1 := math.max(h1, high)
         l1 := math.min(l1, low)
     col = close >= o1 ? cAl : cBa
-    mid = math.round(math.avg(i1, bar_index))
+    mid = int(math.avg(i1, bar_index))
     box.set_lefttop(cj1, i1, math.max(o1, close))
     box.set_rightbottom(cj1, bar_index, math.min(o1, close))
     box.set_bgcolor(cj1, color.new(col, math.min(tCuer + 10, 95)))
@@ -187,8 +187,8 @@ f_hhmm(int t) =>
 var table tb = table.new(position.top_right, 2, 4, border_width = 1,
      frame_width = 1, frame_color = color.new(color.gray, 60))
 if verPanel and barstate.islast
-    ini4 = (idH4 * MS_H4) + anclaH * MS_H1
-    ini1 = idH1 * MS_H1
+    ini4 = int((idH4 * MS_H4) + anclaH * MS_H1)
+    ini1 = int(idH1 * MS_H1)
     table.cell(tb, 0, 0, "Huso", text_size = size.small,
          bgcolor = color.new(color.gray, 80))
     table.cell(tb, 1, 0, tzRef, text_size = size.small,
