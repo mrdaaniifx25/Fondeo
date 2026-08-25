@@ -20,11 +20,18 @@ está probada y qué parte no.
 Y una regla concreta para deducirla de las dos últimas velas diarias, en tres
 casillas: **COMPRA**, **VENTA**, **INVÁLIDO**, con tres configuraciones cada una.
 
-*Nota: el pie de esa publicación viene cortado en la captura. Por la forma de
-los diagramas y por coherencia con el resto del material, la lectura es que se
-aplica el CRT a la diaria: la vela 1 define el rango, la vela 2 toma un extremo
-y cierra dentro → dirección contraria al barrido; si cierra fuera, inválido.
-**Es una inferencia mía, no su texto.** Hace falta el pie completo para fijarla.*
+Con la captura en limpio los diagramas ya se leen, y confirman lo que había
+inferido: es el CRT aplicado a la diaria.
+
+| | vela 1 (base) | vela 2 | |
+|---|---|---|---|
+| **COMPRA** | define el rango | se lleva el **mínimo** y cierra dentro | comprar |
+| **VENTA** | define el rango | se lleva el **máximo** y cierra dentro | vender |
+| **INVÁLIDO** | define el rango | no se lleva nada (vela interna) o no vuelve dentro | no operar |
+
+Su pie no enuncia la regla en palabras; solo dice «la vela diaria deja pistas…
+pero hay que saber leerlas. **No todo es compra o venta.** Filtra, confirma y
+ejecuta con cabeza». La tabla de arriba es lectura de los diagramas.
 
 ## Paso 2 · 4H — el rango y el objetivo principal
 
@@ -73,6 +80,32 @@ aleja de todo lo que he probado: siempre he salido en un solo punto.
 
 # 2 · Las reglas de detalle
 
+## 2.0 · Cómo actúa el precio según el cierre  ← **el eje de todo**
+
+> «Cuando el precio supera el máximo o el mínimo de una vela anterior y logra
+> **cerrar con cuerpo más allá de ese nivel, aumenta la probabilidad de
+> continuidad** hacia el siguiente objetivo. Por el contrario, cuando el mercado
+> deja de confirmar nuevos máximos o mínimos mediante sus cierres, suele entrar
+> en fases de consolidación donde compradores y vendedores buscan equilibrio.»
+
+Con el gráfico anotado de «saca alto / cierra dentro / cierra fuera / saca alto
+reversión», la taxonomía queda cerrada en tres estados:
+
+| lo que hace la vela | qué predicen |
+|---|---|
+| saca el extremo y **cierra fuera con cuerpo** | **continuidad** hacia el siguiente objetivo |
+| saca el extremo y **cierra dentro** | se crea el rango → **reversión**, dirección contraria al barrido |
+| no saca nada (vela interna) | consolidación, equilibrio |
+
+Dos predicciones **opuestas sobre el mismo suceso**, separadas solo por dónde
+cierra. Es de lo que cuelga el resto del material.
+
+**MEDIDO Y NO SE SOSTIENE** · `RESULTADOS_cierres.md`. En H4 las dos celdas dan
+50,62 % y 50,57 % de acierto en la carrera simétrica: idénticas, cuando su marco
+dice que tienen que predecir cosas contrarias. En H1 la regla sale del revés con
+significación (−0,0062 sobre 115.220 observaciones), y el polo que falla es el
+de la continuidad.
+
 ## 2.1 · Las tres fases del rango
 
 > «Primero la acumulación y la creación de la **vela base**. Después la
@@ -97,7 +130,22 @@ Mi motor comprueba el cierre dentro del **rango** (`crt_canonico.py`, opción
 Es un contador sobre el motor que ya existe, y trae una predicción explícita:
 un gradiente ordenado 1 → 2 → 3. Si el gradiente no aparece, se cae sola.
 
-## 2.3 · Rango reiniciado y descartado
+## 2.3 · Rango creado, continuación, descartado
+
+> **Creación:** «el precio toma la liquidez de la vela base y acaba cerrando
+> dentro de la estructura. A partir de esa reacción, se crea el rango que
+> utilizaremos como referencia para leer la intención del movimiento.»
+> **Continuación:** «con el rango ya creado, el precio comienza a respetar la
+> estructura y continúa mostrando intención en la dirección del movimiento.»
+> **Descartado:** «el precio deja de respetar el rango y termina cerrando fuera
+> de la estructura, invalidándolo por completo. La idea del movimiento queda
+> descartada y el contexto cambia por completo hasta que el precio vuelva a
+> reestructurar.»
+> Y una advertencia suya que conviene retener: «cuando esto pasa, es porque **no
+> hemos alineado bien las temporalidades** y el precio no tiene por qué cumplir
+> rangos sin sentido.»
+
+## 2.4 · Rango reiniciado y descartado
 
 > «Rango bajista **reiniciado**: el precio toma el mínimo de la vela que origina
 > el rango, reiniciándolo y generando un rango alcista en contra.
@@ -109,7 +157,7 @@ un gradiente ordenado 1 → 2 → 3. Si el gradiente no aparece, se cae sola.
 Invalidación en tres estados. Mi motor solo tenía vivo o muerto. Aquí tomar el
 extremo contrario **no mata el setup: lo da la vuelta**.
 
-## 2.4 · PO3 en continuaciones
+## 2.5 · PO3 en continuaciones
 
 > «Barrida H4 → Rango M15 → Expansión → Objetivo H4»
 > «Cada vela de 4H tiene una operación oculta de 15 min.»
@@ -123,17 +171,17 @@ extremo contrario **no mata el setup: lo da la vuelta**.
 
 Dos entradas por estructura.
 
-## 2.5 · CRT + order block
+## 2.6 · CRT + order block
 
 > «15M completa rango y 1H crea order block.»
 
-## 2.6 · Correlaciones positivas
+## 2.7 · Correlaciones positivas
 
 XAU–XAG · EURUSD–GBPUSD · AUDUSD–NZDUSD · EURJPY–GBPJPY · USDCHF–USDJPY ·
 US500–NAS100 · NAS100–US30 · UKOIL–WTI · BTC–ETH.
 «Cuando uno sube o baja, el otro suele acompañarlo.»
 
-## 2.7 · Definiciones generales (trader.derivados)
+## 2.8 · Definiciones generales (trader.derivados)
 
 **Order Block:** «la última vela antes de un movimiento muy fuerte en la
 dirección opuesta». Marcar su rango y **esperar a que el precio vuelva**.
@@ -165,10 +213,11 @@ compra; envolvente, estrella fugaz y estrella de la tarde en venta.
 | Rangos internos en H4 | medidos (17,2 %, rango 2,11× más ancho) pero nunca metidos en el motor |
 | «Daily Bias» | medido, **pero con otra definición**: el motor NSBE de swings de Multi Bias, no la regla de dos velas diarias de aquí |
 | | |
+| **La afirmación fundacional (cierra fuera → continúa / cierra dentro → se da la vuelta)** | **MEDIDA · no se sostiene** · `RESULTADOS_cierres.md` |
 | **Cierre dentro del CUERPO, no del rango** | **sin medir** |
 | **Liquidez doble y triple** | **sin medir** |
 | **Rango reiniciado / descartado** | **sin medir** |
-| **Regla de dos velas diarias (compra/venta/inválido)** | **sin medir** (y falta su pie de foto) |
+| **Regla de dos velas diarias (compra/venta/inválido)** | fijada; es el caso D1 de la prueba fundacional, y ahí sale al 48,76 % |
 | **Temporalidad 2H** | **sin usar nunca** |
 | **Dos objetivos escalonados (TP1 en 2H, TP2 en 4H)** | **sin medir** — siempre he salido en un punto |
 | **Order block en 1H + cambio de estructura en M5** | **sin medir** |
