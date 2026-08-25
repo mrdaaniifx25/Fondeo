@@ -1,32 +1,34 @@
 //@version=6
 // ─────────────────────────────────────────────────────────────────────────────
-//  VELAS MTF + DÍA ANTERIOR
+//  VELAS MTF EN PANEL + DÍA ANTERIOR
 //
-//  Dibuja las velas de H1 y H4 encima del gráfico de M5, y marca el máximo y el
-//  mínimo del día anterior.
+//  Las velas de H1 y H4 se dibujan en un panel a la DERECHA del precio, no
+//  encima. Se actualizan en vivo: la última vela de cada grupo es la que está
+//  formándose ahora mismo. Como comparten escala de precio con el gráfico, ves
+//  de un vistazo dónde queda el precio actual dentro del rango H4.
 //
-//  SE MUEVE CON EL GRÁFICO. Solo dibuja lo que cae dentro de la ventana visible
-//  y se recalcula cuando desplazas o haces zoom, así que hay velas MTF vayas
-//  donde vayas en el histórico. Pine tiene un tope de 500 objetos por script y
-//  esta es la forma de no chocar contra él.
+//  El máximo y el mínimo del día anterior sí van sobre el gráfico, porque son
+//  niveles y ahí es donde sirven.
 //
 //  La rejilla H4 es CONFIGURABLE. Por defecto va anclada a la 01:00 de Nueva
 //  York, que es la de la guía CRT (velas de 1am y 5am EST). En hora española:
 //  03:00, 07:00, 11:00, 15:00, 19:00 y 23:00.
 // ─────────────────────────────────────────────────────────────────────────────
-indicator("Velas MTF + Día anterior", "MTF + PD", overlay = true,
+indicator("Velas MTF en panel + Día anterior", "MTF panel", overlay = true,
      max_boxes_count  = 500,
      max_lines_count  = 500,
      max_labels_count = 500)
 
 // ── entradas ────────────────────────────────────────────────────────────────
-gV = "Velas MTF"
-verH4  = input.bool(true, "Velas H4", group = gV, inline = "tf")
-verH1  = input.bool(true, "Velas H1", group = gV, inline = "tf")
-tCuer  = input.int(82, "Transparencia del cuerpo", minval = 0, maxval = 95, group = gV)
-tope4  = input.int(150, "Tope de velas H4 dibujadas", minval = 5, maxval = 240, group = gV)
-tope1  = input.int(240, "Tope de velas H1 dibujadas", minval = 5, maxval = 240, group = gV,
-     tooltip = "Los dos topes juntos no deben pasar de 490. Si te quedas sin velas al alejar el zoom, es que has chocado con el tope de Pine: acércate.")
+gP = "Panel de velas"
+verH4   = input.bool(true, "Velas H4", group = gP, inline = "tf")
+verH1   = input.bool(true, "Velas H1", group = gP, inline = "tf")
+nMost   = input.int(6, "Cuántas mostrar de cada marco", minval = 2, maxval = 20, group = gP)
+sepIni  = input.int(6, "Separación del precio (barras)", minval = 1, maxval = 60, group = gP)
+anchoV  = input.int(4, "Ancho de cada vela (barras)", minval = 1, maxval = 12, group = gP)
+huecoV  = input.int(2, "Hueco entre velas (barras)", minval = 0, maxval = 8, group = gP)
+huecoG  = input.int(8, "Hueco entre los dos grupos (barras)", minval = 2, maxval = 40, group = gP)
+verHora = input.bool(true, "Poner la hora debajo de cada vela", group = gP)
 
 gA = "Rejilla H4"
 anclaH = input.int(1, "El bloque H4 empieza a las", minval = 0, maxval = 23, group = gA,
@@ -34,25 +36,17 @@ anclaH = input.int(1, "El bloque H4 empieza a las", minval = 0, maxval = 23, gro
 tzRef  = input.string("America/New_York", "Huso de referencia", group = gA,
      options = ["America/New_York", "Europe/Madrid", "UTC"])
 
-gD = "Día anterior"
+gD = "Día anterior (sobre el gráfico)"
 verDia   = input.bool(true,  "Marcar máximo y mínimo", group = gD)
 diaAncla = input.bool(false, "Cortar el día con el mismo anclaje que la rejilla H4", group = gD)
-verEtiq  = input.bool(true,  "Etiquetas con el precio", group = gD)
 
 gC = "Colores"
 cAl  = input.color(#2E9E85, "Alcista", group = gC, inline = "c1")
 cBa  = input.color(#C0563A, "Bajista", group = gC, inline = "c1")
+cViv = input.color(#3D7FD6, "Vela en curso", group = gC)
 cDia = input.color(#C9821B, "Día anterior", group = gC)
 
-gP = "Panel"
-verPanel = input.bool(true, "Mostrar horas de la vela en curso", group = gP)
-
-// ── ventana visible. Leer estas variables hace que Pine recalcule al mover ──
-izq = chart.left_visible_bar_time
-der = chart.right_visible_bar_time
-enPantalla = na(izq) or na(der) or (time >= izq and time <= der)
-
-// ── troceado por husos: reconstruye la hora local como marca temporal ───────
+// ── troceado por husos ──────────────────────────────────────────────────────
 tLocal = timestamp("UTC", year(time, tzRef), month(time, tzRef), dayofmonth(time, tzRef),
      hour(time, tzRef), minute(time, tzRef), 0)
 
@@ -64,167 +58,164 @@ idH1 = math.floor(tLocal / MS_H1)
 idH4 = math.floor((tLocal - anclaH * MS_H1) / MS_H4)
 idD  = math.floor((tLocal - (diaAncla ? anclaH : 0) * MS_H1) / MS_D)
 
-// ═══ VELAS H4 ═══════════════════════════════════════════════════════════════
-var array<box>  cajas4  = array.new<box>()
-var array<line> mechas4 = array.new<line>()
+// ═══ ACUMULACIÓN DE VELAS H4 ═══════════════════════════════════════════════
+var array<float> aO4 = array.new<float>()
+var array<float> aH4 = array.new<float>()
+var array<float> aL4 = array.new<float>()
+var array<float> aC4 = array.new<float>()
+var array<int>   aT4 = array.new<int>()
 var float o4 = na
 var float h4 = na
 var float l4 = na
-var int   i4 = na
-var box   cj4 = na
-var line  mc4 = na
-var bool  pin4 = false
+var float c4 = na
+var int   t4 = na
 
-if verH4
-    if na(idH4[1]) or idH4 != idH4[1]
-        o4 := open
-        h4 := high
-        l4 := low
-        i4 := bar_index
-        pin4 := false
-    else
-        h4 := math.max(h4, high)
-        l4 := math.min(l4, low)
-    if enPantalla
-        if not pin4
-            cj4 := box.new(i4, high, bar_index, low, border_width = 1)
-            mc4 := line.new(bar_index, high, bar_index, low, width = 2)
-            array.push(cajas4, cj4)
-            array.push(mechas4, mc4)
-            pin4 := true
-            if array.size(cajas4) > tope4
-                box.delete(array.shift(cajas4))
-                line.delete(array.shift(mechas4))
-        col = close >= o4 ? cAl : cBa
-        mid = int(math.avg(i4, bar_index))
-        box.set_lefttop(cj4, i4, math.max(o4, close))
-        box.set_rightbottom(cj4, bar_index, math.min(o4, close))
-        box.set_bgcolor(cj4, color.new(col, tCuer))
-        box.set_border_color(cj4, color.new(col, 25))
-        line.set_xy1(mc4, mid, h4)
-        line.set_xy2(mc4, mid, l4)
-        line.set_color(mc4, color.new(col, 25))
+if na(idH4[1]) or idH4 != idH4[1]
+    if not na(o4)
+        array.push(aO4, o4)
+        array.push(aH4, h4)
+        array.push(aL4, l4)
+        array.push(aC4, c4)
+        array.push(aT4, t4)
+        if array.size(aO4) > nMost
+            array.shift(aO4)
+            array.shift(aH4)
+            array.shift(aL4)
+            array.shift(aC4)
+            array.shift(aT4)
+    o4 := open
+    h4 := high
+    l4 := low
+    t4 := int((idH4 * MS_H4) + anclaH * MS_H1)
+else
+    h4 := math.max(h4, high)
+    l4 := math.min(l4, low)
+c4 := close
 
-// ═══ VELAS H1 ═══════════════════════════════════════════════════════════════
-var array<box>  cajas1  = array.new<box>()
-var array<line> mechas1 = array.new<line>()
+// ═══ ACUMULACIÓN DE VELAS H1 ═══════════════════════════════════════════════
+var array<float> aO1 = array.new<float>()
+var array<float> aH1 = array.new<float>()
+var array<float> aL1 = array.new<float>()
+var array<float> aC1 = array.new<float>()
+var array<int>   aT1 = array.new<int>()
 var float o1 = na
 var float h1 = na
 var float l1 = na
-var int   i1 = na
-var box   cj1 = na
-var line  mc1 = na
-var bool  pin1 = false
+var float c1 = na
+var int   t1 = na
 
-if verH1
-    if na(idH1[1]) or idH1 != idH1[1]
-        o1 := open
-        h1 := high
-        l1 := low
-        i1 := bar_index
-        pin1 := false
-    else
-        h1 := math.max(h1, high)
-        l1 := math.min(l1, low)
-    if enPantalla
-        if not pin1
-            cj1 := box.new(i1, high, bar_index, low, border_width = 1)
-            mc1 := line.new(bar_index, high, bar_index, low, width = 1)
-            array.push(cajas1, cj1)
-            array.push(mechas1, mc1)
-            pin1 := true
-            if array.size(cajas1) > tope1
-                box.delete(array.shift(cajas1))
-                line.delete(array.shift(mechas1))
-        col = close >= o1 ? cAl : cBa
-        mid = int(math.avg(i1, bar_index))
-        box.set_lefttop(cj1, i1, math.max(o1, close))
-        box.set_rightbottom(cj1, bar_index, math.min(o1, close))
-        box.set_bgcolor(cj1, color.new(col, math.min(tCuer + 10, 95)))
-        box.set_border_color(cj1, color.new(col, 55))
-        line.set_xy1(mc1, mid, h1)
-        line.set_xy2(mc1, mid, l1)
-        line.set_color(mc1, color.new(col, 55))
+if na(idH1[1]) or idH1 != idH1[1]
+    if not na(o1)
+        array.push(aO1, o1)
+        array.push(aH1, h1)
+        array.push(aL1, l1)
+        array.push(aC1, c1)
+        array.push(aT1, t1)
+        if array.size(aO1) > nMost
+            array.shift(aO1)
+            array.shift(aH1)
+            array.shift(aL1)
+            array.shift(aC1)
+            array.shift(aT1)
+    o1 := open
+    h1 := high
+    l1 := low
+    t1 := int(idH1 * MS_H1)
+else
+    h1 := math.max(h1, high)
+    l1 := math.min(l1, low)
+c1 := close
 
-// ═══ MÁXIMO Y MÍNIMO DEL DÍA ANTERIOR ══════════════════════════════════════
-var array<line>  lnDia = array.new<line>()
-var array<label> lbDia = array.new<label>()
+// ═══ DIBUJO DEL PANEL ══════════════════════════════════════════════════════
+f_hhmm(int t) =>
+    str.format("{0,number,00}:{1,number,00}", hour(t, "UTC"), minute(t, "UTC"))
+
+var array<box>   pBox = array.new<box>()
+var array<line>  pLin = array.new<line>()
+var array<label> pLab = array.new<label>()
+
+f_limpia() =>
+    while array.size(pBox) > 0
+        box.delete(array.pop(pBox))
+    while array.size(pLin) > 0
+        line.delete(array.pop(pLin))
+    while array.size(pLab) > 0
+        label.delete(array.pop(pLab))
+
+// dibuja una vela en la posición x indicada
+f_vela(int xi, float vo, float vh, float vl, float vc, int vt, bool viva) =>
+    col = viva ? cViv : (vc >= vo ? cAl : cBa)
+    xd  = xi + anchoV
+    xc  = xi + int(anchoV / 2)
+    b = box.new(xi, math.max(vo, vc), xd, math.min(vo, vc),
+         border_color = col, border_width = 1, bgcolor = color.new(col, viva ? 55 : 20))
+    m = line.new(xc, vh, xc, vl, color = col, width = 2)
+    array.push(pBox, b)
+    array.push(pLin, m)
+    if verHora
+        e = label.new(xc, vl, f_hhmm(vt), style = label.style_label_up,
+             color = color.new(color.gray, 100), textcolor = color.new(col, 20),
+             size = size.tiny)
+        array.push(pLab, e)
+
+f_titulo(int xi, float y, string txt) =>
+    e = label.new(xi, y, txt, style = label.style_label_down,
+         color = color.new(color.gray, 100), textcolor = color.new(color.gray, 10),
+         size = size.small)
+    array.push(pLab, e)
+
+if barstate.islast
+    f_limpia()
+    paso = anchoV + huecoV
+    x = bar_index + sepIni
+    // Ojo: en Pine "for i = 0 to -1" NO se salta, cuenta hacia atras. Con el
+    // array vacio eso pediria el elemento 0 de una lista de cero y reventaria.
+    if verH4 and not na(o4)
+        n4 = array.size(aO4)
+        alto4 = h4
+        if n4 > 0
+            for i = 0 to n4 - 1
+                alto4 := math.max(alto4, array.get(aH4, i))
+        f_titulo(x, alto4, "H4")
+        if n4 > 0
+            for i = 0 to n4 - 1
+                f_vela(x, array.get(aO4, i), array.get(aH4, i), array.get(aL4, i),
+                     array.get(aC4, i), array.get(aT4, i), false)
+                x += paso
+        f_vela(x, o4, h4, l4, c4, t4, true)
+        x += paso + huecoG
+    if verH1 and not na(o1)
+        n1 = array.size(aO1)
+        alto1 = h1
+        if n1 > 0
+            for i = 0 to n1 - 1
+                alto1 := math.max(alto1, array.get(aH1, i))
+        f_titulo(x, alto1, "H1")
+        if n1 > 0
+            for i = 0 to n1 - 1
+                f_vela(x, array.get(aO1, i), array.get(aH1, i), array.get(aL1, i),
+                     array.get(aC1, i), array.get(aT1, i), false)
+                x += paso
+        f_vela(x, o1, h1, l1, c1, t1, true)
+
+// ═══ MÁXIMO Y MÍNIMO DEL DÍA ANTERIOR, SOBRE EL GRÁFICO ════════════════════
 var float dh  = na
 var float dl  = na
 var float pdh = na
 var float pdl = na
-var int   iDia = na
-var line  lH = na
-var line  lL = na
-var label eH = na
-var label eL = na
-var bool  pinD = false
 
-nuevoDia = na(idD[1]) or idD != idD[1]
-if nuevoDia
+if na(idD[1]) or idD != idD[1]
     pdh := dh
     pdl := dl
     dh  := high
     dl  := low
-    iDia := bar_index
-    pinD := false
 else
     dh := math.max(dh, high)
     dl := math.min(dl, low)
 
-if verDia and enPantalla and not na(pdh) and not na(pdl)
-    if not pinD
-        lH := line.new(iDia, pdh, bar_index, pdh, color = cDia, width = 1,
-             style = line.style_dashed)
-        lL := line.new(iDia, pdl, bar_index, pdl, color = cDia, width = 1,
-             style = line.style_dashed)
-        array.push(lnDia, lH)
-        array.push(lnDia, lL)
-        if verEtiq
-            eH := label.new(iDia, pdh, "PDH " + str.tostring(pdh, format.mintick),
-                 style = label.style_label_left, color = color.new(cDia, 90),
-                 textcolor = cDia, size = size.small)
-            eL := label.new(iDia, pdl, "PDL " + str.tostring(pdl, format.mintick),
-                 style = label.style_label_left, color = color.new(cDia, 90),
-                 textcolor = cDia, size = size.small)
-            array.push(lbDia, eH)
-            array.push(lbDia, eL)
-        pinD := true
-        if array.size(lnDia) > 60
-            line.delete(array.shift(lnDia))
-            line.delete(array.shift(lnDia))
-        if array.size(lbDia) > 60
-            label.delete(array.shift(lbDia))
-            label.delete(array.shift(lbDia))
-    line.set_x2(lH, bar_index)
-    line.set_x2(lL, bar_index)
+plot(verDia ? pdh : na, "Máximo del día anterior", cDia, 1, plot.style_linebr)
+plot(verDia ? pdl : na, "Mínimo del día anterior", cDia, 1, plot.style_linebr)
 
-// ═══ PANEL: en qué vela estás ══════════════════════════════════════════════
-// tLocal ya lleva la hora local metida dentro de una marca etiquetada como UTC,
-// así que aquí se lee en UTC. Convertirla otra vez desplazaría el doble.
-f_hhmm(int t) =>
-    str.format("{0,number,00}:{1,number,00}", hour(t, "UTC"), minute(t, "UTC"))
-
-var table tb = table.new(position.top_right, 2, 4, border_width = 1,
-     frame_width = 1, frame_color = color.new(color.gray, 60))
-if verPanel and barstate.islast
-    ini4 = int((idH4 * MS_H4) + anclaH * MS_H1)
-    ini1 = int(idH1 * MS_H1)
-    table.cell(tb, 0, 0, "Huso", text_size = size.small,
-         bgcolor = color.new(color.gray, 80))
-    table.cell(tb, 1, 0, tzRef, text_size = size.small,
-         bgcolor = color.new(color.gray, 80))
-    table.cell(tb, 0, 1, "Vela H4", text_size = size.small)
-    table.cell(tb, 1, 1, f_hhmm(ini4) + " – " + f_hhmm(ini4 + MS_H4 - 60000),
-         text_size = size.small, text_color = cAl)
-    table.cell(tb, 0, 2, "Vela H1", text_size = size.small)
-    table.cell(tb, 1, 2, f_hhmm(ini1) + " – " + f_hhmm(ini1 + MS_H1 - 60000),
-         text_size = size.small)
-    table.cell(tb, 0, 3, "Día anterior", text_size = size.small)
-    table.cell(tb, 1, 3, na(pdl) ? "—" :
-         str.tostring(pdl, format.mintick) + " / " + str.tostring(pdh, format.mintick),
-         text_size = size.small, text_color = cDia)
-
-// ── alertas de barrido del día anterior ────────────────────────────────────
+// ── alertas ─────────────────────────────────────────────────────────────────
 alertcondition(not na(pdh) and ta.crossover(high, pdh),  "Barrido del máximo del día anterior")
 alertcondition(not na(pdl) and ta.crossunder(low, pdl),  "Barrido del mínimo del día anterior")
