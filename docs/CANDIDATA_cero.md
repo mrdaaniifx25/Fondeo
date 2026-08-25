@@ -19,8 +19,10 @@ Cribado sistemático de 54 variables mecánicas sobre EURUSD M15, 2020-2023, seg
 | 48 velas (12 h) | 0 |
 
 Las 15 tienen correlación media de +0,21 entre ellas y máxima de +0,95: **no son
-15 señales, son una sola** — si el precio acaba de subir o de bajar. Todas con
-signo negativo, es decir, **reversión**.
+15 señales, son una sola** — si el precio acaba de subir o de bajar. Trece con
+correlación negativa y dos positivas (`dmax_12`, `dmax_48`), que son justo las
+dos que miden lo contrario —lo lejos que está el precio por *debajo* del
+máximo—, así que las quince apuntan al mismo sitio: **reversión**.
 
 ## La regla, con números fijos
 
@@ -31,14 +33,20 @@ Señal compuesta = − media de los rangos percentiles móviles (2.688 velas)
    pos_12  pos_48  dmax_12  dmin_12  dmax_48  dmin_48
    cuerpo  cuerpo_m4  mecha_inf_m4  racha
 
-Filtro de volatilidad    ATR(48) ≥ 9,47 pips
-Vender  si  señal ≥ −0,206780
-Comprar si  señal ≤ −0,793607
-Horizonte                salir a las 4 velas M15 (1 hora)
+Rango percentil      móvil de 2.688 velas, empates por el rango mínimo
+Filtro de volatilidad    ATR(48) ≥ 9,4708 pips   (percentil 80 de 2020-2023)
+Comprar  si  señal ≥ −0,199146   (los rangos están abajo: el precio acaba de caer)
+Vender   si  señal ≤ −0,781742   (los rangos están arriba: el precio acaba de subir)
+Horizonte                salir a las 4 velas M15 (1 hora), sin stop ni objetivo
 ```
 
 Todo es causal: rangos móviles sobre ventana pasada, umbrales fijados solo con
 2020-2023. Nada mira al futuro.
+
+**Reproducibilidad.** `bt/cero.py` es esta especificación escrita como código y
+`bt/reproduce_cero.py` la vuelve a correr sobre 2020-2023: 187 operaciones al
+año, bruto +2,604, neta +1,404. Es el mismo número. El código y el documento
+dicen lo mismo.
 
 ## Lo que dio en descubrimiento
 
@@ -86,5 +94,12 @@ Se considera **confirmada** si:
 1. El signo se mantiene en EURUSD 2024-2026
 2. La ventaja neta es al menos **la mitad** de +1,41, o sea ≥ +0,70 pips
 3. El signo se mantiene en al menos uno de los otros dos pares
+
+Los umbrales de señal son rangos percentiles, adimensionales, y viajan tal cual
+a los otros dos pares. El filtro de volatilidad no: «9,47 pips» no significa lo
+mismo en GBPUSD que en USDJPY, donde el pip vale otra cosa. Lo que se congeló es
+**el percentil 80**, así que en los otros pares se usa el percentil 80 de su
+propio ATR en 2020-2023. Coste supuesto: 1,20 pips en EURUSD (el de
+descubrimiento), 1,50 en GBPUSD, 1,30 en USDJPY.
 
 Si falla el punto 1 o el 2, la candidata queda descartada y se dice así.
