@@ -20,8 +20,8 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
-PIP = 0.0001
-_CACHE = None
+PIP = 0.0001          # se conserva por compatibilidad con las corridas de FX
+_CACHE = {}           # cache de niveles, POR instrumento
 
 @dataclass
 class Config:
@@ -33,6 +33,11 @@ class Config:
     exigir_h1: bool = True
     h4_anchor_hour: int = 0        # H4 alineado a 00:00 UTC
     min_body_ratio: float = 0.0    # cuerpo minimo de la envolvente / rango
+    # --- instrumento ---
+    unidad: float = 0.0001         # tamano del pip / punto
+    marco_disparo: str = "5min"    # M5 en divisas, M3 en indices segun el video
+    corte_dia_ny: int = 17         # 17:00 NY (corte diario de CFD y FX)
+    clave: str = "fx"              # identifica el instrumento en la cache
     # --- ejecucion ---
     sl_buffer_pips: float = 1.0
     rr: float = 1.0
@@ -85,11 +90,11 @@ def sesiones_completas(m1: pd.DataFrame) -> pd.DataFrame:
     return ses.reset_index(drop=True)
 
 
-def dias_completos(m1: pd.DataFrame) -> pd.DataFrame:
-    """Alto/bajo diario con el corte de las 17:00 de Nueva York, que es el que
-    usa TradingView para los graficos diarios de FX."""
+def dias_completos(m1: pd.DataFrame, corte_ny: int = 17) -> pd.DataFrame:
+    """Alto/bajo diario con el corte de Nueva York que usa TradingView para los
+    graficos diarios de FX y de CFD sobre indices (17:00 por defecto)."""
     ts = pd.DatetimeIndex(m1["ts"]).tz_localize("UTC").tz_convert("America/New_York")
-    dia_fx = (ts + pd.Timedelta(hours=7)).date      # 17:00 NY -> corte de dia
+    dia_fx = (ts + pd.Timedelta(hours=24 - corte_ny)).date
     d = m1.copy()
     d["dia_fx"] = dia_fx
     g = d.groupby("dia_fx").agg(high=("high", "max"), low=("low", "min"),
@@ -110,7 +115,7 @@ def _asof(m5_ts: pd.Series, tabla: pd.DataFrame, col: str) -> np.ndarray:
 #  SENALES
 # ═══════════════════════════════════════════════════════════════════════════
 def construir_senales(m1: pd.DataFrame, cfg: Config):
-    m5 = agregar(m1, "5min").reset_index().rename(columns={"ts": "ts"})
+    m5 = agregar(m1, cfg.marco_disparo).reset_index().rename(columns={"ts": "ts"})
 
     # Extremos acumulados de la vela H1/H4 EN CURSO hasta el cierre de cada M5.
     m5["h1_id"] = m5["ts"].dt.floor("1h")
@@ -121,10 +126,10 @@ def construir_senales(m1: pd.DataFrame, cfg: Config):
         m5[f"{pref}_op"] = m5.groupby(key)["open"].transform("first")
 
     # Niveles estructurales ya cerrados.
-    global _CACHE
-    if _CACHE is None:
-        _CACHE = (sesiones_completas(m1), dias_completos(m1))
-    ses, dia = _CACHE
+    if cfg.clave not in _CACHE:
+        _CACHE[cfg.clave] = (sesiones_completas(m1),
+                             dias_completos(m1, cfg.corte_dia_ny))
+    ses, dia = _CACHE[cfg.clave]
     m5["ses_hi"] = _asof(m5["ts"], ses, "high")
     m5["ses_lo"] = _asof(m5["ts"], ses, "low")
     m5["dia_hi"] = _asof(m5["ts"], dia, "high")
@@ -227,17 +232,17 @@ def simular(m5: pd.DataFrame, m1: pd.DataFrame, cfg: Config):
     ambiguas = 0
 
     for r in cand.itertuples():
-        entrada_ts = np.datetime64(r.ts + pd.Timedelta(minutes=5))
+        entrada_ts = np.datetime64(r.ts + pd.Timedelta(cfg.marco_disparo))
         if entrada_ts < libre_desde:
             continue                                    # una operacion a la vez
         corto = bool(r.sig_corto)
         entrada = r.close
         if corto:
-            sl = max(r.h1_hi, r.high) + cfg.sl_buffer_pips * PIP
+            sl = max(r.h1_hi, r.high) + cfg.sl_buffer_pips * cfg.unidad
             riesgo = sl - entrada
             tp = entrada - cfg.rr * riesgo
         else:
-            sl = min(r.h1_lo, r.low) - cfg.sl_buffer_pips * PIP
+            sl = min(r.h1_lo, r.low) - cfg.sl_buffer_pips * cfg.unidad
             riesgo = entrada - sl
             tp = entrada + cfg.rr * riesgo
         if riesgo <= 0:
@@ -266,8 +271,8 @@ def simular(m5: pd.DataFrame, m1: pd.DataFrame, cfg: Config):
             salida, motivo, i_fin = tp, "TP", i_tp
 
         bruto = (entrada - salida) if corto else (salida - entrada)
-        neto_pips = bruto / PIP - cfg.coste_pips
-        riesgo_pips = riesgo / PIP
+        neto_pips = bruto / cfg.unidad - cfg.coste_pips
+        riesgo_pips = riesgo / cfg.unidad
         trades.append(dict(
             ts=r.ts, salida_ts=pd.Timestamp(t1[i0 + i_fin]),
             dir="corto" if corto else "largo", entrada=entrada, sl=sl, tp=tp,
