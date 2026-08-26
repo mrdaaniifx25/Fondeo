@@ -170,6 +170,32 @@ tenga un objetivo pendiente** y bajar desde ahí.
 También aparece «**rango dentro de rango**», que describen como estructura que
 refuerza la continuación.
 
+## 10 · La aplicación del reinicio no está publicada  (tanda 3)
+
+El pie completo de los cuatro reinicios termina así:
+
+> «Aprender a identificar estos reinicios nos permite interpretar mejor las
+> tomas de liquidez, los cambios de estructura y la dirección real del
+> movimiento.
+>
+> Estos son 4 escenarios que debes conocer para entender mejor los reinicios de
+> rangos. **¿Quieres que te explique cómo funciona este reinicio y cómo lo
+> aplico en el mercado? Comenta REINICIO** 👇»
+
+Los cuatro casos están descritos, pero **cómo lo aplican al operar no se
+publica**: está detrás de un comentario. Lo que hay es la taxonomía, no la regla
+de uso. Conviene tenerlo presente al escribir la especificación: esa parte habrá
+que deducirla de las operaciones, no del material explicativo.
+
+Verificación de la tanda 3: los cuatro casos de reinicio y las publicaciones del
+PO3 de 12H se recibieron por segunda vez y coinciden palabra por palabra con lo
+transcrito en las secciones 3 y 1. La transcripción es fiel.
+
+Confirmado además el diagrama 1/4 de la operación del euro: «ACTIVACIÓN →
+COMPLETACIÓN DEL PO3 DE 12H», con «Activa PO3 12H» sobre una vela pequeña y
+«Completa PO3 12H» sobre una vela bajista grande. Concuerda con que la operación
+fuese una venta.
+
 ---
 
 # 9 · REGISTRO DE OPERACIONES
