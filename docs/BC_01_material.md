@@ -338,6 +338,83 @@ De su registro, las que caen dentro de los datos disponibles (todos terminan el
 | EURUSD | 2026-08-20 | no, los datos acaban el 31 de julio |
 | plata | 2026-07-29 | no, no hay datos de plata |
 
+# 20 · La regla de uso del reinicio  ·  respuesta directa por mensaje privado
+
+Esta es la pieza que estaba detrás de «Comenta REINICIO» y que en §10 quedó
+anotada como no publicada. El usuario la pidió y se la mandaron. Transcripción
+literal:
+
+> «Las reiniciadas son muy importantes para entender **hacia dónde puede
+> continuar el precio**, principalmente por dos motivos.
+>
+> **1 · Porque no todas las temporalidades han cerrado todavía.**
+>
+> Imaginemos que tenemos un rango cerrado que nos indica una posible intención
+> alcista, pero en temporalidades superiores todavía no se ha creado ningún
+> rango. Si en esa temporalidad que tenemos cerrada al alza, por la cual estamos
+> buscando compras, se nos crea una **reiniciada bajista, debemos protegernos**.
+> ¿Por qué? Porque las demás temporalidades todavía no han cerrado y el precio
+> nos está mostrando que todavía tiene posibilidad de desplazarse en ambas
+> direcciones.
+>
+> La reiniciada nos avisa de que **no debemos dar por hecho que el movimiento
+> continuará inmediatamente** en nuestra dirección. Primero necesitamos ver cómo
+> se comportan las demás temporalidades y qué intención termina confirmándose.
+>
+> **2 · Porque nos permite alinear temporalidades.**
+>
+> Por ejemplo, tenemos: 1D → para subir · 4H → para subir · **1H → para bajar**.
+>
+> Nosotros queremos buscar compras. Tenemos las temporalidades superiores
+> alineadas al alza, pero la 1H todavía está en dirección contraria.
+>
+> En este caso, **buscamos una reiniciada alcista en 1H**. Cuando aparece, esa
+> temporalidad vuelve a alinearse con el contexto de 4H y 1D, y ya tenemos una
+> estructura mucho más limpia para darle continuidad al movimiento alcista.
+>
+> Por eso, las reiniciadas no son simplemente una señal de entrada. También nos
+> sirven para **protegernos** cuando las temporalidades todavía no han confirmado
+> sus cierres y para **identificar el momento en que vuelven a alinearse** con el
+> movimiento que estamos buscando.»
+
+## 20.1 · Qué cambia esto en la especificación
+
+**Cambia el disparo de entrada, y no es un matiz.**
+
+`BC_02` §5 implementaba: hay objetivo vivo en temporalidad mayor **y** en la
+temporalidad de ejecución se crea un rango **en la misma dirección**.
+
+Esta respuesta describe el caso contrario y lo convierte en el disparo principal:
+
+```
+1D   alcista
+4H   alcista          las mayores ya están alineadas
+1H   BAJISTA          la de ejecución va en contra
+
+  ->  se espera una REINICIADA ALCISTA en 1H
+  ->  cuando aparece, 1H se realinea
+  ->  ESE es el momento de entrar
+```
+
+O sea: **no se entra cuando la temporalidad de ejecución ya coincide, sino
+cuando pasa de estar en contra a coincidir.** Es un disparo de transición, no de
+estado. Mi motor solo miraba el estado.
+
+Y añade una segunda función que no es de entrada sino de **filtro negativo**: si
+aparece una reiniciada en contra mientras las temporalidades mayores todavía no
+han cerrado su rango, **no se opera**. Eso es lo más cercano a un «cuándo no
+operar» que hay en todo el material, y hasta ahora faltaba por completo.
+
+## 20.2 · Consecuencia para lo ya medido
+
+`BC_04` midió una especificación **incompleta**. No es que el resultado esté mal
+—mide lo que dice medir— pero le faltaba justamente la pieza que sus autores
+consideran central. Se anota así en `BC_04` §7 y se deja como está: reabrirlo
+sería reajustar, y el pre-registro comprometía una sola pasada.
+
+Contrastar esta regla nueva requiere su **propio pre-registro**, con sus propios
+criterios escritos antes de correr.
+
 ---
 
 # 9 · REGISTRO DE OPERACIONES

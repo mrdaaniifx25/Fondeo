@@ -145,9 +145,18 @@ no diplomacia:
 
 1. **La calibración falló.** No pude confirmar que mi rejilla temporal sea la
    suya. Con solo dos operaciones fechadas y utilizables, no había con qué.
-2. **Faltan piezas que ellos no publican**: cómo operan los reinicios (está
-   detrás de «Comenta REINICIO»), cuándo no operan, el tamaño de posición, y las
-   temporalidades de 8H y 2H que sí usan.
+2. **Faltan piezas que ellos no publican**: cuándo no operan, el tamaño de
+   posición, y las temporalidades de 8H y 2H que sí usan.
+
+   **Actualización posterior a esta medición.** La regla de uso del reinicio,
+   que aquí figuraba como no publicada, la mandaron por privado y está transcrita
+   en `BC_01` §20. Cambia el disparo de entrada: no se entra cuando la
+   temporalidad de ejecución **ya** coincide con las mayores, sino cuando pasa
+   **de estar en contra a coincidir** — un disparo de transición, no de estado.
+   Mi motor solo miraba el estado. Esta medición, por tanto, contrastó una
+   especificación incompleta. No se rehace aquí: el pre-registro comprometía una
+   sola pasada y reabrirlo sería reajustar. La regla nueva necesita su propio
+   pre-registro.
 3. **Toda la parte discrecional queda fuera**, por definición.
 
 De lo que sí se puede responder: la rejilla temporal la puse yo entre cuatro
