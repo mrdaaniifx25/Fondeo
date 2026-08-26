@@ -23,10 +23,15 @@ def objetivos_vivos(m1, huso, lectura, ts_ejec):
             cols[nom] = pd.DataFrame({"lado": np.nan, "obj": np.nan, "tomas": np.nan},
                                      index=range(len(ts_ejec)))
             continue
-        t = pd.DataFrame([dict(ts=r.nace, lado=r.lado, obj=r.objetivo, tomas=r.tomas)
-                          for r in rangos]).sort_values("ts")
+        t = pd.DataFrame([dict(ts=r.nace, muere=r.muere, lado=r.lado, obj=r.objetivo,
+                               tomas=r.tomas) for r in rangos]).sort_values("ts")
         m = pd.merge_asof(pd.DataFrame({"ts": ts_ejec}).sort_values("ts"),
                           t, on="ts", direction="backward")
+        # sin esta mascara la funcion no devuelve objetivos VIVOS: devuelve el
+        # ultimo rango creado, completado o descartado incluido.
+        muerto = m["muere"].notna() & (m["ts"] >= m["muere"])
+        for c in ("lado", "obj", "tomas"):
+            m.loc[muerto, c] = np.nan
         cols[nom] = m[["lado", "obj", "tomas"]].reset_index(drop=True)
     return cols
 

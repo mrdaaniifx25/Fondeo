@@ -1,5 +1,11 @@
 # BC · Resultados · **DESCARTADA**
 
+> ⚠️ **Los números de este documento están obsoletos.** Ver
+> [`BC_07_correcciones.md`](BC_07_correcciones.md): el motor tenía dos fallos y la
+> máquina de estados no influía en nada de lo medido aquí. El veredicto —0 de 12
+> celdas, doce medias recortadas en negativo— **se mantiene con el motor
+> corregido**, pero la tabla de la sección 3 no es la buena.
+
 Especificación `BC_02`, criterios `BC_03`. Una pasada, como estaba comprometido.
 
 ---

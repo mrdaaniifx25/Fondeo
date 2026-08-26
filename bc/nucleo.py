@@ -89,9 +89,11 @@ class Rango:
     base_hi: float
     base_lo: float
     nace: pd.Timestamp
+    muere: object = None    # cuando deja de dar contexto; None = sigue vivo al final
     tomas: int = 1          # doble y triple liquidez  ·  BC_02 §3.6
     reiniciado: bool = False
     vivo: bool = True
+    fin_por: str = ""       # completado | descartado | relevado
 
 def vida(v: pd.DataFrame, tf: str) -> list:
     """Recorre las velas y devuelve los rangos con su historia.
@@ -112,24 +114,30 @@ def vida(v: pd.DataFrame, tf: str) -> list:
             llega = (h[i] >= cur.objetivo) if cur.lado > 0 else (l[i] <= cur.objetivo)
             if llega:
                 cur.vivo = False
+                cur.muere = pd.Timestamp(fin[i]); cur.fin_por = "completado"
             else:
-                # el precio vuelve a tomar el MISMO extremo: doble/triple liquidez
+                # El rango se REINICIA cuando el precio vuelve a llevarse el extremo
+                # que lo activo -el bajo en un rango alcista-. NO el contrario: el
+                # contrario es el objetivo, y esta rama solo se evalua cuando el
+                # objetivo no se ha alcanzado, asi que con la lectura anterior era
+                # inalcanzable (0 reinicios en 8.575 rangos). BC_01 §3 casos 1 y 2.
                 otra = (l[i] < cur.base_lo) if cur.lado > 0 else (h[i] > cur.base_hi)
-                dentro = min(cur.base_lo, cur.base_hi) <= c[i] <= max(cur.base_lo, cur.base_hi)
-                if otra and dentro:
-                    cur.tomas += 1
-                # reinicio: se lleva el extremo CONTRARIO
-                contra = (h[i] > cur.base_hi) if cur.lado > 0 else (l[i] < cur.base_lo)
-                if contra:
+                if otra:
                     cur.reiniciado = True
-                # descarte: solo tras reinicio y con CIERRE fuera
+                    dentro = (min(cur.base_lo, cur.base_hi) <= c[i]
+                              <= max(cur.base_lo, cur.base_hi))
+                    if dentro:
+                        cur.tomas += 1        # caso 1: doble/triple toma, sigue vivo
+                # descarte: tras el reinicio, CIERRE fuera de la estructura  ·  caso 2
                 if cur.reiniciado:
-                    fuera = (c[i] > cur.base_hi) if cur.lado > 0 else (c[i] < cur.base_lo)
+                    fuera = (c[i] < cur.base_lo) if cur.lado > 0 else (c[i] > cur.base_hi)
                     if fuera:
                         cur.vivo = False
+                        cur.muere = pd.Timestamp(fin[i]); cur.fin_por = "descartado"
         if lado[i] != 0:
             if cur is not None and cur.vivo:
                 cur.vivo = False          # un rango nuevo releva al anterior
+                cur.muere = pd.Timestamp(fin[i]); cur.fin_por = "relevado"
             cur = Rango(tf, int(lado[i]), float(obj[i]), float(bhi[i]), float(blo[i]),
                         pd.Timestamp(fin[i]))
             out.append(cur)
@@ -144,10 +152,16 @@ def mapa_vivos(rangos: list, v_ejec: pd.DataFrame) -> pd.DataFrame:
     if not rangos:
         return pd.DataFrame(index=v_ejec.index,
                             columns=["r_lado", "r_obj", "r_tomas"], dtype=float)
-    t = pd.DataFrame([dict(nace=r.nace, lado=r.lado, obj=r.objetivo, tomas=r.tomas)
-                      for r in rangos]).sort_values("nace")
+    t = pd.DataFrame([dict(nace=r.nace, muere=r.muere, lado=r.lado, obj=r.objetivo,
+                           tomas=r.tomas) for r in rangos]).sort_values("nace")
     m = pd.merge_asof(pd.DataFrame({"ts": v_ejec["fin"].to_numpy()}).sort_values("ts"),
                       t.rename(columns={"nace": "ts"}), on="ts", direction="backward")
+    # un rango YA MUERTO no da contexto. Sin esta mascara, un objetivo alcanzado
+    # hace dias seguiria contando: merge_asof devuelve el ultimo rango creado, no
+    # el ultimo rango vivo.
+    muerto = m["muere"].notna() & (m["ts"] >= m["muere"])
+    for col in ("lado", "obj", "tomas"):
+        m.loc[muerto, col] = np.nan
     return pd.DataFrame({"r_lado": m["lado"].to_numpy(),
                          "r_obj": m["obj"].to_numpy(),
                          "r_tomas": m["tomas"].to_numpy()}, index=v_ejec.index)
