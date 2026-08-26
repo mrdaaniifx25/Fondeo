@@ -713,6 +713,212 @@ resultado en R</pre>
   </div>
 </section>
 
+<div class="parte">
+  <span class="eti">Parte VII</span>
+  <h2>Definiciones para el indicador</h2>
+  <p class="int">Todo lo anterior lo puede operar una persona porque una persona
+  rellena los huecos sin darse cuenta. Un indicador no puede. Esta parte cierra
+  los diecisiete sitios donde la teoría deja de ser precisa y el código tiene que
+  decidir igualmente.</p>
+</div>
+
+<section>
+  <div class="col">
+    <div class="avi"><span class="eti">Cómo leer esta parte</span>
+    Cada regla lleva marcado su origen. <b>FUENTE</b> = está en el material.
+    <b>DECISIÓN</b> = no está, y hay que elegir algo para poder programar.
+    Las decisiones son mías y son discutibles; lo que no es discutible es que
+    haya que tomarlas.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.1</span><div class="col"><h2>Comparaciones exactas</h2></div></div>
+  <div class="col">
+    <p>Un «se lleva el extremo» hay que escribirlo con un signo concreto.</p>
+    <div class="tw"><table>
+      <tr><th>caso</th><th>regla</th><th>origen</th></tr>
+      <tr><td>Barrido del máximo</td><td class="n2">high &gt; base_high</td><td>DECISIÓN · estricto</td></tr>
+      <tr><td>Barrido del mínimo</td><td class="n2">low &lt; base_low</td><td>DECISIÓN · estricto</td></tr>
+      <tr><td>Cierre dentro del cuerpo</td><td class="n2">min(o,c)base &lt;= close &lt;= max(o,c)base</td><td>FUENTE · inclusivo</td></tr>
+      <tr><td>Se lleva los dos extremos</td><td>no hay setup</td><td>FUENTE</td></tr>
+    </table></div>
+    <p><b>Por qué estricto y no «mayor o igual»:</b> tocar exactamente el mismo
+    precio no es llevarse la liquidez, es llegar a ella. Con datos de un minuto
+    el empate exacto es raro, pero con velas grandes pasa, y hay que decidirlo.</p>
+
+    <h3>La vela base doji</h3>
+    <p>Si apertura y cierre coinciden, el cuerpo tiene altura cero y «cerrar
+    dentro del cuerpo» es imposible.</p>
+    <div class="res"><span class="eti">DECISIÓN</span>
+    Si <code>|apertura − cierre| &lt; 10 % del rango</code> de la vela base, se usa
+    el <b>rango completo</b> en vez del cuerpo. Por debajo de ese umbral el cuerpo
+    no distingue nada.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.2</span><div class="col"><h2>La vida del rango · la máquina de estados</h2></div></div>
+  <div class="col">
+    <p>Es lo más delicado, porque el manual describe estados pero no las
+    transiciones completas.</p>
+    <pre>estado inicial: NINGUNO
+
+NINGUNO --[barrido de un extremo + cierre en cuerpo]--> CREADO
+                                                        objetivo = extremo opuesto
+
+CREADO  --[precio alcanza el objetivo]-----------------> COMPLETADO   (fin)
+CREADO  --[se lleva el extremo CONTRARIO]--------------> REINICIADO
+CREADO  --[nace un rango nuevo en esta TF]-------------> RELEVADO     (fin)
+CREADO  --[pasan N velas sin nada]---------------------> CADUCADO     (fin)
+
+REINICIADO --[cierra FUERA del rango base]-------------> DESCARTADO   (fin)
+REINICIADO --[vuelve a cerrar dentro del cuerpo]-------> CREADO
+                                                         con la dirección INVERTIDA
+                                                         y objetivo en el otro extremo</pre>
+
+    <div class="res"><span class="eti">DECISIÓN · qué objetivo tiene un rango reiniciado</span>
+    El manual dice que el reinicio «lo da la vuelta» pero no dice cuál es el
+    objetivo nuevo. Se toma: <b>el rango invierte su dirección y el objetivo pasa
+    al extremo contrario de la misma vela base</b>. La vela base no cambia; cambia
+    de qué lado se lee.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · cuánto vive un rango</span>
+    Ninguna fuente lo dice, y sin un límite un rango de diario de hace tres
+    semanas seguiría contando. Se fija en <b>10 velas de su propia
+    temporalidad</b>. Un rango de 12H caduca en cinco días; uno de diario, en dos
+    semanas.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · dos rangos vivos a la vez</span>
+    Si nace un rango nuevo en la misma temporalidad, <b>releva al anterior</b>.
+    Solo hay un rango vivo por temporalidad en cada momento. Es lo más simple y
+    evita que se acumulen objetivos contradictorios del mismo marco.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · qué cierre descarta</span>
+    El cierre de una vela <b>de la propia temporalidad del rango</b>. Un cierre de
+    5 minutos no descarta un rango de 12 horas. Si no, cualquier vela pequeña
+    invalidaría todo constantemente.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.3</span><div class="col"><h2>El contexto</h2></div></div>
+  <div class="col">
+    <div class="res"><span class="eti">DECISIÓN · el diario y el de 12H se contradicen</span>
+    <b>Manda el marco mayor.</b> Si el diario dice arriba y el de 12 horas dice
+    abajo, la dirección del día es arriba y el de 12 horas se ignora — no se opera
+    en su contra, pero tampoco cuenta como objetivo alineado.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · cuántos marcos intermedios hacen falta</span>
+    En la lista de comprobación puse «al menos un marco intermedio acompaña».
+    <b>Eso me lo inventé yo</b>, no está en ninguna fuente. Para el indicador se
+    fija así: <b>se cuenta y se muestra</b> cuántos acompañan (0, 1, 2 o 3) y
+    <b>no se filtra por ello</b>. Que decida quien mira.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · el precio ya pasó el objetivo</span>
+    Si el objetivo de una temporalidad queda por detrás del precio actual, ese
+    rango pasa a <b>COMPLETADO</b> aunque el precio llegara sin que lo estuviéramos
+    mirando. No se cuenta como objetivo pendiente.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.4</span><div class="col"><h2>La ejecución</h2></div></div>
+  <div class="col">
+    <div class="res"><span class="eti">DECISIÓN · el stop cuando la entrada viene de un reinicio</span>
+    El disparo por reinicio (§2.2, uso 2) entra al cierre de la vela que reinicia.
+    El stop va en <b>el extremo de esa misma vela</b>, igual que en la entrada
+    normal. Es lo consistente con §4.2.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · killzone, ¿formación o entrada?</span>
+    Se comprueba sobre <b>la vela de entrada</b>, no sobre la formación del rango
+    de contexto. El contexto se construye a cualquier hora; lo que se filtra es
+    cuándo ejecutas.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · qué es «la misma zona» para la mitigación</span>
+    Villahermosa dice que una zona vale una sola vez. Se implementa como:
+    <b>el rango de una vela base concreta se opera una vez</b>. Si el precio vuelve
+    y vuelve a cumplir el patrón sobre <i>la misma</i> vela base, no cuenta. Sobre
+    una vela base nueva, sí.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · varios objetivos alineados</span>
+    Se muestra <b>el más cercano</b> como objetivo operativo y se listan los demás
+    como referencia. El R:R se calcula contra el más cercano, que es lo
+    conservador.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.5</span><div class="col"><h2>Los datos</h2></div></div>
+  <div class="col">
+    <div class="res"><span class="eti">DECISIÓN · huecos de fin de semana</span>
+    El lunes abre con hueco casi siempre. Si la apertura del lunes queda fuera del
+    rango del viernes, <b>cuenta como barrido igual</b> — pero se marca en pantalla
+    como «por hueco», porque no es lo mismo que un barrido intradía y conviene
+    verlo.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · velas incompletas</span>
+    Festivos, cierres anticipados, días de baja liquidez. Una vela con <b>menos
+    del 50 % de los minutos esperados</b> no se usa ni como base ni como barrido.
+    Se salta.</div>
+
+    <div class="avi"><span class="eti">El huso horario · lo más importante de toda esta parte</span>
+    <b>El indicador tiene que llevar el huso como parámetro visible, no
+    escondido.</b> Y una vez elegido, no se toca. Los bloques de 12H, 8H y 4H
+    empiezan a horas distintas según el huso, y eso cambia qué vela es la base —
+    o sea, cambia la estrategia entera.
+    <br><br>
+    Si algún día cambias el huso «a ver qué tal», deja de ser el mismo método y
+    todo lo que hayas registrado antes deja de ser comparable.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.6</span><div class="col"><h2>Qué tiene que mostrar el indicador</h2></div></div>
+  <div class="col">
+    <p>Para que sirva de aviso y de comprobación, no solo de dibujo:</p>
+    <h4>En el gráfico</h4>
+    <ul>
+      <li>La <b>vela base</b> de cada temporalidad activa, con su rango y su
+      cuerpo marcados por separado.</li>
+      <li>El <b>objetivo</b> de cada rango vivo, con etiqueta de qué marco es.</li>
+      <li>El <b>estado</b> de cada rango en color: creado · reiniciado ·
+      descartado · completado · caducado.</li>
+      <li>Los <b>cuatro niveles</b>: máx/mín del día y de la sesión anterior, y
+      cuáles están ya gastados.</li>
+      <li>Cuando hay setup: <b>entrada, stop y objetivo</b> con los precios.</li>
+    </ul>
+    <h4>En el panel</h4>
+    <pre>CONTEXTO        dirección · qué marco manda · objetivo
+ALINEACIÓN      cuántos marcos acompañan (0-3)
+ESTADO          el del rango de cada temporalidad
+TOMAS           simple / doble / triple
+LAS 8 CASILLAS  con su check o su cruz
+LA CUENTA       riesgo · premio · R:R · zona
+VETO            si algo lo bloquea, QUÉ lo bloquea</pre>
+    <div class="res"><span class="eti">Lo que más falta en los indicadores que existen</span>
+    <b>Que diga por qué NO hay operación.</b> Casi todos dibujan cuando hay señal
+    y callan cuando no. Lo útil para aprender es lo contrario: «hay contexto y hay
+    rango en 1H, pero el R:R sale 1,4 — llegas tarde». Eso enseña. Un triángulo
+    verde no.</div>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <div class="avi"><span class="eti">Resumen honesto de la Parte VII</span>
+    De los diecisiete puntos, <b>cuatro salen del material y trece son decisiones
+    mías</b>. Eso no es un defecto del método: es lo normal cuando se pasa de una
+    explicación humana a un programa.
+    <br><br>
+    Pero tiene una consecuencia que conviene tener presente: <b>el indicador no
+    va a implementar «el CRT». Va a implementar esta versión concreta del CRT</b>,
+    con estas trece decisiones dentro. Si alguna está mal, el indicador estará
+    midiendo otra cosa — y por eso van todas escritas y numeradas, para poder
+    cambiarlas una a una y ver qué pasa.</div>
+  </div>
+</section>
+
 <footer style="padding:40px 0 0;color:var(--tenue);font-family:'IBM Plex Mono',monospace;font-size:12px">
   <div class="col">
     <p style="margin:0;line-height:1.7">Unifica: guía CRT de Rubén Villahermosa ·
