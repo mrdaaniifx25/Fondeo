@@ -293,6 +293,51 @@ CONTINUACIÓN FINAL → CIERRE (rango completado).
 > En el último, secuencia claramente bajista: casi todas las velas de 1H
 > mantienen presión vendedora y solo la última intenta recuperar.»
 
+## 18 · Las dos piezas que ellos NO publican  (lectura del usuario)
+
+Ninguna publicación dice dónde va el stop ni a qué hora empieza el bloque de
+12H. El usuario las deduce mirando los gráficos. Se anotan **como inferencia
+suya**, marcadas como tales, porque no son texto de bctrades:
+
+> «En ninguna se especifica nada del stop; si te fijas, siempre lo pone por
+> encima o por debajo del último alto o bajo.»
+>
+> «Empiezan, entiendo, uno a las 00h y otro a las 12h.»
+
+**Stop** — el extremo de la vela que crea el rango en la temporalidad de
+ejecución, más un colchón. Concuerda con los diagramas: en la operación de la
+libra el borde inferior de la caja del 1:3 queda justo por debajo del mínimo de
+la vela que crea el rango de 1H.
+
+**Rejilla de 12H** — bloques que empiezan a las 00:00 y a las 12:00. **Falta el
+huso**, y no es un detalle menor: cambia qué vela es cada cosa. Lecturas
+posibles, todas a probar:
+
+| huso | bloques de 12H |
+|---|---|
+| UTC | 00:00 y 12:00 UTC |
+| Nueva York | 00:00 y 12:00 NY |
+| Madrid | 00:00 y 12:00 CET |
+| bróker típico (UTC+2/+3) | 00:00 y 12:00 hora del bróker |
+
+## 19 · Cómo se va a resolver el huso, sin elegir el que salga mejor
+
+Tienen operaciones documentadas con gráfico, fecha y precios. Se puede
+**calibrar contra su propia descripción**: buscar qué anclaje hace que la
+estructura que ellos narran aparezca donde ellos dicen. Eso no es ajustar a
+resultados, es ajustar a su relato.
+
+De su registro, las que caen dentro de los datos disponibles (todos terminan el
+31 de julio de 2026):
+
+| operación | fecha | ¿calibrable? |
+|---|---|---|
+| S&P 500 | 2026-07-22 | **sí** — hay SPXUSD |
+| NASDAQ | 2026-07-30 | **sí** — hay NSXUSD |
+| GBPUSD | ≤ 2026-05-21 | sí, en cuanto se sepa el día exacto |
+| EURUSD | 2026-08-20 | no, los datos acaban el 31 de julio |
+| plata | 2026-07-29 | no, no hay datos de plata |
+
 ---
 
 # 9 · REGISTRO DE OPERACIONES
