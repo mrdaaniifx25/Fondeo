@@ -106,10 +106,140 @@ Del gráfico H1 de la captura 4/4: eje de 1,17210 a 1,16625, marcas entre
 
 ---
 
+# Tanda 2 · 32 capturas más
+
+## 5 · El R:R NO se elige: lo determina la fase  (13 de agosto)  ← clave
+
+> «¿En qué fase se encuentra el precio dentro del PO3? El RR es una parte
+> fundamental de esta lectura, ya que nos ayuda a entender **la calidad de la
+> oportunidad** dependiendo de dónde esté el precio dentro del recorrido.
+>
+> **Zona óptima — RR 1:3.** Es la zona más favorable para buscar una ejecución,
+> donde encontramos la mejor relación riesgo/beneficio.
+>
+> **Zona de continuación — RR 1:2.** Suele encontrarse aproximadamente en la
+> mitad del recorrido. El movimiento todavía tiene margen, aunque el RR empieza
+> a ser menor.
+>
+> **Zona de últimas oportunidades — RR 1:1.** El precio ya ha recorrido gran
+> parte del movimiento, por lo que el margen disponible se reduce y el RR es
+> mucho más limitado.
+>
+> Por eso, no solo importa identificar el PO3, sino también **saber dónde está
+> el precio dentro de él y qué RR nos ofrece esa fase**. Esto nos permite
+> interpretar mejor la oportunidad y **decidir si la entrada tiene sentido**.»
+
+Los diagramas titulan las tres zonas «ZONA ÓPTIMA — RR 1:3», «ZONA DE
+CONTINUACIÓN — RR 1:2» y «ZONA DE ÚLTIMAS OPORTUNIDADES — RR 1:1», y sombrean
+en cada uno el tramo del recorrido que queda por delante.
+
+**Esto es una definición mecánica de «el setup se ve bien».** No es una
+sensación: es la distancia que queda hasta el objetivo dividida por la distancia
+al stop. Zona óptima = queda 3 veces el riesgo o más.
+
+## 6 · PO3 de dos velas y de tres velas  (25 de julio)
+
+> «El PO3 puede presentarse de dos formas: PO3 de 2 velas y PO3 de 3 velas.
+> Aunque su estructura visual es diferente, ambos siguen exactamente la misma
+> lógica: acumulación, manipulación y distribución.
+>
+> En el **PO3 de 2 velas**, la segunda vela realiza **tanto la manipulación como
+> la distribución**, dejando un movimiento más directo y rápido hacia el objetivo.
+>
+> En el **PO3 de 3 velas**, la segunda vela se encarga **únicamente de la
+> manipulación**, mientras que la tercera desarrolla la distribución.»
+
+## 7 · Las tres fases, definidas  (15 de agosto)
+
+> «**Acumulación** → el precio comienza a absorber órdenes y preparar el
+> siguiente movimiento.
+> **Manipulación** → movimiento diseñado para generar liquidez y sacar
+> participantes del mercado.
+> **Distribución** → el precio comienza a desplazarse en la dirección prevista.»
+
+## 8 · Las temporalidades que usan
+
+No hay una rejilla fija. En el material aparecen **diario, 12H, 8H, 2H, 1H,
+15M, 10M, 5M y 2M**. El criterio no es «uso H4»: es **buscar la temporalidad que
+tenga un objetivo pendiente** y bajar desde ahí.
+
+> «En 8 horas vemos que el precio tiene un **objetivo pendiente de completar** y
+> ya se encuentra muy próximo a alcanzarlo. Esto nos da el contexto principal y
+> el recorrido potencial que vamos a buscar.»
+
+También aparece «**rango dentro de rango**», que describen como estructura que
+refuerza la continuación.
+
+---
+
+# 9 · REGISTRO DE OPERACIONES
+
+| # | instrumento | fecha | dirección | R:R | resultado declarado |
+|---|---|---|---|---|---|
+| 1 | EURUSD | 2026-08-20 | venta | 1:3 | objetivo 12H completado |
+| 2 | **plata** (XAGUSD) | 2026-07-29 | compra | 1,2 y 1:2 | **+4R** entre las dos |
+| 3 | S&P 500 | 2026-07-22 | compra | 1,2 | objetivo 12H completado |
+| 4 | NASDAQ | 2026-07-30 | — | — | explicación del día, objetivo diario completado |
+| 5 | S&P 500 | *sin fecha visible* | compra | 1:1 | **PÉRDIDA** · «Cerrado PyG: −5,00» |
+| 6 | S&P 500 | *sin fecha visible* | compra | — | objetivo de 8H |
+| 7 | *sin identificar* | 2026-07-28 | — | — | «tomada junto a la comunidad» |
+
+## 9.1 · Publican pérdidas
+
+La operación 5 lleva en la propia captura de su plataforma **«Cerrado PyG:
+−5,00»** con un stop de 5,00 y ratio 3,4. Es una operación perdedora publicada
+con el mismo formato que las ganadoras.
+
+Eso cambia lo que se puede hacer con su registro: si no publicaran más que
+ganadoras, su tasa de acierto no valdría nada. Publicando también las que
+pierden, el registro empieza a ser utilizable **si se recogen todas**.
+
+## 9.2 · Detalle de la plata (29 de julio)
+
+> «Aquí tenéis las dos entradas de la plata de hoy, analizadas en futuros y
+> ejecutadas en CFDs.
+>
+> La primera entrada fue ejecutada en el **pre-tasas de interés**, aprovechando
+> la estructura previa a la noticia. La segunda se ejecutó **justo antes de la
+> publicación de las tasas de interés**, buscando aprovechar la aceleración del
+> movimiento hacia unos objetivos de temporalidad superior que ya teníamos
+> identificados.
+>
+> La decisión estaba respaldada por una estructura clara: los objetivos estaban
+> perfectamente definidos y el precio había estado estructurando compras durante
+> todo el día. Con esa alineación entre temporalidades y un contexto favorable,
+> ejecutamos las dos operaciones utilizando **el punto óptimo y la
+> continuación**, sumando un total de **4R**.»
+
+De la captura de su plataforma: objetivo 0,740 (1,294 %), stop 0,305 (0,533 %),
+ratio riesgo/beneficio 2,43.
+
+**Operan con noticias programadas, no las evitan.**
+
+## 9.3 · Detalle del S&P 500 perdedor
+
+Secuencia de la publicación:
+> 1H — «vemos un rango alcista creado. El precio vuelve a abrir por debajo del
+> rango, realizando una **doble liquidez**, lo que nos deja un escenario
+> interesante para buscar la continuación.»
+> 15M — «el precio nos alinea un rango a favor de la dirección del objetivo
+> marcado en 1 hora, reforzando el contexto.»
+> 5M — «también tenemos un rango alineado. Únicamente nos faltaría **un cierre**
+> para poder ejecutar la entrada.»
+> 2M — «se produce el cierre donde ejecutamos la operación, obteniendo un RR de
+> **1:1** hasta el objetivo de 1 hora.»
+
+Entraron en **zona de últimas oportunidades** (RR 1:1) y perdieron.
+
+---
+
 ## Lo que hace falta todavía
 
-- **Más operaciones con fecha.** Con una no se hace nada. Hacen falta 20-30.
-- El **stop**: dicen el R:R pero no dónde ponen el stop.
+- **Más operaciones con fecha.** Van 7, y dos sin fecha. Hacen falta 20-30.
+- Las **fechas** de las operaciones 5, 6 y 7.
+- El **stop**: dan el R:R y el importe, pero no la regla de dónde lo colocan.
 - Cuándo **no** operan.
-- Cómo definen exactamente «zona óptima del PO3».
-- La rejilla del 12H: a qué hora empieza cada bloque.
+- La **rejilla** de las temporalidades: a qué hora empieza el bloque de 12H, de
+  8H, de 2H. Sin eso, «el objetivo de 12 horas» no es reproducible.
+- Cómo se decide **qué temporalidad manda** cuando varias tienen objetivo
+  pendiente.
