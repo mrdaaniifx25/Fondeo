@@ -1,0 +1,652 @@
+<title>Indicador CRT Máster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+:root{
+  --fondo:#F4F6F6; --sup:#FFFFFF; --sup2:#EBEEEF;
+  --tinta:#101619; --tinta2:#3A474D; --gris:#5E6D74; --linea:#D6DDDF;
+  --alc:#0E7F72; --baj:#BE3B33; --asia:#5F45AD; --aviso:#A96706;
+  --alcSuave:rgba(14,127,114,.10); --bajSuave:rgba(190,59,51,.10);
+  --asiaSuave:rgba(95,69,173,.10); --avisoSuave:rgba(169,103,6,.10);
+  --sombra:0 1px 2px rgba(16,22,25,.05), 0 8px 24px -16px rgba(16,22,25,.25);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --fondo:#0C1013; --sup:#151B20; --sup2:#1D252B;
+    --tinta:#E3E9ED; --tinta2:#B3C0C7; --gris:#87979F; --linea:#28323A;
+    --alc:#35C6B1; --baj:#F1766D; --asia:#A78CEA; --aviso:#E4A644;
+    --alcSuave:rgba(53,198,177,.13); --bajSuave:rgba(241,118,109,.13);
+    --asiaSuave:rgba(167,140,234,.13); --avisoSuave:rgba(228,166,68,.13);
+    --sombra:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --fondo:#0C1013; --sup:#151B20; --sup2:#1D252B;
+  --tinta:#E3E9ED; --tinta2:#B3C0C7; --gris:#87979F; --linea:#28323A;
+  --alc:#35C6B1; --baj:#F1766D; --asia:#A78CEA; --aviso:#E4A644;
+  --alcSuave:rgba(53,198,177,.13); --bajSuave:rgba(241,118,109,.13);
+  --asiaSuave:rgba(167,140,234,.13); --avisoSuave:rgba(228,166,68,.13);
+  --sombra:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--fondo); color:var(--tinta);
+  font-family:"Source Serif 4",Georgia,serif; font-size:17px; line-height:1.62;
+  margin:0; padding:0 20px 120px;
+  -webkit-font-smoothing:antialiased;
+}
+.env{max-width:1180px;margin:0 auto}
+.col{max-width:640px}
+
+h1,h2,h3,h4,.disp{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;text-wrap:balance}
+h1{font-size:clamp(2.1rem,5.2vw,3.3rem);font-weight:700;letter-spacing:-.024em;line-height:1.04;margin:0}
+h2{font-size:clamp(1.4rem,3vw,1.85rem);font-weight:600;letter-spacing:-.018em;line-height:1.16;margin:0 0 .2em}
+h3{font-size:1.12rem;font-weight:600;letter-spacing:-.008em;margin:2.4em 0 .5em}
+h4{font-size:.94rem;font-weight:600;margin:1.8em 0 .35em}
+p{margin:0 0 1.05em}
+a{color:var(--alc)}
+strong{font-weight:600}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.88em}
+
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:.7rem;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gris);
+}
+
+/* cabecera */
+header{padding:72px 0 40px;border-bottom:1px solid var(--linea);margin-bottom:56px}
+.sub{font-size:1.14rem;color:var(--tinta2);max-width:56ch;margin:1.1em 0 0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px}
+.meta span{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--gris);letter-spacing:.02em}
+
+/* secciones */
+section{margin:0 0 76px;scroll-margin-top:20px}
+.shead{display:flex;gap:16px;align-items:baseline;margin-bottom:1.4em;border-top:2px solid var(--tinta);padding-top:14px}
+.snum{font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:600;color:var(--gris);padding-top:.35em;flex:none}
+
+/* indice */
+nav.idx{margin-bottom:64px}
+nav.idx ol{list-style:none;margin:0;padding:0;display:grid;gap:1px;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));background:var(--linea);
+  border:1px solid var(--linea);border-radius:3px;overflow:hidden}
+nav.idx li{background:var(--sup)}
+nav.idx a{display:flex;gap:10px;padding:12px 14px;text-decoration:none;color:var(--tinta);
+  font-family:Archivo,sans-serif;font-size:.86rem;font-weight:500;line-height:1.3}
+nav.idx a:hover{background:var(--sup2)}
+nav.idx a:focus-visible{outline:2px solid var(--alc);outline-offset:-2px}
+nav.idx .n{font-family:"IBM Plex Mono",monospace;color:var(--gris);font-size:.78rem;flex:none}
+
+/* aviso destacado */
+.alto{
+  border:1px solid var(--baj);border-left-width:4px;background:var(--bajSuave);
+  padding:20px 24px;border-radius:3px;margin:0 0 2em;max-width:660px;
+}
+.alto p:last-child{margin-bottom:0}
+.alto .eyebrow{color:var(--baj)}
+
+.nota{
+  border-left:3px solid var(--linea);padding:2px 0 2px 18px;margin:1.6em 0;
+  color:var(--tinta2);font-size:.96rem;max-width:620px;
+}
+
+/* leyenda de elementos del grafico */
+.leyenda{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);border-radius:3px;overflow:hidden}
+.el{display:grid;grid-template-columns:200px 1fr;gap:0;background:var(--sup)}
+.el .vista{background:var(--sup2);display:flex;align-items:center;justify-content:center;padding:16px 12px;border-right:1px solid var(--linea)}
+.el .txt{padding:16px 20px}
+.el .txt h4{margin:0 0 .25em;font-size:.95rem}
+.el .txt p{margin:0;font-size:.93rem;color:var(--tinta2);line-height:1.55}
+@media(max-width:640px){.el{grid-template-columns:1fr}.el .vista{border-right:0;border-bottom:1px solid var(--linea)}}
+
+/* panel simulado */
+.panelwrap{margin:2em 0;display:flex;justify-content:center}
+.panel{
+  font-family:"IBM Plex Mono",monospace;font-size:.8rem;line-height:1.85;
+  background:#0F1519;color:#DCE4E8;border:1px solid #2A353D;border-radius:3px;
+  padding:14px 18px;min-width:360px;box-shadow:var(--sombra);
+  font-variant-numeric:tabular-nums;
+}
+.panel .r{display:flex;justify-content:space-between;gap:30px;white-space:nowrap}
+.panel .k{color:#7C8C94}
+.panel .v{text-align:right}
+.panel .up{color:#35C6B1}.panel .dn{color:#F1766D}.panel .mu{color:#7C8C94}.panel .wr{color:#E4A644}
+.panel .hd{border-bottom:1px solid #2A353D;padding-bottom:6px;margin-bottom:6px;color:#DCE4E8}
+.panel .ft{border-top:1px solid #2A353D;padding-top:6px;margin-top:6px}
+.pcap{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--gris);text-align:center;margin-top:10px;letter-spacing:.03em}
+
+/* tablas */
+.tw{overflow-x:auto;margin:1.6em 0;border:1px solid var(--linea);border-radius:3px;background:var(--sup)}
+table{border-collapse:collapse;width:100%;font-family:Archivo,sans-serif;font-size:.87rem;min-width:520px}
+th{
+  text-align:left;font-weight:600;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gris);padding:11px 16px;border-bottom:1px solid var(--linea);white-space:nowrap;
+  background:var(--sup2);
+}
+td{padding:11px 16px;border-bottom:1px solid var(--linea);vertical-align:top;color:var(--tinta2);line-height:1.5}
+tr:last-child td{border-bottom:0}
+td:first-child{color:var(--tinta);font-weight:500}
+td.m,th.m{font-family:"IBM Plex Mono",monospace;font-size:.8rem;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.72rem;
+  padding:1px 7px;border-radius:2px;white-space:nowrap;font-weight:500}
+.p-alc{background:var(--alcSuave);color:var(--alc)}
+.p-baj{background:var(--bajSuave);color:var(--baj)}
+.p-neu{background:var(--sup2);color:var(--gris)}
+.p-av{background:var(--avisoSuave);color:var(--aviso)}
+
+/* pasos */
+.pasos{list-style:none;counter-reset:p;margin:2em 0 0;padding:0;display:grid;gap:0}
+.pasos li{counter-increment:p;display:grid;grid-template-columns:44px 1fr;gap:18px;
+  padding:20px 0;border-top:1px solid var(--linea)}
+.pasos li:last-child{border-bottom:1px solid var(--linea)}
+.pasos li::before{
+  content:counter(p,decimal-leading-zero);font-family:"IBM Plex Mono",monospace;
+  font-size:.78rem;font-weight:600;color:var(--alc);padding-top:.28em;
+}
+.pasos h4{margin:0 0 .3em}
+.pasos p{margin:0;font-size:.95rem;color:var(--tinta2)}
+.pasos .fail{margin-top:.55em;font-size:.85rem;color:var(--gris);font-family:Archivo,sans-serif}
+.pasos .fail b{color:var(--baj);font-weight:600}
+
+/* glosario */
+dl.glo{margin:1.6em 0 0;display:grid;gap:0}
+dl.glo div{padding:18px 0;border-top:1px solid var(--linea);display:grid;
+  grid-template-columns:190px 1fr;gap:24px}
+dl.glo div:last-child{border-bottom:1px solid var(--linea)}
+dt{font-family:Archivo,sans-serif;font-weight:600;font-size:.95rem;line-height:1.35}
+dt .src{display:block;font-family:"IBM Plex Mono",monospace;font-size:.68rem;
+  font-weight:400;color:var(--gris);letter-spacing:.05em;margin-top:.4em;text-transform:uppercase}
+dd{margin:0;font-size:.95rem;color:var(--tinta2)}
+dd p{margin:0 0 .6em}dd p:last-child{margin:0}
+@media(max-width:640px){dl.glo div{grid-template-columns:1fr;gap:8px}}
+
+footer{border-top:1px solid var(--linea);padding-top:28px;margin-top:20px;
+  font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--gris);line-height:1.8}
+</style>
+
+<div class="env">
+
+<header>
+  <div class="eyebrow">Manual de uso · TradingView · EURUSD</div>
+  <h1>Indicador CRT&nbsp;Máster</h1>
+  <p class="sub">Dibuja los rangos del Candle Range Theory en cuatro temporalidades, colorea las sesiones, marca la liquidez pendiente y dice en cada momento por qué hay operación — o por qué no la hay.</p>
+  <div class="meta">
+    <span>pine/crt_master.pine</span>
+    <span>Pine Script v6</span>
+    <span>493 líneas</span>
+    <span>no repinta</span>
+  </div>
+</header>
+
+<nav class="idx" aria-label="Índice">
+  <ol>
+    <li><a href="#s1"><span class="n">01</span>Qué hace y qué no hace</a></li>
+    <li><a href="#s2"><span class="n">02</span>Puesta en marcha</a></li>
+    <li><a href="#s3"><span class="n">03</span>Lo que ves en el gráfico</a></li>
+    <li><a href="#s4"><span class="n">04</span>El panel, línea por línea</a></li>
+    <li><a href="#s5"><span class="n">05</span>Cómo nace una señal</a></li>
+    <li><a href="#s6"><span class="n">06</span>Por qué NO hay operación</a></li>
+    <li><a href="#s7"><span class="n">07</span>Los estados del rango</a></li>
+    <li><a href="#s8"><span class="n">08</span>Los avisos</a></li>
+    <li><a href="#s9"><span class="n">09</span>Todos los ajustes</a></li>
+    <li><a href="#s10"><span class="n">10</span>Glosario</a></li>
+    <li><a href="#s11"><span class="n">11</span>Lo que no sabe</a></li>
+  </ol>
+</nav>
+
+<!-- 01 ─────────────────────────────────────────────────────── -->
+<section id="s1">
+  <div class="shead"><span class="snum">01</span><div><h2>Qué hace y qué no hace</h2></div></div>
+  <div class="col">
+    <p>El indicador reconstruye, vela a vela, el método que enseña bctrades: una vela deja un rango, la siguiente sale de ese rango, toma la liquidez y vuelve a meterse dentro. Eso «activa» el rango y crea un objetivo en el extremo opuesto. Cuando varias temporalidades tienen objetivos vivos en la misma dirección, se baja a una temporalidad menor y se entra buscando esos objetivos.</p>
+    <p>Todo eso lo hace el indicador solo. Tú no tienes que medir nada, ni contar velas, ni decidir si un cierre está dentro o fuera. Lo hace y lo escribe en pantalla.</p>
+    <h3>Lo que NO hace, y conviene tener claro desde la primera línea</h3>
+  </div>
+
+  <div class="alto">
+    <div class="eyebrow">Antes de operar con esto</div>
+    <p style="margin-top:.6em"><strong>Este método, medido sobre cuatro años de EURUSD, GBPUSD, USDJPY, NASDAQ y S&amp;P, pierde dinero después de costes.</strong> Doce configuraciones probadas, ninguna por encima del umbral de significación, las doce con la media recortada en negativo. La ventaja bruta existe y es pequeña — unos +0,12&nbsp;R por operación en la mejor lectura — pero el coste de entrar y salir se la come entera.</p>
+    <p>El indicador es correcto: hace exactamente lo que el método dice. Que el método funcione es otra cosa, y la evidencia que tenemos dice que no, al menos en 1H. <strong>Úsalo para aprender a ver la estructura y para llevar un registro, no como una máquina de dar dinero.</strong> Si vas a operarlo, hazlo en demo hasta que tengas tu propio registro de cien operaciones.</p>
+  </div>
+
+  <div class="col">
+    <p>Tampoco decide por ti el tamaño de la posición, ni gestiona la operación una vez abierta, ni mueve el stop. Marca la entrada, el stop y el objetivo en el momento de la señal, y ahí acaba su trabajo.</p>
+  </div>
+</section>
+
+<!-- 02 ─────────────────────────────────────────────────────── -->
+<section id="s2">
+  <div class="shead"><span class="snum">02</span><div><h2>Puesta en marcha</h2></div></div>
+  <div class="col"><p>Cinco pasos. El tercero es el que más gente se salta y el que más daño hace.</p></div>
+
+  <ol class="pasos">
+    <li>
+      <h4>Copia el código en TradingView</h4>
+      <p>Abre el <em>Editor Pine</em> abajo del todo, pega el contenido de <code>pine/crt_master.pine</code>, pulsa <em>Guardar</em>, ponle nombre y pulsa <em>Añadir al gráfico</em>.</p>
+    </li>
+    <li>
+      <h4>Pon el gráfico en EURUSD y en M5 o M15</h4>
+      <p>El indicador construye las velas de 1H, 4H, 12H y 1D a partir de las velas del gráfico. Si el gráfico tiene velas de más de una hora no puede reconstruir la ejecución, y te lo dirá con un cartel naranja en pantalla.</p>
+      <p class="fail"><b>M15 es lo recomendable</b> — carga rápido y basta para todo. M5 da algo más de precisión en el momento exacto de la señal.</p>
+    </li>
+    <li>
+      <h4>Elige el huso horario y no lo vuelvas a tocar</h4>
+      <p>Los bloques de 12H, 4H y 1D empiezan a una hora concreta, y esa hora depende del huso. Cambiar el huso no es un ajuste cosmético: cambia qué velas existen, y por tanto cambia todos los rangos, todos los objetivos y todas las señales.</p>
+      <p class="fail"><b>El material de bctrades nunca publica el huso.</b> Por defecto está <code>Europe/Madrid</code>, que es el tuyo. Si algún día lo cambias «a ver qué tal», deja de ser el mismo método y todo tu registro anterior deja de valer.</p>
+    </li>
+    <li>
+      <h4>Comprueba el tamaño del pip</h4>
+      <p>Viene puesto en <code>0.0001</code>, que es lo correcto para EURUSD. Solo hay que cambiarlo si operas otro instrumento: <code>0.01</code> para pares con yen, <code>1.0</code> para índices.</p>
+    </li>
+    <li>
+      <h4>Crea la alerta</h4>
+      <p>Sección <a href="#s8">08</a>. Sin esto el indicador dibuja pero no te avisa, y tendrás que estar mirando la pantalla.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- 03 ─────────────────────────────────────────────────────── -->
+<section id="s3">
+  <div class="shead"><span class="snum">03</span><div><h2>Lo que ves en el gráfico</h2></div></div>
+  <div class="col"><p>Seis tipos de dibujo, y nada más. Si ves algo en pantalla, es una de estas seis cosas.</p></div>
+
+  <div class="leyenda">
+
+    <div class="el">
+      <div class="vista">
+        <svg width="150" height="58" viewBox="0 0 150 58" role="img" aria-label="Caja de rango con línea de objetivo discontinua">
+          <rect x="8" y="12" width="134" height="34" stroke-width="1"/ style="fill:var(--alcSuave);stroke:var(--alc)">
+          <line x1="8" y1="12" x2="142" y2="12" stroke-width="2" stroke-dasharray="6 4"/ style="stroke:var(--alc)">
+          <rect x="24" y="12" width="7" height="34"/ style="fill:var(--gris)">
+          <line x1="27.5" y1="6" x2="27.5" y2="52" stroke-width="1"/ style="stroke:var(--gris)">
+          <rect x="44" y="26" width="7" height="14"/ style="fill:var(--alc)">
+          <line x1="47.5" y1="26" x2="47.5" y2="53" stroke-width="1"/ style="stroke:var(--alc)">
+        </svg>
+      </div>
+      <div class="txt">
+        <h4>La caja del rango</h4>
+        <p>Los dos extremos de la <strong>vela base</strong>. Verde si el rango es alcista, rojo si es bajista. Se extiende hacia la derecha mientras el rango siga vivo y se para cuando muere. Hay una caja por temporalidad: 1D, 12H, 4H y 1H.</p>
+      </div>
+    </div>
+
+    <div class="el">
+      <div class="vista">
+        <svg width="150" height="58" viewBox="0 0 150 58" role="img" aria-label="Línea discontinua gruesa de objetivo">
+          <line x1="8" y1="20" x2="142" y2="20" stroke-width="2.5" stroke-dasharray="7 5"/ style="stroke:var(--alc)">
+          <text x="8" y="42" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">1.09240</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h4>La línea del objetivo</h4>
+        <p>Discontinua y gruesa, en el <strong>extremo opuesto</strong> de la vela base. Es adonde el método dice que va el precio. Cuando el precio la toca, el rango pasa a COMPLETADO y la línea deja de extenderse.</p>
+      </div>
+    </div>
+
+    <div class="el">
+      <div class="vista">
+        <svg width="150" height="58" viewBox="0 0 150 58" role="img" aria-label="Etiqueta del marco con su estado">
+          <rect x="14" y="18" width="122" height="22" rx="2" stroke-width="1"/ style="fill:var(--alcSuave);stroke:var(--alc)">
+          <text x="24" y="33" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--alc)">12H · CONTINUACIÓN</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h4>La etiqueta del rango</h4>
+        <p>Pegada a la caja. Dice de qué temporalidad es y en qué <a href="#s7">estado</a> está. Cambia sola conforme el precio avanza. Cuando el rango muere se vuelve gris.</p>
+      </div>
+    </div>
+
+    <div class="el">
+      <div class="vista">
+        <svg width="150" height="58" viewBox="0 0 150 58" role="img" aria-label="Fondo coloreado de las tres sesiones">
+          <rect x="4" y="8" width="44" height="42"/ style="fill:var(--asiaSuave)">
+          <rect x="48" y="8" width="50" height="42"/ style="fill:var(--alcSuave)">
+          <rect x="98" y="8" width="48" height="42"/ style="fill:var(--bajSuave)">
+          <text x="12" y="32" font-family="IBM Plex Mono, monospace" font-size="8.5" style="fill:var(--asia)">ASIA</text>
+          <text x="53" y="32" font-family="IBM Plex Mono, monospace" font-size="8.5" style="fill:var(--alc)">LONDRES</text>
+          <text x="115" y="32" font-family="IBM Plex Mono, monospace" font-size="8.5" style="fill:var(--baj)">NY</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h4>El color de fondo de las sesiones</h4>
+        <p>Morado Asia, verde Londres, rojo Nueva York, en tu huso. Donde Londres y Nueva York se solapan los dos colores se suman y el fondo queda más denso — ese solape es la franja de más movimiento del día.</p>
+      </div>
+    </div>
+
+    <div class="el">
+      <div class="vista">
+        <svg width="150" height="58" viewBox="0 0 150 58" role="img" aria-label="Nivel punteado de máximo de sesión con su etiqueta">
+          <line x1="8" y1="18" x2="142" y2="18" stroke-width="1.2" stroke-dasharray="2 3"/ style="stroke:var(--alc)">
+          <rect x="8" y="24" width="66" height="15" rx="2"/ style="fill:var(--alcSuave)">
+          <text x="13" y="35" font-family="IBM Plex Mono, monospace" font-size="8.5" style="fill:var(--alc)">Londres máx</text>
+          <line x1="8" y1="46" x2="142" y2="46" stroke-width="1.2" stroke-dasharray="2 3"/ style="stroke:var(--asia)">
+        </svg>
+      </div>
+      <div class="txt">
+        <h4>Máximos y mínimos de sesión</h4>
+        <p>Punteados, del color de su sesión, con el nombre al lado. Marcan liquidez que todavía está ahí. <strong>Cuando el precio los toca, la línea desaparece sola</strong> — esa liquidez ya se ha tomado y deja de ser un imán. Lo que queda dibujado es lo que aún está pendiente.</p>
+      </div>
+    </div>
+
+    <div class="el">
+      <div class="vista">
+        <svg width="150" height="58" viewBox="0 0 150 58" role="img" aria-label="Etiqueta de señal de compra">
+          <rect x="24" y="8" width="102" height="42" rx="2"/ style="fill:var(--alc)">
+          <text x="34" y="22" font-family="Archivo, sans-serif" font-size="10.5" font-weight="700" fill="#fff">▲ COMPRA</text>
+          <text x="34" y="34" font-family="Archivo, sans-serif" font-size="9" fill="#fff" opacity=".92">R:R 3.42</text>
+          <text x="34" y="45" font-family="Archivo, sans-serif" font-size="9" fill="#fff" opacity=".92">stop 9.4 pips</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h4>La señal</h4>
+        <p>Un cartel sólido bajo la vela (compra) o encima (venta), con el R:R, el tamaño del stop en pips y cuántas temporalidades acompañan. Junto a él aparecen dos líneas punteadas cortas: <strong>abajo el stop, arriba el objetivo</strong>. Solo sale cuando se cumple todo lo de la sección <a href="#s5">05</a>.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 04 ─────────────────────────────────────────────────────── -->
+<section id="s4">
+  <div class="shead"><span class="snum">04</span><div><h2>El panel, línea por línea</h2></div></div>
+  <div class="col">
+    <p>Abajo a la derecha hay una tabla pequeña. Es la parte más importante del indicador y la que casi ningún indicador tiene: <strong>cuenta también los momentos en que no hay nada que hacer, y por qué</strong>.</p>
+  </div>
+
+  <div class="panelwrap">
+    <div class="panel" role="img" aria-label="Ejemplo del panel del indicador con una señal de compra activa">
+      <div class="r hd"><span>CRT · lectura B</span><span class="up">Europe/Madrid ●</span></div>
+      <div class="r"><span class="k">1D</span><span class="v up">▲ CONTINUACIÓN → 1.09240</span></div>
+      <div class="r"><span class="k">12H</span><span class="v up">▲ DOBLE LIQUIDEZ ×2 → 1.08910</span></div>
+      <div class="r"><span class="k">4H</span><span class="v mu">COMPLETADO</span></div>
+      <div class="r"><span class="k">1H</span><span class="v up">▲ CREADO → 1.08750</span></div>
+      <div class="r"><span class="k">alineados</span><span class="v">2 de 3</span></div>
+      <div class="r"><span class="k">R:R</span><span class="v up">3.42</span></div>
+      <div class="r"><span class="k">sesión</span><span class="v">Londres</span></div>
+      <div class="r ft"><span class="up">▶</span><span class="v up">SEÑAL COMPRA · R:R 3.42</span></div>
+    </div>
+  </div>
+  <p class="pcap">el panel tal y como aparece en pantalla</p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>Línea</th><th>Qué dice</th><th>Cómo leerla</th></tr></thead>
+    <tbody>
+      <tr><td class="m">CRT · lectura B</td><td>Qué definición de activación estás usando.</td><td>B es la que tiene datos suficientes. Si pone A o C, sabes que estás en una variante.</td></tr>
+      <tr><td class="m">Europe/Madrid ●</td><td>El huso, y si estás dentro de tu ventana operativa.</td><td><span class="pill p-alc">● verde</span> estás dentro y el indicador te avisará. <span class="pill p-neu">○ gris</span> estás fuera: sigue dibujando pero no suena.</td></tr>
+      <tr><td class="m">1D / 12H / 4H</td><td>El rango de cada temporalidad mayor, su estado y su objetivo.</td><td>▲ verde alcista, ▼ rojo bajista, gris muerto. El número tras la flecha es el precio al que va.</td></tr>
+      <tr><td class="m">1H</td><td>Igual, pero es la temporalidad donde se entra.</td><td>Cuando pone <span class="pill p-alc">CREADO</span> es el momento en que se decide si hay operación.</td></tr>
+      <tr><td class="m">alineados</td><td>Cuántas temporalidades mayores apuntan a lo mismo que 1H.</td><td>«2 de 3» = de las tres mayores, dos tienen objetivo vivo en esa dirección. Cuantas más, más contexto acompaña.</td></tr>
+      <tr><td class="m">R:R</td><td>Cuánto ganas por cada euro que arriesgas si llega al objetivo.</td><td><span class="pill p-alc">verde</span> pasa el mínimo. <span class="pill p-av">naranja</span> se queda corto. <span class="pill p-neu">—</span> no hay nada que medir todavía.</td></tr>
+      <tr><td class="m">sesión</td><td>En qué sesión está el precio ahora mismo.</td><td>Puede poner «Londres + NY» cuando se solapan.</td></tr>
+      <tr><td class="m">▶ / ·</td><td>La conclusión: hay señal, o el motivo de que no la haya.</td><td>Esta es la línea que hay que leer. Sección <a href="#s6">06</a>.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="col">
+    <div class="nota">Los valores de <span class="mono">alineados</span> y <span class="mono">R:R</span> se congelan en lo que salió en el último cierre de 1H. No se mueven tick a tick, y eso es intencionado: el método decide en el cierre de la vela, no durante.</div>
+  </div>
+</section>
+
+<!-- 05 ─────────────────────────────────────────────────────── -->
+<section id="s5">
+  <div class="shead"><span class="snum">05</span><div><h2>Cómo nace una señal</h2></div></div>
+  <div class="col"><p>Cada vez que cierra una vela de 1H, el indicador recorre estos seis pasos en orden. Si uno falla, se para ahí y escribe el motivo en el panel. Por eso el motivo te dice exactamente hasta dónde llegó.</p></div>
+
+  <ol class="pasos">
+    <li>
+      <h4>¿Ha cerrado una vela de 1H?</h4>
+      <p>Todo el proceso ocurre en el cierre de la vela, nunca durante. Es lo que hace que el indicador no repinte: lo que ves dibujado en el pasado es lo que se veía en su momento.</p>
+    </li>
+    <li>
+      <h4>¿Esa vela ha creado un rango nuevo?</h4>
+      <p>La vela de 1H tiene que haber <strong>barrido un extremo</strong> de la vela de 1H anterior y haber <strong>cerrado dentro de su cuerpo</strong>. Si barre el mínimo, el rango es alcista. Si barre el máximo, bajista.</p>
+      <p class="fail">Si no → <b>sin rango nuevo en 1H</b>. Es lo que verás la mayor parte del tiempo, y es normal.</p>
+    </li>
+    <li>
+      <h4>¿Cuántas temporalidades mayores van en esa misma dirección?</h4>
+      <p>Mira 1D, 12H y 4H. Cuenta las que tengan un rango <strong>vivo</strong>, en la <strong>misma dirección</strong>, y con el objetivo todavía <strong>por delante del precio</strong>. Las tres condiciones.</p>
+      <p class="fail">Si hay menos de las que pides → <b>rango alcista en 1H, pero 0 marcos de contexto alineados</b>.</p>
+    </li>
+    <li>
+      <h4>¿El stop es lo bastante grande para poder operarlo?</h4>
+      <p>El stop va al mínimo de esa vela de 1H (en compra) o al máximo (en venta), más el colchón. Si el stop resultante es más pequeño que tres veces el coste, la operación se descarta.</p>
+      <p class="fail">Si no → <b>riesgo de 2.8 pips: por debajo del mínimo operable</b>. Un stop de 2,8 pips con 1,2 de coste no se puede operar de verdad: solo el deslizamiento se lo come.</p>
+    </li>
+    <li>
+      <h4>¿El R:R llega al mínimo?</h4>
+      <p>Se toma el <strong>objetivo más cercano</strong> de entre los alineados — la lectura conservadora, la que menos favorece al método — y se divide la distancia hasta él entre el tamaño del stop.</p>
+      <p class="fail">Si no → <b>R:R 1.80, por debajo de 3.0</b>. Es el filtro de «se ve bien», y es un cociente, no una sensación.</p>
+    </li>
+    <li>
+      <h4>¿Estás en tu ventana?</h4>
+      <p>Si sí, sale el cartel, salen las líneas de stop y objetivo, y suena la alerta.</p>
+      <p class="fail">Si no → <b>SEÑAL fuera de tu ventana</b>. El cartel no sale, pero el panel te lo dice, para que sepas que ocurrió mientras no estabas.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- 06 ─────────────────────────────────────────────────────── -->
+<section id="s6">
+  <div class="shead"><span class="snum">06</span><div><h2>Por qué NO hay operación</h2></div></div>
+  <div class="col">
+    <p>Casi todos los indicadores dibujan cuando hay señal y callan cuando no. Así no se aprende nada de los días en que no toca, que son la mayoría. Estos son todos los mensajes que puede escribir el panel, sin excepción.</p>
+  </div>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>Mensaje</th><th>Qué ha pasado</th><th>Qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td class="m">esperando la primera vela de 1H</td><td>Acabas de añadir el indicador y todavía no ha cerrado ninguna vela de 1H.</td><td>Esperar. Como mucho una hora.</td></tr>
+      <tr><td class="m">sin rango nuevo en 1H</td><td>La última vela de 1H no barrió ni cerró dentro. No hay setup.</td><td>Nada. Es el mensaje normal el 85&nbsp;% del tiempo.</td></tr>
+      <tr><td class="m">rango alcista en 1H, pero N marcos de contexto alineados</td><td>Hay setup en 1H pero las temporalidades mayores no acompañan, o su objetivo ya quedó atrás.</td><td>Nada. Mira el panel: verás qué marcos están vivos y hacia dónde.</td></tr>
+      <tr><td class="m">riesgo de X pips: por debajo del mínimo operable</td><td>El stop sale demasiado pegado. La vela de 1H tenía muy poco recorrido.</td><td>Nada. Es una protección, no un capricho: sin ella salen R:R absurdos que no se pueden ejecutar.</td></tr>
+      <tr><td class="m">R:R X, por debajo de 3.0</td><td>Todo cuadra pero el objetivo está demasiado cerca para lo que arriesgas.</td><td>Nada. Según el propio material, esta es la zona de «últimas oportunidades»: el margen ya se ha consumido.</td></tr>
+      <tr><td class="m">SEÑAL fuera de tu ventana</td><td>Había operación válida pero a una hora en la que no estás.</td><td>Anotarla en tu registro. Sirve para saber cuánto te estás perdiendo por el horario.</td></tr>
+      <tr><td class="m">SEÑAL COMPRA · R:R X</td><td>Los seis pasos han pasado.</td><td>Entrar al cierre de esa vela, stop y objetivo donde marcan las líneas punteadas.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 07 ─────────────────────────────────────────────────────── -->
+<section id="s7">
+  <div class="shead"><span class="snum">07</span><div><h2>Los estados del rango</h2></div></div>
+  <div class="col">
+    <p>Un rango no está vivo o muerto, tiene historia. Estos son los estados por los que puede pasar, y los verás tanto en la etiqueta de la caja como en el panel. Los cinco primeros salen del material de bctrades; los dos últimos son decisiones de implementación.</p>
+  </div>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>Estado</th><th>Significa</th><th>¿Sigue vivo?</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill p-alc">CREADO</span></td><td>Acaba de activarse. La vela barrió el extremo de la anterior y cerró dentro de su cuerpo.</td><td>Sí</td></tr>
+      <tr><td><span class="pill p-alc">CREADO (hueco)</span></td><td>Igual, pero el barrido vino de un salto de precio — apertura del domingo, festivo. No es lo mismo barrer operando que barrer por un hueco, así que queda marcado.</td><td>Sí</td></tr>
+      <tr><td><span class="pill p-alc">CONTINUACIÓN</span></td><td>El precio respeta la estructura y va hacia el objetivo. Es el estado sano.</td><td>Sí</td></tr>
+      <tr><td><span class="pill p-alc">DOBLE LIQUIDEZ&nbsp;×2</span></td><td>El precio ha vuelto a llevarse el mismo extremo y ha cerrado otra vez dentro. Segunda toma. El rango aguanta.</td><td>Sí</td></tr>
+      <tr><td><span class="pill p-av">REINICIADO</span></td><td>Se ha llevado el extremo otra vez pero esta vez sin cerrar dentro. Está en el aire: o vuelve, o se descarta.</td><td>Sí, de momento</td></tr>
+      <tr><td><span class="pill p-neu">COMPLETADO</span></td><td>El precio ha alcanzado el objetivo. El rango ha hecho su trabajo.</td><td>No</td></tr>
+      <tr><td><span class="pill p-baj">DESCARTADO</span></td><td>Tras el reinicio, una vela ha <strong>cerrado fuera</strong> de la estructura. El rango se cancela.</td><td>No</td></tr>
+      <tr><td><span class="pill p-neu">RELEVADO</span></td><td>Ha nacido un rango nuevo en esa temporalidad y toma el relevo. Solo hay un rango vivo por temporalidad.</td><td>No</td></tr>
+      <tr><td><span class="pill p-neu">CADUCADO</span></td><td>Ha agotado el límite de velas que le pusiste. Solo aparece si activas ese ajuste, que por defecto está apagado.</td><td>No</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="col">
+    <div class="nota"><strong>Un rango muerto deja de contar como contexto.</strong> Suena obvio y no lo era: durante dos semanas el motor con el que se midió todo esto devolvía como contexto el último rango creado aunque estuviera completado o descartado. Un objetivo alcanzado tres días antes seguía puntuando. Corregido — y al corregirlo las operaciones cayeron a un tercio.</div>
+  </div>
+</section>
+
+<!-- 08 ─────────────────────────────────────────────────────── -->
+<section id="s8">
+  <div class="shead"><span class="snum">08</span><div><h2>Los avisos</h2></div></div>
+  <div class="col">
+    <p>Se configura una vez y ya está. En TradingView, con el indicador puesto en el gráfico:</p>
+  </div>
+  <ol class="pasos">
+    <li><h4>Botón del reloj → Crear alerta</h4><p>O el atajo <code>Alt+A</code>.</p></li>
+    <li><h4>En «Condición» elige el indicador</h4><p>Aparecerá como <em>CRT Máster</em>. Debajo, deja marcada la opción <em>Any alert() function call</em>.</p></li>
+    <li><h4>Frecuencia: una vez por barra al cierre</h4><p>Viene ya forzado desde el código, pero compruébalo.</p></li>
+    <li><h4>Elige cómo quieres que te avise</h4><p>Notificación al móvil, correo, sonido. Con la app de TradingView instalada, el aviso al móvil llega en segundos.</p></li>
+  </ol>
+  <div class="col">
+    <p style="margin-top:1.6em">El mensaje que te llega lleva todo lo necesario para decidir sin abrir el gráfico:</p>
+  </div>
+  <div class="panelwrap">
+    <div class="panel" style="min-width:auto;max-width:520px">
+      <div class="r"><span>CRT COMPRA EURUSD · R:R 3.42 · stop 9.4 pips · 2 marcos alineados</span></div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="nota">Los avisos solo suenan dentro de tu ventana — <strong>09:00-11:30</strong> y <strong>14:00-16:00</strong>, hora española, con el cambio de horario resuelto solo. El dibujo, en cambio, no se filtra nunca: por la tarde puedes repasar lo que pasó mientras no estabas, y eso es justo lo que hace falta para aprender.</div>
+  </div>
+</section>
+
+<!-- 09 ─────────────────────────────────────────────────────── -->
+<section id="s9">
+  <div class="shead"><span class="snum">09</span><div><h2>Todos los ajustes</h2></div></div>
+  <div class="col"><p>Están agrupados igual que en la ventana de configuración. La última columna es la que importa: qué pasa si lo tocas.</p></div>
+
+  <h3>Huso y rejilla</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Ajuste</th><th class="m">Por defecto</th><th>Qué hace</th><th>Si lo cambias</th></tr></thead>
+    <tbody>
+      <tr><td>Huso horario</td><td class="m">Europe/Madrid</td><td>A qué hora empiezan los bloques de 12H, 4H y 1D.</td><td><strong>Cambia todo.</strong> Otros rangos, otros objetivos, otras señales. Tu registro anterior deja de valer.</td></tr>
+      <tr><td>Hora de anclaje</td><td class="m">0</td><td>El bloque de 12H empieza a las 00:00 y 12:00; el de 1D a las 00:00.</td><td>Igual de grave que el huso. El material nunca publica el anclaje: es una decisión, no un dato.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>CRT · rangos</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Ajuste</th><th class="m">Por defecto</th><th>Qué hace</th><th>Si lo cambias</th></tr></thead>
+    <tbody>
+      <tr><td>Lectura de la activación</td><td class="m">B</td><td>Qué cuenta como activar un rango. <strong>A</strong>: la vela abre fuera. <strong>B</strong>: barre y cierra dentro del cuerpo. <strong>C</strong>: las dos.</td><td>C deja 6-10 operaciones en cuatro años: no hay con qué juzgar. B es la única con datos.</td></tr>
+      <tr><td>1D / 12H / 4H</td><td class="m">las tres</td><td>Qué temporalidades cuentan como contexto.</td><td>Quitar una hace más fácil que se alineen, y por tanto más señales de peor calidad.</td></tr>
+      <tr><td>Vida máxima del rango</td><td class="m">0</td><td>Cuántas velas puede vivir un rango antes de caducar. 0 = sin límite.</td><td>0 reproduce el motor con el que están hechas las medidas. 10 es la variante del manual escrito, que <strong>no está medida</strong>.</td></tr>
+      <tr><td>Vela base doji</td><td class="m">10&nbsp;%</td><td>Si el cuerpo de la vela base es menor que este porcentaje de su rango, se usa el rango entero para decidir si el cierre queda «dentro».</td><td>Al 0&nbsp;% los dojis casi nunca activan nada. Al 50&nbsp;% activa casi todo.</td></tr>
+      <tr><td>Dejar el historial dibujado</td><td class="m">sí</td><td>Los rangos muertos se quedan en gris en vez de borrarse.</td><td>Apágalo si el gráfico se te llena demasiado. Se pierde la posibilidad de repasar.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejecución</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Ajuste</th><th class="m">Por defecto</th><th>Qué hace</th><th>Si lo cambias</th></tr></thead>
+    <tbody>
+      <tr><td>Tamaño del pip</td><td class="m">0.0001</td><td>Para convertir a pips el stop y el coste.</td><td>Solo si cambias de instrumento. Mal puesto, todos los filtros de riesgo se descolocan.</td></tr>
+      <tr><td>R:R mínimo</td><td class="m">3.0</td><td>El filtro de calidad. Es el «3» del 1:3 que enseñan.</td><td>Bajarlo da muchas más señales, y peores. Su única operación perdedora publicada entró con R:R 1:1.</td></tr>
+      <tr><td>Colchón del stop</td><td class="m">1 tick</td><td>Cuánto se separa el stop del extremo de la vela.</td><td>Poco efecto. Entre 0 y 2 ticks apenas cambia nada.</td></tr>
+      <tr><td>Coste ida y vuelta</td><td class="m">1.2 pips</td><td>Lo que te cuesta abrir y cerrar. Se usa para el mínimo de riesgo.</td><td>Pon el de tu bróker de verdad, no el que te gustaría tener.</td></tr>
+      <tr><td>Riesgo mínimo</td><td class="m">3× el coste</td><td>Descarta operaciones con el stop demasiado pegado.</td><td>Bajarlo deja entrar operaciones que sobre el papel dan R:R de 1198 y en la vida real no se pueden ejecutar.</td></tr>
+      <tr><td>Marcos alineados mínimos</td><td class="m">1</td><td>Cuántas temporalidades mayores hacen falta.</td><td>Con 2 hay muchas menos señales. Con 3, casi ninguna: ocho en cuatro años.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Tu ventana operativa</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Ajuste</th><th class="m">Por defecto</th><th>Qué hace</th><th>Si lo cambias</th></tr></thead>
+    <tbody>
+      <tr><td>Avisar solo dentro</td><td class="m">sí</td><td>Los avisos suenan solo en tu horario. El dibujo nunca se filtra.</td><td>Apagado, te avisará a las tres de la mañana.</td></tr>
+      <tr><td>Ventana 1 · Londres</td><td class="m">0900-1130</td><td>Apertura de Londres.</td><td rowspan="2">No hay evidencia de que filtrar por horario mejore <em>este</em> método: la diferencia dentro/fuera no pasa de z&nbsp;+1,5 en ninguna configuración. Está por tu horario, no por una hipótesis.</td></tr>
+      <tr><td>Ventana 2 · NY</td><td class="m">1400-1600</td><td>Apertura de Nueva York.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Sesiones y niveles</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Ajuste</th><th class="m">Por defecto</th><th>Qué hace</th><th>Si lo cambias</th></tr></thead>
+    <tbody>
+      <tr><td>Colorear las sesiones</td><td class="m">sí</td><td>Fondo morado / verde / rojo.</td><td>—</td></tr>
+      <tr><td>Asia / Londres / NY</td><td class="m">0000-0900<br>0800-1700<br>1400-2300</td><td>Las horas de cada sesión, en tu huso.</td><td>Si operas índices, la de NY debería ser 1530-1700: el mercado en efectivo abre a las 15:30 hora española, invierno y verano.</td></tr>
+      <tr><td>Mitigado cuando</td><td class="m">mecha</td><td><strong>mecha</strong>: basta tocar el nivel. <strong>cierre</strong>: hace falta que una vela cierre al otro lado.</td><td>Con «cierre» los niveles duran bastante más en pantalla.</td></tr>
+      <tr><td>Niveles que se mantienen</td><td class="m">10</td><td>Cuántos niveles sin mitigar se conservan de cada tipo.</td><td>Subirlo mucho llena el gráfico y puede tocar el límite de dibujos de TradingView.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 10 ─────────────────────────────────────────────────────── -->
+<section id="s10">
+  <div class="shead"><span class="snum">10</span><div><h2>Glosario</h2></div></div>
+  <div class="col"><p>Todo lo que hace falta saber para entender lo que dibuja, y de dónde sale cada concepto.</p></div>
+
+  <dl class="glo">
+    <div>
+      <dt>Vela base<span class="src">texto de bctrades</span></dt>
+      <dd><p>La vela anterior a la que activa el rango. Sus extremos definen la caja; su cuerpo define la zona donde un cierre cuenta como «dentro».</p><p>«El precio crea una vela base donde comienza la acumulación de liquidez y, posteriormente, manipula esa zona para construir el rango.»</p></dd>
+    </div>
+    <div>
+      <dt>Barrido<span class="src">texto de bctrades</span></dt>
+      <dd><p>Que el precio pase del máximo o del mínimo de la vela base. Por debajo del mínimo o por encima del máximo, con la mecha basta.</p></dd>
+    </div>
+    <div>
+      <dt>Activación<span class="src">texto de bctrades</span></dt>
+      <dd><p>Barrer un extremo <strong>y volver a cerrar dentro del cuerpo</strong> de la vela base. Eso crea el rango. Barrer y quedarse fuera no activa nada.</p></dd>
+    </div>
+    <div>
+      <dt>Objetivo<span class="src">texto y diagramas</span></dt>
+      <dd><p>El <strong>extremo opuesto</strong> de la vela base. Si el rango se activó barriendo el mínimo, el objetivo es el máximo. No es un múltiplo del riesgo: es un sitio concreto del gráfico.</p></dd>
+    </div>
+    <div>
+      <dt>Reinicio<span class="src">texto de bctrades</span></dt>
+      <dd><p>Que el precio vuelva a llevarse <strong>el mismo extremo</strong> que activó el rango. No lo mata: lo pone en el aire. Si vuelve a cerrar dentro es una segunda toma de liquidez; si cierra fuera, se descarta.</p></dd>
+    </div>
+    <div>
+      <dt>Doble y triple liquidez<span class="src">texto de bctrades</span></dt>
+      <dd><p>Cuántas veces el precio se ha llevado el mismo extremo sin que el rango se descarte. Dos veces, tres veces. Se cuenta y se muestra.</p><p>Medido: el gradiente que se les atribuye no aparece. La triple no rinde mejor que la simple.</p></dd>
+    </div>
+    <div>
+      <dt>Descarte<span class="src">texto de bctrades</span></dt>
+      <dd><p>Después de un reinicio, una vela <strong>cierra fuera</strong> de la estructura. Solo entonces el rango se cancela. «Tras un reinicio, el rango solo se descarta si el precio confirma con un cierre fuera del rango principal.»</p></dd>
+    </div>
+    <div>
+      <dt>Marcos alineados<span class="src">texto de bctrades</span></dt>
+      <dd><p>Cuántas temporalidades mayores tienen a la vez un objetivo vivo en la misma dirección. «Vamos acumulando objetivos y reforzando la dirección.»</p></dd>
+    </div>
+    <div>
+      <dt>R:R<span class="src">texto de bctrades</span></dt>
+      <dd><p>Distancia hasta el objetivo dividida entre distancia hasta el stop. Ellos definen tres zonas: <strong>≥3</strong> óptima, <strong>≈2</strong> continuación, <strong>≈1</strong> últimas oportunidades.</p><p>Medido: las tres zonas rinden igual. El gradiente no aparece en los datos.</p></dd>
+    </div>
+    <div>
+      <dt>Mitigación<span class="src">uso general, no de bctrades</span></dt>
+      <dd><p>Que el precio vuelva a un nivel y lo toque. Aplicado aquí a los máximos y mínimos de sesión: mientras la línea siga dibujada, esa liquidez sigue ahí; cuando desaparece, ya se la han llevado.</p></dd>
+    </div>
+    <div>
+      <dt>Sesiones<span class="src">convención del mercado</span></dt>
+      <dd><p>Las tres franjas en que se reparte el día en divisas. Asia mueve poco y suele dejar rangos estrechos; Londres abre con volumen; el solape con Nueva York es la franja de más movimiento.</p><p>bctrades no publica horarios en ninguna parte de su material. Las horas de aquí vienen de otras fuentes y de tu propia operativa.</p></dd>
+    </div>
+    <div>
+      <dt>Killzone<span class="src">otras fuentes</span></dt>
+      <dd><p>Franja horaria en la que se supone que hay que operar. Aparece en casi todo el material de este estilo. Medido en este proyecto: <strong>ayuda o perjudica según el montaje</strong>, no es una ley general, y en el CRT concretamente restaba.</p></dd>
+    </div>
+  </dl>
+</section>
+
+<!-- 11 ─────────────────────────────────────────────────────── -->
+<section id="s11">
+  <div class="shead"><span class="snum">11</span><div><h2>Lo que el indicador no sabe</h2></div></div>
+  <div class="col">
+    <p>Si vas a seguir solo lo que marca la pantalla, hace falta que sepas dónde acaba lo que está comprobado y dónde empieza lo que es una decisión.</p>
+
+    <h3>Cuatro reglas vienen del material. Trece son decisiones</h3>
+    <p>Salen de bctrades: qué es la vela base, qué es la activación, dónde está el objetivo, y los cinco estados del rango. Todo lo demás — dónde va exactamente el stop, a qué hora empieza el bloque de 12H, qué pasa si la vela base es un doji, cuánto vive un rango, qué hacer con los huecos de fin de semana, cómo se resuelve un empate entre stop y objetivo — <strong>no está publicado en ninguna parte</strong>, y he tenido que decidirlo yo.</p>
+    <p>Eso significa que el indicador no implementa «el CRT». Implementa <strong>esta versión concreta</strong> del CRT, con esas trece decisiones dentro. Otra persona haría otro indicador con el mismo material y le saldrían otros números.</p>
+
+    <h3>Lo que no está publicado y por tanto no está aquí</h3>
+    <p>Cómo se operan los reinicios. Cuándo deciden no operar. El tamaño de la posición. La gestión una vez abierta la operación. Las temporalidades de 8H y 2H, que usan y aquí no están. Y la parte discrecional: si al mirar el gráfico descartan setups por algo que no han escrito, eso no puede estar en ningún código.</p>
+
+    <h3>Y lo que dicen las medidas</h3>
+    <p>Cuatro años, cinco instrumentos, doce configuraciones, 13.789 operaciones simuladas. Ninguna configuración supera el umbral de significación. Las doce medias recortadas salen negativas. La ventaja bruta existe —del orden de +0,12&nbsp;R por operación en la mejor lectura— y el coste se la come entera.</p>
+    <p>Hay un resultado que sí apunta a algo, y no es este: <strong>la ventaja bruta del CRT es prácticamente la misma en todas las temporalidades, mientras que el coste cae según se sube.</strong> En 1H el coste es el 14,3&nbsp;% del riesgo; en diario, el 2,3&nbsp;%. El neto cruza el cero entre 8 y 12 horas. Si algo de esto funciona, funciona arriba, no en 1H. Eso está sin confirmar en instrumentos que no se hayan usado para descubrirlo, y hasta que se confirme no es más que una pista.</p>
+
+    <div class="nota">Mientras tanto, lo más útil que puedes hacer con este indicador no es operarlo: es <strong>mirarlo</strong>. Déjalo puesto, apunta cada señal en una hoja con su R:R y su resultado, y a las cien operaciones tendrás algo que ahora mismo no tiene nadie — tu propio registro, con tu criterio, sobre tu instrumento.</div>
+  </div>
+</section>
+
+<footer>
+  <div>pine/crt_master.pine · docs/BC_02_especificacion.md · docs/BC_07_correcciones.md</div>
+  <div>Los estados y la activación salen del material de bctrades. El resto está declarado como decisión en el manual operativo.</div>
+</footer>
+
+</div>
