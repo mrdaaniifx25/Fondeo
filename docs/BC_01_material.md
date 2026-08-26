@@ -198,6 +198,103 @@ fuese una venta.
 
 ---
 
+# Tanda 4 · la cadena completa, ya explícita
+
+## 11 · Qué significa «activar un rango»  ← definición que faltaba
+
+> «En esta sesión podemos observar cómo el precio **abre por debajo de la vela
+> anterior**, activando liquidez y preparando el contexto para un posible
+> desplazamiento alcista.» *(diagrama: «Abre por debajo y activa rango 1D»)*
+
+> «En 4H vemos cómo el precio **abre por debajo** y activa un nuevo rango
+> alcista, alineándose tanto con el objetivo diario como con el de 12H.»
+
+La activación no es «la mecha se lleva el extremo»: es que **la vela abre fuera
+del rango de la anterior**. Abrir por debajo activa rango alcista; abrir por
+encima, bajista. El objetivo queda en el extremo opuesto.
+
+*Ambigüedad a resolver antes de programar: si «abre por debajo» se refiere al
+precio de apertura estrictamente, o a que el recorrido de la vela empieza por
+debajo. En divisas la apertura es casi siempre el cierre anterior, así que la
+lectura estricta daría muy pocos casos. Se probarán las dos y se reportarán las
+dos.*
+
+## 12 · Acumular objetivos: varias temporalidades apuntando al mismo sitio
+
+> «Vamos **acumulando objetivos** y reforzando la dirección del movimiento,
+> dejando ya las temporalidades alineadas hacia esa dirección. Ahora lo único
+> que falta es **encontrar un cierre** para poder ejecutar la operación con
+> confirmación.»
+
+Los diagramas marcan simultáneamente «Objetivo 1D», «Objetivo 12H y 1D»,
+«Objetivo 12H» y «Objetivo 4H». Cuantas más temporalidades tengan objetivo
+pendiente en la misma dirección, más fuerte.
+
+> «Diario y 12H seguían sosteniendo la intención alcista, mientras temporalidades
+> menores empezaban a alinearse con esa misma dirección hasta darnos la
+> confirmación final en 1H. **Ahí es donde realmente buscamos ejecutar: en la
+> zona donde nace el desplazamiento de temporalidad mayor**, y donde el contexto
+> ya nos permite buscar continuidad hacia los objetivos principales.»
+
+## 13 · La cadena entera, tal como la escriben
+
+```
+1D    el precio abre por debajo de la vela anterior  ->  activa rango 1D
+                                                         objetivo 1D
+12H   activa rango 12H                               ->  objetivo 12H
+4H    activa rango 4H                                ->  objetivo 4H
+      (los objetivos se acumulan: 4H, 12H y 1D en la misma dirección)
+1H    creación de rango 1H
+      se espera un CIERRE de 1H              ->  EJECUCIÓN
+      margen 1:3 hasta los objetivos de 12H y diario
+```
+
+## 14 · Confirmado: el cierre es dentro del CUERPO
+
+> «Después la manipulación, donde el precio **liquida esa vela base y cierra
+> dentro del cuerpo** creando un rango.»  *(30 de mayo)*
+
+Queda fijado: cuerpo, no rango.
+
+## 15 · Estructura interna del rango  (1 de junio)
+
+> «El precio crea una **vela base** donde comienza la acumulación de liquidez y,
+> posteriormente, **manipula esa zona para construir el rango**. Una vez
+> confirmado, el mercado desarrolla **continuaciones dentro del PO3** con rangos
+> en temporalidades menores que impulsan el movimiento hasta completar el
+> objetivo principal.»
+
+El diagrama etiqueta, en orden: APERTURA vela base → ACUMULACIÓN vela base →
+CIERRE vela base → MANIPULACIÓN (formación de rango) → CONTINUACIÓN PO3 →
+CONTINUACIÓN FINAL → CIERRE (rango completado).
+
+## 16 · CRT en 15M + Order Block en 1H  (31 de mayo)
+
+> «Esta estructura la solemos utilizar para **confirmar la continuidad** del
+> precio y detectar si realmente tiene intención de seguir buscando los objetivos
+> de temporalidades mayores.
+> · En 15M se completa el rango (CRT).
+> · Posteriormente, en 1H se genera el Order Block.
+> · Esa combinación nos ayuda a validar dirección, intención y posible
+>   continuación del movimiento.
+> Alcista: 15M completa rango y 1H crea OB alcista.
+> Bajista: 15M completa rango y 1H crea OB bajista.
+> **Esperar la confirmación entre temporalidades antes de buscar la entrada.**»
+
+## 17 · Los cuatro tipos de vela de 4H  (29 de mayo)
+
+> «En el primero, las tres primeras velas de 1H acumulan movimiento y la cuarta
+> toma la liquidez antes de cerrar, dejando una vela de 4H alcista pero negativa.
+> En el segundo, la segunda vela de 1H toma la liquidez y recupera rápidamente,
+> formando una vela positiva en 4H con cuerpo claramente alcista.
+> En el tercero, una estructura mucho más lateral: el precio mantiene equilibrio
+> durante toda la formación y cierra negativa, pero en zona neutral sin
+> desplazamiento.
+> En el último, secuencia claramente bajista: casi todas las velas de 1H
+> mantienen presión vendedora y solo la última intenta recuperar.»
+
+---
+
 # 9 · REGISTRO DE OPERACIONES
 
 | # | instrumento | fecha | dirección | R:R | resultado declarado |
@@ -209,6 +306,8 @@ fuese una venta.
 | 5 | S&P 500 | *sin fecha visible* | compra | 1:1 | **PÉRDIDA** · «Cerrado PyG: −5,00» |
 | 6 | S&P 500 | *sin fecha visible* | compra | — | objetivo de 8H |
 | 7 | *sin identificar* | 2026-07-28 | — | — | «tomada junto a la comunidad» |
+| 8 | **GBPUSD** | *anterior al 21-05-2026* | **compra** | **1:3** | cadena 1D → 4H doble liquidez → cierre 1H |
+| 9 | *sin identificar* | 2026-05-25 | **compra** | **1:3** | cadena 1D → 12H → 4H → cierre 1H |
 
 ## 9.1 · Publican pérdidas
 
@@ -241,6 +340,24 @@ De la captura de su plataforma: objetivo 0,740 (1,294 %), stop 0,305 (0,533 %),
 ratio riesgo/beneficio 2,43.
 
 **Operan con noticias programadas, no las evitan.**
+
+## 9.4 · La libra, la operación mejor documentada
+
+> «Entrada de hoy en la libra, analizada en futuros y ejecutada en CFDs.»
+
+> **1D** — «el precio abre por debajo de la vela anterior, activando liquidez y
+> preparando el contexto para un posible desplazamiento alcista. Ahora vamos a
+> bajar de temporalidad para buscar algún cierre o confirmación.»
+> **4H** — «el precio ya tiene un rango previamente creado y vuelve a buscar la
+> liquidez de ese mismo rango, respetando en todo momento la estructura.»
+> *(diagrama: «Crea rango 4H» y «**Doble liquidez**»)*
+> **1H** — «el precio nos crea un rango y finalmente nos deja el cierre que
+> estábamos buscando para poder posicionarnos. La entrada se ejecuta utilizando
+> una gestión de riesgo con **margen 1:3**.»
+> *(diagrama: «Crea rango 1H», «Ejecutamos cierre 1H», «RR 1:3»)*
+
+Aquí está la doble liquidez usada **en la práctica**, no en un diagrama teórico:
+es la del rango de 4H, y la usan para sostener el contexto alcista.
 
 ## 9.3 · Detalle del S&P 500 perdedor
 
