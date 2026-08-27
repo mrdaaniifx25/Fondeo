@@ -1,0 +1,183 @@
+//@version=6
+// ════════════════════════════════════════════════════════════════════════════
+//  Sesiones · Asia, Londres y Nueva York en hora de España
+//
+//  Sobre el indicador original, ademas de quitar los FVG:
+//
+//   · HORARIOS. Estaban anclados a Nueva York con especificaciones que en hora
+//     de España daban Asia 00-07, Londres 08-14 y NY 14-20. Ahora van en
+//     Europe/Madrid con las horas reales de cada sesion, y valen invierno y
+//     verano sin tocar nada.
+//
+//   · MITIGACION. Solo se comprobaba dentro de `if barstate.islast`, asi que en
+//     el historico no se borraba ni un nivel y en tiempo real el contador subia
+//     con cada tick. Ahora corre en cada vela cerrada, que es lo que hacia falta.
+//
+//   · LINEAS. Se creaban con x2 = bar_index + 60 fijo, asi que se quedaban
+//     cortas a las sesenta velas. Ahora se extienden solas.
+//
+//   · LIMITES. El indicador no declaraba max_boxes_count, asi que TradingView
+//     dejaba solo 50 cajas. Ahora se declara y ademas se limita a mano cuantas
+//     sesiones se conservan.
+//
+//  Se añaden las dos killzones que operas, que es lo que de verdad miras.
+// ════════════════════════════════════════════════════════════════════════════
+indicator("Sesiones", overlay = true, max_boxes_count = 500, max_lines_count = 500)
+
+gT = "Horario"
+tz = input.string("Europe/Madrid", "Huso horario", group = gT,
+     options = ["Europe/Madrid", "America/New_York", "UTC"],
+     tooltip = "Con Europe/Madrid las sesiones y las killzones caen a la misma " +
+     "hora de tu reloj en invierno y en verano.")
+
+gS = "Sesiones"
+verAsia = input.bool(true,  "Asia",    inline = "a", group = gS)
+spAsia  = input.session("0000-0900",   inline = "a", group = gS, title = "")
+cAsia   = input.color(color.new(#8E8E93, 92), "", inline = "a", group = gS)
+verLon  = input.bool(true,  "Londres", inline = "l", group = gS)
+spLon   = input.session("0800-1700",   inline = "l", group = gS, title = "")
+cLon    = input.color(color.new(#2F6FD0, 92), "", inline = "l", group = gS)
+verNY   = input.bool(true,  "N. York", inline = "n", group = gS)
+spNY    = input.session("1400-2300",   inline = "n", group = gS, title = "")
+cNY     = input.color(color.new(#E08A2B, 92), "", inline = "n", group = gS)
+dias    = input.string("23456", "Días", group = gS,
+     tooltip = "1 domingo, 2 lunes … 7 sábado. 23456 = de lunes a viernes.")
+nSes    = input.int(4, "Sesiones que se conservan dibujadas", 1, 30, group = gS)
+
+gK = "Killzones · las que operas"
+verKZ  = input.bool(true, "Marcar las killzones", group = gK)
+spKZ1  = input.session("0800-1100", "London killzone", group = gK)
+spKZ2  = input.session("1300-1600", "New York killzone", group = gK)
+cKZ    = input.color(color.new(#2F6FD0, 88), "Color", group = gK)
+
+gN = "Máximos y mínimos de sesión"
+verNiv = input.bool(true, "Dibujarlos y borrarlos al ser mitigados", group = gN)
+retardo = input.int(2, "Velas de retardo antes de borrar", 0, 20, group = gN,
+     tooltip = "Cuando el precio toca el nivel, la línea aguanta estas velas más " +
+     "antes de desaparecer, para que te dé tiempo a verlo.")
+
+// ── sesiones activas ────────────────────────────────────────────────────────
+dentro(string sp) => not na(time(timeframe.period, sp + ":" + dias, tz))
+
+inAsia = verAsia and dentro(spAsia)
+inLon  = verLon  and dentro(spLon)
+inNY   = verNY   and dentro(spNY)
+
+bgcolor(verKZ and (dentro(spKZ1) or dentro(spKZ2)) ? cKZ : na, title = "killzone")
+
+// ── una sesión: caja del rango, y línea del alto y del bajo al cerrar ────────
+type Sesion
+    string nom
+    color  col
+    float  hi = na
+    float  lo = na
+    int    x0 = na
+    box    cj = na
+    line   lnA = na
+    line   lnB = na
+    float  nivA = na          // nivel vivo del alto; na = ya mitigado
+    float  nivB = na
+    int    ctA = -1           // velas desde que se toco; -1 = sin tocar
+    int    ctB = -1
+
+var Sesion asia = Sesion.new("Asia", #8E8E93)
+var Sesion lon  = Sesion.new("Londres", #2F6FD0)
+var Sesion ny   = Sesion.new("NY", #E08A2B)
+var array<box> cajas = array.new<box>()
+
+guarda(box b) =>
+    array.push(cajas, b)
+    if array.size(cajas) > nSes * 3
+        box.delete(array.shift(cajas))
+
+corre(Sesion s, bool dentro, bool antes, color fondo) =>
+    if dentro and not antes
+        s.x0 := bar_index
+        s.hi := high
+        s.lo := low
+        s.cj := box.new(bar_index, high, bar_index, low, bgcolor = fondo,
+             border_color = color.new(s.col, 55), border_width = 1)
+        guarda(s.cj)
+    else if dentro and not na(s.x0)
+        s.hi := math.max(high, s.hi)
+        s.lo := math.min(low, s.lo)
+        box.set_top(s.cj, s.hi)
+        box.set_bottom(s.cj, s.lo)
+        box.set_right(s.cj, bar_index)
+    // al cerrar la sesion se fijan los dos niveles. Solo se conserva el par mas
+    // reciente de cada sesion: el anterior se borra para no ensuciar.
+    if verNiv and not dentro and antes and not na(s.x0)
+        line.delete(s.lnA)
+        line.delete(s.lnB)
+        s.lnA := line.new(s.x0, s.hi, bar_index, s.hi, color = color.new(s.col, 15),
+             width = 1, extend = extend.right)
+        s.lnB := line.new(s.x0, s.lo, bar_index, s.lo, color = color.new(s.col, 15),
+             width = 1, extend = extend.right)
+        s.nivA := s.hi
+        s.nivB := s.lo
+        s.ctA := -1
+        s.ctB := -1
+
+// La mitigacion corre en CADA vela cerrada. En el original estaba dentro de
+// `if barstate.islast`, asi que en el historico no borraba nada.
+mitiga(Sesion s) =>
+    if not na(s.nivA)
+        if s.ctA < 0 and high >= s.nivA
+            s.ctA := 0
+            line.set_style(s.lnA, line.style_dotted)
+        else if s.ctA >= 0
+            s.ctA += 1
+            if s.ctA >= retardo
+                line.delete(s.lnA)
+                s.nivA := na
+    if not na(s.nivB)
+        if s.ctB < 0 and low <= s.nivB
+            s.ctB := 0
+            line.set_style(s.lnB, line.style_dotted)
+        else if s.ctB >= 0
+            s.ctB += 1
+            if s.ctB >= retardo
+                line.delete(s.lnB)
+                s.nivB := na
+
+if barstate.isconfirmed
+    corre(asia, inAsia, inAsia[1], cAsia)
+    corre(lon,  inLon,  inLon[1],  cLon)
+    corre(ny,   inNY,   inNY[1],   cNY)
+    if verNiv
+        mitiga(asia)
+        mitiga(lon)
+        mitiga(ny)
+else
+    // en la vela en curso la caja sigue creciendo, para que se vea en vivo
+    if inAsia and not na(asia.cj)
+        box.set_top(asia.cj, math.max(asia.hi, high))
+        box.set_bottom(asia.cj, math.min(asia.lo, low))
+        box.set_right(asia.cj, bar_index)
+    if inLon and not na(lon.cj)
+        box.set_top(lon.cj, math.max(lon.hi, high))
+        box.set_bottom(lon.cj, math.min(lon.lo, low))
+        box.set_right(lon.cj, bar_index)
+    if inNY and not na(ny.cj)
+        box.set_top(ny.cj, math.max(ny.hi, high))
+        box.set_bottom(ny.cj, math.min(ny.lo, low))
+        box.set_right(ny.cj, bar_index)
+
+// ── etiquetas al borde derecho ──────────────────────────────────────────────
+var array<label> etq = array.new<label>()
+
+etiqueta(Sesion s, bool alto) =>
+    float v = alto ? s.nivA : s.nivB
+    if not na(v)
+        array.push(etq, label.new(bar_index + 12, v, s.nom + (alto ? " máx" : " mín"),
+             style = label.style_none, textcolor = color.new(s.col, 20), size = size.tiny))
+
+if barstate.islast and verNiv
+    while array.size(etq) > 0
+        label.delete(array.pop(etq))
+    etiqueta(asia, true)
+    etiqueta(asia, false)
+    etiqueta(lon, true)
+    etiqueta(lon, false)
+    etiqueta(ny, true)
+    etiqueta(ny, false)
