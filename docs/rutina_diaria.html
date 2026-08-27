@@ -138,11 +138,9 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
       <tr><td class="m">BARRIDO ▲<br>cierra dentro ✓ · faltan 2h40</td><td>La vela de 4H ya se llevó el mínimo. Empieza el partido: bajas a M15 y esperas.</td><td class="hacer f-esp">Atención</td></tr>
       <tr><td class="m">4H alcista pero H1<br>no acompaña</td><td>Falta un eslabón. H1 no ha barrido en la misma dirección.</td><td class="hacer f-no">Nada</td></tr>
       <tr><td class="m">M15 cerró fuera ·<br>sigo esperando</td><td>Esa vela de M15 no valió, pero <strong>no se descarta nada</strong>. Sigue vivo.</td><td class="hacer f-esp">Esperar</td></tr>
-      <tr><td class="m">riesgo de 2.4 pips:<br>por debajo del mínimo</td><td>El stop sale tan pegado que no se puede operar de verdad.</td><td class="hacer f-no">Nada</td></tr>
-      <tr><td class="m">R:R 1.20, por debajo<br>de tu mínimo</td><td>Llegas tarde al recorrido. El tren ya salió.</td><td class="hacer f-no">Nada</td></tr>
       <tr><td class="m">⊘ reiniciada en contra<br>y arriba sin cerrar</td><td>Señal de peligro del método. El precio puede irse por los dos lados.</td><td class="hacer f-alto">NO OPERAR</td></tr>
-      <tr><td class="m">SEÑAL fuera de tu<br>ventana · R:R 2.4</td><td>Operación válida a una hora en la que no estás.</td><td class="hacer f-no">Apuntarla</td></tr>
-      <tr><td class="m">SEÑAL COMPRA ·<br>R:R 2.4 · zona óptima</td><td>Los cinco eslabones han encajado.</td><td class="hacer f-si">ENTRAR</td></tr>
+      <tr><td class="m">SEÑAL fuera de tu<br>ventana</td><td>Operación válida a una hora en la que no estás.</td><td class="hacer f-no">Apuntarla</td></tr>
+      <tr><td class="m">SEÑAL COMPRA ·<br>stop 12.4 pips</td><td>Los cinco eslabones han encajado.</td><td class="hacer f-si">ENTRAR</td></tr>
     </tbody>
   </table></div>
 
@@ -153,12 +151,11 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
     <div class="r"><span>CRT 4H</span><span class="up">gatillo M15 ●</span></div>
     <div class="r"><span class="k">1D · 12H · 4H · 1H</span><span class="up">▲ ▲ ▲ ▲</span></div>
     <div class="r"><span class="k">estructura</span><span class="wr">BARRIDO ▲ dentro ✓ · faltan 2h40</span></div>
-    <div class="r"><span class="k">R:R</span><span>2.41</span></div>
-    <div class="r"><span class="k">zona</span><span class="up">óptima</span></div>
-    <div class="r"><span class="k">coste sobre el riesgo</span><span>7.2 %</span></div>
+    <div class="r"><span class="k">stop</span><span>12.4 pips</span></div>
     <div class="r"><span class="mu">·</span><span class="mu">M15 cerró fuera · sigo esperando</span></div>
   </div>
   <div class="col">
+    <div class="nota" style="border-left-color:var(--azul)">El indicador <strong>no calcula riesgo ni R:R, y no filtra por ellos</strong>. Te dice cuándo y a qué precios, y te da el tamaño del stop en pips para que dimensiones en MT5. El resto es tuyo.</div>
     <div class="nota">La fila de flechas es tu contexto: <strong>1D · 12H · 4H · 1H</strong>. Cuantas más apunten al mismo sitio, mejor. Ese número lo copias al libro <em>antes</em> de que pase nada, no después.</div>
   </div>
 </section>
@@ -254,10 +251,8 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
       <tr><td>Marcos alineados</td><td>El número de la fila de flechas, <strong>copiado antes de entrar</strong></td></tr>
       <tr><td>¿Reiniciada?</td><td>Sí / no</td></tr>
       <tr><td>¿4H sin cerrar?</td><td>Sí si la etiqueta lo decía. Sirve para comparar provisionales contra confirmadas</td></tr>
-      <tr><td>Zona</td><td>Óptima / continuación / últimas</td></tr>
       <tr><td>Entrada · Stop · Objetivo</td><td>Los tres precios</td></tr>
-      <tr><td>R:R</td><td>El del panel, antes de entrar</td></tr>
-      <tr><td>Coste sobre el riesgo</td><td>El porcentaje del panel</td></tr>
+      <tr><td>Stop en pips</td><td>El del panel. Es lo que necesitas para dimensionar en MT5</td></tr>
       <tr><td>Resultado</td><td>Objetivo / stop / cerrada a mano</td></tr>
       <tr><td><strong>¿Seguí la regla?</strong></td><td><strong>Sí / no.</strong> La columna más valiosa</td></tr>
       <tr><td>Cómo me sentí</td><td>Una frase</td></tr>
@@ -269,7 +264,7 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
     <p>Fecha, por qué no entraste, y qué habría pasado. <strong>Es la hoja que contesta si tu criterio al descartar te salva o te cuesta</strong>, y no hay ninguna otra forma de saberlo.</p>
     <h3>Al acabar el mes</h3>
     <p>Antes que cualquier resultado: <strong>¿cuántas veces seguiste la regla?</strong> Si es menos de ocho de cada diez, no has probado el método — has probado otra cosa, y hay que repetir el mes.</p>
-    <p>Después: ¿las de cuatro flechas salieron mejor que las de dos? ¿Las de zona óptima mejor que las de continuación? ¿Las que descartaste habrían ganado? ¿En qué franja están tus mejores operaciones?</p>
+    <p>Después: ¿las de cuatro flechas salieron mejor que las de dos? ¿Las que descartaste habrían ganado? ¿En qué franja están tus mejores operaciones?</p>
     <div class="nota">Treinta operaciones no dicen si el método gana dinero. Dicen si <strong>tú</strong> puedes ejecutarlo, que es la pregunta que tienes delante ahora mismo.</div>
   </div>
 </section>
@@ -285,8 +280,6 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
       <tr><td>Gatillo</td><td class="m">15 min</td><td>Puedes probar 5 el mes que viene. No dentro de este.</td></tr>
       <tr><td>Exigir H1</td><td class="m">activado</td><td>Es tu eslabón, el que me corregiste.</td></tr>
       <tr><td>Tamaño del pip</td><td class="m">0.0001</td><td>Correcto para EURUSD.</td></tr>
-      <tr><td>Coste ida y vuelta</td><td class="m">el de tu bróker</td><td>El real, no el que te gustaría.</td></tr>
-      <tr><td>R:R mínimo</td><td class="m">0 (sin filtro)</td><td>Este mes ves todas y anotas la zona. El filtro lo pones con tus datos.</td></tr>
       <tr><td>Bloqueo por reiniciada</td><td class="m">activado</td><td>Regla suya, no mía.</td></tr>
       <tr><td>Ventanas</td><td class="m">0900-1130 · 1400-1600</td><td>Solo controlan los avisos. El dibujo no se filtra nunca.</td></tr>
     </tbody>
