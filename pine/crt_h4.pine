@@ -31,6 +31,9 @@ minGat  = input.int(15,  "Gatillo · minutos por vela", 1, 240, step = 1, group 
      "antes entras y más cerca del stop, a cambio de menos certeza. 5 y 15 son las " +
      "que enseña el material; 60 es la variante lenta. Elige una y no la cambies " +
      "dentro del mismo mes, o tu libro no compara nada.")
+pedirH1 = input.bool(true, "Exigir que H1 haya barrido en la misma dirección", group = gR,
+     tooltip = "Antes de bajar a M15, H1 tiene que tener rango vivo en la misma " +
+     "dirección que 4H: los dos apuntando al mismo sitio.")
 verCtx  = input.bool(true, "Líneas de objetivo de 12H y diario", group = gR)
 vidaMax = input.int(10, "Salir a mercado tras N velas de estructura", 0, 60, group = gR)
 dojiPct = input.float(10.0, "Vela base doji: cuerpo menor que este % del rango", 0, 50, group = gR)
@@ -107,7 +110,8 @@ type Marco
 var Marco d1  = Marco.new(1440)
 var Marco h12 = Marco.new(720)
 var Marco est = Marco.new(240)
-var Marco gat = Marco.new(60)
+var Marco h1  = Marco.new(60)
+var Marco gat = Marco.new(15)
 
 procesa(Marco s) =>
     float co = s.o
@@ -209,11 +213,13 @@ paso(Marco s) =>
 d1.per  := 1440
 h12.per := 720
 est.per := minEst
+h1.per  := 60
 gat.per := minGat
 
 paso(d1)
 paso(h12)
 naceEst = paso(est)
+paso(h1)
 naceGat = paso(gat)
 
 // ── objetivos de contexto ───────────────────────────────────────────────────
@@ -335,37 +341,39 @@ zona(float ent, float obj, float pr, int L) =>
     float d = math.abs(pr - ent)
     d < t ? "óptima" : d < 2*t ? "continuación" : "últimas oport."
 
-if naceGat
-    int L = gat.lado
-    bool alineado = est.vivo and est.lado == L
-    ultRein := gat.ladoAnt != 0 and gat.ladoAnt != L and alineado
-    // proteccion: reiniciada EN CONTRA con una mayor sin rango vivo
-    if bloqRe and est.vivo and est.lado != L and (not d1.vivo or not h12.vivo)
-        bloqueado := true
-        motivo := "⊘ reiniciada en contra y arriba sin cerrar · NO SE OPERA"
+// La señal.  El gatillo no necesita hacer su propio CRT: basta con que su cierre
+// devuelva el precio al lado bueno del nivel que barrio la vela de 4H. Eso es el
+// "vuelve a entrar dentro" del turtle soup, tomado a escala de M15.
+if barstate.isconfirmed and gat.cerrada and not gat.cerrada[1]
+    int L = est.lado
+    if not est.vivo
+        motivo := "sin rango vivo en 4H"
         ultRR := na
     else
-        if alineado
-            bloqueado := false
-        if not est.vivo
-            motivo := "sin rango vivo en estructura"
+        bool vuelve = L > 0 ? gat.pc > est.mecha : gat.pc < est.mecha
+        bool h1ok = not pedirH1 or (h1.vivo and h1.lado == L)
+        ultRein := gat.ladoAnt != 0 and gat.ladoAnt != L and gat.lado == L
+        if bloqRe and gat.lado != 0 and gat.lado != L and (not d1.vivo or not h12.vivo)
+            bloqueado := true
+            motivo := "⊘ reiniciada en contra y arriba sin cerrar · NO SE OPERA"
             ultRR := na
-        else if not alineado
-            motivo := "rango de estructura " + (est.lado > 0 ? "alcista" : "bajista") +
-                 " y el gatillo va al revés · esperando reiniciada"
+        else if not h1ok
+            motivo := "4H " + (L > 0 ? "alcista" : "bajista") + " pero H1 no acompaña"
             ultRR := na
-        else if bloqueado
-            motivo := "⊘ bloqueado hasta que cierre una temporalidad mayor"
+        else if not vuelve
+            motivo := "esperando que M15 cierre de vuelta dentro de la vela base"
             ultRR := na
         else
-            float ent = gat.cierre
-            float stp = L > 0 ? gat.mecha - colchon * syminfo.mintick
-                              : gat.mecha + colchon * syminfo.mintick
+            bloqueado := false
+            float ent = gat.pc
+            float stp = L > 0 ? est.mecha - colchon * syminfo.mintick
+                              : est.mecha + colchon * syminfo.mintick
             float rgo = math.abs(ent - stp)
             float obj = est.obj
             ultRR := rgo > 0 ? math.abs(obj - ent) / rgo : na
             ultZona := zona(est.cierre, est.obj, ent, L)
-            int nAl = (d1.vivo and d1.lado == L ? 1 : 0) + (h12.vivo and h12.lado == L ? 1 : 0) + 2
+            int nAl = 2 + (d1.vivo and d1.lado == L ? 1 : 0) + (h12.vivo and h12.lado == L ? 1 : 0) +
+                 (h1.vivo and h1.lado == L ? 1 : 0)
             if rgo <= 0 or rgo / pip < 3 * costeU
                 motivo := "riesgo de " + str.tostring(rgo / pip, "#.#") + " pips: por debajo del mínimo operable"
             else if rrMin > 0 and ultRR < rrMin
@@ -377,8 +385,7 @@ if naceGat
                      "\nentrada  " + str.tostring(ent, format.mintick) +
                      "\nstop     " + str.tostring(stp, format.mintick) + "   · " + str.tostring(rgo / pip, "#.#") + " pips" +
                      "\nobjetivo " + str.tostring(obj, format.mintick) + "   · R:R " + str.tostring(ultRR, "#.##") +
-                     "\nzona " + ultZona + " · " + str.tostring(nAl) + " de 4 · gatillo " +
-                     str.tostring(minGat / 60.0, "#.##") + "H" +
+                     "\nzona " + ultZona + " · " + str.tostring(nAl) + " de 5" +
                      (enVentana ? "" : "\n(fuera de tu ventana)"),
                      style = L > 0 ? label.style_label_up : label.style_label_down,
                      color = color.new(cs, enVentana ? 12 : 58), textcolor = color.white,
@@ -414,11 +421,11 @@ if verPanel and barstate.islast
     int nAl = (d1.vivo ? 1 : 0) + (h12.vivo ? 1 : 0) + (est.vivo ? 1 : 0) + (gat.vivo ? 1 : 0)
     table.cell(pan, 0, 0, "CRT " + str.tostring(minEst / 60, "#") + "H", text_size = size.small,
          text_color = color.white, text_halign = text.align_left)
-    table.cell(pan, 1, 0, "gatillo " + str.tostring(minGat) + "m" + (enVentana ? "  ●" : "  ○"),
+    table.cell(pan, 1, 0, "gatillo M" + str.tostring(minGat) + (enVentana ? "  ●" : "  ○"),
          text_size = size.small, text_color = enVentana ? ALC : color.gray, text_halign = text.align_right)
-    fila(pan, 1, "1D · 12H · 4H · gatillo",
-         flecha(d1) + " " + flecha(h12) + " " + flecha(est) + " " + flecha(gat) +
-         (ultRein ? "  reiniciada" : ""), ultRein ? ORO : color.white)
+    fila(pan, 1, "1D · 12H · 4H · 1H",
+         flecha(d1) + " " + flecha(h12) + " " + flecha(est) + " " + flecha(h1) +
+         (ultRein ? "   reiniciada" : ""), ultRein ? ORO : color.white)
     string txtEst = est.vivo ? est.estado + "  →  " + str.tostring(est.obj, format.mintick) : est.estado
     color  colEst = colM(est)
     if est.barriendo != 0
