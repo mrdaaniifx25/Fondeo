@@ -74,8 +74,9 @@ epocaDe(int t) =>
 bloqueDe(int e, int per) => int(math.floor(e / (per * MIN_MS)))
 elFin = epocaDe(time_close - 1)
 elSig = epocaDe(time_close)
-enVentana = not usarVent or not na(time(timeframe.period, vent1 + ":23456", tz))
-                         or not na(time(timeframe.period, vent2 + ":23456", tz))
+enKZ1 = not na(time(timeframe.period, vent1 + ":23456", tz))
+enKZ2 = not na(time(timeframe.period, vent2 + ":23456", tz))
+enVentana = not usarVent or enKZ1 or enKZ2
 
 // ════════════════════════════════════════════════════════════════════════════
 type Marco
@@ -125,7 +126,7 @@ procesa(Marco s) =>
     if s.vivo
         bool llega = s.lado > 0 ? ch >= s.obj : cl <= s.obj
         bool salta = s.lado > 0 ? cl <= s.mecha : ch >= s.mecha
-        s.edad += 1
+        s.edad := s.edad + 1
         if llega
             s.vivo := false
             s.estado := "COMPLETADO"
@@ -178,18 +179,18 @@ abre(Marco s, int b) =>
     s.h := high
     s.l := low
     s.c := close
+    true
 
 paso(Marco s) =>
     int b  = bloqueDe(elFin, s.per)
     int bn = bloqueDe(elSig, s.per)
     bool nace = false
-    if na(s.bid)
+    bool nueva = na(s.bid) or b != s.bid
+    if nueva and not na(s.bid) and not s.cerrada
+        nace := procesa(s)
+    if nueva
         abre(s, b)
-    else if b != s.bid
-        if not s.cerrada
-            nace := procesa(s)
-        abre(s, b)
-    else
+    if not nueva
         s.h := math.max(s.h, high)
         s.l := math.min(s.l, low)
         s.c := close
@@ -265,6 +266,7 @@ borra() =>
     label.delete(l1)
     label.delete(l2)
     label.delete(l3)
+    true
 
 if naceEst
     if not histor
@@ -300,7 +302,8 @@ if est.vivo and not na(cj)
     if verPO3 and not na(b3)
         line.set_x2(b3, bar_index)
         label.set_x(l3, int(math.avg(line.get_x1(b3), bar_index)))
-else if not est.vivo and not na(cj)
+
+if not est.vivo and not na(cj)
     box.set_border_color(cj, color.new(GRI, 55))
     line.set_color(lnE, color.new(GRI, 60))
     line.set_style(lnE, line.style_dotted)
@@ -325,68 +328,97 @@ var bool   bloqueado = false
 // dentro de la vela base.
 int   setL   = est.barriendo != 0 ? est.barriendo : (est.vivo ? est.lado : 0)
 bool  setProv = est.barriendo != 0
-float setBase = setL == 0 ? na : setProv ? (setL > 0 ? est.pl : est.ph)
-                                         : (setL > 0 ? est.blo : est.bhi)
+float baseProv = setL > 0 ? est.pl : est.ph
+float baseFija = setL > 0 ? est.blo : est.bhi
+float setBase = setL == 0 ? na : setProv ? baseProv : baseFija
 float setMecha = setL == 0 ? na : setProv ? (setL > 0 ? est.l : est.h) : est.mecha
 float setObj  = setL == 0 ? na : setProv ? (setL > 0 ? est.ph : est.pl) : est.obj
 float setCie  = setProv ? est.pc : est.cierre
 
-if barstate.isconfirmed and gat.cerrada and not gat.cerrada[1]
+// Pine no admite historial sobre campos de objeto -gat.cerrada[1] no compila-,
+// asi que el estado anterior se guarda a mano.
+var bool gatAntes = false
+bool acabaGat = barstate.isconfirmed and gat.cerrada and not gatAntes
+if barstate.isconfirmed
+    gatAntes := gat.cerrada
+
+// Sin if/else: cada caso es un `if` con su propia guarda. En Pine las ramas de
+// un if/else tienen que devolver el mismo tipo, y aqui unas acaban en una
+// asignacion y otras en una llamada que no devuelve nada. Con ifs sueltos no
+// hay nada que comparar.
+if acabaGat
+    bool resuelto = false
+    bool vuelve = setL == 0 ? false : setL > 0 ? gat.pc > setBase : gat.pc < setBase
+    bool h1ok   = not pedirH1 or (h1.vivo and h1.lado == setL)
+    bool arribaSinCerrar = not d1.vivo or not h12.vivo
+    bool gatEnContra = setL != 0 and gat.lado != 0 and gat.lado != setL
+    bool bloqueaRe = bloqRe and gatEnContra and arribaSinCerrar
+
+    if setL != 0
+        ultRein := gat.ladoAnt != 0 and gat.ladoAnt != setL and gat.lado == setL
+
     if setL == 0
         motivo := "sin barrido en 4H"
         ultStop := na
-    else
-        // vuelve DENTRO de la vela base, que es lo que se barrio
-        bool vuelve = setL > 0 ? gat.pc > setBase : gat.pc < setBase
-        bool h1ok = not pedirH1 or (h1.vivo and h1.lado == setL)
-        ultRein := gat.ladoAnt != 0 and gat.ladoAnt != setL and gat.lado == setL
-        if bloqRe and gat.lado != 0 and gat.lado != setL and (not d1.vivo or not h12.vivo)
-            bloqueado := true
-            motivo := "⊘ reiniciada en contra y arriba sin cerrar · NO SE OPERA"
-            ultStop := na
-        else if not h1ok
-            motivo := "4H " + (setL > 0 ? "alcista" : "bajista") + " pero H1 no acompaña"
-            ultStop := na
-        else if not vuelve
-            // un cierre de M15 fuera NO descarta nada: el rango es de 4H y solo
-            // un cierre de 4H puede descartarlo. Se sigue esperando.
-            motivo := "M15 cerró fuera · sigo esperando el que vuelva dentro"
-            ultStop := na
-        else
-            bloqueado := false
-            float ent = gat.pc
-            float stp = setL > 0 ? setMecha - colchon * syminfo.mintick
-                                 : setMecha + colchon * syminfo.mintick
-            float rgo = math.abs(ent - stp)
-            ultStop := rgo / pip
-            int nAl = 2 + (d1.vivo and d1.lado == setL ? 1 : 0) +
-                 (h12.vivo and h12.lado == setL ? 1 : 0) + (h1.vivo and h1.lado == setL ? 1 : 0)
-            if rgo <= 0
-                motivo := "el barrido no deja stop"
-            else
-                color cs = setL > 0 ? ALC : BAJ
-                label.new(bar_index, setL > 0 ? low : high,
-                     (setL > 0 ? "▲ COMPRA" : "▼ VENTA") + (setProv ? "  · 4H sin cerrar" : "") +
-                     (ultRein ? "  · reiniciada" : "") +
-                     "\nentrada  " + str.tostring(ent, format.mintick) +
-                     "\nstop     " + str.tostring(stp, format.mintick) + "   · " + str.tostring(rgo / pip, "#.#") + " pips" +
-                     "\nobjetivo " + str.tostring(setObj, format.mintick) +
-                     "\n" + str.tostring(nAl) + " de 5 marcos" +
-                     (enVentana ? "" : "\n(fuera de tu ventana)"),
-                     style = setL > 0 ? label.style_label_up : label.style_label_down,
-                     color = color.new(cs, enVentana ? 12 : 58), textcolor = color.white,
-                     size = size.normal)
-                line.new(bar_index, stp, bar_index + 20, stp, color = BAJ, width = 2, style = line.style_dashed)
-                line.new(bar_index, ent, bar_index + 20, ent, color = color.new(color.gray, 20), width = 2)
-                motivo := (enVentana ? "SEÑAL " : "SEÑAL fuera de tu ventana · ") +
-                     (setL > 0 ? "COMPRA" : "VENTA") + " · stop " + str.tostring(rgo / pip, "#.#") + " pips"
-                if enVentana
-                    alert((setL > 0 ? "CRT COMPRA " : "CRT VENTA ") + syminfo.ticker +
-                         (setProv ? " (4H sin cerrar)" : "") +
-                         " · entrada " + str.tostring(ent, format.mintick) +
-                         " · stop " + str.tostring(stp, format.mintick) +
-                         " · objetivo " + str.tostring(setObj, format.mintick),
-                         alert.freq_once_per_bar_close)
+        resuelto := true
+
+    if not resuelto and bloqueaRe
+        bloqueado := true
+        motivo := "⊘ reiniciada en contra y arriba sin cerrar · NO SE OPERA"
+        ultStop := na
+        resuelto := true
+
+    if not resuelto and not h1ok
+        motivo := "4H " + (setL > 0 ? "alcista" : "bajista") + " pero H1 no acompaña"
+        ultStop := na
+        resuelto := true
+
+    // un cierre del gatillo FUERA no descarta nada: el rango es de 4H y solo un
+    // cierre de 4H puede descartarlo. Se sigue esperando.
+    if not resuelto and not vuelve
+        motivo := "M15 cerró fuera · sigo esperando el que vuelva dentro"
+        ultStop := na
+        resuelto := true
+
+    if not resuelto
+        bloqueado := false
+        float ent = gat.pc
+        float colch = colchon * syminfo.mintick
+        float stp = setL > 0 ? setMecha - colch : setMecha + colch
+        float rgo = math.abs(ent - stp)
+        ultStop := rgo / pip
+        int nAl = 2 + (d1.vivo and d1.lado == setL ? 1 : 0) +
+             (h12.vivo and h12.lado == setL ? 1 : 0) + (h1.vivo and h1.lado == setL ? 1 : 0)
+        if rgo <= 0
+            motivo := "el barrido no deja stop"
+        if rgo > 0
+            color cs = setL > 0 ? ALC : BAJ
+            label.new(bar_index, setL > 0 ? low : high,
+                 (setL > 0 ? "▲ COMPRA" : "▼ VENTA") + (setProv ? "  · 4H sin cerrar" : "") +
+                 (ultRein ? "  · reiniciada" : "") +
+                 "\nentrada  " + str.tostring(ent, format.mintick) +
+                 "\nstop     " + str.tostring(stp, format.mintick) + "   · " +
+                 str.tostring(rgo / pip, "#.#") + " pips" +
+                 "\nobjetivo " + str.tostring(setObj, format.mintick) +
+                 "\n" + str.tostring(nAl) + " de 5 marcos" +
+                 (enVentana ? "" : "\n(fuera de tu ventana)"),
+                 style = setL > 0 ? label.style_label_up : label.style_label_down,
+                 color = color.new(cs, enVentana ? 12 : 58), textcolor = color.white,
+                 size = size.normal)
+            line.new(bar_index, stp, bar_index + 20, stp, color = BAJ, width = 2,
+                 style = line.style_dashed)
+            line.new(bar_index, ent, bar_index + 20, ent, color = color.new(color.gray, 20),
+                 width = 2)
+            if enVentana
+                alert((setL > 0 ? "CRT COMPRA " : "CRT VENTA ") + syminfo.ticker +
+                     (setProv ? " (4H sin cerrar)" : "") +
+                     " · entrada " + str.tostring(ent, format.mintick) +
+                     " · stop " + str.tostring(stp, format.mintick) +
+                     " · objetivo " + str.tostring(setObj, format.mintick),
+                     alert.freq_once_per_bar_close)
+            motivo := (enVentana ? "SEÑAL " : "SEÑAL fuera de tu ventana · ") +
+                 (setL > 0 ? "COMPRA" : "VENTA") + " · stop " +
+                 str.tostring(rgo / pip, "#.#") + " pips"
 
 // ── panel ───────────────────────────────────────────────────────────────────
 flecha(Marco s) => s.vivo ? (s.lado > 0 ? "▲" : "▼") : "—"
@@ -431,8 +463,8 @@ if verPanel and barstate.islast
 
 // el ritmo del gatillo, para poder mirar en M5 sin perder la referencia
 bool finGat = bloqueDe(elSig, gat.per) != bloqueDe(elFin, gat.per)
-bgcolor(verRitmo and finGat and timeframe.in_seconds() < gat.per * 60
-     ? color.new(color.gray, 88) : na, title = "cierre del gatillo")
+bool marcaRitmo = verRitmo and finGat and timeframe.in_seconds() < gat.per * 60
+bgcolor(marcaRitmo ? color.new(color.gray, 88) : na, title = "cierre del gatillo")
 
 var label avTF = na
 if barstate.islast
