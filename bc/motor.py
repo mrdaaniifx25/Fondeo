@@ -11,7 +11,9 @@ import numpy as np, pandas as pd
 import nucleo as N
 
 CTX = [("1D", 24), ("12H", 12), ("4H", 4)]      # temporalidades de contexto
-EJEC_H = 1                                       # ejecucion en 1H  ·  BC_02 §5
+EJEC_H = 1                                       # por defecto 1H  ·  BC_02 §5
+# El material habla de 1H, 15M, 10M, 5M y 2M, y sus dos operaciones documentadas
+# entran en 15M y en 10M. Hasta BC_09 esto era una constante.  ·  BC_09
 
 def objetivos_vivos(m1, huso, lectura, ts_ejec):
     """Para cada instante de ejecucion, los objetivos de contexto todavia vivos."""
@@ -36,7 +38,8 @@ def objetivos_vivos(m1, huso, lectura, ts_ejec):
     return cols
 
 def opera(m1, huso, lectura, colchon, unidad, coste, rr_min=3.0,
-          desde=None, hasta=None, tope_velas=5, riesgo_min_x_coste=3.0):
+          desde=None, hasta=None, tope_velas=5, riesgo_min_x_coste=3.0,
+          ejec_h=None):
     """riesgo_min_x_coste: el stop tiene que estar al menos a N veces el coste.
 
     No es un filtro de rendimiento, es de EJECUTABILIDAD. Un stop de 1,9 pips
@@ -44,7 +47,7 @@ def opera(m1, huso, lectura, colchon, unidad, coste, rr_min=3.0,
     come, y ademas dispara el R:R a valores absurdos -se han visto de 1198- que
     envenenan la media. Se aplica igual a todas las celdas.
     """
-    ej = N.activaciones(N.velas(m1, EJEC_H, huso, 0), lectura)
+    ej = N.activaciones(N.velas(m1, EJEC_H if ejec_h is None else ejec_h, huso, 0), lectura)
     ts = ej["fin"].to_numpy()
     ctx = objetivos_vivos(m1, huso, lectura, ts)
 
