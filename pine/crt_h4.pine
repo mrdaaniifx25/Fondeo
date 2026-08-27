@@ -312,6 +312,48 @@ if not est.vivo and not na(cj)
     borra()
     b1 := na
 
+// ── el setup provisional, con la vela de 4H todavía abierta ─────────────────
+// Sin esto no se dibujaba NADA hasta que cerraba la vela de 4H, o sea hasta
+// cuatro horas despues del barrido. Y es justo cuando se opera: el gatillo
+// puede disparar con la de 4H abierta, y hasta ahora disparaba a ciegas.
+// Se dibuja discontinuo, para distinguirlo del rango ya confirmado.
+var box  cjP = na
+var line lnP = na
+var line lnS = na
+
+if est.barriendo != 0 and not est.vivo
+    color cp = est.barriendo > 0 ? ALC : BAJ
+    float oP = est.barriendo > 0 ? est.ph : est.pl
+    float mP = est.barriendo > 0 ? est.l : est.h
+    if na(cjP)
+        cjP := box.new(est.barPrev, est.ph, bar_index + 1, est.pl, bgcolor = na,
+             border_color = color.new(cp, 45), border_width = 1,
+             border_style = line.style_dashed)
+        lnP := line.new(est.barPrev, oP, bar_index + 12, oP, color = color.new(cp, 35),
+             width = 2, style = line.style_dashed)
+        lnS := line.new(est.barIni, mP, bar_index + 12, mP, color = color.new(BAJ, 35),
+             width = 1, style = line.style_dotted)
+    box.set_top(cjP, est.ph)
+    box.set_bottom(cjP, est.pl)
+    box.set_right(cjP, bar_index + 1)
+    box.set_border_color(cjP, color.new(cp, 45))
+    line.set_y1(lnP, oP)
+    line.set_y2(lnP, oP)
+    line.set_x2(lnP, bar_index + 12)
+    line.set_color(lnP, color.new(cp, 35))
+    line.set_y1(lnS, mP)
+    line.set_y2(lnS, mP)
+    line.set_x2(lnS, bar_index + 12)
+
+// en cuanto la de 4H cierra -confirmando o fallando- el provisional se va
+if est.barriendo == 0 or est.vivo
+    box.delete(cjP)
+    line.delete(lnP)
+    line.delete(lnS)
+    cjP := na
+    lnP := na
+    lnS := na
+
 // ── el gatillo ──────────────────────────────────────────────────────────────
 var string motivo = "esperando"
 var float  ultStop = na
@@ -351,11 +393,13 @@ if acabaGat
     bool vuelve = setL == 0 ? false : setL > 0 ? gat.pc > setBase : gat.pc < setBase
     bool h1ok   = not pedirH1 or (h1.vivo and h1.lado == setL)
     bool arribaSinCerrar = not d1.vivo or not h12.vivo
-    bool gatEnContra = setL != 0 and gat.lado != 0 and gat.lado != setL
-    bool bloqueaRe = bloqRe and gatEnContra and arribaSinCerrar
+    // la reiniciada del mensaje privado es de H1, no del gatillo: "buscamos una
+    // reiniciada alcista en 1H". Estaba mirando el marco equivocado.
+    bool h1EnContra = setL != 0 and h1.vivo and h1.lado != 0 and h1.lado != setL
+    bool bloqueaRe = bloqRe and h1EnContra and arribaSinCerrar
 
     if setL != 0
-        ultRein := gat.ladoAnt != 0 and gat.ladoAnt != setL and gat.lado == setL
+        ultRein := h1.ladoAnt != 0 and h1.ladoAnt != setL and h1.vivo and h1.lado == setL
 
     if setL == 0
         motivo := "sin barrido en 4H"
