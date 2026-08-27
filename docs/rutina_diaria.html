@@ -103,7 +103,7 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
 <div class="env">
 
 <header>
-  <div class="eyebrow">EURUSD · gráfico en M15 · un mes en demo</div>
+  <div class="eyebrow">EURUSD · gráfico en M15 o M5 · un mes en demo</div>
   <h1>Rutina diaria</h1>
   <p class="sub">Lo que haces cada día con el indicador delante. Este es el documento que abres por la mañana; los demás son consulta.</p>
 </header>
@@ -165,7 +165,7 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
   <div class="shead"><span class="snum">03</span><h2>El día</h2></div>
 
   <div class="reloj">
-    <div class="fr"><div class="h">08:45</div><div class="q">
+    <div class="fr"><div class="h">07:45</div><div class="q">
       <b>Preparas y escribes tu frase</b>
       <p>Miras las tres de arriba, en este orden, y no bajas hasta tener la anterior:</p>
       <ul>
@@ -176,7 +176,7 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
       <p style="margin-top:.6em">Y escribes una frase en el libro: <em>«busco compras hacia 1,0940 porque diaria y 12H apuntan arriba y hay rango de 4H alcista.»</em> Si no te sale la frase, es que hoy no hay sesgo — y eso también se apunta.</p>
     </div></div>
 
-    <div class="fr"><div class="h">09:00 – 11:30<br><span style="color:var(--gris)">Londres</span></div><div class="q">
+    <div class="fr"><div class="h">08:00 – 11:00<br><span style="color:var(--gris)">Londres</span></div><div class="q">
       <b>Miras el panel, nada más</b>
       <ul>
         <li>Si pone <span class="mono">sin barrido</span>: no hay nada. Puedes hacer otra cosa.</li>
@@ -187,7 +187,7 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
       <p style="margin-top:.6em"><strong>No bajes a M5 a mirar.</strong> Si te descubres haciéndolo, cierras el gráfico diez minutos.</p>
     </div></div>
 
-    <div class="fr"><div class="h">14:00 – 16:00<br><span style="color:var(--gris)">Nueva York</span></div><div class="q">
+    <div class="fr"><div class="h">13:00 – 16:00<br><span style="color:var(--gris)">Nueva York</span></div><div class="q">
       <b>Lo mismo, sin volver a leer el contexto</b>
       <p>El sesgo es el que escribiste por la mañana. Si a media tarde te dan ganas de cambiarlo, estás improvisando, y eso va al libro.</p>
       <p style="margin-top:.5em"><strong>Máximo dos operaciones al día</strong>, hayan salido bien o mal.</p>
@@ -212,7 +212,7 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
     <thead><tr><th>Si pasa esto</th><th>Haces esto</th></tr></thead>
     <tbody>
       <tr><td>Llevas tres días sin ninguna señal</td><td><strong>Nada.</strong> Es lo normal. Este método da pocas entradas y los días vacíos son la mayoría. Anota «sin setup» y cierra.</td></tr>
-      <tr><td>La señal salta a las 12:30, fuera de tu ventana</td><td>No entras. La apuntas en el libro con lo que habría pasado. Al final del mes sabrás cuánto te cuesta el horario.</td></tr>
+      <tr><td>La señal salta a las 12:00, fuera de tus killzones</td><td>No entras. La apuntas en el libro con lo que habría pasado. Al final del mes sabrás cuánto te cuesta el horario.</td></tr>
       <tr><td>Entras y a los diez minutos te salta el stop</td><td>Nada. El stop hizo su trabajo. Lo apuntas y sigues. <strong>No entras otra vez «para recuperar».</strong></td></tr>
       <tr><td>El precio va a favor y te da miedo perderlo</td><td>No cierras antes. El objetivo está donde está. Si lo cierras antes, va al libro como «no seguí la regla», que es la columna que te va a enseñar más.</td></tr>
       <tr><td>Hay setup en 4H pero H1 no acompaña</td><td>Esperas. Puede que aparezca la <strong>reiniciada</strong> de H1 y se alinee — ese es el mejor momento del método.</td></tr>
@@ -281,11 +281,11 @@ footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex 
       <tr><td>Exigir H1</td><td class="m">activado</td><td>Es tu eslabón, el que me corregiste.</td></tr>
       <tr><td>Tamaño del pip</td><td class="m">0.0001</td><td>Correcto para EURUSD.</td></tr>
       <tr><td>Bloqueo por reiniciada</td><td class="m">activado</td><td>Regla suya, no mía.</td></tr>
-      <tr><td>Ventanas</td><td class="m">0900-1130 · 1400-1600</td><td>Solo controlan los avisos. El dibujo no se filtra nunca.</td></tr>
+      <tr><td>Killzones</td><td class="m">0800-1100 · 1300-1600</td><td>Caen a la misma hora invierno y verano. Solo controlan los avisos.</td></tr>
     </tbody>
   </table></div>
   <div class="col">
-    <div class="nota">Gráfico en <strong>M15</strong> sobre <strong>EURUSD</strong>. Si lo pones en una temporalidad mayor que el gatillo, el indicador te lo avisa con un cartel naranja.</div>
+    <div class="nota"><strong>Puedes mirar en M5 sin problema.</strong> El indicador calcula lo mismo y las señales son idénticas: el gatillo sigue siendo el cierre de M15. Para no perder el ritmo, cada cierre de M15 se marca con una franja gris tenue en el fondo — esas son las únicas velas en las que puede aparecer una señal. Lo que no puedes es ponerte por encima de M15: ahí el indicador te avisa con un cartel naranja.</div>
   </div>
 </section>
 

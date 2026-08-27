@@ -41,6 +41,10 @@ dojiPct = input.float(10.0, "Vela base doji: cuerpo menor que este % del rango",
 gD = "Lo que se dibuja"
 verPO3  = input.bool(true, "Corchetes del PO3 sobre el rango vivo", group = gD)
 histor  = input.bool(true, "Dejar el historial de rangos en gris", group = gD)
+verRitmo = input.bool(true, "Marcar el cierre de cada vela del gatillo", group = gD,
+     tooltip = "Solo aparece si el gráfico es más pequeño que el gatillo. Sirve " +
+     "para mirar en M5 sin perder de vista dónde cierran las velas de M15, que " +
+     "es el único instante en el que puede aparecer una señal.")
 verPanel = input.bool(true, "Panel", group = gD)
 
 gE = "Ejecución"
@@ -51,10 +55,12 @@ bloqRe  = input.bool(true, "Bloquear si hay reiniciada en contra sin cerrar arri
      "una temporalidad mayor todavía no ha cerrado su rango, no se opera.")
 
 gV = "Tu ventana operativa"
-usarVent = input.bool(true, "Avisar solo dentro de la ventana", group = gV,
-     tooltip = "Dibuja siempre. Esto controla los avisos.")
-vent1 = input.session("0900-1130", "Ventana 1 · Londres", group = gV)
-vent2 = input.session("1400-1600", "Ventana 2 · Nueva York", group = gV)
+usarVent = input.bool(true, "Avisar solo dentro de la killzone", group = gV,
+     tooltip = "Dibuja siempre. Esto controla los avisos. Con el huso en " +
+     "Europe/Madrid las dos ventanas caen a la misma hora de tu reloj en " +
+     "invierno y en verano, porque España y Nueva York cambian de horario a la vez.")
+vent1 = input.session("0800-1100", "London killzone", group = gV)
+vent2 = input.session("1300-1600", "New York killzone", group = gV)
 
 ALC = #0E8C7D
 BAJ = #C4443C
@@ -422,6 +428,11 @@ if verPanel and barstate.islast
          text_color = hay ? ALC : blo ? BAJ : color.gray, text_halign = text.align_left)
     table.cell(pan, 1, 4, motivo, text_size = size.small,
          text_color = hay ? ALC : blo ? BAJ : color.gray, text_halign = text.align_right)
+
+// el ritmo del gatillo, para poder mirar en M5 sin perder la referencia
+bool finGat = bloqueDe(elSig, gat.per) != bloqueDe(elFin, gat.per)
+bgcolor(verRitmo and finGat and timeframe.in_seconds() < gat.per * 60
+     ? color.new(color.gray, 88) : na, title = "cierre del gatillo")
 
 var label avTF = na
 if barstate.islast
