@@ -98,3 +98,61 @@ Fuente: HistData, ficheros anuales de M1, 2020 a 2025.
 
 **Estos dos instrumentos quedan reservados desde ahora.** No se miran, no se
 grafican, no se exploran. Se corre el barrido una vez y se reporta.
+
+---
+
+# Enmienda · 2026-08-27, todavía sin datos
+
+Se fija el alcance definitivo y los parámetros que aún quedaban sueltos. **Se
+escribe antes de que los ficheros existan en el repositorio**, que es lo único
+que hace que esto valga.
+
+## Alcance
+
+```
+XAUUSD   2023 · 2024 · 2025
+GRXEUR   2023 · 2024 · 2025      (DAX)
+```
+
+Seis instrumento-años, seis ficheros anuales de HistData. Potencia: n ≈ 564, el
+intervalo del 95 % saldrá de ±0,099 R. Con un efecto verdadero de +0,10 R eso da
+z ≈ 2,0. Es el mínimo que permite concluir, y se acepta de antemano que un
+resultado de z entre 1,5 y 2,0 se reportará como **no concluyente**, no como
+éxito.
+
+## Conversión horaria — la misma que ya está validada
+
+HistData entrega las marcas de tiempo en hora de Nueva York. `bt/check_tz.py`
+comprobó empíricamente sobre EURUSD que llevan **horario de verano**, no EST
+fijo. Se usa la misma conversión de `bt/load_pares.py`, sin excepciones:
+
+```python
+idx.tz_localize("America/New_York").tz_convert("UTC").tz_localize(None)
+```
+
+Si los ficheros nuevos no pasan la comprobación del hueco semanal, se dice y se
+para. No se prueba otra conversión «a ver si sale mejor».
+
+## Costes, declarados ahora
+
+El coste es la variable de la que depende todo el resultado, así que no puede
+elegirse después. Se fijan **por lo alto**, en contra de la hipótesis:
+
+| instrumento | unidad | coste ida y vuelta | equivale a |
+|---|---|---|---|
+| XAUUSD | 0,01 USD | **35 unidades** | 0,35 USD de spread |
+| GRXEUR | 1 punto | **2,0 puntos** | 2 puntos de spread |
+
+Los dos están en el extremo caro de lo que cobra un bróker retail decente. Si
+sale positivo con estos costes, saldría más positivo con los reales.
+
+Junto a la neta se reportará el **coste que dejaría cada celda en cero**, que no
+depende de esta elección y permite a cualquiera comparar con lo que pague.
+
+## Qué está escrito y no se toca
+
+- El anclaje: `ancla_ny = 1`, el mismo de todo el proyecto.
+- La celda principal: **H12**.
+- Una sola pasada. El resultado se publica entero, salgan las seis
+  temporalidades como salgan.
+- 2026 no entra. Si se descarga, se guarda cerrado para después.
