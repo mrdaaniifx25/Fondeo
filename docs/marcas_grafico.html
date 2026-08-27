@@ -1,0 +1,383 @@
+<title>Marcas en el gráfico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+
+<style>
+:root{
+  --fondo:#F5F5F2; --sup:#FFFFFF; --sup2:#EBEBE6; --papel:#FAFAF7;
+  --tinta:#16181A; --tinta2:#3E4448; --gris:#6A7075; --linea:#DBDBD4;
+  --azul:#26437E; --azulS:rgba(38,67,126,.10);
+  --alc:#0E7F72; --baj:#BE3B33; --oro:#9A6B10; --mora:#5F45AD;
+  --alcS:rgba(14,127,114,.13); --bajS:rgba(190,59,51,.13);
+  --oroS:rgba(154,107,16,.13); --moraS:rgba(95,69,173,.11);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --fondo:#0D0F11; --sup:#16191C; --sup2:#1E2226; --papel:#131619;
+  --tinta:#E6E7E4; --tinta2:#B6BBBE; --gris:#888E93; --linea:#2A2F34;
+  --azul:#93AAE4; --azulS:rgba(147,170,228,.13);
+  --alc:#35C6B1; --baj:#F1766D; --oro:#DFA53E; --mora:#A78CEA;
+  --alcS:rgba(53,198,177,.15); --bajS:rgba(241,118,109,.15);
+  --oroS:rgba(223,165,62,.15); --moraS:rgba(167,140,234,.13);
+}}
+:root[data-theme="dark"]{
+  --fondo:#0D0F11; --sup:#16191C; --sup2:#1E2226; --papel:#131619;
+  --tinta:#E6E7E4; --tinta2:#B6BBBE; --gris:#888E93; --linea:#2A2F34;
+  --azul:#93AAE4; --azulS:rgba(147,170,228,.13);
+  --alc:#35C6B1; --baj:#F1766D; --oro:#DFA53E; --mora:#A78CEA;
+  --alcS:rgba(53,198,177,.15); --bajS:rgba(241,118,109,.15);
+  --oroS:rgba(223,165,62,.15); --moraS:rgba(167,140,234,.13);
+}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);margin:0;padding:0 20px 110px;
+  font-family:Newsreader,Georgia,serif;font-size:17.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.env{max-width:960px;margin:0 auto}
+.col{max-width:620px}
+h1,h2,h3,.disp{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;text-wrap:balance}
+h1{font-size:clamp(1.95rem,5vw,2.9rem);font-weight:700;letter-spacing:-.026em;line-height:1.05;margin:0}
+h2{font-size:1.3rem;font-weight:600;letter-spacing:-.016em;margin:0}
+p{margin:0 0 .9em}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.85em}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.69rem;font-weight:500;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--gris)}
+header{padding:70px 0 30px}
+.sub{font-size:1.12rem;color:var(--tinta2);max-width:52ch;margin:1em 0 0}
+
+figure{margin:1.8em 0}
+figure svg{width:100%;height:auto;display:block;color:var(--tinta)}
+figcaption{font-family:"IBM Plex Mono",monospace;font-size:.71rem;color:var(--gris);
+  margin-top:11px;text-align:center;letter-spacing:.02em}
+
+section{margin:0 0 66px;scroll-margin-top:18px}
+.shead{display:flex;gap:16px;align-items:baseline;border-top:2px solid var(--tinta);
+  padding-top:13px;margin-bottom:1.2em}
+.snum{font-family:"IBM Plex Mono",monospace;font-size:.75rem;font-weight:500;
+  color:var(--azul);padding-top:.35em;flex:none}
+
+.ficha{display:grid;grid-template-columns:150px 1fr;gap:0;background:var(--linea);
+  border:1px solid var(--linea);border-radius:2px;overflow:hidden;margin:1.4em 0;gap:1px}
+.ficha .k{background:var(--sup2);padding:11px 15px;font-family:"IBM Plex Mono",monospace;
+  font-size:.73rem;color:var(--gris);letter-spacing:.03em}
+.ficha .v{background:var(--sup);padding:11px 16px;font-size:.95rem;color:var(--tinta2);
+  font-family:Archivo,sans-serif}
+.ficha .v b{color:var(--tinta);font-weight:600}
+@media(max-width:620px){.ficha{grid-template-columns:1fr}.ficha .k{padding-bottom:2px}}
+
+.muestra{background:var(--papel);border:1px solid var(--linea);border-radius:2px;
+  padding:14px 18px;margin:1.4em 0}
+.muestra svg{width:100%;height:auto;display:block;color:var(--tinta)}
+
+.nota{border-left:3px solid var(--linea);padding:2px 0 2px 18px;margin:1.5em 0;
+  color:var(--tinta2);font-size:.95rem;max-width:600px}
+footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex Mono",monospace;
+  font-size:.72rem;color:var(--gris);line-height:1.85}
+</style>
+
+<div class="env">
+
+<header>
+  <div class="eyebrow">Especificación visual del indicador</div>
+  <h1>Qué dibuja en el gráfico</h1>
+  <p class="sub">Elemento por elemento: cómo se ve, dónde se ancla, cuándo aparece y cuándo desaparece. Todo lo que no esté aquí, no se dibuja.</p>
+</header>
+
+<figure>
+  <svg viewBox="0 0 760 470" role="img" aria-label="Vista general del gráfico con todos los elementos: fondo de sesiones, barra de ventana operativa, caja del rango de 4 horas, líneas de objetivo de 4H, 12H y diario, zona de riesgo en rojo bajo la entrada y zona de recorrido dividida en tres bandas de R:R sobre ella.">
+    <!-- zona de riesgo y de recorrido -->
+    <rect x="211" y="292" width="349" height="72" style="fill:var(--bajS)"/>
+    <rect x="211" y="248" width="349" height="44" style="fill:var(--alcS)"/>
+    <rect x="211" y="204" width="349" height="44" style="fill:var(--oroS)"/>
+    <rect x="211" y="160" width="349" height="44" style="fill:var(--bajS)"/>
+
+    <!-- caja del rango 4H -->
+    <rect x="168" y="160" width="392" height="180" style="fill:none;stroke:var(--alc)" stroke-width="1.2"/>
+    <text x="174" y="154" font-family="Archivo, sans-serif" font-size="10.5" font-weight="600" style="fill:var(--alc)">rango 4H alcista</text>
+
+    <!-- objetivos -->
+    <line x1="60" y1="112" x2="560" y2="112" style="stroke:var(--gris)" stroke-width="1" stroke-dasharray="9 6" opacity=".75"/>
+    <line x1="60" y1="136" x2="560" y2="136" style="stroke:var(--alc)" stroke-width="1.5" stroke-dasharray="9 6" opacity=".8"/>
+    <line x1="168" y1="160" x2="560" y2="160" style="stroke:var(--alc)" stroke-width="2.5" stroke-dasharray="8 5"/>
+    <text x="572" y="109" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">1D · 1,0966</text>
+    <text x="572" y="133" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--alc)">12H · 1,0951</text>
+    <text x="572" y="157" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="500" style="fill:var(--alc)">TP · 4H · 1,0940</text>
+
+    <!-- entrada y stop -->
+    <line x1="211" y1="292" x2="560" y2="292" style="stroke:var(--tinta)" stroke-width="1.6"/>
+    <line x1="211" y1="364" x2="560" y2="364" style="stroke:var(--baj)" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <text x="572" y="289" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="500" style="fill:var(--tinta)">ENTRADA · 1,0878</text>
+    <text x="572" y="368" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="500" style="fill:var(--baj)">SL · 1,0866</text>
+
+    <!-- etiquetas de zona R:R -->
+    <text x="556" y="273" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--alc)">ZONA ÓPTIMA</text>
+    <text x="556" y="229" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--oro)">CONTINUACIÓN</text>
+    <text x="556" y="185" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--baj)">ÚLTIMAS OPORT.</text>
+
+    <!-- velas -->
+    <g style="stroke:var(--baj);fill:var(--baj)">
+      <line x1="60" y1="220" x2="60" y2="268" stroke-width="1.2"/><rect x="51" y="232" width="18" height="24" stroke="none"/>
+      <line x1="100" y1="244" x2="100" y2="304" stroke-width="1.2"/><rect x="91" y="256" width="18" height="36" stroke="none"/>
+    </g>
+    <g style="stroke:var(--alc);fill:var(--alc)">
+      <line x1="140" y1="256" x2="140" y2="304" stroke-width="1.2"/><rect x="131" y="268" width="18" height="24" stroke="none"/>
+      <line x1="180" y1="160" x2="180" y2="340" stroke-width="1.5"/><rect x="171" y="172" width="18" height="144" stroke="none"/>
+    </g>
+    <g style="stroke:var(--baj);fill:var(--baj)">
+      <line x1="220" y1="178" x2="220" y2="352" stroke-width="1.7"/><rect x="211" y="184" width="18" height="108" stroke="none"/>
+    </g>
+    <g style="stroke:var(--alc);fill:var(--alc)">
+      <line x1="260" y1="232" x2="260" y2="304" stroke-width="1.2"/><rect x="251" y="244" width="18" height="48" stroke="none"/>
+      <line x1="300" y1="196" x2="300" y2="256" stroke-width="1.2"/><rect x="291" y="208" width="18" height="36" stroke="none"/>
+      <line x1="340" y1="172" x2="340" y2="220" stroke-width="1.2"/><rect x="331" y="184" width="18" height="24" stroke="none"/>
+      <line x1="380" y1="154" x2="380" y2="190" stroke-width="1.2"/><rect x="371" y="166" width="18" height="18" stroke="none"/>
+    </g>
+
+    <!-- gatillo -->
+    <polygon points="220,300 212,314 228,314" style="fill:var(--alc)"/>
+    <line x1="220" y1="352" x2="220" y2="366" style="stroke:var(--alc)" stroke-width="1" opacity=".5"/>
+
+    <!-- ventana operativa -->
+    <rect x="40" y="400" width="520" height="6" style="fill:var(--sup2)"/>
+    <rect x="150" y="400" width="120" height="6" style="fill:var(--azul)"/>
+    <rect x="360" y="400" width="96" height="6" style="fill:var(--azul)"/>
+    <text x="572" y="406" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--azul)">tu ventana</text>
+
+    <!-- sesiones -->
+    <rect x="40" y="414" width="110" height="18" style="fill:var(--moraS)"/>
+    <rect x="150" y="414" width="210" height="18" style="fill:var(--alcS)"/>
+    <rect x="360" y="414" width="200" height="18" style="fill:var(--bajS)"/>
+    <text x="95" y="427" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--mora)">ASIA</text>
+    <text x="255" y="427" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--alc)">LONDRES</text>
+    <text x="460" y="427" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--baj)">NUEVA YORK</text>
+
+    <!-- niveles de sesion sin mitigar -->
+    <line x1="40" y1="246" x2="560" y2="246" style="stroke:var(--mora)" stroke-width="1" stroke-dasharray="2 4"/>
+    <text x="572" y="249" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--mora)">Asia máx</text>
+
+    <!-- confirmaciones -->
+    <line x1="40" y1="444" x2="720" y2="444" style="stroke:var(--linea)" stroke-width="1"/>
+    <text x="40" y="462" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">1D</text>
+    <text x="62" y="462" font-family="Archivo, sans-serif" font-size="11" font-weight="700" style="fill:var(--alc)">▲</text>
+    <text x="96" y="462" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">12H</text>
+    <text x="126" y="462" font-family="Archivo, sans-serif" font-size="11" font-weight="700" style="fill:var(--alc)">▲</text>
+    <text x="160" y="462" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">4H</text>
+    <text x="182" y="462" font-family="Archivo, sans-serif" font-size="11" font-weight="700" style="fill:var(--alc)">▲</text>
+    <text x="216" y="462" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">1H</text>
+    <text x="238" y="462" font-family="Archivo, sans-serif" font-size="11" font-weight="700" style="fill:var(--alc)">▲</text>
+    <text x="266" y="462" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--oro)">reiniciada</text>
+    <text x="360" y="462" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">4 de 4 alineadas · R:R 1,83 · zona óptima</text>
+  </svg>
+  <figcaption>todo a la vez, que es como lo vas a ver · una compra en EURUSD</figcaption>
+</figure>
+
+<!-- 1 ─────────────────────────────────────── -->
+<section id="s1">
+  <div class="shead"><span class="snum">01</span><h2>Las sesiones</h2></div>
+  <div class="col"><p>No pintan el gráfico entero de colores: van en una <strong>banda fina abajo</strong>, para que veas en qué sesión estás sin que el fondo te tape las velas.</p></div>
+  <div class="muestra">
+    <svg viewBox="0 0 660 74" role="img" aria-label="Banda de sesiones con Asia en morado, Londres en verde y Nueva York en rojo, y encima una barra azul con las dos ventanas operativas.">
+      <rect x="10" y="12" width="640" height="7" style="fill:var(--sup2)"/>
+      <rect x="146" y="12" width="148" height="7" style="fill:var(--azul)"/>
+      <rect x="404" y="12" width="118" height="7" style="fill:var(--azul)"/>
+      <text x="220" y="8" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--azul)">09:00 – 11:30</text>
+      <text x="463" y="8" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--azul)">14:00 – 16:00</text>
+      <rect x="10" y="26" width="136" height="20" style="fill:var(--moraS)"/>
+      <rect x="146" y="26" width="258" height="20" style="fill:var(--alcS)"/>
+      <rect x="404" y="26" width="246" height="20" style="fill:var(--bajS)"/>
+      <text x="78" y="40" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--mora)">ASIA</text>
+      <text x="275" y="40" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--alc)">LONDRES</text>
+      <text x="527" y="40" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--baj)">NUEVA YORK</text>
+      <text x="10" y="64" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--gris)">00:00</text>
+      <text x="404" y="64" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--gris)">14:00</text>
+      <text x="650" y="64" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--gris)">23:00</text>
+    </svg>
+  </div>
+  <div class="ficha">
+    <div class="k">cómo</div><div class="v">Banda de color al pie del gráfico. <b>Morado Asia, verde Londres, rojo Nueva York.</b> Donde Londres y NY se solapan, los dos colores se suman.</div>
+    <div class="k">tu ventana</div><div class="v">Encima, una barra azul sólida en <b>09:00-11:30</b> y <b>14:00-16:00</b>. Es lo único que necesitas mirar para saber si puedes actuar.</div>
+    <div class="k">cuándo</div><div class="v">Siempre. En hora de España, con el cambio de horario resuelto solo.</div>
+  </div>
+  <h3 style="font-family:Archivo,sans-serif;font-size:1.02rem;margin:2em 0 .4em">Máximos y mínimos de sesión</h3>
+  <div class="ficha">
+    <div class="k">cómo</div><div class="v">Línea <b>punteada fina</b> del color de su sesión, con el nombre a la derecha.</div>
+    <div class="k">dónde</div><div class="v">En el máximo y el mínimo que dejó cada sesión al cerrar.</div>
+    <div class="k">desaparece</div><div class="v"><b>Sola, en cuanto el precio la toca.</b> Esa liquidez ya se la han llevado y deja de ser un imán. Lo que sigue dibujado es lo que queda pendiente.</div>
+  </div>
+</section>
+
+<!-- 2 ─────────────────────────────────────── -->
+<section id="s2">
+  <div class="shead"><span class="snum">02</span><h2>Los rangos</h2></div>
+  <div class="col"><p>Cuatro temporalidades a la vez sería un gráfico ilegible. Solo <strong>una lleva caja</strong>: la que operas.</p></div>
+  <div class="ficha">
+    <div class="k">4H · con caja</div><div class="v">Rectángulo del máximo al mínimo de la <b>vela base</b>, borde fino en verde o rojo según la dirección, sin relleno. Se estira hacia la derecha mientras el rango siga vivo y se para en seco cuando muere.</div>
+    <div class="k">12H y 1D</div><div class="v"><b>Sin caja.</b> Solo su línea de objetivo, más fina y más apagada cuanto mayor es la temporalidad. Están para darte contexto, no para taparte el gráfico.</div>
+    <div class="k">1H</div><div class="v">Tampoco lleva caja. Aparece como marcador en la fila de confirmaciones (sección <a href="#s5">05</a>).</div>
+    <div class="k">estado</div><div class="v">Etiqueta pegada a la caja: <span class="mono">CREADO</span>, <span class="mono">CONTINUACIÓN</span>, <span class="mono">DOBLE LIQUIDEZ ×2</span>, <span class="mono">REINICIADO</span>. Cambia sola.</div>
+    <div class="k">al morir</div><div class="v">La caja se vuelve <b>gris</b> y deja de estirarse. Se queda ahí para que puedas repasar, con la etiqueta puesta: <span class="mono">COMPLETADO</span> o <span class="mono">DESCARTADO</span>.</div>
+  </div>
+</section>
+
+<!-- 3 ─────────────────────────────────────── -->
+<section id="s3">
+  <div class="shead"><span class="snum">03</span><h2>El PO3</h2></div>
+  <div class="col"><p>Tres corchetes debajo de las velas, cada uno marcando su fase. Solo se dibujan sobre el <strong>rango vivo</strong> de 4H — el histórico no los lleva, o el gráfico sería ilegible.</p></div>
+  <div class="muestra">
+    <svg viewBox="0 0 660 130" role="img" aria-label="Tres corchetes bajo las velas marcando acumulación sobre la vela base, manipulación sobre la vela que barre, y distribución sobre el recorrido hacia el objetivo.">
+      <g style="stroke:var(--alc);fill:var(--alc)">
+        <line x1="70" y1="14" x2="70" y2="76" stroke-width="1.4"/><rect x="62" y="22" width="16" height="46" stroke="none"/>
+      </g>
+      <g style="stroke:var(--baj);fill:var(--baj)">
+        <line x1="120" y1="20" x2="120" y2="82" stroke-width="1.6"/><rect x="112" y="26" width="16" height="34" stroke="none"/>
+      </g>
+      <g style="stroke:var(--alc);fill:var(--alc)">
+        <line x1="170" y1="34" x2="170" y2="70" stroke-width="1.2"/><rect x="162" y="40" width="16" height="22" stroke="none"/>
+        <line x1="210" y1="24" x2="210" y2="56" stroke-width="1.2"/><rect x="202" y="30" width="16" height="20" stroke="none"/>
+        <line x1="250" y1="16" x2="250" y2="44" stroke-width="1.2"/><rect x="242" y="22" width="16" height="16" stroke="none"/>
+      </g>
+      <path d="M 58 92 L 58 98 L 82 98 L 82 92" style="fill:none;stroke:var(--gris)" stroke-width="1.2"/>
+      <path d="M 108 92 L 108 98 L 132 98 L 132 92" style="fill:none;stroke:var(--baj)" stroke-width="1.2"/>
+      <path d="M 156 92 L 156 98 L 264 98 L 264 92" style="fill:none;stroke:var(--alc)" stroke-width="1.2"/>
+      <text x="70" y="114" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--gris)">ACUMULACIÓN</text>
+      <text x="120" y="114" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--baj)">MANIPULACIÓN</text>
+      <text x="210" y="114" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--alc)">DISTRIBUCIÓN</text>
+      <text x="300" y="52" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--tinta2)">PO3 de 3 velas</text>
+      <text x="300" y="68" font-family="Newsreader, serif" font-size="11.5" style="fill:var(--gris)">si la manipulación y la distribución</text>
+      <text x="300" y="82" font-family="Newsreader, serif" font-size="11.5" style="fill:var(--gris)">caen en la misma vela, pone «PO3 de 2 velas»</text>
+    </svg>
+  </div>
+  <div class="ficha">
+    <div class="k">acumulación</div><div class="v">Corchete gris bajo la <b>vela base</b>.</div>
+    <div class="k">manipulación</div><div class="v">Corchete rojo bajo la vela que <b>barre y cierra dentro</b>. Es la trampa.</div>
+    <div class="k">distribución</div><div class="v">Corchete verde desde la vela siguiente hasta donde llegue. Se va estirando.</div>
+    <div class="k">y además</div><div class="v">Un texto pequeño dice si es <b>PO3 de 2 velas o de 3</b>. Si es de 2, el movimiento arranca de golpe y no hay tiempo de dudar.</div>
+  </div>
+</section>
+
+<!-- 4 ─────────────────────────────────────── -->
+<section id="s4">
+  <div class="shead"><span class="snum">04</span><h2>Los objetivos</h2></div>
+  <div class="col"><p>Tres líneas horizontales, una por temporalidad, con <strong>el grosor diciendo de quién es</strong>. Cuanto mayor la temporalidad, más fina y más apagada — están detrás, no delante.</p></div>
+  <div class="muestra">
+    <svg viewBox="0 0 660 116" role="img" aria-label="Tres líneas de objetivo: la de 4 horas gruesa y sólida en verde, la de 12 horas más fina, la diaria fina y gris, y una cuarta ya completada tachada en gris.">
+      <line x1="10" y1="20" x2="500" y2="20" style="stroke:var(--gris)" stroke-width="1" stroke-dasharray="9 6" opacity=".75"/>
+      <text x="512" y="24" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">1D · 1,0966</text>
+      <line x1="10" y1="48" x2="500" y2="48" style="stroke:var(--alc)" stroke-width="1.5" stroke-dasharray="9 6" opacity=".8"/>
+      <text x="512" y="52" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--alc)">12H · 1,0951</text>
+      <line x1="10" y1="76" x2="500" y2="76" style="stroke:var(--alc)" stroke-width="2.5" stroke-dasharray="8 5"/>
+      <text x="512" y="80" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="500" style="fill:var(--alc)">4H · 1,0940 · TP</text>
+      <line x1="10" y1="102" x2="500" y2="102" style="stroke:var(--gris)" stroke-width="1.5" stroke-dasharray="3 4" opacity=".45"/>
+      <text x="512" y="106" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">4H · completado</text>
+    </svg>
+  </div>
+  <div class="ficha">
+    <div class="k">dónde</div><div class="v">En el <b>extremo opuesto de la vela base</b> de cada temporalidad.</div>
+    <div class="k">etiqueta</div><div class="v">A la derecha, con la temporalidad y el precio. El de 4H lleva además <span class="mono">TP</span>, porque es el que vas a usar.</div>
+    <div class="k">si hay varios</div><div class="v">El TP va al <b>más cercano</b> de los que apunten en tu dirección. Es la lectura conservadora: te da el R:R más bajo, y así el número con el que decides es el peor posible.</div>
+    <div class="k">al completarse</div><div class="v">La línea se vuelve <b>gris y punteada corta</b>, y deja de contar como contexto. Un objetivo alcanzado ayer no es contexto de hoy.</div>
+  </div>
+</section>
+
+<!-- 5 ─────────────────────────────────────── -->
+<section id="s5">
+  <div class="shead"><span class="snum">05</span><h2>Las confirmaciones</h2></div>
+  <div class="col"><p>Una fila abajo del todo con las cuatro temporalidades y hacia dónde va cada una. Es tu semáforo: lo miras de un vistazo y sabes si hay contexto.</p></div>
+  <div class="muestra">
+    <svg viewBox="0 0 660 116" role="img" aria-label="Fila de confirmaciones mostrando tres situaciones: todo alineado, la de ejecución en contra a la espera de reiniciada, y una reiniciada en contra que bloquea la operativa.">
+      <text x="10" y="16" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--gris)">TODO ALINEADO</text>
+      <g font-family="IBM Plex Mono, monospace" font-size="10"><text x="10" y="36" style="fill:var(--gris)">1D</text><text x="34" y="36" style="fill:var(--alc)">▲</text><text x="60" y="36" style="fill:var(--gris)">12H</text><text x="92" y="36" style="fill:var(--alc)">▲</text><text x="118" y="36" style="fill:var(--gris)">4H</text><text x="142" y="36" style="fill:var(--alc)">▲</text><text x="168" y="36" style="fill:var(--gris)">1H</text><text x="192" y="36" style="fill:var(--alc)">▲</text><text x="222" y="36" style="fill:var(--alc)">4 de 4 · listo para el gatillo</text></g>
+
+      <text x="10" y="66" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--oro)">LA DE EJECUCIÓN EN CONTRA</text>
+      <g font-family="IBM Plex Mono, monospace" font-size="10"><text x="10" y="86" style="fill:var(--gris)">1D</text><text x="34" y="86" style="fill:var(--alc)">▲</text><text x="60" y="86" style="fill:var(--gris)">12H</text><text x="92" y="86" style="fill:var(--alc)">▲</text><text x="118" y="86" style="fill:var(--gris)">4H</text><text x="142" y="86" style="fill:var(--alc)">▲</text><text x="168" y="86" style="fill:var(--gris)">1H</text><text x="192" y="86" style="fill:var(--baj)">▼</text><text x="222" y="86" style="fill:var(--oro)">esperando reiniciada alcista en 1H</text></g>
+
+      <text x="10" y="110" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--baj)">⊘  reiniciada en contra y 12H sin cerrar  ·  NO SE OPERA</text>
+    </svg>
+  </div>
+  <div class="ficha">
+    <div class="k">cómo</div><div class="v">▲ verde, ▼ rojo, — gris si no hay rango vivo. Y a la derecha, cuántas coinciden.</div>
+    <div class="k">reiniciada</div><div class="v">Cuando 1H va en contra, el panel pone <b>«esperando reiniciada»</b> en ámbar. Cuando llega, el marcador cambia y se ilumina: <b>ese es el mejor momento del método</b>, y lo verás sin buscarlo.</div>
+    <div class="k">bloqueo</div><div class="v">Si aparece una reiniciada <b>en contra</b> mientras una temporalidad mayor todavía no ha cerrado su vela, sale <b>⊘ NO SE OPERA</b> y no se dispara ningún gatillo. Es la regla de protección que te mandaron por privado.</div>
+  </div>
+</section>
+
+<!-- 6 ─────────────────────────────────────── -->
+<section id="s6">
+  <div class="shead"><span class="snum">06</span><h2>El gatillo</h2></div>
+  <div class="col"><p>Un solo dibujo, en un solo instante: <strong>el cierre de la vela de 1H que confirma</strong>. Ni antes ni después.</p></div>
+  <div class="muestra">
+    <svg viewBox="0 0 660 128" role="img" aria-label="El gatillo: un triángulo bajo la vela de confirmación con una etiqueta que da entrada, stop, objetivo, R:R y zona.">
+      <g style="stroke:var(--alc);fill:var(--alc)">
+        <line x1="66" y1="20" x2="66" y2="76" stroke-width="1.4"/><rect x="58" y="34" width="16" height="30" stroke="none"/>
+      </g>
+      <polygon points="66,84 58,98 74,98" style="fill:var(--alc)"/>
+      <rect x="96" y="16" width="230" height="94" rx="2" style="fill:var(--alc)"/>
+      <text x="110" y="38" font-family="Archivo, sans-serif" font-size="13" font-weight="700" fill="#fff">▲ COMPRA</text>
+      <text x="110" y="58" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#fff" opacity=".95">entrada  1,08780</text>
+      <text x="110" y="74" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#fff" opacity=".95">stop     1,08660   ·  12 pips</text>
+      <text x="110" y="90" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#fff" opacity=".95">objetivo 1,09400   ·  R:R 1,83</text>
+      <text x="110" y="104" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#fff" opacity=".95">zona óptima · 4 de 4 alineadas</text>
+      <text x="346" y="42" font-family="Newsreader, serif" font-size="12.5" style="fill:var(--tinta2)">Y suena la alerta al móvil,</text>
+      <text x="346" y="60" font-family="Newsreader, serif" font-size="12.5" style="fill:var(--tinta2)">con el mismo texto, solo si</text>
+      <text x="346" y="78" font-family="Newsreader, serif" font-size="12.5" style="fill:var(--tinta2)">estás dentro de tu ventana.</text>
+    </svg>
+  </div>
+  <div class="ficha">
+    <div class="k">cuándo</div><div class="v">Al <b>cierre</b> de la vela de 1H que confirma. El indicador no dibuja nada a mitad de vela: lo que ves en el pasado es lo que se veía en su momento.</div>
+    <div class="k">fuera de hora</div><div class="v">Si el gatillo salta fuera de tu ventana, <b>se dibuja igual pero en tono apagado</b> y con la nota «fuera de tu ventana». No suena. Así por la tarde ves lo que te perdiste, que es lo que va a alimentar tu libro.</div>
+    <div class="k">lo que NO hace</div><div class="v">No dibuja flechas de «posible entrada», ni zonas de interés, ni avisos previos. <b>O hay gatillo o no lo hay.</b></div>
+  </div>
+</section>
+
+<!-- 7 ─────────────────────────────────────── -->
+<section id="s7">
+  <div class="shead"><span class="snum">07</span><h2>Las zonas de R:R</h2></div>
+  <div class="col"><p>Aquí está el truco visual que más te va a servir. El espacio entre tu entrada y el objetivo se sombrea en <strong>tres bandas horizontales</strong>, y la posición del precio dentro de ellas te dice, sin calcular nada, en qué zona estás.</p></div>
+  <div class="muestra">
+    <svg viewBox="0 0 660 168" role="img" aria-label="El recorrido entre la entrada y el objetivo dividido en tres bandas: verde abajo (zona óptima), ámbar en medio (continuación) y roja arriba (últimas oportunidades), con el precio situado en la banda verde.">
+      <rect x="10" y="20" width="430" height="36" style="fill:var(--bajS)"/>
+      <rect x="10" y="56" width="430" height="36" style="fill:var(--oroS)"/>
+      <rect x="10" y="92" width="430" height="36" style="fill:var(--alcS)"/>
+      <line x1="10" y1="20" x2="470" y2="20" style="stroke:var(--alc)" stroke-width="2.5" stroke-dasharray="8 5"/>
+      <line x1="10" y1="128" x2="470" y2="128" style="stroke:var(--tinta)" stroke-width="1.6"/>
+      <line x1="10" y1="152" x2="470" y2="152" style="stroke:var(--baj)" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <rect x="10" y="128" width="430" height="24" style="fill:var(--bajS)"/>
+
+      <text x="430" y="42" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--baj)">ÚLTIMAS OPORTUNIDADES · 1:1</text>
+      <text x="430" y="78" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--oro)">CONTINUACIÓN · 1:2</text>
+      <text x="430" y="114" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9.5" style="fill:var(--alc)">ZONA ÓPTIMA · 1:3</text>
+      <text x="482" y="24" font-family="IBM Plex Mono, monospace" font-size="10.5" style="fill:var(--alc)">TP</text>
+      <text x="482" y="132" font-family="IBM Plex Mono, monospace" font-size="10.5" style="fill:var(--tinta)">entrada</text>
+      <text x="482" y="156" font-family="IBM Plex Mono, monospace" font-size="10.5" style="fill:var(--baj)">SL</text>
+      <text x="482" y="144" font-family="IBM Plex Mono, monospace" font-size="9" style="fill:var(--gris)">riesgo</text>
+      <polygon points="10,110 22,104 22,116" style="fill:var(--tinta)"/>
+      <text x="28" y="114" font-family="Newsreader, serif" font-size="12" style="fill:var(--tinta2)">el precio está aquí</text>
+    </svg>
+  </div>
+  <div class="ficha">
+    <div class="k">cómo</div><div class="v">El tramo entre entrada y objetivo, partido en tres. <b>Verde abajo, ámbar en medio, rojo arriba.</b> Y bajo la entrada, el riesgo sombreado en rojo.</div>
+    <div class="k">para qué</div><div class="v">Cuando aparece un setup, <b>miras dónde cae el precio</b>. En verde, se entra. En ámbar, solo si todo lo demás acompaña. En rojo, no se entra.</div>
+    <div class="k">y en número</div><div class="v">El panel lo dice también en cifra: <span class="mono">R:R 1,83 · zona óptima</span>. Para que lo copies al libro tal cual.</div>
+  </div>
+  <div class="col">
+    <div class="nota">Esto es lo que te quita el «llego tarde». No llegas tarde ni pronto: <strong>llegas a una banda de color</strong>. Si es roja, no era tu operación y no ha pasado nada.</div>
+  </div>
+</section>
+
+<!-- 8 ─────────────────────────────────────── -->
+<section id="s8">
+  <div class="shead"><span class="snum">08</span><h2>El TP y el SL</h2></div>
+  <div class="ficha">
+    <div class="k">SL · dónde</div><div class="v">Al otro lado de la <b>mecha que hizo el barrido</b>, más el colchón. En una compra, debajo del mínimo recién barrido. Línea roja discontinua, con el precio y el tamaño en pips a la derecha.</div>
+    <div class="k">SL · por qué ahí</div><div class="v">El setup afirma que <b>ese mínimo era el mínimo</b>. Si el precio vuelve a pasarlo, la lectura ya era falsa. Un stop más lejos no protege más: te deja dentro de una operación que ya se demostró equivocada.</div>
+    <div class="k">TP · dónde</div><div class="v">En el <b>objetivo del rango de 4H</b> — el extremo opuesto de la vela base. Si hay objetivos acumulados arriba en la misma dirección, al <b>más cercano</b> de ellos.</div>
+    <div class="k">se dibujan</div><div class="v">Los dos <b>a la vez que el gatillo</b>, nunca después. Las pones en el bróker en el mismo momento de entrar y te apartas.</div>
+    <div class="k">no se mueven</div><div class="v">El indicador <b>no dibuja trailing, ni parciales, ni stop a break-even</b>. Si un día decides moverlo, es decisión tuya y va anotada en el libro como «no seguí la regla».</div>
+    <div class="k">stop imposible</div><div class="v">Si el barrido deja un stop de dos o tres pips, el gatillo <b>no salta</b>: el panel pone «riesgo por debajo del mínimo operable». Esa operación no existe.</div>
+  </div>
+</section>
+
+<footer>
+  <div>Especificación visual · lo que no está en esta página, el indicador no lo dibuja.</div>
+  <div>Las sesiones, los rangos, el PO3, los objetivos y las tres zonas de R:R salen del material. El grosor por temporalidad, la banda de sesiones al pie, el sombreado en tres bandas y el bloqueo por reiniciada en contra son decisiones de presentación tomadas para que el gráfico siga siendo legible.</div>
+</footer>
+
+</div>
