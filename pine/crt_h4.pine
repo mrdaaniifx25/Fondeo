@@ -341,65 +341,81 @@ zona(float ent, float obj, float pr, int L) =>
     float d = math.abs(pr - ent)
     d < t ? "óptima" : d < 2*t ? "continuación" : "últimas oport."
 
-// La señal.  El gatillo no necesita hacer su propio CRT: basta con que su cierre
-// devuelva el precio al lado bueno del nivel que barrio la vela de 4H. Eso es el
-// "vuelve a entrar dentro" del turtle soup, tomado a escala de M15.
+// ── el setup ────────────────────────────────────────────────────────────────
+// Existe en dos momentos, y el codigo tenia solo el segundo:
+//   PROVISIONAL  la vela de 4H EN CURSO ya se ha llevado el extremo, pero
+//                todavia no ha cerrado. Aqui es donde se opera de verdad: si
+//                esperas al cierre de 4H entras cuatro horas tarde.
+//   CONFIRMADO   la vela de 4H cerro dentro del cuerpo y el rango esta vivo.
+// En los dos, el gatillo es el mismo: que un cierre de M15 devuelva el precio
+// dentro de la vela base.
+int   setL   = est.barriendo != 0 ? est.barriendo : (est.vivo ? est.lado : 0)
+bool  setProv = est.barriendo != 0
+float setBase = setL == 0 ? na : setProv ? (setL > 0 ? est.pl : est.ph)
+                                         : (setL > 0 ? est.blo : est.bhi)
+float setMecha = setL == 0 ? na : setProv ? (setL > 0 ? est.l : est.h) : est.mecha
+float setObj  = setL == 0 ? na : setProv ? (setL > 0 ? est.ph : est.pl) : est.obj
+float setCie  = setProv ? est.pc : est.cierre
+
 if barstate.isconfirmed and gat.cerrada and not gat.cerrada[1]
-    int L = est.lado
-    if not est.vivo
-        motivo := "sin rango vivo en 4H"
+    if setL == 0
+        motivo := "sin barrido en 4H"
         ultRR := na
     else
-        bool vuelve = L > 0 ? gat.pc > est.mecha : gat.pc < est.mecha
-        bool h1ok = not pedirH1 or (h1.vivo and h1.lado == L)
-        ultRein := gat.ladoAnt != 0 and gat.ladoAnt != L and gat.lado == L
-        if bloqRe and gat.lado != 0 and gat.lado != L and (not d1.vivo or not h12.vivo)
+        // vuelve DENTRO de la vela base, que es lo que se barrio
+        bool vuelve = setL > 0 ? gat.pc > setBase : gat.pc < setBase
+        bool h1ok = not pedirH1 or (h1.vivo and h1.lado == setL)
+        ultRein := gat.ladoAnt != 0 and gat.ladoAnt != setL and gat.lado == setL
+        if bloqRe and gat.lado != 0 and gat.lado != setL and (not d1.vivo or not h12.vivo)
             bloqueado := true
             motivo := "⊘ reiniciada en contra y arriba sin cerrar · NO SE OPERA"
             ultRR := na
         else if not h1ok
-            motivo := "4H " + (L > 0 ? "alcista" : "bajista") + " pero H1 no acompaña"
+            motivo := "4H " + (setL > 0 ? "alcista" : "bajista") + " pero H1 no acompaña"
             ultRR := na
         else if not vuelve
-            motivo := "esperando que M15 cierre de vuelta dentro de la vela base"
+            // un cierre de M15 fuera NO descarta nada: el rango es de 4H y solo
+            // un cierre de 4H puede descartarlo. Se sigue esperando.
+            motivo := "M15 cerró fuera · sigo esperando el que vuelva dentro"
             ultRR := na
         else
             bloqueado := false
             float ent = gat.pc
-            float stp = L > 0 ? est.mecha - colchon * syminfo.mintick
-                              : est.mecha + colchon * syminfo.mintick
+            float stp = setL > 0 ? setMecha - colchon * syminfo.mintick
+                                 : setMecha + colchon * syminfo.mintick
             float rgo = math.abs(ent - stp)
-            float obj = est.obj
-            ultRR := rgo > 0 ? math.abs(obj - ent) / rgo : na
-            ultZona := zona(est.cierre, est.obj, ent, L)
-            int nAl = 2 + (d1.vivo and d1.lado == L ? 1 : 0) + (h12.vivo and h12.lado == L ? 1 : 0) +
-                 (h1.vivo and h1.lado == L ? 1 : 0)
+            ultRR := rgo > 0 ? math.abs(setObj - ent) / rgo : na
+            ultZona := zona(setCie, setObj, ent, setL)
+            int nAl = 2 + (d1.vivo and d1.lado == setL ? 1 : 0) +
+                 (h12.vivo and h12.lado == setL ? 1 : 0) + (h1.vivo and h1.lado == setL ? 1 : 0)
             if rgo <= 0 or rgo / pip < 3 * costeU
                 motivo := "riesgo de " + str.tostring(rgo / pip, "#.#") + " pips: por debajo del mínimo operable"
             else if rrMin > 0 and ultRR < rrMin
                 motivo := "R:R " + str.tostring(ultRR, "#.##") + ", por debajo de " + str.tostring(rrMin, "#.#")
             else
-                color cs = L > 0 ? ALC : BAJ
-                label.new(bar_index, L > 0 ? low : high,
-                     (L > 0 ? "▲ COMPRA" : "▼ VENTA") + (ultRein ? "  · reiniciada" : "") +
+                color cs = setL > 0 ? ALC : BAJ
+                label.new(bar_index, setL > 0 ? low : high,
+                     (setL > 0 ? "▲ COMPRA" : "▼ VENTA") + (setProv ? "  · 4H sin cerrar" : "") +
+                     (ultRein ? "  · reiniciada" : "") +
                      "\nentrada  " + str.tostring(ent, format.mintick) +
                      "\nstop     " + str.tostring(stp, format.mintick) + "   · " + str.tostring(rgo / pip, "#.#") + " pips" +
-                     "\nobjetivo " + str.tostring(obj, format.mintick) + "   · R:R " + str.tostring(ultRR, "#.##") +
+                     "\nobjetivo " + str.tostring(setObj, format.mintick) + "   · R:R " + str.tostring(ultRR, "#.##") +
                      "\nzona " + ultZona + " · " + str.tostring(nAl) + " de 5" +
                      (enVentana ? "" : "\n(fuera de tu ventana)"),
-                     style = L > 0 ? label.style_label_up : label.style_label_down,
+                     style = setL > 0 ? label.style_label_up : label.style_label_down,
                      color = color.new(cs, enVentana ? 12 : 58), textcolor = color.white,
                      size = size.normal)
                 line.new(bar_index, stp, bar_index + 20, stp, color = BAJ, width = 2, style = line.style_dashed)
                 line.new(bar_index, ent, bar_index + 20, ent, color = color.new(color.gray, 20), width = 2)
                 motivo := (enVentana ? "SEÑAL " : "SEÑAL fuera de tu ventana · ") +
-                     (L > 0 ? "COMPRA" : "VENTA") + " · R:R " + str.tostring(ultRR, "#.##") +
+                     (setL > 0 ? "COMPRA" : "VENTA") + " · R:R " + str.tostring(ultRR, "#.##") +
                      " · zona " + ultZona
                 if enVentana
-                    alert((L > 0 ? "CRT COMPRA " : "CRT VENTA ") + syminfo.ticker +
+                    alert((setL > 0 ? "CRT COMPRA " : "CRT VENTA ") + syminfo.ticker +
+                         (setProv ? " (4H sin cerrar)" : "") +
                          " · entrada " + str.tostring(ent, format.mintick) +
                          " · stop " + str.tostring(stp, format.mintick) +
-                         " · objetivo " + str.tostring(obj, format.mintick) +
+                         " · objetivo " + str.tostring(setObj, format.mintick) +
                          " · R:R " + str.tostring(ultRR, "#.##") + " · zona " + ultZona,
                          alert.freq_once_per_bar_close)
 
