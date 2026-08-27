@@ -25,10 +25,12 @@ tz      = input.string("Europe/Madrid", "Huso horario", group = gR,
      tooltip = "Elígelo una vez y no lo cambies. Cambia qué velas existen, y con " +
      "ellas todos los rangos y todos los objetivos.")
 minEst  = input.int(240, "Estructura · minutos por vela", 60, 1440, step = 60, group = gR)
-minGat  = input.int(60,  "Gatillo · minutos por vela", 5, 240, step = 5, group = gR,
-     tooltip = "60 = segunda ejecución, esperas el cierre de 1H. " +
-     "15 = primera ejecución, entras en el primer rango de M15. " +
-     "Elige una y no la cambies dentro del mismo mes, o tu libro no compara nada.")
+minGat  = input.int(15,  "Gatillo · minutos por vela", 1, 240, step = 1, group = gR,
+     tooltip = "Dónde esperas el cierre que confirma. El barrido lo hace la vela " +
+     "de 4H; la confirmación la tomas en la escala que quieras. Cuanto más abajo, " +
+     "antes entras y más cerca del stop, a cambio de menos certeza. 5 y 15 son las " +
+     "que enseña el material; 60 es la variante lenta. Elige una y no la cambies " +
+     "dentro del mismo mes, o tu libro no compara nada.")
 verCtx  = input.bool(true, "Líneas de objetivo de 12H y diario", group = gR)
 vidaMax = input.int(10, "Salir a mercado tras N velas de estructura", 0, 60, group = gR)
 dojiPct = input.float(10.0, "Vela base doji: cuerpo menor que este % del rango", 0, 50, group = gR)
@@ -95,6 +97,12 @@ type Marco
     float  cierre  = na       // cierre de la vela que activo
     int    edad    = 0
     string estado  = "sin rango"
+    // la vela EN CURSO: un barrido es un instante, la confirmacion llega al
+    // cierre. Entre los dos hay horas de incertidumbre que ningun indicador
+    // enseña, y son exactamente las que hacen dudar.
+    int    barriendo = 0      // 0 nada · 1 se ha llevado el bajo · -1 el alto
+    bool   ahoraOK   = false  // si cerrase ahora, ¿cerraria dentro del cuerpo?
+    int    faltaMin  = 0
 
 var Marco d1  = Marco.new(1440)
 var Marco h12 = Marco.new(720)
@@ -181,6 +189,21 @@ paso(Marco s) =>
         if bn != b and barstate.isconfirmed and not s.cerrada
             nace := procesa(s)
             s.cerrada := true
+    // estado de la vela en curso, para el panel
+    if s.hayPrev and not s.cerrada
+        bool bAlc = s.l < s.pl
+        bool bBaj = s.h > s.ph
+        s.barriendo := bAlc and not bBaj ? 1 : bBaj and not bAlc ? -1 : 0
+        float cuA = math.max(s.po, s.pc)
+        float cuB = math.min(s.po, s.pc)
+        float rg = s.ph - s.pl
+        if rg > 0 and (cuA - cuB) < rg * dojiPct / 100.0
+            cuA := s.ph
+            cuB := s.pl
+        s.ahoraOK := s.c >= cuB and s.c <= cuA
+        s.faltaMin := int(((b + 1) * s.per * MIN_MS - elFin) / MIN_MS)
+    else if s.cerrada
+        s.barriendo := 0
     nace
 
 d1.per  := 1440
@@ -396,8 +419,17 @@ if verPanel and barstate.islast
     fila(pan, 1, "1D · 12H · 4H · gatillo",
          flecha(d1) + " " + flecha(h12) + " " + flecha(est) + " " + flecha(gat) +
          (ultRein ? "  reiniciada" : ""), ultRein ? ORO : color.white)
-    fila(pan, 2, "estructura", est.vivo ? est.estado + "  →  " + str.tostring(est.obj, format.mintick)
-         : est.estado, colM(est))
+    string txtEst = est.vivo ? est.estado + "  →  " + str.tostring(est.obj, format.mintick) : est.estado
+    color  colEst = colM(est)
+    if est.barriendo != 0
+        // el barrido ya ha ocurrido pero la vela no ha cerrado: ni valido ni
+        // invalido todavia. Es el hueco que hace dudar, y aqui se ve.
+        txtEst := "BARRIDO " + (est.barriendo > 0 ? "▲" : "▼") + "  " +
+             (est.ahoraOK ? "cierra dentro ✓" : "cierra FUERA ✗") + "  ·  faltan " +
+             (est.faltaMin >= 60 ? str.tostring(est.faltaMin / 60) + "h" +
+              str.tostring(est.faltaMin % 60, "00") : str.tostring(est.faltaMin) + "m")
+        colEst := est.ahoraOK ? ORO : GRI
+    fila(pan, 2, "estructura", txtEst, colEst)
     fila(pan, 3, "R:R", na(ultRR) ? "—" : str.tostring(ultRR, "#.##"),
          na(ultRR) ? color.gray : color.white)
     fila(pan, 4, "zona", ultZona,
