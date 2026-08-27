@@ -21,6 +21,10 @@
 //     sesiones se conservan.
 //
 //  Se añaden las dos killzones que operas, que es lo que de verdad miras.
+//
+//  Los niveles se ACUMULAN: cada sesion deja su alto y su bajo, y ahi se quedan
+//  hasta que el precio los toca. No se borra el de la sesion anterior al llegar
+//  una nueva, que era lo que hacia el original.
 // ════════════════════════════════════════════════════════════════════════════
 indicator("Sesiones", overlay = true, max_boxes_count = 500, max_lines_count = 500)
 
@@ -52,9 +56,13 @@ cKZ    = input.color(color.new(#2F6FD0, 88), "Color", group = gK)
 
 gN = "Máximos y mínimos de sesión"
 verNiv = input.bool(true, "Dibujarlos y borrarlos al ser mitigados", group = gN)
+maxNiv = input.int(20, "Niveles sin mitigar que se conservan", 2, 100, group = gN,
+     tooltip = "Se acumulan de todas las sesiones anteriores mientras no los " +
+     "toquen. Al pasar de este número se borra el más antiguo.")
 retardo = input.int(2, "Velas de retardo antes de borrar", 0, 20, group = gN,
-     tooltip = "Cuando el precio toca el nivel, la línea aguanta estas velas más " +
-     "antes de desaparecer, para que te dé tiempo a verlo.")
+     tooltip = "Cuando el precio toca el nivel, la línea se pone punteada y " +
+     "aguanta estas velas más antes de desaparecer, para que te dé tiempo a verlo.")
+verEtq = input.bool(true, "Etiqueta con el nombre a la derecha", group = gN)
 
 // ── sesiones activas ────────────────────────────────────────────────────────
 enSesion(string sp) => not na(time(timeframe.period, sp + ":" + dias, tz))
@@ -65,7 +73,7 @@ inNY   = verNY   and enSesion(spNY)
 
 bgcolor(verKZ and (enSesion(spKZ1) or enSesion(spKZ2)) ? cKZ : na, title = "killzone")
 
-// ── una sesión: caja del rango, y línea del alto y del bajo al cerrar ────────
+// ── el estado de cada sesión ────────────────────────────────────────────────
 type Sesion
     string nom
     color  col
@@ -73,26 +81,47 @@ type Sesion
     float  lo = na
     int    x0 = na
     box    cj = na
-    line   lnA = na
-    line   lnB = na
-    float  nivA = na          // nivel vivo del alto; na = ya mitigado
-    float  nivB = na
-    int    ctA = -1           // velas desde que se toco; -1 = sin tocar
-    int    ctB = -1
+
+// Un nivel es el alto o el bajo que dejó una sesión al cerrar. Vive hasta que
+// el precio lo toca. Los de sesiones anteriores NO se borran al llegar una
+// nueva: se acumulan, que es lo que hace falta para ver la liquidez pendiente.
+type Nivel
+    string nom
+    color  col
+    float  precio
+    bool   alto
+    line   ln
+    label  et
+    int    ct = -1            // velas desde que se tocó; -1 = sin tocar
 
 var Sesion asia = Sesion.new("Asia", #8E8E93)
-var Sesion lon  = Sesion.new("Londres", #2F6FD0)
+var Sesion lon  = Sesion.new("London", #2F6FD0)
 var Sesion ny   = Sesion.new("NY", #E08A2B)
-var array<box> cajas = array.new<box>()
+var array<box>   cajas   = array.new<box>()
+var array<Nivel> niveles = array.new<Nivel>()
 
 // Todas las funciones terminan en `true`. En Pine el valor de la ultima
 // expresion es el valor de retorno, y si una rama acaba en una llamada que no
-// devuelve nada y otra en una asignacion, el compilador se queja. Cerrando
-// siempre igual no puede pasar.
+// devuelve nada y otra en una asignacion, el compilador se queja.
 guarda(box b) =>
     array.push(cajas, b)
     if array.size(cajas) > nSes * 3
         box.delete(array.shift(cajas))
+    true
+
+nuevoNivel(Sesion s, bool alto) =>
+    float precio = alto ? s.hi : s.lo
+    string txt = s.nom + (alto ? " High" : " Low")
+    Nivel n = Nivel.new(txt, s.col, precio, alto,
+         line.new(s.x0, precio, bar_index, precio, color = color.new(s.col, 15),
+              width = 1, extend = extend.right),
+         verEtq ? label.new(bar_index + 12, precio, txt, style = label.style_none,
+              textcolor = color.new(s.col, 20), size = size.tiny) : na)
+    array.push(niveles, n)
+    if array.size(niveles) > maxNiv
+        Nivel v = array.shift(niveles)
+        line.delete(v.ln)
+        label.delete(v.et)
     true
 
 corre(Sesion s, bool activa, bool antes, color fondo) =>
@@ -109,42 +138,30 @@ corre(Sesion s, bool activa, bool antes, color fondo) =>
         box.set_top(s.cj, s.hi)
         box.set_bottom(s.cj, s.lo)
         box.set_right(s.cj, bar_index)
-    // al cerrar la sesion se fijan los dos niveles. Solo se conserva el par mas
-    // reciente de cada sesion: el anterior se borra para no ensuciar.
     if verNiv and not activa and antes and not na(s.x0)
-        line.delete(s.lnA)
-        line.delete(s.lnB)
-        s.lnA := line.new(s.x0, s.hi, bar_index, s.hi, color = color.new(s.col, 15),
-             width = 1, extend = extend.right)
-        s.lnB := line.new(s.x0, s.lo, bar_index, s.lo, color = color.new(s.col, 15),
-             width = 1, extend = extend.right)
-        s.nivA := s.hi
-        s.nivB := s.lo
-        s.ctA := -1
-        s.ctB := -1
+        nuevoNivel(s, true)
+        nuevoNivel(s, false)
     true
 
 // La mitigacion corre en CADA vela cerrada. En el original estaba dentro de
 // `if barstate.islast`, asi que en el historico no borraba nada.
-// Primero se cuentan los niveles que ya estaban tocados y despues se mira si
-// alguno se toca ahora: asi el que se acaba de tocar no cuenta esta vela.
-mitiga(Sesion s) =>
-    if not na(s.nivA) and s.ctA >= 0
-        s.ctA := s.ctA + 1
-        if s.ctA >= retardo
-            line.delete(s.lnA)
-            s.nivA := na
-    if not na(s.nivA) and s.ctA < 0 and high >= s.nivA
-        s.ctA := 0
-        line.set_style(s.lnA, line.style_dotted)
-    if not na(s.nivB) and s.ctB >= 0
-        s.ctB := s.ctB + 1
-        if s.ctB >= retardo
-            line.delete(s.lnB)
-            s.nivB := na
-    if not na(s.nivB) and s.ctB < 0 and low <= s.nivB
-        s.ctB := 0
-        line.set_style(s.lnB, line.style_dotted)
+// Se recorre hacia atras para poder quitar elementos sin descolocar el indice.
+mitiga() =>
+    if array.size(niveles) > 0
+        for i = array.size(niveles) - 1 to 0
+            Nivel n = array.get(niveles, i)
+            bool fuera = false
+            if n.ct >= 0
+                n.ct := n.ct + 1
+                if n.ct >= retardo
+                    fuera := true
+            if n.ct < 0 and (n.alto ? high >= n.precio : low <= n.precio)
+                n.ct := 0
+                line.set_style(n.ln, line.style_dotted)
+            if fuera
+                line.delete(n.ln)
+                label.delete(n.et)
+                array.remove(niveles, i)
     true
 
 // en la vela en curso la caja sigue creciendo, para que se vea en vivo
@@ -160,31 +177,16 @@ if barstate.isconfirmed
     corre(lon,  inLon,  inLon[1],  cLon)
     corre(ny,   inNY,   inNY[1],   cNY)
     if verNiv
-        mitiga(asia)
-        mitiga(lon)
-        mitiga(ny)
+        mitiga()
 
 if not barstate.isconfirmed
     estira(asia, inAsia)
     estira(lon,  inLon)
     estira(ny,   inNY)
 
-// ── etiquetas al borde derecho ──────────────────────────────────────────────
-var array<label> etq = array.new<label>()
-
-etiqueta(Sesion s, bool alto) =>
-    float v = alto ? s.nivA : s.nivB
-    if not na(v)
-        array.push(etq, label.new(bar_index + 12, v, s.nom + (alto ? " máx" : " mín"),
-             style = label.style_none, textcolor = color.new(s.col, 20), size = size.tiny))
-    true
-
-if barstate.islast and verNiv
-    while array.size(etq) > 0
-        label.delete(array.pop(etq))
-    etiqueta(asia, true)
-    etiqueta(asia, false)
-    etiqueta(lon, true)
-    etiqueta(lon, false)
-    etiqueta(ny, true)
-    etiqueta(ny, false)
+// las etiquetas siguen al borde derecho del gráfico
+if barstate.islast and verEtq and array.size(niveles) > 0
+    for i = 0 to array.size(niveles) - 1
+        Nivel n = array.get(niveles, i)
+        if not na(n.et)
+            label.set_x(n.et, bar_index + 12)
