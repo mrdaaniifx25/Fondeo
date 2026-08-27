@@ -1,76 +1,64 @@
 //@version=6
 // ════════════════════════════════════════════════════════════════════════════
-//  CRT H4 · la version que sale de tus respuestas
+//  CRT · estructura en 4H, gatillo en 1H
 //
-//  docs/CRT_H4_especificacion.md tiene el origen de cada regla y lo que dice
-//  la medicion de cada una.
+//  docs/marcas_grafico.html tiene el dibujo de cada elemento y sus reglas.
+//  docs/cuaderno_crt.html tiene el metodo entero.
 //
-//     1 · ESTRUCTURA en H4: barre el extremo de la anterior y CIERRA dentro
-//         de su cuerpo
-//     2 · CONFIRMACION: rango vivo de H1 en la misma direccion
-//     3 · ENTRADA al cierre de esa vela de H4, a mercado
-//     4 · STOP en la mecha del barrido mas un tick
-//     5 · OBJETIVO en el extremo opuesto de la vela base
-//     6 · SALIDA a las 10 velas de H4 si no ha resuelto
+//     CONTEXTO      1D y 12H  ->  solo sus lineas de objetivo
+//     ESTRUCTURA    4H        ->  la caja, el PO3 y el objetivo principal
+//     GATILLO       1H o M15  ->  crea rango en la misma direccion -> señal
 //
-//  El stop va PEGADO y eso no es negociable: medido sobre siete instrumentos,
-//  con el stop en la mecha el CRT acierta 2,9 puntos por encima de lo que da
-//  la pura geometria; con un stop de 1 ATR acierta 4,5 puntos POR DEBAJO.
-//  Ensanchar el stop no protege, invalida el setup y te deja dentro.
+//     ENTRADA   al cierre de la vela del gatillo
+//     STOP      en la mecha del barrido de esa vela, mas el colchon
+//     OBJETIVO  el del rango de 4H, o el mas cercano de los alineados
 //
-//  No repinta. Todo corre sobre velas cerradas y confirmadas.
+//  Las sesiones NO van aqui: van en un indicador aparte.
+//  No repinta: todo corre sobre velas cerradas y confirmadas.
 // ════════════════════════════════════════════════════════════════════════════
-indicator("CRT H4 · estructura y ejecución", "CRT H4", overlay = true,
+indicator("CRT · 4H y gatillo", "CRT 4H", overlay = true,
      max_lines_count = 500, max_boxes_count = 500, max_labels_count = 500)
 
 gR = "La regla"
 tz      = input.string("Europe/Madrid", "Huso horario", group = gR,
      options = ["Europe/Madrid", "America/New_York", "UTC", "Etc/GMT-2"],
-     tooltip = "Elígelo una vez y no lo cambies. Cambia qué velas existen, " +
-     "y por tanto todos los rangos y todas las señales.")
-minEst  = input.int(240, "Estructura · minutos por vela", 60, 1440, step = 60, group = gR,
-     tooltip = "240 = H4, que es donde lees tú.")
-minCon  = input.int(60,  "Confirmación · minutos por vela", 5, 720, step = 5, group = gR,
-     tooltip = "60 = H1. Tiene que haber un rango vivo aquí en la misma dirección.")
-pedirCon = input.bool(true, "Exigir la confirmación para dar señal", group = gR,
-     tooltip = "Medido: +0,046 R a favor, pero con z +1,67, por debajo del " +
-     "umbral. Es lo más prometedor que hay y NO está demostrado.")
+     tooltip = "Elígelo una vez y no lo cambies. Cambia qué velas existen, y con " +
+     "ellas todos los rangos y todos los objetivos.")
+minEst  = input.int(240, "Estructura · minutos por vela", 60, 1440, step = 60, group = gR)
+minGat  = input.int(60,  "Gatillo · minutos por vela", 5, 240, step = 5, group = gR,
+     tooltip = "60 = segunda ejecución, esperas el cierre de 1H. " +
+     "15 = primera ejecución, entras en el primer rango de M15. " +
+     "Elige una y no la cambies dentro del mismo mes, o tu libro no compara nada.")
+verCtx  = input.bool(true, "Líneas de objetivo de 12H y diario", group = gR)
 vidaMax = input.int(10, "Salir a mercado tras N velas de estructura", 0, 60, group = gR)
 dojiPct = input.float(10.0, "Vela base doji: cuerpo menor que este % del rango", 0, 50, group = gR)
+
+gD = "Lo que se dibuja"
+verPO3  = input.bool(true, "Corchetes del PO3 sobre el rango vivo", group = gD)
+verZona = input.bool(true, "Sombrear las tres zonas de R:R", group = gD)
+histor  = input.bool(true, "Dejar el historial de rangos en gris", group = gD)
+verPanel = input.bool(true, "Panel", group = gD)
 
 gE = "Ejecución"
 pip     = input.float(0.0001, "Tamaño del pip", 0.000001, 100, group = gE)
 colchon = input.float(1.0, "Colchón del stop (ticks)", 0, 20, group = gE)
 costeU  = input.float(1.2, "Coste ida y vuelta (pips)", 0, 100, step = 0.1, group = gE)
-rrMin   = input.float(0.0, "R:R mínimo (0 = sin filtro)", 0, 10, step = 0.25, group = gE,
-     tooltip = "La regla no lleva filtro de R:R: el R:R mediano de este setup " +
-     "es 1,31, así que exigir 3 lo dejaría sin operaciones.")
+rrMin   = input.float(0.0, "R:R mínimo (0 = sin filtro)", 0, 10, step = 0.25, group = gE)
+bloqRe  = input.bool(true, "Bloquear si hay reiniciada en contra sin cerrar arriba", group = gE,
+     tooltip = "La regla de protección: si aparece una reiniciada en contra mientras " +
+     "una temporalidad mayor todavía no ha cerrado su rango, no se opera.")
 
 gV = "Tu ventana operativa"
 usarVent = input.bool(true, "Avisar solo dentro de la ventana", group = gV,
-     tooltip = "Dibuja siempre; esto controla solo los avisos.")
+     tooltip = "Dibuja siempre. Esto controla los avisos.")
 vent1 = input.session("0900-1130", "Ventana 1 · Londres", group = gV)
 vent2 = input.session("1400-1600", "Ventana 2 · Nueva York", group = gV)
 
-gS = "Sesiones"
-verSes  = input.bool(true, "Colorear las sesiones", group = gS)
-sesAsia = input.session("0000-0900", "Asia", group = gS)
-sesLon  = input.session("0800-1700", "Londres", group = gS)
-sesNY   = input.session("1400-2300", "Nueva York", group = gS)
-cAsia   = input.color(color.new(#7E57C2, 93), "", inline = "c", group = gS)
-cLon    = input.color(color.new(#26A69A, 93), "", inline = "c", group = gS)
-cNY     = input.color(color.new(#EF5350, 93), "", inline = "c", group = gS)
-
-gM = "Máximos y mínimos de sesión"
-verNiv  = input.bool(true, "Marcarlos, y borrarlos al ser mitigados", group = gM)
-mitiga  = input.string("mecha", "Mitigado cuando", ["mecha", "cierre"], group = gM)
-maxNiv  = input.int(8, "Niveles sin mitigar que se mantienen", 1, 40, group = gM)
-
-verPanel = input.bool(true, "Mostrar panel", "Panel")
-
-COL_ALC = #26A69A
-COL_BAJ = #EF5350
-MIN_MS  = 60000
+ALC = #0E8C7D
+BAJ = #C4443C
+ORO = #B0790F
+GRI = color.gray
+MIN_MS = 60000
 
 // ── reloj local ─────────────────────────────────────────────────────────────
 epocaDe(int t) =>
@@ -78,92 +66,16 @@ epocaDe(int t) =>
 bloqueDe(int e, int per) => int(math.floor(e / (per * MIN_MS)))
 elFin = epocaDe(time_close - 1)
 elSig = epocaDe(time_close)
+enVentana = not usarVent or not na(time(timeframe.period, vent1 + ":23456", tz))
+                         or not na(time(timeframe.period, vent2 + ":23456", tz))
 
-// ── sesiones ────────────────────────────────────────────────────────────────
-enSesion(string s) => not na(time(timeframe.period, s + ":23456", tz))
-inAsia = enSesion(sesAsia)
-inLon  = enSesion(sesLon)
-inNY   = enSesion(sesNY)
-bgcolor(verSes and inAsia ? cAsia : na, title = "Asia")
-bgcolor(verSes and inLon  ? cLon  : na, title = "Londres")
-bgcolor(verSes and inNY   ? cNY   : na, title = "Nueva York")
-enVentana = not usarVent or enSesion(vent1) or enSesion(vent2)
-
-// ── máximos y mínimos de sesión ─────────────────────────────────────────────
-var array<line>  nvLin = array.new<line>()
-var array<label> nvEtq = array.new<label>()
-var array<float> nvVal = array.new<float>()
-var array<bool>  nvAlt = array.new<bool>()
-
-nuevoNivel(float p, bool esAlto, string nom, color col) =>
-    ln = line.new(bar_index, p, bar_index + 1, p, color = col, width = 1,
-         extend = extend.right, style = line.style_dotted)
-    lb = label.new(bar_index, p, nom + (esAlto ? " máx" : " mín"),
-         style = esAlto ? label.style_label_down : label.style_label_up,
-         color = color.new(col, 88), textcolor = col, size = size.tiny)
-    array.push(nvLin, ln)
-    array.push(nvEtq, lb)
-    array.push(nvVal, p)
-    array.push(nvAlt, esAlto)
-    if array.size(nvLin) > maxNiv * 2
-        line.delete(array.shift(nvLin))
-        label.delete(array.shift(nvEtq))
-        array.shift(nvVal)
-        array.shift(nvAlt)
-
-var float aA = na
-var float aB = na
-var float lA = na
-var float lB = na
-var float yA = na
-var float yB = na
-
-if verNiv
-    if inAsia
-        aA := inAsia[1] ? math.max(nz(aA, high), high) : high
-        aB := inAsia[1] ? math.min(nz(aB, low),  low)  : low
-    if inLon
-        lA := inLon[1] ? math.max(nz(lA, high), high) : high
-        lB := inLon[1] ? math.min(nz(lB, low),  low)  : low
-    if inNY
-        yA := inNY[1] ? math.max(nz(yA, high), high) : high
-        yB := inNY[1] ? math.min(nz(yB, low),  low)  : low
-    if not inAsia and inAsia[1] and not na(aA)
-        nuevoNivel(aA, true, "Asia", #7E57C2)
-        nuevoNivel(aB, false, "Asia", #7E57C2)
-        aA := na
-        aB := na
-    if not inLon and inLon[1] and not na(lA)
-        nuevoNivel(lA, true, "Londres", #26A69A)
-        nuevoNivel(lB, false, "Londres", #26A69A)
-        lA := na
-        lB := na
-    if not inNY and inNY[1] and not na(yA)
-        nuevoNivel(yA, true, "NY", #EF5350)
-        nuevoNivel(yB, false, "NY", #EF5350)
-        yA := na
-        yB := na
-    if array.size(nvLin) > 0
-        for i = array.size(nvLin) - 1 to 0
-            float v = array.get(nvVal, i)
-            bool es = array.get(nvAlt, i)
-            bool tomado = mitiga == "mecha" ? (es ? high >= v : low <= v)
-                                            : (es ? close > v : close < v)
-            if tomado
-                line.delete(array.get(nvLin, i))
-                label.delete(array.get(nvEtq, i))
-                array.remove(nvLin, i)
-                array.remove(nvEtq, i)
-                array.remove(nvVal, i)
-                array.remove(nvAlt, i)
-
-// ════════════════════════════════════════════════════════════════════════════
-//  MOTOR
 // ════════════════════════════════════════════════════════════════════════════
 type Marco
     int    per
     int    bid     = na
     bool   cerrada = false
+    int    barIni  = na
+    int    barPrev = na
     float  o = na
     float  h = na
     float  l = na
@@ -173,22 +85,22 @@ type Marco
     float  ph = na
     float  pl = na
     float  pc = na
-    int    lado    = 0        // direccion del ULTIMO rango creado
+    int    lado    = 0
+    int    ladoAnt = 0        // direccion del rango anterior, para la reiniciada
     bool   vivo    = false
     float  obj     = na
     float  bhi     = na
     float  blo     = na
-    float  stp     = na       // mecha del barrido de la vela que activo
+    float  mecha   = na       // el extremo del barrido: ahi va el stop
+    float  cierre  = na       // cierre de la vela que activo
     int    edad    = 0
     string estado  = "sin rango"
 
+var Marco d1  = Marco.new(1440)
+var Marco h12 = Marco.new(720)
 var Marco est = Marco.new(240)
-var Marco con = Marco.new(60)
-var box  cjEst = na
-var line lnEst = na
-var label etEst = na
+var Marco gat = Marco.new(60)
 
-// Procesa una vela cerrada. Devuelve true si esa vela ACTIVA un rango nuevo.
 procesa(Marco s) =>
     float co = s.o
     float ch = s.h
@@ -197,7 +109,7 @@ procesa(Marco s) =>
     bool nace = false
     if s.vivo
         bool llega = s.lado > 0 ? ch >= s.obj : cl <= s.obj
-        bool salta = s.lado > 0 ? cl <= s.stp : ch >= s.stp
+        bool salta = s.lado > 0 ? cl <= s.mecha : ch >= s.mecha
         s.edad += 1
         if llega
             s.vivo := false
@@ -224,13 +136,15 @@ procesa(Marco s) =>
             alc := false
             baj := false
         if alc or baj
-            s.lado := alc ? 1 : -1
-            s.obj  := alc ? s.ph : s.pl
-            s.bhi  := s.ph
-            s.blo  := s.pl
-            s.stp  := alc ? cl : ch          // la mecha del barrido
-            s.edad := 0
-            s.vivo := true
+            s.ladoAnt := s.lado
+            s.lado  := alc ? 1 : -1
+            s.obj   := alc ? s.ph : s.pl
+            s.bhi   := s.ph
+            s.blo   := s.pl
+            s.mecha := alc ? cl : ch
+            s.cierre := cc
+            s.edad  := 0
+            s.vivo  := true
             s.estado := "CREADO"
             nace := true
     s.po := s.o
@@ -243,6 +157,8 @@ procesa(Marco s) =>
 abre(Marco s, int b) =>
     s.bid := b
     s.cerrada := false
+    s.barPrev := s.barIni
+    s.barIni := bar_index
     s.o := open
     s.h := high
     s.l := low
@@ -267,103 +183,237 @@ paso(Marco s) =>
             s.cerrada := true
     nace
 
+d1.per  := 1440
+h12.per := 720
 est.per := minEst
-con.per := minCon
-paso(con)                       // la confirmacion se actualiza ANTES
-naceEst = paso(est)
+gat.per := minGat
 
-// ── señal ───────────────────────────────────────────────────────────────────
-var string motivo = "esperando la primera vela de estructura"
-var float  ultRR  = na
+paso(d1)
+paso(h12)
+naceEst = paso(est)
+naceGat = paso(gat)
+
+// ── objetivos de contexto ───────────────────────────────────────────────────
+lin(Marco s, line ln, float ancho, float transp) =>
+    line r = ln
+    if s.vivo
+        color cx = s.lado > 0 ? ALC : BAJ
+        if na(r)
+            r := line.new(bar_index, s.obj, bar_index + 1, s.obj,
+                 color = color.new(cx, int(transp)), width = int(ancho), style = line.style_dashed)
+        line.set_y1(r, s.obj)
+        line.set_y2(r, s.obj)
+        line.set_x2(r, bar_index + 24)
+        line.set_color(r, color.new(cx, int(transp)))
+    else if not na(r)
+        line.set_color(r, color.new(GRI, 55))
+        line.set_style(r, line.style_dotted)
+    r
+
+var line lnD1  = na
+var line lnH12 = na
+if verCtx
+    lnD1  := lin(d1,  lnD1,  1, 40)
+    lnH12 := lin(h12, lnH12, 2, 20)
+
+// ── la caja de 4H, el PO3 y las zonas ───────────────────────────────────────
+var box   cj  = na
+var line  lnE = na
+var label et  = na
+var line  b1  = na
+var line  b2  = na
+var line  b3  = na
+var label l1  = na
+var label l2  = na
+var label l3  = na
+var box   z1  = na
+var box   z2  = na
+var box   z3  = na
+
+borra() =>
+    box.delete(z1)
+    box.delete(z2)
+    box.delete(z3)
+    line.delete(b1)
+    line.delete(b2)
+    line.delete(b3)
+    label.delete(l1)
+    label.delete(l2)
+    label.delete(l3)
 
 if naceEst
-    int L = est.lado
-    float ent = est.pc                                   // cierre de la vela
-    float stp = L > 0 ? est.stp - colchon * syminfo.mintick
-                      : est.stp + colchon * syminfo.mintick
-    float rgo = math.abs(ent - stp)
-    bool  acompana = con.vivo and con.lado == L
-    ultRR := rgo > 0 ? math.abs(est.obj - ent) / rgo : na
-    if rgo <= 0
-        motivo := "el barrido no deja stop"
-    else if pedirCon and not acompana
-        motivo := "rango " + (L > 0 ? "alcista" : "bajista") + " en estructura, pero " +
-             (con.vivo ? "la confirmación va al revés" : "no hay rango vivo en confirmación")
-    else if rrMin > 0 and ultRR < rrMin
-        motivo := "R:R " + str.tostring(ultRR, "#.##") + ", por debajo de " + str.tostring(rrMin, "#.#")
-    else
-        color cs = L > 0 ? COL_ALC : COL_BAJ
-        box.delete(cjEst)
-        line.delete(lnEst)
-        label.delete(etEst)
-        cjEst := box.new(bar_index, est.bhi, bar_index + 1, est.blo,
-             border_color = color.new(cs, 45), bgcolor = color.new(cs, 93))
-        lnEst := line.new(bar_index, est.obj, bar_index + 30, est.obj,
-             color = cs, width = 2, style = line.style_dashed)
-        etEst := label.new(bar_index, L > 0 ? est.blo : est.bhi,
-             (L > 0 ? "▲ COMPRA" : "▼ VENTA") +
-             "\nstop " + str.tostring(rgo / pip, "#.#") + " pips" +
-             "\nR:R " + str.tostring(ultRR, "#.##") +
-             "\ncoste " + str.tostring(100 * costeU / (rgo / pip), "#.#") + " % del riesgo" +
-             (enVentana ? "" : "\n(fuera de tu ventana)"),
-             style = L > 0 ? label.style_label_up : label.style_label_down,
-             color = color.new(cs, enVentana ? 15 : 55), textcolor = color.white,
-             size = size.normal)
-        line.new(bar_index, stp, bar_index + 30, stp, color = COL_BAJ, style = line.style_dotted)
-        motivo := (enVentana ? "SEÑAL " : "SEÑAL fuera de tu ventana · ") +
-             (L > 0 ? "COMPRA" : "VENTA") + " · R:R " + str.tostring(ultRR, "#.##")
-        if enVentana
-            alert((L > 0 ? "CRT H4 COMPRA " : "CRT H4 VENTA ") + syminfo.ticker +
-                 " · entrada " + str.tostring(ent, format.mintick) +
-                 " · stop " + str.tostring(stp, format.mintick) +
-                 " · objetivo " + str.tostring(est.obj, format.mintick) +
-                 " · R:R " + str.tostring(ultRR, "#.##"),
-                 alert.freq_once_per_bar_close)
-else if barstate.isconfirmed and est.cerrada and est.estado != "CREADO"
-    motivo := "la última vela de estructura no barrió y cerró dentro"
+    if not histor
+        box.delete(cj)
+        line.delete(lnE)
+        label.delete(et)
+    borra()
+    color cx = est.lado > 0 ? ALC : BAJ
+    cj := box.new(est.barPrev, est.bhi, bar_index + 1, est.blo,
+         border_color = color.new(cx, 30), bgcolor = na, border_width = 1)
+    lnE := line.new(est.barPrev, est.obj, bar_index + 24, est.obj,
+         color = cx, width = 3, style = line.style_dashed)
+    et := label.new(est.barPrev, est.lado > 0 ? est.blo : est.bhi, "4H · CREADO",
+         style = est.lado > 0 ? label.style_label_up : label.style_label_down,
+         color = color.new(cx, 88), textcolor = cx, size = size.small)
+    if verPO3
+        float y = est.lado > 0 ? est.blo : est.bhi
+        float d = (est.bhi - est.blo) * 0.10
+        float yb = est.lado > 0 ? y - d : y + d
+        b1 := line.new(est.barPrev, yb, est.barIni - 1, yb, color = GRI, width = 2)
+        b2 := line.new(est.barIni, yb, bar_index, yb, color = cx == ALC ? BAJ : ALC, width = 2)
+        b3 := line.new(bar_index + 1, yb, bar_index + 2, yb, color = cx, width = 2)
+        l1 := label.new(int(math.avg(est.barPrev, est.barIni)), yb, "acumulación",
+             style = label.style_none, textcolor = GRI, size = size.tiny)
+        l2 := label.new(int(math.avg(est.barIni, bar_index)), yb, "manipulación",
+             style = label.style_none, textcolor = cx == ALC ? BAJ : ALC, size = size.tiny)
+        l3 := label.new(bar_index + 2, yb, "distribución",
+             style = label.style_none, textcolor = cx, size = size.tiny)
+    if verZona
+        float a = est.cierre
+        float b = est.obj
+        float t = (b - a) / 3.0
+        z1 := box.new(bar_index, a, bar_index + 24, a + t,
+             border_color = na, bgcolor = color.new(ALC, 88))
+        z2 := box.new(bar_index, a + t, bar_index + 24, a + 2*t,
+             border_color = na, bgcolor = color.new(ORO, 88))
+        z3 := box.new(bar_index, a + 2*t, bar_index + 24, b,
+             border_color = na, bgcolor = color.new(BAJ, 88))
 
-if est.vivo and not na(cjEst)
-    box.set_right(cjEst, bar_index + 1)
+if est.vivo and not na(cj)
+    box.set_right(cj, bar_index + 1)
+    line.set_x2(lnE, bar_index + 24)
+    label.set_text(et, "4H · " + est.estado)
+    if verPO3 and not na(b3)
+        line.set_x2(b3, bar_index)
+        label.set_x(l3, int(math.avg(line.get_x1(b3), bar_index)))
+    if verZona and not na(z1)
+        box.set_right(z1, bar_index + 24)
+        box.set_right(z2, bar_index + 24)
+        box.set_right(z3, bar_index + 24)
+else if not est.vivo and not na(cj)
+    box.set_border_color(cj, color.new(GRI, 55))
+    line.set_color(lnE, color.new(GRI, 60))
+    line.set_style(lnE, line.style_dotted)
+    label.set_textcolor(et, GRI)
+    label.set_text(et, "4H · " + est.estado)
+    borra()
+    b1 := na
+    z1 := na
+
+// ── el gatillo ──────────────────────────────────────────────────────────────
+var string motivo = "esperando"
+var float  ultRR  = na
+var string ultZona = "—"
+var bool   ultRein = false
+var bool   bloqueado = false
+
+zona(float ent, float obj, float pr, int L) =>
+    float t = math.abs(obj - ent) / 3.0
+    float d = math.abs(pr - ent)
+    d < t ? "óptima" : d < 2*t ? "continuación" : "últimas oport."
+
+if naceGat
+    int L = gat.lado
+    bool alineado = est.vivo and est.lado == L
+    ultRein := gat.ladoAnt != 0 and gat.ladoAnt != L and alineado
+    // proteccion: reiniciada EN CONTRA con una mayor sin rango vivo
+    if bloqRe and est.vivo and est.lado != L and (not d1.vivo or not h12.vivo)
+        bloqueado := true
+        motivo := "⊘ reiniciada en contra y arriba sin cerrar · NO SE OPERA"
+        ultRR := na
+    else
+        if alineado
+            bloqueado := false
+        if not est.vivo
+            motivo := "sin rango vivo en estructura"
+            ultRR := na
+        else if not alineado
+            motivo := "rango de estructura " + (est.lado > 0 ? "alcista" : "bajista") +
+                 " y el gatillo va al revés · esperando reiniciada"
+            ultRR := na
+        else if bloqueado
+            motivo := "⊘ bloqueado hasta que cierre una temporalidad mayor"
+            ultRR := na
+        else
+            float ent = gat.cierre
+            float stp = L > 0 ? gat.mecha - colchon * syminfo.mintick
+                              : gat.mecha + colchon * syminfo.mintick
+            float rgo = math.abs(ent - stp)
+            float obj = est.obj
+            ultRR := rgo > 0 ? math.abs(obj - ent) / rgo : na
+            ultZona := zona(est.cierre, est.obj, ent, L)
+            int nAl = (d1.vivo and d1.lado == L ? 1 : 0) + (h12.vivo and h12.lado == L ? 1 : 0) + 2
+            if rgo <= 0 or rgo / pip < 3 * costeU
+                motivo := "riesgo de " + str.tostring(rgo / pip, "#.#") + " pips: por debajo del mínimo operable"
+            else if rrMin > 0 and ultRR < rrMin
+                motivo := "R:R " + str.tostring(ultRR, "#.##") + ", por debajo de " + str.tostring(rrMin, "#.#")
+            else
+                color cs = L > 0 ? ALC : BAJ
+                label.new(bar_index, L > 0 ? low : high,
+                     (L > 0 ? "▲ COMPRA" : "▼ VENTA") + (ultRein ? "  · reiniciada" : "") +
+                     "\nentrada  " + str.tostring(ent, format.mintick) +
+                     "\nstop     " + str.tostring(stp, format.mintick) + "   · " + str.tostring(rgo / pip, "#.#") + " pips" +
+                     "\nobjetivo " + str.tostring(obj, format.mintick) + "   · R:R " + str.tostring(ultRR, "#.##") +
+                     "\nzona " + ultZona + " · " + str.tostring(nAl) + " de 4 · gatillo " +
+                     str.tostring(minGat / 60.0, "#.##") + "H" +
+                     (enVentana ? "" : "\n(fuera de tu ventana)"),
+                     style = L > 0 ? label.style_label_up : label.style_label_down,
+                     color = color.new(cs, enVentana ? 12 : 58), textcolor = color.white,
+                     size = size.normal)
+                line.new(bar_index, stp, bar_index + 20, stp, color = BAJ, width = 2, style = line.style_dashed)
+                line.new(bar_index, ent, bar_index + 20, ent, color = color.new(color.gray, 20), width = 2)
+                motivo := (enVentana ? "SEÑAL " : "SEÑAL fuera de tu ventana · ") +
+                     (L > 0 ? "COMPRA" : "VENTA") + " · R:R " + str.tostring(ultRR, "#.##") +
+                     " · zona " + ultZona
+                if enVentana
+                    alert((L > 0 ? "CRT COMPRA " : "CRT VENTA ") + syminfo.ticker +
+                         " · entrada " + str.tostring(ent, format.mintick) +
+                         " · stop " + str.tostring(stp, format.mintick) +
+                         " · objetivo " + str.tostring(obj, format.mintick) +
+                         " · R:R " + str.tostring(ultRR, "#.##") + " · zona " + ultZona,
+                         alert.freq_once_per_bar_close)
 
 // ── panel ───────────────────────────────────────────────────────────────────
+flecha(Marco s) => s.vivo ? (s.lado > 0 ? "▲" : "▼") : "—"
+colM(Marco s) => s.vivo ? (s.lado > 0 ? ALC : BAJ) : GRI
+
 fila(table t, int r, string a, string b, color cb) =>
-    table.cell(t, 0, r, a, text_size = size.small, text_color = color.gray,
-         text_halign = text.align_left)
-    table.cell(t, 1, r, b, text_size = size.small, text_color = cb,
-         text_halign = text.align_right)
+    table.cell(t, 0, r, a, text_size = size.small, text_color = color.gray, text_halign = text.align_left)
+    table.cell(t, 1, r, b, text_size = size.small, text_color = cb, text_halign = text.align_right)
 
 var table pan = table.new(position.bottom_right, 2, 7,
-     bgcolor = color.new(color.black, 15), border_width = 1,
-     border_color = color.new(color.gray, 75), frame_width = 1,
-     frame_color = color.new(color.gray, 75))
+     bgcolor = color.new(color.black, 12), border_width = 1,
+     border_color = color.new(color.gray, 78), frame_width = 1, frame_color = color.new(color.gray, 78))
 
 if verPanel and barstate.islast
     bool hay = str.startswith(motivo, "SEÑAL")
-    string te = est.vivo ? (est.lado > 0 ? "▲ " : "▼ ") + est.estado + "  →  " +
-         str.tostring(est.obj, format.mintick) : est.estado
-    string tc = con.vivo ? (con.lado > 0 ? "▲ " : "▼ ") + con.estado : con.estado
-    table.cell(pan, 0, 0, "CRT " + str.tostring(minEst / 60, "#.#") + "H", text_size = size.small,
+    bool blo = str.startswith(motivo, "⊘")
+    int nAl = (d1.vivo ? 1 : 0) + (h12.vivo ? 1 : 0) + (est.vivo ? 1 : 0) + (gat.vivo ? 1 : 0)
+    table.cell(pan, 0, 0, "CRT " + str.tostring(minEst / 60, "#") + "H", text_size = size.small,
          text_color = color.white, text_halign = text.align_left)
-    table.cell(pan, 1, 0, tz + (enVentana ? "  ●" : "  ○"), text_size = size.small,
-         text_color = enVentana ? COL_ALC : color.gray, text_halign = text.align_right)
-    fila(pan, 1, "estructura", te, est.vivo ? (est.lado > 0 ? COL_ALC : COL_BAJ) : color.gray)
-    fila(pan, 2, "confirmación", tc, con.vivo ? (con.lado > 0 ? COL_ALC : COL_BAJ) : color.gray)
-    fila(pan, 3, "acompaña", est.vivo and con.vivo and est.lado == con.lado ? "sí" : "no",
-         est.vivo and con.vivo and est.lado == con.lado ? COL_ALC : color.gray)
-    fila(pan, 4, "R:R", na(ultRR) ? "—" : str.tostring(ultRR, "#.##"),
+    table.cell(pan, 1, 0, "gatillo " + str.tostring(minGat) + "m" + (enVentana ? "  ●" : "  ○"),
+         text_size = size.small, text_color = enVentana ? ALC : color.gray, text_halign = text.align_right)
+    fila(pan, 1, "1D · 12H · 4H · gatillo",
+         flecha(d1) + " " + flecha(h12) + " " + flecha(est) + " " + flecha(gat) +
+         (ultRein ? "  reiniciada" : ""), ultRein ? ORO : color.white)
+    fila(pan, 2, "estructura", est.vivo ? est.estado + "  →  " + str.tostring(est.obj, format.mintick)
+         : est.estado, colM(est))
+    fila(pan, 3, "R:R", na(ultRR) ? "—" : str.tostring(ultRR, "#.##"),
          na(ultRR) ? color.gray : color.white)
-    fila(pan, 5, "sesión", inLon and inNY ? "Londres + NY" : inLon ? "Londres" :
-         inNY ? "Nueva York" : inAsia ? "Asia" : "—", color.white)
-    table.cell(pan, 0, 6, hay ? "▶" : "·", text_size = size.small,
-         text_color = hay ? COL_ALC : color.gray, text_halign = text.align_left)
+    fila(pan, 4, "zona", ultZona,
+         ultZona == "óptima" ? ALC : ultZona == "continuación" ? ORO : ultZona == "—" ? color.gray : BAJ)
+    fila(pan, 5, "coste sobre el riesgo", na(ultRR) ? "—" :
+         str.tostring(100 * costeU / (math.abs(gat.cierre - gat.mecha) / pip), "#.#") + " %", color.white)
+    table.cell(pan, 0, 6, hay ? "▶" : blo ? "⊘" : "·", text_size = size.small,
+         text_color = hay ? ALC : blo ? BAJ : color.gray, text_halign = text.align_left)
     table.cell(pan, 1, 6, motivo, text_size = size.small,
-         text_color = hay ? COL_ALC : color.gray, text_halign = text.align_right)
+         text_color = hay ? ALC : blo ? BAJ : color.gray, text_halign = text.align_right)
 
-var label avisoTF = na
+var label avTF = na
 if barstate.islast
-    label.delete(avisoTF)
-    if timeframe.in_seconds() > minCon * 60
-        avisoTF := label.new(bar_index, high,
-             "El gráfico tiene velas más grandes que la\ntemporalidad de confirmación.\nPonte en M15 o menos.",
+    label.delete(avTF)
+    if timeframe.in_seconds() > minGat * 60
+        avTF := label.new(bar_index, high,
+             "El gráfico tiene velas más grandes que el gatillo.\nPonte en M15 o menos.",
              style = label.style_label_down, color = color.new(color.orange, 15),
              textcolor = color.white, size = size.normal)
