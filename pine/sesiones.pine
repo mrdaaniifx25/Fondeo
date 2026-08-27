@@ -57,13 +57,13 @@ retardo = input.int(2, "Velas de retardo antes de borrar", 0, 20, group = gN,
      "antes de desaparecer, para que te dé tiempo a verlo.")
 
 // ── sesiones activas ────────────────────────────────────────────────────────
-dentro(string sp) => not na(time(timeframe.period, sp + ":" + dias, tz))
+enSesion(string sp) => not na(time(timeframe.period, sp + ":" + dias, tz))
 
-inAsia = verAsia and dentro(spAsia)
-inLon  = verLon  and dentro(spLon)
-inNY   = verNY   and dentro(spNY)
+inAsia = verAsia and enSesion(spAsia)
+inLon  = verLon  and enSesion(spLon)
+inNY   = verNY   and enSesion(spNY)
 
-bgcolor(verKZ and (dentro(spKZ1) or dentro(spKZ2)) ? cKZ : na, title = "killzone")
+bgcolor(verKZ and (enSesion(spKZ1) or enSesion(spKZ2)) ? cKZ : na, title = "killzone")
 
 // ── una sesión: caja del rango, y línea del alto y del bajo al cerrar ────────
 type Sesion
@@ -85,20 +85,25 @@ var Sesion lon  = Sesion.new("Londres", #2F6FD0)
 var Sesion ny   = Sesion.new("NY", #E08A2B)
 var array<box> cajas = array.new<box>()
 
+// Todas las funciones terminan en `true`. En Pine el valor de la ultima
+// expresion es el valor de retorno, y si una rama acaba en una llamada que no
+// devuelve nada y otra en una asignacion, el compilador se queja. Cerrando
+// siempre igual no puede pasar.
 guarda(box b) =>
     array.push(cajas, b)
     if array.size(cajas) > nSes * 3
         box.delete(array.shift(cajas))
+    true
 
-corre(Sesion s, bool dentro, bool antes, color fondo) =>
-    if dentro and not antes
+corre(Sesion s, bool activa, bool antes, color fondo) =>
+    if activa and not antes
         s.x0 := bar_index
         s.hi := high
         s.lo := low
         s.cj := box.new(bar_index, high, bar_index, low, bgcolor = fondo,
              border_color = color.new(s.col, 55), border_width = 1)
         guarda(s.cj)
-    else if dentro and not na(s.x0)
+    if activa and antes and not na(s.x0)
         s.hi := math.max(high, s.hi)
         s.lo := math.min(low, s.lo)
         box.set_top(s.cj, s.hi)
@@ -106,7 +111,7 @@ corre(Sesion s, bool dentro, bool antes, color fondo) =>
         box.set_right(s.cj, bar_index)
     // al cerrar la sesion se fijan los dos niveles. Solo se conserva el par mas
     // reciente de cada sesion: el anterior se borra para no ensuciar.
-    if verNiv and not dentro and antes and not na(s.x0)
+    if verNiv and not activa and antes and not na(s.x0)
         line.delete(s.lnA)
         line.delete(s.lnB)
         s.lnA := line.new(s.x0, s.hi, bar_index, s.hi, color = color.new(s.col, 15),
@@ -117,28 +122,38 @@ corre(Sesion s, bool dentro, bool antes, color fondo) =>
         s.nivB := s.lo
         s.ctA := -1
         s.ctB := -1
+    true
 
 // La mitigacion corre en CADA vela cerrada. En el original estaba dentro de
 // `if barstate.islast`, asi que en el historico no borraba nada.
+// Primero se cuentan los niveles que ya estaban tocados y despues se mira si
+// alguno se toca ahora: asi el que se acaba de tocar no cuenta esta vela.
 mitiga(Sesion s) =>
-    if not na(s.nivA)
-        if s.ctA < 0 and high >= s.nivA
-            s.ctA := 0
-            line.set_style(s.lnA, line.style_dotted)
-        else if s.ctA >= 0
-            s.ctA += 1
-            if s.ctA >= retardo
-                line.delete(s.lnA)
-                s.nivA := na
-    if not na(s.nivB)
-        if s.ctB < 0 and low <= s.nivB
-            s.ctB := 0
-            line.set_style(s.lnB, line.style_dotted)
-        else if s.ctB >= 0
-            s.ctB += 1
-            if s.ctB >= retardo
-                line.delete(s.lnB)
-                s.nivB := na
+    if not na(s.nivA) and s.ctA >= 0
+        s.ctA := s.ctA + 1
+        if s.ctA >= retardo
+            line.delete(s.lnA)
+            s.nivA := na
+    if not na(s.nivA) and s.ctA < 0 and high >= s.nivA
+        s.ctA := 0
+        line.set_style(s.lnA, line.style_dotted)
+    if not na(s.nivB) and s.ctB >= 0
+        s.ctB := s.ctB + 1
+        if s.ctB >= retardo
+            line.delete(s.lnB)
+            s.nivB := na
+    if not na(s.nivB) and s.ctB < 0 and low <= s.nivB
+        s.ctB := 0
+        line.set_style(s.lnB, line.style_dotted)
+    true
+
+// en la vela en curso la caja sigue creciendo, para que se vea en vivo
+estira(Sesion s, bool activa) =>
+    if activa and not na(s.cj)
+        box.set_top(s.cj, math.max(s.hi, high))
+        box.set_bottom(s.cj, math.min(s.lo, low))
+        box.set_right(s.cj, bar_index)
+    true
 
 if barstate.isconfirmed
     corre(asia, inAsia, inAsia[1], cAsia)
@@ -148,20 +163,11 @@ if barstate.isconfirmed
         mitiga(asia)
         mitiga(lon)
         mitiga(ny)
-else
-    // en la vela en curso la caja sigue creciendo, para que se vea en vivo
-    if inAsia and not na(asia.cj)
-        box.set_top(asia.cj, math.max(asia.hi, high))
-        box.set_bottom(asia.cj, math.min(asia.lo, low))
-        box.set_right(asia.cj, bar_index)
-    if inLon and not na(lon.cj)
-        box.set_top(lon.cj, math.max(lon.hi, high))
-        box.set_bottom(lon.cj, math.min(lon.lo, low))
-        box.set_right(lon.cj, bar_index)
-    if inNY and not na(ny.cj)
-        box.set_top(ny.cj, math.max(ny.hi, high))
-        box.set_bottom(ny.cj, math.min(ny.lo, low))
-        box.set_right(ny.cj, bar_index)
+
+if not barstate.isconfirmed
+    estira(asia, inAsia)
+    estira(lon,  inLon)
+    estira(ny,   inNY)
 
 // ── etiquetas al borde derecho ──────────────────────────────────────────────
 var array<label> etq = array.new<label>()
@@ -171,6 +177,7 @@ etiqueta(Sesion s, bool alto) =>
     if not na(v)
         array.push(etq, label.new(bar_index + 12, v, s.nom + (alto ? " máx" : " mín"),
              style = label.style_none, textcolor = color.new(s.col, 20), size = size.tiny))
+    true
 
 if barstate.islast and verNiv
     while array.size(etq) > 0
