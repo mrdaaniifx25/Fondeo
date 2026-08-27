@@ -25,6 +25,11 @@
 //  Los niveles se ACUMULAN: cada sesion deja su alto y su bajo, y ahi se quedan
 //  hasta que el precio los toca. No se borra el de la sesion anterior al llegar
 //  una nueva, que era lo que hacia el original.
+//
+//  Y las sesiones NO SE SOLAPAN por construccion: solo se configura la hora a la
+//  que empieza cada una, y cada sesion termina donde arranca la siguiente. Asia
+//  se cierra cuando abre Londres, y Londres cuando abre Nueva York. En ese mismo
+//  instante quedan marcados su alto y su bajo.
 // ════════════════════════════════════════════════════════════════════════════
 indicator("Sesiones", overlay = true, max_boxes_count = 500, max_lines_count = 500)
 
@@ -34,19 +39,25 @@ tz = input.string("Europe/Madrid", "Huso horario", group = gT,
      tooltip = "Con Europe/Madrid las sesiones y las killzones caen a la misma " +
      "hora de tu reloj en invierno y en verano.")
 
-gS = "Sesiones"
-verAsia = input.bool(true,  "Asia",    inline = "a", group = gS)
-spAsia  = input.session("0000-0900",   inline = "a", group = gS, title = "")
-cAsia   = input.color(color.new(#8E8E93, 92), "", inline = "a", group = gS)
-verLon  = input.bool(true,  "Londres", inline = "l", group = gS)
-spLon   = input.session("0800-1700",   inline = "l", group = gS, title = "")
-cLon    = input.color(color.new(#2F6FD0, 92), "", inline = "l", group = gS)
-verNY   = input.bool(true,  "N. York", inline = "n", group = gS)
-spNY    = input.session("1400-2300",   inline = "n", group = gS, title = "")
-cNY     = input.color(color.new(#E08A2B, 92), "", inline = "n", group = gS)
-dias    = input.string("23456", "Días", group = gS,
+gS = "Sesiones · encadenadas, no se solapan"
+hAsia = input.string("0000", "Empieza Asia",       inline = "a", group = gS)
+cAsia = input.color(color.new(#8E8E93, 92), "",    inline = "a", group = gS)
+hLon  = input.string("0800", "Empieza Londres",    inline = "l", group = gS)
+cLon  = input.color(color.new(#2F6FD0, 92), "",    inline = "l", group = gS)
+hNY   = input.string("1400", "Empieza Nueva York", inline = "n", group = gS)
+cNY   = input.color(color.new(#E08A2B, 92), "",    inline = "n", group = gS)
+hFin  = input.string("2300", "Cierra el día",      group = gS,
+     tooltip = "Formato HHMM en hora de España. Cada sesión termina donde " +
+     "empieza la siguiente: Asia acaba cuando abre Londres, y Londres cuando " +
+     "abre Nueva York. Así no pueden solaparse.")
+dias  = input.string("23456", "Días", group = gS,
      tooltip = "1 domingo, 2 lunes … 7 sábado. 23456 = de lunes a viernes.")
-nSes    = input.int(4, "Sesiones que se conservan dibujadas", 1, 30, group = gS)
+nSes  = input.int(4, "Sesiones que se conservan dibujadas", 1, 30, group = gS)
+
+// cada sesion va desde su hora de inicio hasta la de la siguiente
+spAsia = hAsia + "-" + hLon
+spLon  = hLon  + "-" + hNY
+spNY   = hNY   + "-" + hFin
 
 gK = "Killzones · las que operas"
 verKZ  = input.bool(true, "Marcar las killzones", group = gK)
@@ -67,9 +78,9 @@ verEtq = input.bool(true, "Etiqueta con el nombre a la derecha", group = gN)
 // ── sesiones activas ────────────────────────────────────────────────────────
 enSesion(string sp) => not na(time(timeframe.period, sp + ":" + dias, tz))
 
-inAsia = verAsia and enSesion(spAsia)
-inLon  = verLon  and enSesion(spLon)
-inNY   = verNY   and enSesion(spNY)
+inAsia = enSesion(spAsia)
+inLon  = enSesion(spLon)
+inNY   = enSesion(spNY)
 
 bgcolor(verKZ and (enSesion(spKZ1) or enSesion(spKZ2)) ? cKZ : na, title = "killzone")
 
