@@ -1,0 +1,304 @@
+<title>Rutina diaria CRT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+
+<style>
+:root{
+  --fondo:#F5F5F2; --sup:#FFFFFF; --sup2:#EBEBE6; --papel:#FAFAF7;
+  --tinta:#16181A; --tinta2:#3E4448; --gris:#6A7075; --linea:#DBDBD4;
+  --azul:#26437E; --azulS:rgba(38,67,126,.09);
+  --alc:#0E7F72; --baj:#BE3B33; --oro:#9A6B10;
+  --alcS:rgba(14,127,114,.11); --bajS:rgba(190,59,51,.11); --oroS:rgba(154,107,16,.11);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --fondo:#0D0F11; --sup:#16191C; --sup2:#1E2226; --papel:#131619;
+  --tinta:#E6E7E4; --tinta2:#B6BBBE; --gris:#888E93; --linea:#2A2F34;
+  --azul:#93AAE4; --azulS:rgba(147,170,228,.13);
+  --alc:#35C6B1; --baj:#F1766D; --oro:#DFA53E;
+  --alcS:rgba(53,198,177,.14); --bajS:rgba(241,118,109,.14); --oroS:rgba(223,165,62,.14);
+}}
+:root[data-theme="dark"]{
+  --fondo:#0D0F11; --sup:#16191C; --sup2:#1E2226; --papel:#131619;
+  --tinta:#E6E7E4; --tinta2:#B6BBBE; --gris:#888E93; --linea:#2A2F34;
+  --azul:#93AAE4; --azulS:rgba(147,170,228,.13);
+  --alc:#35C6B1; --baj:#F1766D; --oro:#DFA53E;
+  --alcS:rgba(53,198,177,.14); --bajS:rgba(241,118,109,.14); --oroS:rgba(223,165,62,.14);
+}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);margin:0;padding:0 20px 110px;
+  font-family:Newsreader,Georgia,serif;font-size:17.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.env{max-width:980px;margin:0 auto}
+.col{max-width:620px}
+h1,h2,h3,.disp{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;text-wrap:balance}
+h1{font-size:clamp(1.95rem,5vw,2.9rem);font-weight:700;letter-spacing:-.026em;line-height:1.04;margin:0}
+h2{font-size:1.3rem;font-weight:600;letter-spacing:-.016em;margin:0}
+h3{font-size:1.02rem;font-weight:600;margin:2em 0 .4em}
+p{margin:0 0 .9em}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.85em}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.69rem;font-weight:500;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--gris)}
+header{padding:70px 0 28px}
+.sub{font-size:1.12rem;color:var(--tinta2);max-width:52ch;margin:1em 0 0}
+
+section{margin:0 0 68px;scroll-margin-top:18px}
+.shead{display:flex;gap:16px;align-items:baseline;border-top:2px solid var(--tinta);
+  padding-top:13px;margin-bottom:1.2em}
+.snum{font-family:"IBM Plex Mono",monospace;font-size:.75rem;font-weight:500;
+  color:var(--azul);padding-top:.35em;flex:none}
+
+.tw{overflow-x:auto;margin:1.5em 0;border:1px solid var(--linea);border-radius:2px;background:var(--sup)}
+table{border-collapse:collapse;width:100%;font-family:Archivo,sans-serif;font-size:.87rem;min-width:520px}
+th{text-align:left;font-weight:600;font-size:.68rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--gris);padding:11px 15px;border-bottom:1px solid var(--linea);white-space:nowrap;background:var(--sup2)}
+td{padding:11px 15px;border-bottom:1px solid var(--linea);vertical-align:top;color:var(--tinta2);line-height:1.5}
+tr:last-child td{border-bottom:0}
+td:first-child{color:var(--tinta)}
+td.m{font-family:"IBM Plex Mono",monospace;font-size:.78rem;line-height:1.45}
+.hacer{font-family:Archivo,sans-serif;font-weight:600;white-space:nowrap}
+.f-no{color:var(--gris)}
+.f-esp{color:var(--oro)}
+.f-si{color:var(--alc)}
+.f-alto{color:var(--baj)}
+
+.reloj{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  border-radius:2px;overflow:hidden;margin:1.5em 0}
+.reloj .fr{display:grid;grid-template-columns:120px 1fr;background:var(--sup)}
+.reloj .h{background:var(--sup2);padding:15px 16px;font-family:"IBM Plex Mono",monospace;
+  font-size:.8rem;color:var(--azul);border-right:1px solid var(--linea)}
+.reloj .q{padding:15px 18px}
+.reloj .q b{font-family:Archivo,sans-serif;font-size:.97rem;display:block;margin-bottom:.25em}
+.reloj .q p{margin:0;font-size:.95rem;color:var(--tinta2)}
+.reloj .q ul{margin:.5em 0 0;padding-left:1.1em;font-size:.95rem;color:var(--tinta2)}
+.reloj .q li{margin:.25em 0}
+@media(max-width:600px){.reloj .fr{grid-template-columns:1fr}.reloj .h{border-right:0;border-bottom:1px solid var(--linea);padding-bottom:8px}}
+
+.duras{list-style:none;margin:1.5em 0;padding:0;counter-reset:d}
+.duras li{counter-increment:d;display:grid;grid-template-columns:34px 1fr;gap:14px;
+  padding:14px 0;border-top:1px solid var(--linea);font-size:1rem}
+.duras li:last-child{border-bottom:1px solid var(--linea)}
+.duras li::before{content:counter(d);font-family:"IBM Plex Mono",monospace;font-size:.78rem;
+  color:var(--baj);padding-top:.35em}
+
+.pan{font-family:"IBM Plex Mono",monospace;font-size:.78rem;line-height:1.85;
+  background:#0F1519;color:#DCE4E8;border:1px solid #2A353D;border-radius:3px;
+  padding:13px 17px;max-width:430px;margin:1.3em 0}
+.pan .r{display:flex;justify-content:space-between;gap:24px}
+.pan .k{color:#7C8C94}.pan .up{color:#35C6B1}.pan .dn{color:#F1766D}
+.pan .mu{color:#7C8C94}.pan .wr{color:#DFA53E}
+
+.nota{border-left:3px solid var(--linea);padding:2px 0 2px 18px;margin:1.5em 0;
+  color:var(--tinta2);font-size:.95rem;max-width:600px}
+.mapa{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  border-radius:2px;overflow:hidden;margin:1.5em 0}
+.mapa div{background:var(--sup);padding:13px 16px;display:grid;grid-template-columns:190px 1fr;
+  gap:16px;font-size:.94rem}
+.mapa .n{font-family:Archivo,sans-serif;font-weight:600;color:var(--tinta)}
+.mapa .d{color:var(--tinta2)}
+@media(max-width:600px){.mapa div{grid-template-columns:1fr;gap:4px}}
+footer{border-top:1px solid var(--linea);padding-top:24px;font-family:"IBM Plex Mono",monospace;
+  font-size:.72rem;color:var(--gris);line-height:1.85}
+</style>
+
+<div class="env">
+
+<header>
+  <div class="eyebrow">EURUSD · gráfico en M15 · un mes en demo</div>
+  <h1>Rutina diaria</h1>
+  <p class="sub">Lo que haces cada día con el indicador delante. Este es el documento que abres por la mañana; los demás son consulta.</p>
+</header>
+
+<div class="col">
+  <p class="nota" style="margin-top:24px">Si solo lees una cosa de todo lo que hemos escrito, que sea la sección <a href="#s2">02</a>: el panel dice qué hacer en cada momento, y tú obedeces. No hay nada que interpretar.</p>
+</div>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="shead"><span class="snum">01</span><h2>Los cuatro documentos</h2></div>
+  <div class="col"><p>Para que no tengas que acordarte de cuál es cuál.</p></div>
+  <div class="mapa">
+    <div><span class="n">Rutina diaria</span><span class="d">Este. Lo abres cada mañana. Qué hacer, en qué orden, y qué significa cada cosa del panel.</span></div>
+    <div><span class="n">Cuaderno de campo</span><span class="d">El método entero y por qué cada cosa es como es. Se lee una vez y se vuelve a él cuando algo no cuadra.</span></div>
+    <div><span class="n">Marcas en el gráfico</span><span class="d">Qué dibuja el indicador, elemento por elemento. Consulta rápida.</span></div>
+    <div><span class="n">El libro de operaciones</span><span class="d">Tu hoja. Se rellena todos los días, incluidos los días en que no operas.</span></div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="shead"><span class="snum">02</span><h2>El panel manda</h2></div>
+  <div class="col">
+    <p>Abajo a la derecha. La última línea es la única que tienes que leer: dice lo que está pasando y, por tanto, lo que haces. Estas son <strong>todas</strong> las cosas que puede decir.</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Lo que pone</th><th>Qué significa</th><th>Tú</th></tr></thead>
+    <tbody>
+      <tr><td class="m">sin barrido en 4H</td><td>La vela de 4H no se ha llevado nada. No hay nada en marcha.</td><td class="hacer f-no">Nada</td></tr>
+      <tr><td class="m">BARRIDO ▲<br>cierra dentro ✓ · faltan 2h40</td><td>La vela de 4H ya se llevó el mínimo. Empieza el partido: bajas a M15 y esperas.</td><td class="hacer f-esp">Atención</td></tr>
+      <tr><td class="m">4H alcista pero H1<br>no acompaña</td><td>Falta un eslabón. H1 no ha barrido en la misma dirección.</td><td class="hacer f-no">Nada</td></tr>
+      <tr><td class="m">M15 cerró fuera ·<br>sigo esperando</td><td>Esa vela de M15 no valió, pero <strong>no se descarta nada</strong>. Sigue vivo.</td><td class="hacer f-esp">Esperar</td></tr>
+      <tr><td class="m">riesgo de 2.4 pips:<br>por debajo del mínimo</td><td>El stop sale tan pegado que no se puede operar de verdad.</td><td class="hacer f-no">Nada</td></tr>
+      <tr><td class="m">R:R 1.20, por debajo<br>de tu mínimo</td><td>Llegas tarde al recorrido. El tren ya salió.</td><td class="hacer f-no">Nada</td></tr>
+      <tr><td class="m">⊘ reiniciada en contra<br>y arriba sin cerrar</td><td>Señal de peligro del método. El precio puede irse por los dos lados.</td><td class="hacer f-alto">NO OPERAR</td></tr>
+      <tr><td class="m">SEÑAL fuera de tu<br>ventana · R:R 2.4</td><td>Operación válida a una hora en la que no estás.</td><td class="hacer f-no">Apuntarla</td></tr>
+      <tr><td class="m">SEÑAL COMPRA ·<br>R:R 2.4 · zona óptima</td><td>Los cinco eslabones han encajado.</td><td class="hacer f-si">ENTRAR</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="col">
+    <p>Y así se ve el panel entero cuando hay algo en marcha:</p>
+  </div>
+  <div class="pan">
+    <div class="r"><span>CRT 4H</span><span class="up">gatillo M15 ●</span></div>
+    <div class="r"><span class="k">1D · 12H · 4H · 1H</span><span class="up">▲ ▲ ▲ ▲</span></div>
+    <div class="r"><span class="k">estructura</span><span class="wr">BARRIDO ▲ dentro ✓ · faltan 2h40</span></div>
+    <div class="r"><span class="k">R:R</span><span>2.41</span></div>
+    <div class="r"><span class="k">zona</span><span class="up">óptima</span></div>
+    <div class="r"><span class="k">coste sobre el riesgo</span><span>7.2 %</span></div>
+    <div class="r"><span class="mu">·</span><span class="mu">M15 cerró fuera · sigo esperando</span></div>
+  </div>
+  <div class="col">
+    <div class="nota">La fila de flechas es tu contexto: <strong>1D · 12H · 4H · 1H</strong>. Cuantas más apunten al mismo sitio, mejor. Ese número lo copias al libro <em>antes</em> de que pase nada, no después.</div>
+  </div>
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="shead"><span class="snum">03</span><h2>El día</h2></div>
+
+  <div class="reloj">
+    <div class="fr"><div class="h">08:45</div><div class="q">
+      <b>Preparas y escribes tu frase</b>
+      <p>Miras las tres de arriba, en este orden, y no bajas hasta tener la anterior:</p>
+      <ul>
+        <li><strong>Diaria</strong> — ¿hay rango vivo? ¿arriba o abajo?</li>
+        <li><strong>12H</strong> — ¿hay objetivo pendiente y acompaña a la diaria?</li>
+        <li><strong>4H</strong> — ¿hay rango? Ese es el que vas a operar. Apuntas su objetivo.</li>
+      </ul>
+      <p style="margin-top:.6em">Y escribes una frase en el libro: <em>«busco compras hacia 1,0940 porque diaria y 12H apuntan arriba y hay rango de 4H alcista.»</em> Si no te sale la frase, es que hoy no hay sesgo — y eso también se apunta.</p>
+    </div></div>
+
+    <div class="fr"><div class="h">09:00 – 11:30<br><span style="color:var(--gris)">Londres</span></div><div class="q">
+      <b>Miras el panel, nada más</b>
+      <ul>
+        <li>Si pone <span class="mono">sin barrido</span>: no hay nada. Puedes hacer otra cosa.</li>
+        <li>Si pone <span class="mono">BARRIDO</span>: ya estás en juego. Esperas.</li>
+        <li>Cuando salte <span class="mono">SEÑAL</span>: entras <strong>a mercado, al momento</strong>, y pones stop y objetivo donde marcan las líneas.</li>
+        <li>Y te apartas del gráfico.</li>
+      </ul>
+      <p style="margin-top:.6em"><strong>No bajes a M5 a mirar.</strong> Si te descubres haciéndolo, cierras el gráfico diez minutos.</p>
+    </div></div>
+
+    <div class="fr"><div class="h">14:00 – 16:00<br><span style="color:var(--gris)">Nueva York</span></div><div class="q">
+      <b>Lo mismo, sin volver a leer el contexto</b>
+      <p>El sesgo es el que escribiste por la mañana. Si a media tarde te dan ganas de cambiarlo, estás improvisando, y eso va al libro.</p>
+      <p style="margin-top:.5em"><strong>Máximo dos operaciones al día</strong>, hayan salido bien o mal.</p>
+    </div></div>
+
+    <div class="fr"><div class="h">Por la tarde<br><span style="color:var(--gris)">5 minutos</span></div><div class="q">
+      <b>Rellenas el libro</b>
+      <ul>
+        <li>Las que hiciste, con su captura.</li>
+        <li><strong>Las que viste y no tomaste</strong>, y por qué.</li>
+        <li>Las que saltaron fuera de tu horario — el indicador las dibuja apagadas para esto.</li>
+        <li>Una frase de cómo te sentiste.</li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="shead"><span class="snum">04</span><h2>Cuando algo se tuerce</h2></div>
+  <div class="tw"><table>
+    <thead><tr><th>Si pasa esto</th><th>Haces esto</th></tr></thead>
+    <tbody>
+      <tr><td>Llevas tres días sin ninguna señal</td><td><strong>Nada.</strong> Es lo normal. Este método da pocas entradas y los días vacíos son la mayoría. Anota «sin setup» y cierra.</td></tr>
+      <tr><td>La señal salta a las 12:30, fuera de tu ventana</td><td>No entras. La apuntas en el libro con lo que habría pasado. Al final del mes sabrás cuánto te cuesta el horario.</td></tr>
+      <tr><td>Entras y a los diez minutos te salta el stop</td><td>Nada. El stop hizo su trabajo. Lo apuntas y sigues. <strong>No entras otra vez «para recuperar».</strong></td></tr>
+      <tr><td>El precio va a favor y te da miedo perderlo</td><td>No cierras antes. El objetivo está donde está. Si lo cierras antes, va al libro como «no seguí la regla», que es la columna que te va a enseñar más.</td></tr>
+      <tr><td>Hay setup en 4H pero H1 no acompaña</td><td>Esperas. Puede que aparezca la <strong>reiniciada</strong> de H1 y se alinee — ese es el mejor momento del método.</td></tr>
+      <tr><td>Sale ⊘ NO SE OPERA</td><td>Se acabó por hoy en esa dirección. Es la regla de protección que te mandaron ellos por privado, no un capricho del indicador.</td></tr>
+      <tr><td>Dos setups a la vez, uno arriba y otro abajo</td><td>Ninguno. Si el gráfico te da las dos direcciones, el contexto no está claro.</td></tr>
+      <tr><td>Se te pasa una señal por estar en otra cosa</td><td>No la persigas. El precio ya no está donde estaba y el R:R que calculó el indicador ya no es el tuyo.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="shead"><span class="snum">05</span><h2>Las seis que no se negocian</h2></div>
+  <div class="col"><p>Todo lo demás se puede discutir. Esto no, durante este mes.</p></div>
+  <ol class="duras">
+    <li>Entras <strong>al cierre de la vela de M15</strong>, a mercado. No buscas mejor precio.</li>
+    <li>El stop va en <strong>la mecha del barrido de 4H</strong>. No se mueve, no se aparta, no se le da «un poco más».</li>
+    <li>Stop y objetivo se ponen <strong>en el mismo momento de entrar</strong>. Nunca después.</li>
+    <li><strong>Dos operaciones al día como máximo.</strong></li>
+    <li>El <strong>huso horario del indicador no se toca</strong>. Cambiarlo cambia todos los rangos y tu libro deja de valer.</li>
+    <li>Se rellena el libro <strong>todos los días</strong>, también los días en que no pasa nada.</li>
+  </ol>
+  <div class="col">
+    <div class="nota">La sexta es la que más gente se salta y la que hace que el mes sirva de algo. Un mes con treinta anotaciones vale; un mes con nueve, no vale para nada.</div>
+  </div>
+</section>
+
+<!-- 06 -->
+<section id="s6">
+  <div class="shead"><span class="snum">06</span><h2>El libro</h2></div>
+  <div class="tw"><table>
+    <thead><tr><th>Columna</th><th>Qué pones</th></tr></thead>
+    <tbody>
+      <tr><td>Fecha y hora</td><td>Del cierre de la vela de M15 en que entraste</td></tr>
+      <tr><td>Dirección</td><td>Compra / venta</td></tr>
+      <tr><td>Marcos alineados</td><td>El número de la fila de flechas, <strong>copiado antes de entrar</strong></td></tr>
+      <tr><td>¿Reiniciada?</td><td>Sí / no</td></tr>
+      <tr><td>¿4H sin cerrar?</td><td>Sí si la etiqueta lo decía. Sirve para comparar provisionales contra confirmadas</td></tr>
+      <tr><td>Zona</td><td>Óptima / continuación / últimas</td></tr>
+      <tr><td>Entrada · Stop · Objetivo</td><td>Los tres precios</td></tr>
+      <tr><td>R:R</td><td>El del panel, antes de entrar</td></tr>
+      <tr><td>Coste sobre el riesgo</td><td>El porcentaje del panel</td></tr>
+      <tr><td>Resultado</td><td>Objetivo / stop / cerrada a mano</td></tr>
+      <tr><td><strong>¿Seguí la regla?</strong></td><td><strong>Sí / no.</strong> La columna más valiosa</td></tr>
+      <tr><td>Cómo me sentí</td><td>Una frase</td></tr>
+      <tr><td>Captura</td><td>Imagen del gráfico</td></tr>
+    </tbody>
+  </table></div>
+  <div class="col">
+    <h3>Y la hoja aparte: las que no tomaste</h3>
+    <p>Fecha, por qué no entraste, y qué habría pasado. <strong>Es la hoja que contesta si tu criterio al descartar te salva o te cuesta</strong>, y no hay ninguna otra forma de saberlo.</p>
+    <h3>Al acabar el mes</h3>
+    <p>Antes que cualquier resultado: <strong>¿cuántas veces seguiste la regla?</strong> Si es menos de ocho de cada diez, no has probado el método — has probado otra cosa, y hay que repetir el mes.</p>
+    <p>Después: ¿las de cuatro flechas salieron mejor que las de dos? ¿Las de zona óptima mejor que las de continuación? ¿Las que descartaste habrían ganado? ¿En qué franja están tus mejores operaciones?</p>
+    <div class="nota">Treinta operaciones no dicen si el método gana dinero. Dicen si <strong>tú</strong> puedes ejecutarlo, que es la pregunta que tienes delante ahora mismo.</div>
+  </div>
+</section>
+
+<!-- 07 -->
+<section id="s7">
+  <div class="shead"><span class="snum">07</span><h2>Los ajustes</h2></div>
+  <div class="tw"><table>
+    <thead><tr><th>Ajuste</th><th>Déjalo en</th><th></th></tr></thead>
+    <tbody>
+      <tr><td>Huso horario</td><td class="m">Europe/Madrid</td><td><strong>No lo toques nunca.</strong></td></tr>
+      <tr><td>Estructura</td><td class="m">240 min · 4H</td><td>Donde vive el rango que operas.</td></tr>
+      <tr><td>Gatillo</td><td class="m">15 min</td><td>Puedes probar 5 el mes que viene. No dentro de este.</td></tr>
+      <tr><td>Exigir H1</td><td class="m">activado</td><td>Es tu eslabón, el que me corregiste.</td></tr>
+      <tr><td>Tamaño del pip</td><td class="m">0.0001</td><td>Correcto para EURUSD.</td></tr>
+      <tr><td>Coste ida y vuelta</td><td class="m">el de tu bróker</td><td>El real, no el que te gustaría.</td></tr>
+      <tr><td>R:R mínimo</td><td class="m">0 (sin filtro)</td><td>Este mes ves todas y anotas la zona. El filtro lo pones con tus datos.</td></tr>
+      <tr><td>Bloqueo por reiniciada</td><td class="m">activado</td><td>Regla suya, no mía.</td></tr>
+      <tr><td>Ventanas</td><td class="m">0900-1130 · 1400-1600</td><td>Solo controlan los avisos. El dibujo no se filtra nunca.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="col">
+    <div class="nota">Gráfico en <strong>M15</strong> sobre <strong>EURUSD</strong>. Si lo pones en una temporalidad mayor que el gatillo, el indicador te lo avisa con un cartel naranja.</div>
+  </div>
+</section>
+
+<footer>
+  <div>pine/crt_h4.pine · docs/cuaderno_crt.html · docs/marcas_grafico.html</div>
+  <div>La cadena de cinco temporalidades es la que tú describiste. El stop en la mecha del barrido está medido. La entrada al cierre sin esperar confirmación extra, el límite de dos operaciones y el bloqueo por reiniciada están declarados como decisiones en el cuaderno.</div>
+</footer>
+
+</div>
