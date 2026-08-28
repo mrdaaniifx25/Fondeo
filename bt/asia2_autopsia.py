@@ -18,12 +18,36 @@ v = (m1.groupby("b5").agg(o=("open","first"), h=("high","max"), l=("low","min"),
 v = v[v.n >= 3].reset_index(drop=True)
 v["dia"] = v.b5.dt.date; v["hm"] = v.b5.dt.hour*100 + v.b5.dt.minute
 
+# temporalidades de contexto, en hora local
+def agrupa(regla):
+    b = m1["loc"].dt.floor(regla)
+    g = (m1.groupby(b).agg(o=("open","first"), h=("high","max"), l=("low","min"),
+                           c=("close","last"), n=("ts","size")).reset_index()
+                      .rename(columns={"loc": "b"}))
+    return g[g.n >= 3].reset_index(drop=True)
+
+CTX = {"1h": agrupa("1h"), "4h": agrupa("4h"), "1D": agrupa("1D")}
+CUANTAS = {"1h": 48, "4h": 60, "1D": 40}
+
 o = pd.read_csv("data/etiquetado_asia2_respuestas.csv")
 ver = pd.read_csv("data/etiquetado_asia2_verdad.csv").set_index("id")
 setups = {s["id"]: s for s in json.load(open("data/etiquetado_asia2_setups.json"))}
 cam = pd.read_parquet("data/etiquetado_asia2_camino.parquet")
 cm = {k: g for k, g in cam.groupby("id")}
 MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]
+
+def ctx_de(regla, corte):
+    """las ultimas velas de esa temporalidad hasta la del corte, inclusive"""
+    g = CTX[regla]
+    j = int(g.index[g.b <= corte][-1])
+    ini = max(0, j - CUANTAS[regla] + 1)
+    tr = g.iloc[ini:j + 1]
+    return dict(velas=[[round(float(x.o),5), round(float(x.h),5), round(float(x.l),5),
+                        round(float(x.c),5)] for x in tr.itertuples()],
+                etiq=[f"{x.b:%d/%m}" if regla != "1h" else f"{x.b:%d} {x.b:%H}h"
+                      for x in tr.itertuples()],
+                i_marca=int(j - ini))
+
 
 fichas = []
 for r in o.itertuples():
@@ -60,6 +84,7 @@ for r in o.itertuples():
         i_barrido=i_corte - (len(s["velas"])-1 - s["i_barrido"]),
         entrada=round(ent,5), stop=round(sl,5), obj=round(tp,5),
         riesgo=round(rgo/U,1), rr=round(abs(tp-ent)/rgo,2),
+        ctx={k: ctx_de(k, corte) for k in CTX},
         i_sl=a_m5(i_sl_m1), i_mfe=a_m5(i_mfe_m1),
         mfe=round(float(fav[:(i_sl_m1+1) if i_sl_m1 is not None else len(fav)].max()/rgo),2),
         minutos=(i_sl_m1+1) if i_sl_m1 is not None else None,
