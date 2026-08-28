@@ -79,3 +79,39 @@ ventaja de dirección.
 **Lo único que puede resolverlo es el registro hacia delante**: anotar cada
 operación *antes* de saber el resultado, incluidas las que se salta y por qué.
 Sin eso, no hay forma de distinguir criterio de disponibilidad.
+
+
+---
+
+## Adenda · tres objeciones comprobadas
+
+`bt/agosto_objeciones.py`.
+
+**1. El filtro horario no es "de 8 a 9 no opero".** En sus 25 entradas reales
+hay **0 antes de las 08:20** pero **6 entre las 08:20 y las 09:00** (el 24 % de
+su mes). Lo que su registro sostiene es "no entro en los primeros 20 minutos",
+no "no opero la primera hora". Con ese filtro — el único que sus datos
+respaldan — sólo salen 3 de las 11, y queda z **+1,84**.
+
+**2. La mecánica del stop no rescata a las 11.** Se resimularon con SU
+colocación (2,5 p al otro lado del nivel de Asia) en vez de la de la regla
+(al otro lado de la vela anterior). Riesgo mediano 5,5 p → 3,7 p, y el
+resultado **no cambia: 2 TP / 9 SL**. Además las entradas de esas 11 quedaban
+a 0,1-3,2 p del nivel, o sea que tampoco entraban peor que él.
+
+**3. "Suerte" es la palabra equivocada.** El binomial contra el 33,3 %:
+
+| escenario | acierto | 1 entre |
+|---|---|---|
+| como lo operó | 75,0 % | 27 794 |
+| + las 11 | 57,1 % | 311 |
+| + las 8 (>= 08:20) | 59,4 % | 450 |
+| + las 6 (>= 09:00) | 65,5 % | 2 545 |
+
+Ninguno de esos números es suerte. z +1,49 significa *19 días no bastan para
+demostrarlo*, no *queda demostrado que no lo hay*.
+
+**4. Y queda el hecho que no explica nada de lo anterior:** sus compras
+hicieron 11 de 12 (92 %); las compras de esas mismas 11 hicieron 2 de 9 (22 %).
+Mismo lado, mismo nivel, mismo mes, resultado opuesto. Lo que las separa no es
+la dirección, ni el stop, ni la hora.
