@@ -1,0 +1,176 @@
+<title>Lo que haces de verdad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+:root{
+  --papel:#EDEFF3; --carta:#FBFCFD; --hueco:#E3E6EC;
+  --tinta:#18202C; --tenue:#69748A; --linea:#D3D8E1; --linea2:#E6E9EF;
+  --alza:#2A7A70; --baja:#B0523C; --marca:#B5811F; --marcaSuave:#EFE2C4; --foco:#2A5C9A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --papel:#11151B; --carta:#181D25; --hueco:#141920;
+    --tinta:#E3E8F0; --tenue:#8894A6; --linea:#2A323E; --linea2:#212831;
+    --alza:#4FA294; --baja:#D0755A; --marca:#D7A441; --marcaSuave:#3A3122; --foco:#6E9FD8;
+  }
+}
+:root[data-theme="dark"]{
+  --papel:#11151B; --carta:#181D25; --hueco:#141920;
+  --tinta:#E3E8F0; --tenue:#8894A6; --linea:#2A323E; --linea2:#212831;
+  --alza:#4FA294; --baja:#D0755A; --marca:#D7A441; --marcaSuave:#3A3122; --foco:#6E9FD8;
+}
+*{box-sizing:border-box}
+body{background:var(--papel); color:var(--tinta); margin:0; padding:0 0 5rem;
+     font-family:"Archivo",system-ui,-apple-system,sans-serif; -webkit-font-smoothing:antialiased}
+.env{max-width:900px; margin:0 auto; padding:0 1.25rem}
+:focus-visible{outline:2px solid var(--foco); outline-offset:2px}
+h1{font-size:clamp(2.1rem,5.5vw,3.2rem); line-height:1.03; margin:0 0 1.1rem; letter-spacing:-.025em; text-wrap:balance; font-weight:700}
+h2{font-size:1.4rem; margin:0 0 .55rem; letter-spacing:-.015em; text-wrap:balance}
+p{font-family:"Source Serif 4",Georgia,serif; font-size:1rem; line-height:1.62; color:var(--tenue); max-width:64ch; margin:0 0 1rem}
+p b, li b, td b{color:var(--tinta); font-weight:600}
+.ojo{font-family:"IBM Plex Mono",monospace; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--marca); font-weight:600; margin:0 0 .6rem}
+section{padding:2.75rem 0; border-top:1px solid var(--linea)}
+header.hero{padding:3.5rem 0 2.5rem}
+ul,ol{margin:0 0 1rem; padding-left:1.15rem; font-family:"Source Serif 4",Georgia,serif; color:var(--tenue); line-height:1.62; max-width:64ch}
+li{margin-bottom:.45rem}
+
+pre{margin:1.25rem 0 0; padding:1.15rem 1.3rem; background:var(--carta); border:1px solid var(--linea);
+    border-radius:10px; overflow-x:auto; font-family:"IBM Plex Mono",monospace; font-size:.84rem;
+    line-height:1.85; color:var(--tinta)}
+pre b{color:var(--marca); font-weight:600}
+.tabla{overflow-x:auto; margin:1.25rem 0 0; border:1px solid var(--linea); border-radius:10px; background:var(--carta)}
+table{border-collapse:collapse; width:100%; font-size:.88rem}
+th,td{padding:.6rem .85rem; text-align:left; border-bottom:1px solid var(--linea2); vertical-align:top}
+th{color:var(--tenue); font-weight:600; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.dos{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--linea); border:1px solid var(--linea); border-radius:10px; overflow:hidden; margin-top:1.25rem}
+.dos > div{background:var(--carta); padding:1.15rem 1.25rem}
+.dos h3{font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; margin:0 0 .7rem; color:var(--tenue)}
+.dos ul{margin:0; padding-left:1.05rem; font-size:.92rem}
+.dos .si h3{color:var(--alza)} .dos .no h3{color:var(--baja)}
+@media (max-width:640px){.dos{grid-template-columns:1fr}}
+.aviso{margin-top:1.5rem; padding:1rem 1.2rem; border-left:3px solid var(--marca); background:var(--marcaSuave); border-radius:0 6px 6px 0}
+.aviso p{margin:0; color:var(--tinta); font-size:.95rem}
+.preg{counter-reset:q; list-style:none; padding:0; margin-top:1.25rem}
+.preg li{counter-increment:q; position:relative; padding:.85rem 0 .85rem 2.6rem; border-bottom:1px solid var(--linea2); margin:0; font-family:"Archivo",sans-serif; font-size:.95rem; color:var(--tinta); line-height:1.5}
+.preg li::before{content:counter(q); position:absolute; left:0; top:.85rem; font-family:"IBM Plex Mono",monospace;
+  font-size:.75rem; font-weight:600; color:var(--marca); border:1px solid var(--linea); border-radius:5px;
+  width:1.7rem; height:1.5rem; display:grid; place-items:center}
+.preg li:last-child{border-bottom:0}
+.preg li span{display:block; font-family:"Source Serif 4",Georgia,serif; color:var(--tenue); font-size:.89rem; margin-top:.2rem}
+</style>
+
+<div class="env">
+
+<header class="hero">
+  <p class="ojo">Leído de 22 capturas · sin tocar los datos</p>
+  <h1>No estás operando el barrido de Asia.</h1>
+  <p>He mirado las veintidós capturas como si no supiera nada de lo que hemos hablado estos días, sólo qué hay dibujado en la pantalla. Y sale una estrategia coherente, repetida y bastante disciplinada. Pero <b>no es la que me describiste</b>, y esa diferencia explica por qué ninguna de las pruebas la ha capturado.</p>
+</header>
+
+<section>
+  <h2>La regla, tal y como se lee</h2>
+  <pre><b>DÓNDE</b>      en una línea horizontal que ya estaba en el gráfico — el alto o
+           el mínimo de una sesión anterior, todavía sin tocar
+
+<b>CUÁNDO</b>     el precio VUELVE a esa línea y no la pasa
+
+<b>DIRECCIÓN</b>  en contra de cómo llega
+           llega desde abajo y se para  ->  VENTA
+           llega desde arriba y aguanta ->  COMPRA
+
+<b>ENTRADA</b>    en la propia línea, pegado a ella
+
+<b>STOP</b>       justo al otro lado del extremo local más cercano
+           entre 2 y 6 pips en casi todas
+
+<b>OBJETIVO</b>   1:2 fijo, medido desde la entrada. La caja verde es
+           exactamente el doble de la roja en las veintidós
+
+<b>HORARIO</b>    08:00 – 11:00 en la inmensa mayoría
+
+<b>CUÁNTAS</b>    hasta dos por sesión, una en cada extremo del rango</pre>
+  <p style="margin-top:1.25rem">Eso es una estrategia. Tiene entrada, salida, gestión y horario, y la repites igual día tras día. No es improvisación.</p>
+</section>
+
+<section>
+  <h2>Dónde se separa de lo que me contaste</h2>
+  <div class="tabla"><table>
+    <thead><tr><th>lo que me describiste en su día</th><th>lo que hacen las capturas</th></tr></thead>
+    <tbody>
+      <tr><td>el precio <b>barre</b> el alto o el mínimo de Asia y cierra al otro lado</td><td>el precio <b>vuelve</b> a un nivel y lo <b>respeta</b>: ni lo barre ni lo cierra al otro lado</td></tr>
+      <tr><td>el gatillo es una <b>vela envolvente</b></td><td>no veo envolventes. La vela de entrada suele ser <b>pequeña</b>, de pausa, pegada al nivel</td></tr>
+      <tr><td>entras al <b>cierre de la envolvente</b></td><td>entras <b>en el nivel</b>, no al cierre de una vela concreta</td></tr>
+      <tr><td>objetivo en el <b>extremo opuesto de Asia</b>, o 1:2 según la rama</td><td><b>1:2 siempre</b>, en las dos direcciones, sin excepción</td></tr>
+      <tr><td>una operación por día</td><td><b>hasta dos</b>, y a menudo una en cada extremo del mismo rango</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="aviso"><p>Son dos familias distintas. Lo que me describiste es una <b>ruptura fallida</b>: el precio pasa el nivel y se da la vuelta. Lo que haces es un <b>rechazo de nivel</b>: el precio llega y no lo pasa. Todo lo que he probado y cerrado estos días era lo primero. <b>Lo segundo no lo ha tocado ninguna prueba.</b></p></div>
+</section>
+
+<section>
+  <h2>Lo que veo claro y lo que estoy suponiendo</h2>
+  <div class="dos">
+    <div class="si">
+      <h3>Claro en las 22</h3>
+      <ul>
+        <li>La caja verde es <b>exactamente el doble</b> de la roja. El 1:2 no lo estimas: lo mides con la herramienta.</li>
+        <li>El stop es <b>muy corto</b> y va al extremo local inmediato, no al alto o mínimo de Asia.</li>
+        <li>Las cajas se apoyan en una <b>línea horizontal gris</b> que ya estaba dibujada.</li>
+        <li>La franja horaria: casi todo entre las <b>8 y las 11</b>.</li>
+        <li>Cuando hay dos, una es <b>compra abajo</b> y la otra <b>venta arriba</b> del mismo rango.</li>
+      </ul>
+    </div>
+    <div class="no">
+      <h3>No lo puedo determinar</h3>
+      <ul>
+        <li><b>Qué línea exactamente.</b> En varias capturas hay dos o tres grises a la vez: alto de Asia, mínimo de Londres, cierre de ayer. No sé cuál eliges.</li>
+        <li><b>Si esperas a que cierre una vela</b> o entras al tocar el nivel.</li>
+        <li><b>Dónde va el stop exactamente</b>: ¿la vela anterior, la mecha del rechazo, o un número fijo de pips?</li>
+        <li><b>Si la segunda entrada</b> se abre con la primera todavía viva, o sólo cuando ya ha cerrado.</li>
+        <li><b>Qué te hace pasar.</b> Sólo veo lo que operaste, no lo que descartaste.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Lo que implican esos stops con 150 € fijos</h2>
+  <p>Midiendo la altura de las cajas rojas contra el eje de precios salen stops de <b>2 a 6 pips</b>. Arriesgar 150 € fijos con un stop así obliga a un lote enorme, y el diferencial se paga sobre ese lote:</p>
+  <div class="tabla"><table>
+    <thead><tr><th class="num">stop</th><th class="num">€ por pip</th><th class="num">lotes aprox.</th><th class="num">el spread de 1,2 p te cuesta</th><th class="num">de tus 150 €</th></tr></thead>
+    <tbody>
+      <tr><td class="num">2 p</td><td class="num">75 €</td><td class="num">8,7</td><td class="num">90 €</td><td class="num"><b>60 %</b></td></tr>
+      <tr><td class="num">4 p</td><td class="num">37 €</td><td class="num">4,4</td><td class="num">45 €</td><td class="num"><b>30 %</b></td></tr>
+      <tr><td class="num">6 p</td><td class="num">25 €</td><td class="num">2,9</td><td class="num">30 €</td><td class="num"><b>20 %</b></td></tr>
+      <tr><td class="num">25 p</td><td class="num">6 €</td><td class="num">0,7</td><td class="num">7,20 €</td><td class="num">4,8 %</td></tr>
+    </tbody>
+  </table></div>
+  <p style="margin-top:1.25rem">Con un stop de 4 pips empiezas cada operación <b>45 € por debajo</b>. Para que el 1:2 salga rentable pagando eso necesitas acertar bastante más del tercio que da la pura geometría — y ése ha sido el muro de todo el proyecto, pero ahora está en euros y en tu propia operativa.</p>
+  <p>Y una consecuencia práctica que no es estadística: <b>4 lotes en EURUSD desde el móvil</b>. Un deslizamiento de un pip en la ejecución son 37 € más. Con esos tamaños, el broker y la latencia dejan de ser un detalle.</p>
+</section>
+
+<section>
+  <h2>Lo que te pregunto para poder probarla</h2>
+  <p>Con estas cinco respuestas la estrategia queda escrita, y entonces se puede pre-registrar y medir en serio — porque es una familia que no hemos tocado.</p>
+  <ol class="preg">
+    <li>¿Qué nivel exactamente?<span>De las líneas que tienes dibujadas: ¿el alto y el mínimo de Asia, los de Londres, los de NY, o cualquiera que siga sin tocar?</span></li>
+    <li>¿Entras al tocar o esperas cierre?<span>Es decir: orden puesta en el nivel, o entras cuando una vela de M5 cierra sin haberlo pasado.</span></li>
+    <li>¿Dónde va el stop, con palabras?<span>«Al otro lado de la mecha que tocó el nivel», «bajo el mínimo de la vela anterior», «cinco pips fijos»… lo que sea, pero una regla.</span></li>
+    <li>¿Cuándo NO entras?<span>Lo que más me falta. ¿Qué ves en un nivel que te hace no operarlo?</span></li>
+    <li>¿Las dos de un día son independientes?<span>¿Abres la segunda con la primera aún abierta, o sólo después de que cierre?</span></li>
+  </ol>
+</section>
+
+<section>
+  <h2>Por qué esto es buena noticia</h2>
+  <p>Llevamos días cerrando cosas: el barrido de Asia, el filtro de la vuelta limpia, la réplica en oro. Todo eso sigue cerrado y no lo reabre nada de aquí.</p>
+  <p>Pero lo que sale de tus capturas <b>es otra cosa</b>, y es una cosa que nunca se ha medido en este proyecto. Tiene además dos ventajas sobre lo anterior: la describes con cinco respuestas, y <b>ya la estás operando</b> — así que el registro hacia delante, escrito antes del resultado, es la prueba natural y no cuesta nada montarla.</p>
+  <p>La pega sigue siendo la misma de siempre y ahora la ves en euros: con stops de 2 a 6 pips, el diferencial se lleva entre el 20 % y el 60 % de lo que arriesgas antes de empezar. Si esta estrategia funciona, lo primero que habrá que ver es si aguanta con el stop un poco más ancho.</p>
+</section>
+
+</div>
