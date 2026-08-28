@@ -17,8 +17,10 @@
 //     cortas a las sesenta velas. Ahora se extienden solas.
 //
 //   · LIMITES. El indicador no declaraba max_boxes_count, asi que TradingView
-//     dejaba solo 50 cajas. Ahora se declara y ademas se limita a mano cuantas
-//     sesiones se conservan.
+//     dejaba solo 50 cajas. Ahora se declaran cajas, lineas y etiquetas a 500.
+//     El ajuste «Dias de sesiones que se conservan» empezaba en 4, que borraba
+//     todo lo anterior a anteayer: ahora arranca en 20 y llega a 160, que es el
+//     tope real -tres cajas por dia contra las 500 que admite TradingView-.
 //
 //  Se añaden las dos killzones que operas, que es lo que de verdad miras.
 //
@@ -31,7 +33,8 @@
 //  se cierra cuando abre Londres, y Londres cuando abre Nueva York. En ese mismo
 //  instante quedan marcados su alto y su bajo.
 // ════════════════════════════════════════════════════════════════════════════
-indicator("Sesiones", overlay = true, max_boxes_count = 500, max_lines_count = 500)
+indicator("Sesiones", overlay = true, max_boxes_count = 500, max_lines_count = 500,
+     max_labels_count = 500)
 
 gT = "Horario"
 tz = input.string("Europe/Madrid", "Huso horario", group = gT,
@@ -52,7 +55,11 @@ hFin  = input.string("2300", "Cierra el día",      group = gS,
      "abre Nueva York. Así no pueden solaparse.")
 dias  = input.string("23456", "Días", group = gS,
      tooltip = "1 domingo, 2 lunes … 7 sábado. 23456 = de lunes a viernes.")
-nSes  = input.int(4, "Sesiones que se conservan dibujadas", 1, 30, group = gS)
+nSes  = input.int(20, "Días de sesiones que se conservan", 1, 160, group = gS,
+     tooltip = "Cada día son tres cajas -Asia, Londres y NY-, y TradingView admite " +
+     "500 dibujos. Con 160 se llega al tope. Si subes esto y el gráfico sigue sin " +
+     "marcar meses atrás, el que se ha quedado corto es el plan de TradingView: en " +
+     "el gratuito M5 carga unas 5.000 velas, que son unos 17 días.")
 
 // cada sesion va desde su hora de inicio hasta la de la siguiente
 spAsia = hAsia + "-" + hLon
