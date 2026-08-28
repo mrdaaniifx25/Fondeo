@@ -1,4 +1,29 @@
-# Verificación de agosto · sus 16 operaciones contra el minuto
+# Verificación de agosto · CORREGIDO
+
+> **Aviso de corrección (2026-08-28, posterior).** Con las 9 fichas que faltaban
+> —del 3 al 11 de agosto— la muestra sube a 25 y sale a la luz un fallo de mi
+> método: para resolver cada operación yo tomaba **el primer momento en que el
+> precio tocaba su entrada a partir de las 08:00**. Con stops de 3 pips ese
+> precio se toca muchas veces en una mañana, y cada toque da un resultado
+> distinto. Sobre las 14 verificables:
+>
+> | supongo que entra a partir de | n | %TP | R bruta |
+> |---|---|---|---|
+> | 08:00 | 14 | 28,6 % | −0,142 |
+> | 09:00 | 13 | 38,5 % | +0,157 |
+> | **09:30** | 13 | **69,2 %** | **+1,082** |
+> | 10:00 | 10 | 70,0 % | +1,107 |
+> | 11:00 | 8 | 25,0 % | −0,250 |
+>
+> El resultado lo decide mi suposición, no los datos. Y en cuatro casos —T18,
+> T19, T22 y T23— mi resolución dice SL o «sin resolver» donde **su propia
+> herramienta declara TP**, siempre en el sentido de que yo entro demasiado
+> pronto.
+>
+> **Todo lo que sigue queda en suspenso** hasta tener la hora de entrada de cada
+> operación. Con ella la resolución es exacta y no hay nada que suponer.
+
+# Lo que se calculó (con el método defectuoso)
 
 Fecha: 2026-08-28. Datos: `data/eurusd_m1_2026_08.parquet` (2 al 21 de agosto).
 Fichas: `data/agosto_operaciones.csv`, leídas de las capturas de la herramienta
