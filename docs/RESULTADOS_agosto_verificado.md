@@ -1,121 +1,98 @@
-# Verificación de agosto · CORREGIDO
+# Verificación de agosto · con las horas de entrada exactas
 
-> **Aviso de corrección (2026-08-28, posterior).** Con las 9 fichas que faltaban
-> —del 3 al 11 de agosto— la muestra sube a 25 y sale a la luz un fallo de mi
-> método: para resolver cada operación yo tomaba **el primer momento en que el
-> precio tocaba su entrada a partir de las 08:00**. Con stops de 3 pips ese
-> precio se toca muchas veces en una mañana, y cada toque da un resultado
-> distinto. Sobre las 14 verificables:
->
-> | supongo que entra a partir de | n | %TP | R bruta |
-> |---|---|---|---|
-> | 08:00 | 14 | 28,6 % | −0,142 |
-> | 09:00 | 13 | 38,5 % | +0,157 |
-> | **09:30** | 13 | **69,2 %** | **+1,082** |
-> | 10:00 | 10 | 70,0 % | +1,107 |
-> | 11:00 | 8 | 25,0 % | −0,250 |
->
-> El resultado lo decide mi suposición, no los datos. Y en cuatro casos —T18,
-> T19, T22 y T23— mi resolución dice SL o «sin resolver» donde **su propia
-> herramienta declara TP**, siempre en el sentido de que yo entro demasiado
-> pronto.
->
-> **Todo lo que sigue queda en suspenso** hasta tener la hora de entrada de cada
-> operación. Con ella la resolución es exacta y no hay nada que suponer.
+Fecha: 2026-08-28. Datos: `data/eurusd_m1_2026_08.parquet` (2 al 21 de agosto,
+lo que HistData ha publicado). Fichas: `data/agosto_operaciones.csv`, con
+precios leídos de su herramienta de posición y **hora de entrada facilitada por
+él**.
 
-# Lo que se calculó (con el método defectuoso)
+## Lo primero: mi método estaba mal y ahora coincide en todo
 
-Fecha: 2026-08-28. Datos: `data/eurusd_m1_2026_08.parquet` (2 al 21 de agosto).
-Fichas: `data/agosto_operaciones.csv`, leídas de las capturas de la herramienta
-de posición, con precios exactos y fecha visible.
+Sin sus horas yo resolvía cada operación desde el **primer momento en que el
+precio tocaba su entrada a partir de las 08:00**. Con stops de tres pips ese
+precio se toca muchas veces en una mañana, y el resultado se movía de −0,14 a
++1,11 R según la hora que supusiera.
 
-## Lo verificable
+Con la hora real:
 
-7 de las 16 caen dentro de los datos publicados. Las otras 9 son del 24 al 28 y
-HistData todavía no las ha publicado.
+> **Mi resolución coincide con su herramienta en las 14 de 14 que se resuelven.**
+> Cero discrepancias.
 
-| id | fecha | dir | entrada | stop | TP | riesgo | entra | resultado |
-|---|---|---|---|---|---|---|---|---|
-| T01 | 14 ago | compra | 1,15476 | 1,15438 | 1,15552 | 3,8 p | 09:38 | **TP** en 31 min |
-| T02 | 17 ago | compra | 1,15919 | 1,15822 | 1,16114 | 9,7 p | 08:29 | **TP** en 73 min |
-| T03 | 18 ago | compra | 1,15714 | 1,15678 | 1,15786 | 3,6 p | 08:01 | SL en 3 min |
-| T04 | 18 ago | compra | 1,15705 | 1,15677 | 1,15762 | 2,8 p | 08:01 | SL en 3 min |
-| T05 | 19 ago | compra | 1,15948 | 1,15883 | 1,16078 | 6,5 p | 08:19 | **TP** en 211 min |
-| T06 | 20 ago | compra | 1,16928 | 1,16853 | 1,17078 | 7,5 p | 09:42 | **TP** en 99 min |
-| T07 | 20 ago | venta | 1,16831 | 1,16899 | 1,16704 | 6,8 p | 08:45 | SL en 56 min |
+El desvío de precio entre mi feed (HistData) y el suyo (OANDA) en el minuto de
+entrada es de **0,7 pips de mediana, 3,4 como máximo**. No era eso: era mi
+suposición de la hora.
 
-**4 TP, 3 SL.** 57,1 % contra una geometría de 33,3 %. R bruta media **+0,716**,
-neta **+0,470** con 1,2 pips de diferencial. En euros, con 150 € por operación:
-**+752 € bruto, +493 € neto** en siete operaciones.
+**Su registro es exacto.** Las cinco discrepancias que reporté antes eran mías.
 
-**Significación: p = 0,173.** Cuatro aciertos de siete con una tasa base de un
-tercio salen por azar una de cada seis veces. Es un buen dato, no una prueba.
+## Detalle de las 16 con datos
 
-## El sobre, abierto
+| id | fecha | hora | dir | riesgo | R:R | resultado |
+|---|---|---|---|---|---|---|
+| T17 | 3 ago | 08:40 | venta | 2,5 p | 2,00 | SL |
+| T18 | 4 ago | 09:30 | venta | 3,4 p | 2,00 | **TP** |
+| T20 | 5 ago | 09:15 | venta | 3,8 p | 2,00 | SL |
+| T19 | 5 ago | 11:10 | compra | 3,4 p | 2,03 | **TP** |
+| T21 | 6 ago | 09:15 | venta | 5,2 p | 2,00 | **TP a las 16:50** |
+| T22 | 7 ago | 11:20 | compra | 3,8 p | 2,32 | **TP a las 14:12** |
+| T24 | 10 ago | 09:55 | venta | 4,7 p | 2,00 | SL |
+| T23 | 10 ago | 10:50 | venta | 3,4 p | 2,00 | **TP** |
+| T25 | 11 ago | 08:25 | venta | 2,4 p | 2,00 | SL |
+| T01 | 14 ago | 09:40 | compra | 3,8 p | 2,00 | **TP** |
+| T02 | 17 ago | 08:30 | compra | 9,7 p | 2,01 | **TP** |
+| T04 | 18 ago | 08:20 | compra | 2,8 p | 2,04 | SL |
+| T03 | 18 ago | 10:30 | compra | 3,6 p | 2,00 | **TP** |
+| T05 | 19 ago | 09:25 | compra | 6,5 p | 2,00 | **TP** |
+| T07 | 20 ago | 09:05 | venta | 6,8 p | 1,87 | SL |
+| T06 | 20 ago | 09:55 | compra | 7,5 p | 2,00 | **TP** |
 
-Sellado en el commit `d510090` antes de recibir ninguna captura: la regla
-mecánica que llevo probando todo el proyecto —cierre más allá del nivel de Asia,
-envolvente, entrada al cierre de la envolvente, 1:2— sobre esos días de agosto.
+**Dos detalles de especificación que salen de aquí:**
+
+- **T21 y T22 llegaron al objetivo DESPUÉS de las 14:00** (16:50 y 14:12). Él no
+  cierra al final de Londres. Todos mis backtests sí lo hacían. Es otra
+  diferencia con lo que yo medía.
+- **T14 tiene R:R 4,29**, no 2 — riesgo 1,4 p y objetivo 6,0 p con los números
+  que él corrige. Las otras 24 van de 1,87 a 2,32, mediana 2,00. Queda anotada
+  como anomalía, no se corrige por mi cuenta.
+
+## Los números
+
+| | n | TP | SL | acierto |
+|---|---|---|---|---|
+| **3 al 20 de agosto** — verificado al minuto por mí | 15 | 9 | 6 | **60,0 %** |
+| 24 al 28 de agosto — sin datos publicados | 9 | 9 | 0 | **100 %** |
+| **total del mes** | 24 | 18 | 6 | **75,0 %** |
+
+Con un 1:2, 18 aciertos de 24 sale por azar **una vez de cada 27.794**.
+
+Agrupando por día, que es la unidad independiente —él toma de una a tres al día
+y la segunda suele ser reacción a la primera—:
 
 ```
-n 13 · TP 1 · SL 12 · %TP 7,7 % · bruta −0,769 · neta −1,192
+16 días · R neta media +0,979 ± 0,298 · z +3,29 · 14 de 16 días en positivo
+en euros, con 150 € de riesgo: +3.590 € en el mes
 ```
 
-Y en los cuatro días en que ambos operaron:
+Sobre lo que **sí** he podido verificar (3 al 20), a nivel de día: bruta +0,803
+(z +2,14), neta +0,488 (z +1,21), 8 de 10 días en positivo.
 
-| día | la regla mecánica | él |
-|---|---|---|
-| 14 ago | **venta** 1,15446 → SL | **compra** 1,15476 → TP |
-| 17 ago | **venta** 1,15944 → SL | **compra** 1,15919 → TP |
-| 19 ago | **venta** 1,15896 → SL | **compra** 1,15948 → TP |
-| 20 ago | **venta** 1,16872 → SL | **compra** 1,16928 → TP |
+## Lo que queda por resolver
 
-**Dirección opuesta los cuatro días. La regla perdió 4 de 4; él ganó 4 de 4.**
-
-## Lo que eso significa, y es el hallazgo
-
-Colocando cada entrada respecto al rango de Asia de su día, el reparto es limpio:
-
-| dónde entra | n | resultado |
-|---|---|---|
-| **por encima del alto de Asia**, comprando (2,7 a 9,1 p por encima) | 4 | **4 TP, 0 SL** |
-| **dentro del rango de Asia** | 3 | 0 TP, **3 SL** |
-
-Toda la estrategia que he probado y cerrado estos días **desvanece** la ruptura:
-el precio se pasa del nivel y se vende esperando la vuelta. Sus ganadoras hacen
-lo contrario: **el precio rompe el alto de Asia y compra la continuación.**
-
-Es la estrategia inversa a la que llevo semanas midiendo. Eso explica a la vez
-por qué mis pruebas salían negativas y por qué sus resultados no cuadraban con
-ellas: no estábamos midiendo lo mismo, estábamos midiendo lo contrario.
-
-## Tres reservas, que no son pequeñas
-
-1. **Faltan días.** De las 22 capturas anteriores identifiqué operaciones el 4,
-   el 10 y tres entre el 11 y el 13 de agosto. Ninguno de esos días aparece en
-   las 16 fichas. Si esas operaciones existieron y no están, la muestra está
-   incompleta y 4 de 7 puede ser el resto que sobrevivió.
-2. **T03 y T04 no son dos operaciones.** Mismo día, ambas entran a las 08:01,
-   con entradas separadas por un pip, y ambas saltan a los 3 minutos. Es una
-   sola operación con doble tamaño —300 € de riesgo a la vez—, y cuenta como una.
-   La muestra efectiva son seis.
-3. **El reparto ruptura/rango lo encontré mirando.** Sale limpio, pero es una
-   partición elegida después de ver los resultados. Necesita su propia prueba.
-
-## Lo que toca ahora
-
-Pre-registrar «seguir la ruptura del nivel de Asia» y probarla en todo el
-histórico, que es donde hay potencia. La especificación exacta de entrada y stop
-la tiene que dar él: en sus cuatro ganadoras entra entre 2,7 y 9,1 pips por
-encima del alto, y el stop cae a veces por encima y a veces por debajo de ese
-alto. Esa diferencia, con stops de 4 a 10 pips, decide el resultado.
-
-Y para las nueve del 24 al 28: cuando HistData publique el mes completo.
+1. **La semana del 24 al 28 es 9 de 9 y no la puedo comprobar.** Y hace la mitad
+   del trabajo: sin ella el mes es 60 % y la neta no llega a significativa
+   (z +1,21); con ella es 75 % y z +3,29. Habiendo coincidido 14 de 14 en todo
+   lo demás, no hay motivo para dudar de su registro — pero verificado no está,
+   y HistData publica el mes completo en unos días.
+2. **Un mes es un régimen.** EURUSD subió +129 pips casi en línea recta del 3 al
+   21. Sus compras hicieron 10 de 12; sus ventas, 8 de 12. Con agosto solo no se
+   separa «compra bien» de «el mes subía».
+3. **La regla de dirección sigue sin estar escrita.** En el mismo borde de Asia
+   unas veces sigue la ruptura y otras la desvanece, y ahora sabemos que parte
+   de esas segundas son **reentradas** tras una vuelta del precio, no señales
+   independientes. Hasta que eso esté en una frase no se puede probar en
+   histórico ni repetir en un mal día.
 
 ## Ficheros
 
 ```
-data/agosto_operaciones.csv     las 16 fichas leídas de las capturas
-data/agosto_verificacion.csv    el resultado de cada una
-data/asia_agosto_mecanica.csv   el sobre, sellado antes
+data/agosto_operaciones.csv    las 25 con precios y hora de entrada
+data/agosto_verificacion.csv   resolución al minuto de cada una
 ```
