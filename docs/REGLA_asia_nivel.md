@@ -69,7 +69,24 @@ ARMADO   el nivel está armado mientras el precio no esté pegado a él.
 Con eso: **1,1 disparos por mañana**, contra sus 1,6. El resto lo explican las
 reentradas. Del orden correcto, y ya es una regla mecánica.
 
-## Lo único que sigue sin regla: el stop
+## El stop, ya con regla
+
+Él lo dice así: *«lo pongo por encima o por debajo de la anterior de la que
+entro»* — el extremo de la vela **anterior a la de entrada**.
+
+Medido: lo coloca sistemáticamente **~1 pip por dentro** de ese extremo, con una
+dispersión de ±1,5 p. Once o doce de las dieciséis caen a menos de 2 pips.
+
+| | mediana | a ≤1 p | a ≤2 p |
+|---|---|---|---|
+| su hora = apertura de la vela | 1,5 p por dentro | 6 de 16 | 11 de 16 |
+| su hora = cierre de la vela | 1,1 p por dentro | 4 de 16 | 12 de 16 |
+
+Para la regla se toma **el extremo tal cual**. Consecuencia a tener en cuenta:
+sus stops reales son ~1 pip más ajustados que los de la regla, así que su lote
+es algo mayor y su fracción de coste algo peor que la que dará el backtest.
+
+## Lo que sigue sin estar del todo cerrado
 
 Su stop **no está** en ningún punto estructural. Comparado con los tres
 candidatos naturales, y siempre **por dentro** de los tres:
@@ -88,8 +105,9 @@ lleva el diferencial. Hace falta que lo diga él.
 
 - Gatillo: **escrito y verificado** en 16 de 16.
 - Selección: **escrita** (armado por visita al nivel), da 1,1/mañana contra 1,6.
-- Stop: **sin regla**. Es lo que falta para poder pre-registrar y correr los
-  ~1.400 días de 2020-2026.
+- Stop: **escrito** — extremo de la vela anterior a la de entrada.
+- Cierre: **no cierra a las 14:00**. Dos de sus objetivos llegaron a las 14:12 y
+  a las 16:50.
 
 Una advertencia para cuando se corra: el ajuste 16 de 16 usa una tolerancia de
 ±1 vela. En un backtest no hay tolerancia — la regla dispara donde dispara —, así
