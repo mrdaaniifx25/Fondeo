@@ -13,9 +13,11 @@ import pandas as pd
 UNIDAD, COSTE = 0.0001, 1.2
 rng = np.random.default_rng(20260827)
 
-ruta = sys.argv[1] if len(sys.argv) > 1 else "data/respuestas_asia.txt"
-ver = pd.read_csv("data/etiquetado_asia_verdad.csv").set_index("id")
-cam = pd.read_parquet("data/etiquetado_asia_camino.parquet")
+CUAL = "v2" if "v2" in sys.argv else "v1"
+SUF = "" if CUAL == "v1" else "2"
+ruta = next((a for a in sys.argv[1:] if a not in ("v1", "v2")), f"data/respuestas_asia{SUF}.txt")
+ver = pd.read_csv(f"data/etiquetado_asia{SUF}_verdad.csv").set_index("id")
+cam = pd.read_parquet(f"data/etiquetado_asia{SUF}_camino.parquet")
 caminos = {k: g for k, g in cam.groupby("id")}
 
 
@@ -100,7 +102,7 @@ def resumen(nom, d):
 ops = t[t.opera] if "opera" in t else t
 n_paso = int((~t.opera).sum())
 print("=" * 106)
-print(f"BARAJA CIEGA DEL BARRIDO DE ASIA · {len(t)} respondidos de 60 · "
+print(f"BARAJA CIEGA {CUAL.upper()} · {len(t)} respondidos de {len(ver)} · "
       f"{len(ops)} operados, {n_paso} pasados")
 print("=" * 106)
 print(f"{'':34s} {'n':>4} {'riesgo':>8} {'R:R':>6} {'%TP':>7} {'geometría':>9} "
@@ -108,7 +110,7 @@ print(f"{'':34s} {'n':>4} {'riesgo':>8} {'R:R':>6} {'%TP':>7} {'geometría':>9} 
 resumen("tus entradas", ops)
 resumen("la regla mecánica, esos mismos", mecanica(ops.id))
 resumen("la regla mecánica, los pasados", mecanica(t[~t.opera].id))
-resumen("la regla mecánica, los 60", mecanica(list(ver.index)))
+resumen(f"la regla mecánica, los {len(ver)}", mecanica(list(ver.index)))
 
 if len(ops) and n_paso:
     a = mecanica(ops.id).R
@@ -119,5 +121,5 @@ if len(ops) and n_paso:
         print(f"\n  tu criterio de selección: los que elegiste operar rinden {d:+.3f} R "
               f"más que los que pasaste (z {d/ee:+.2f})")
 
-ops.to_csv("data/etiquetado_asia_respuestas.csv", index=False)
-print("\n  guardado en data/etiquetado_asia_respuestas.csv")
+ops.to_csv(f"data/etiquetado_asia{SUF}_respuestas.csv", index=False)
+print(f"\n  guardado en data/etiquetado_asia{SUF}_respuestas.csv")

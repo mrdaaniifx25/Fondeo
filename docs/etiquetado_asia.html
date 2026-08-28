@@ -116,6 +116,7 @@ h1{font-size:clamp(2rem,5vw,3rem); line-height:1.04; margin:0 0 1rem; letter-spa
 .campo.arm input{border-color:var(--marca); box-shadow:0 0 0 2px var(--marcaSuave)}
 .calc{font-family:"IBM Plex Mono",monospace; font-size:.76rem; color:var(--tenue); font-variant-numeric:tabular-nums; margin-left:auto}
 .calc b{color:var(--tinta); font-weight:600}
+.calc .mal{color:var(--baja); font-family:"Archivo",sans-serif; font-weight:600; font-size:.78rem}
 .pista{font-family:"Source Serif 4",Georgia,serif; font-size:.82rem; color:var(--tenue); margin:0}
 .oculto{display:none}
 
@@ -342,6 +343,12 @@ function ficha(s){
     }
   }
 
+  function coherente(){
+    if(r.op !== 1 || r.entrada == null || r.sl == null || r.tp == null) return true;
+    return r.dir > 0 ? (r.sl < r.entrada && r.tp > r.entrada)
+                     : (r.sl > r.entrada && r.tp < r.entrada);
+  }
+
   function pinta(){
     el.querySelectorAll("[data-op] button").forEach(b =>
       b.setAttribute("aria-pressed", String(r.op !== null && +b.dataset.v === r.op)));
@@ -349,12 +356,16 @@ function ficha(s){
       b.setAttribute("aria-pressed", String(+b.dataset.v === r.dir)));
     grDir.classList.toggle("oculto", r.op !== 1);
     campos.classList.toggle("oculto", r.op !== 1);
-    el.classList.toggle("lista", r.op === 1 && r.sl != null && r.tp != null);
+    el.classList.toggle("lista", r.op === 1 && r.sl != null && r.tp != null && coherente());
     el.classList.toggle("pasada", r.op === 0);
     el.querySelectorAll(".campo").forEach(c => c.classList.toggle("arm", c.dataset.c === armado));
     if(r.op === 1 && r.entrada != null && r.sl != null && r.tp != null){
-      const rgo = Math.abs(r.entrada - r.sl), rec = Math.abs(r.tp - r.entrada);
-      calc.innerHTML = `riesgo <b>${(rgo/0.0001).toFixed(1)} p</b> · R:R <b>${(rec/(rgo||1e-9)).toFixed(2)}</b>`;
+      if(!coherente()){
+        calc.innerHTML = `<span class="mal">en ${r.dir>0?"compra":"venta"} el stop va ${r.dir>0?"debajo":"encima"} y el objetivo ${r.dir>0?"encima":"debajo"}</span>`;
+      } else {
+        const rgo = Math.abs(r.entrada - r.sl), rec = Math.abs(r.tp - r.entrada);
+        calc.innerHTML = `riesgo <b>${(rgo/0.0001).toFixed(1)} p</b> · R:R <b>${(rec/(rgo||1e-9)).toFixed(2)}</b>`;
+      }
     } else calc.textContent = "";
     marca(); contar();
   }
@@ -399,7 +410,11 @@ DATOS.forEach(s => mazo.appendChild(ficha(s)));
 function hechas(){
   return DATOS.filter(s => {
     const r = estado[s.id];
-    return r && (r.op === 0 || (r.op === 1 && r.sl != null && r.tp != null && r.entrada != null));
+    if(!r) return false;
+    if(r.op === 0) return true;
+    if(r.op !== 1 || r.sl == null || r.tp == null || r.entrada == null) return false;
+    return r.dir > 0 ? (r.sl < r.entrada && r.tp > r.entrada)
+                     : (r.sl > r.entrada && r.tp < r.entrada);
   }).length;
 }
 function contar(){
