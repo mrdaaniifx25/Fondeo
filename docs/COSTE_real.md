@@ -61,8 +61,31 @@ diez veces o más, 38,5 % de acierto contra el 33,3 % geométrico — tenía un 
 de equilibrio de **0,26 pips**. Con 1,28 está muerto cinco veces. Esa familia
 queda cerrada por caja, no por criterio.
 
-## Pendiente
+## No hace falta afinarlo más
 
-Medir el spread con `mt5/spread_sesion.mq5` sobre el historial real en vez de a
-ojo, para tener la media y el p90 de la ventana 08:00-11:30 en lugar de un rango
-estimado.
+Barrido de 0,9 a 2,0 pips sobre las cuatro cosas que decidimos con este número:
+
+```
+  coste     tu agosto        agosto honesto     la regla 6 años      grupo 10+
+           neta/d      z     neta/d      z      neta/d      z      neta/d      z
+  0,90p    +1,063  +3,60     +0,522  +1,77      -0,206  -5,71      -0,442  -3,02
+  1,28p    +0,956  +3,21     +0,418  +1,42      -0,303  -8,01      -0,692  -3,99
+  1,43p    +0,914  +3,05     +0,377  +1,28      -0,341  -8,83      -0,791  -4,27
+  1,58p    +0,872  +2,90     +0,337  +1,14      -0,379  -9,59      -0,889  -4,51
+  2,00p    +0,754  +2,47     +0,222  +0,75      -0,487 -11,48      -1,166  -5,03
+```
+
+**Ningún signo cambia en todo el rango.** Su agosto es positivo y significativo
+en los siete valores; el agosto honesto es positivo y nunca significativo; la
+regla a seis años y el grupo 10+ son negativos siempre.
+
+Así que medir el spread al decimal no cambiaría ninguna conclusión. **Se adopta
+1,43 pips** como coste de trabajo, el punto medio de la banda, y se deja de
+perseguir el número.
+
+La mitad sólida de esa cifra es la comisión: 0,58 pips salidos de cobros reales.
+Lo estimado es el spread, y es la parte que menos pesa.
+
+`mt5/spread_sesion.mq5` queda ahí para cuando haya cuenta activa y un ordenador.
+No es bloqueante. Desde el móvil, la app de MT5 muestra Bid y Ask en la ficha
+del símbolo: el spread es la resta, y con anotarlo tres o cuatro mañanas basta.
