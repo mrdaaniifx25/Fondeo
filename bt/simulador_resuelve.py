@@ -32,9 +32,13 @@ loc = m1["loc"].to_numpy(); H = m1.high.to_numpy(); L = m1.low.to_numpy(); C = m
 s = m1.set_index("loc").close
 h1 = s.resample("1h").last().dropna(); m15 = s.resample("15min").last().dropna()
 
-def direccion(se, t, k):
-    """signo de las ultimas k barras CERRADAS antes de t"""
-    i = se.index.searchsorted(t, side="right") - 1
+def direccion(se, t, k, minutos):
+    """signo de las ultimas k barras REALMENTE CERRADAS antes de t.
+
+    El indice son horas de apertura: hay que restar la duracion de la vela
+    antes de buscar, o se lee el cierre de una vela todavia en formacion.
+    """
+    i = se.index.searchsorted(t - pd.Timedelta(minutes=minutos), side="right") - 1
     return 0 if i < k else int(np.sign(se.iloc[i] - se.iloc[i-k]))
 
 R, mot, fav = [], [], []
@@ -52,7 +56,7 @@ for r in e.itertuples():
         sal = C[j1-1]; R.append(((sal-r.entrada) if r.lado > 0 else (r.entrada-sal))/rgo); mot.append("cierre")
     elif isl <= it: R.append(-1.0); mot.append("SL")
     else: R.append(2.0); mot.append("TP")
-    fav.append(direccion(h1, t0, 4) == r.lado and direccion(m15, t0, 4) == r.lado)
+    fav.append(direccion(h1, t0, 4, 60) == r.lado and direccion(m15, t0, 4, 15) == r.lado)
 e["R"] = R; e["motivo"] = mot; e["fav"] = fav; e["neto"] = e.R - COSTE/e.rgo
 e.to_csv(ENTRADA.replace("respuestas", "resuelto").replace(".txt", ".csv"), index=False)
 

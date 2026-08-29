@@ -14,9 +14,15 @@ def marco(regla):
 h1  = marco("1h")
 m15 = marco("15min")
 
-def direccion(serie, ts, atras):
-    """signo del movimiento de las ultimas `atras` barras CERRADAS antes de ts"""
-    idx = serie.index.searchsorted(ts, side="left") - 1     # ultima barra cerrada
+def direccion(serie, ts, atras, minutos):
+    """signo de las ultimas `atras` barras REALMENTE CERRADAS antes de ts.
+
+    El indice de `serie` son horas de APERTURA, asi que una barra solo esta
+    cerrada si su apertura + su duracion es menor o igual que ts. Restar la
+    duracion antes de buscar es lo que evita leer una vela en formacion.
+    """
+    lim = ts - np.timedelta64(minutos, "m")
+    idx = serie.index.searchsorted(lim, side="right") - 1
     out = np.zeros(len(ts), dtype=int)
     ok = idx >= atras
     a = serie.to_numpy()
@@ -25,8 +31,8 @@ def direccion(serie, ts, atras):
 
 t = pd.read_csv("data/asia_nivel.csv", parse_dates=["ts"])
 ts = t.ts.to_numpy()
-t["dirH1"]  = direccion(h1,  ts, 4)
-t["dirM15"] = direccion(m15, ts, 4)
+t["dirH1"]  = direccion(h1,  ts, 4, 60)
+t["dirM15"] = direccion(m15, ts, 4, 15)
 t["favH1"]  = t.dirH1  == t.lado
 t["favM15"] = t.dirM15 == t.lado
 t["neto"]   = t.R - COSTE / t.riesgo
