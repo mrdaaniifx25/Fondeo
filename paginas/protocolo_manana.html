@@ -51,6 +51,7 @@ h1{font-size:clamp(32px,6vw,48px); font-weight:700; letter-spacing:-.02em; line-
    margin:0 0 20px; text-wrap:balance}
 .pie0{color:var(--suave); margin:0 0 16px; max-width:62ch}
 .pie0 strong{color:var(--tinta); font-weight:600}
+.pie0 .mono{font-family:"IBM Plex Mono",monospace; font-size:14px}
 
 .aviso{
   border:1px solid var(--linea2); border-left:4px solid var(--ojo);
@@ -150,11 +151,12 @@ tbody tr.dest td{background:var(--siF); font-weight:600}
   <p class="rotulo">EURUSD · M5 · Londres</p>
   <h1>Protocolo de la mañana</h1>
   <p class="pie0">Seis comprobaciones en orden, todos los días. Si alguna falla, no se opera y se cierra el portátil. Cada regla de aquí sale de un resultado medido sobre 2.080 operaciones de 2020&nbsp;a&nbsp;2025, o de lo que tú mismo describiste por escrito. <strong>Ninguna está ajustada a tu agosto.</strong></p>
+  <p class="pie0"><strong>Revisado el 28 de agosto</strong>: los números de H1 y M15 de la primera versión estaban inflados por un fallo mío &mdash; el código leía el cierre de velas que aún no habían cerrado. Corregido en <span class="mono">docs/CORRECCION_mirada_al_futuro.md</span>. El filtro sigue en pie, pero es mucho más pequeño de lo que te dije.</p>
 
   <div class="aviso">
     <h4>Léelo antes de usarlo</h4>
-    <p>Seguido a ciegas, este protocolo da un <strong>profit factor neto de 1,02</strong>. Eso es plano. No te va a hacer ganar dinero por sí solo.</p>
-    <p>Lo que sí hace, y está medido: te quita de encima las operaciones que <strong>pierden 1.790&nbsp;€ al mes</strong>. Es un suelo, no una ventaja.</p>
+    <p>Seguido a ciegas, este protocolo <strong>no gana dinero</strong>. En 2020-2025 el conjunto filtrado da profit factor neto 0,65, y con stops anchos se acerca a 1,0 sin pasarlo. Es un suelo, no una ventaja.</p>
+    <p>Lo que sí hace: te quita de encima lo peor. Todas las señales juntas dan <strong>PF neto 0,56</strong>; filtradas por contexto, 0,65. Sigue siendo perder menos, no ganar.</p>
     <p>La ventaja, si existe, está en cuáles eliges tú de las que quedan. Eso todavía no está demostrado y por eso hay una hoja de registro al final.</p>
   </div>
 </header>
@@ -179,8 +181,8 @@ tbody tr.dest td{background:var(--siF); font-weight:600}
       <li>Cierre de ahora <strong>por debajo</strong> → sólo ventas hoy.</li>
       <li>Iguales → no operas.</li>
     </ul>
-    <p>Este es el filtro que más dinero te ahorra de todos. No lo saltes «porque el patrón se ve muy claro».</p>
-    <div class="dato"><b>medido:</b> a favor de H1 acierta el 34,8 % · en contra, el 18,6 % · 2.080 operaciones</div>
+    <p>Es el único filtro que ha sobrevivido a una prueba preregistrada. Es pequeño &mdash; no te va a salvar el mes &mdash; pero es lo único que hay.</p>
+    <div class="dato"><b>medido:</b> el acierto es el mismo a favor que en contra (30,8 %). Lo que cambia es el resultado neto</div>
   </div>
 
   <div class="paso">
@@ -188,7 +190,7 @@ tbody tr.dest td{background:var(--siF); font-weight:600}
     <p>Igual que el anterior pero con <strong>cuatro velas de 15 minutos</strong>. Cierre de la última cerrada contra el cierre de cuatro antes.</p>
     <p>Tiene que apuntar <strong>en la misma dirección que H1</strong>. Si H1 sube y M15 baja, hoy no hay operación. No se elige la que más te guste.</p>
     <div class="veredicto"><span class="v si">H1 y M15 coinciden → sigue</span><span class="v no">Se contradicen → fuera</span></div>
-    <div class="dato"><b>medido:</b> las dos a favor 34,9 % · el resto 21,2 % · diferencia z +9,92</div>
+    <div class="dato"><b>medido:</b> las dos a favor 32,2 % y R/op −0,023 · el resto 29,7 % y −0,085 · diferencia z +2,97</div>
   </div>
 
   <div class="paso">
@@ -225,7 +227,7 @@ tbody tr.dest td{background:var(--siF); font-weight:600}
 
 <div class="fuera">
   <div class="f"><b>Antes de las 08:20</b><span class="por">0 de tus 25</span><span>La primera media hora es la apertura. Tú nunca has entrado ahí, y de las que se dispararon a las 08:04 dos de tres fueron pérdida.</span></div>
-  <div class="f"><b>Contra H1 o contra M15</b><span class="por">PF 0,24</span><span>626 señales en seis años, 21,2 % de acierto. Son el 30 % de los disparos y son las que vacían la cuenta.</span></div>
+  <div class="f"><b>Contra H1 o contra M15</b><span class="por">PF 0,50</span><span>1.142 señales en seis años, 29,7 % de acierto y −0,085 R por operación. No es la diferencia enorme que creí ver al principio: es pequeña, pero es la única que ha pasado un preregistro.</span></div>
   <div class="f"><b>La segunda del día</b><span class="por">−0,363 R</span><span>Existe porque la primera falló. Es una revancha con nombre técnico.</span></div>
   <div class="f"><b>Stop de menos de 10 pips</b><span class="por">hasta 113 %</span><span>Con 1,43 pips de coste, un stop de 1,4 te cuesta más de lo que arriesgas. Uno de 2 se lleva el 79 %.</span></div>
   <div class="f"><b>Un toque sin cierre por fuera</b><span class="por">—</span><span>Que el precio llegue al nivel no es una señal. Sin cuerpo cerrado fuera o envolvente, no hay entrada.</span></div>
