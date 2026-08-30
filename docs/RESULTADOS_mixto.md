@@ -96,3 +96,30 @@ Una prueba limpia. Ya se ha mirado todo el histórico disponible, así que la
 única muestra virgen que queda es **el futuro**: fijar la especificación
 —barrido de nivel de sesión en H4, sólo en la sesión de Londres, stop a un punto
 de la mecha, objetivo 2R, una por día— y medirla hacia delante.
+
+---
+
+## Adenda · la salida no era la palanca
+
+Todo el proyecto ha probado ~15 reglas de **entrada** y **una sola de salida**:
+stop fijo y objetivo a 2R. Parecía un punto ciego evidente, así que se midió.
+
+En EURUSD, mix H4, **el 26,5 % de las operaciones perdedoras llegaron a +1R
+antes de morir**. Suena a palanca enorme. Simulada de verdad, no lo es:
+
+```
+  regla                          %TP    %BE    %SL      R/op   suma R
+  dejar el stop quieto          32,2%   0,1%  64,4%   +0,0172    +28,8
+  a la entrada en +0,8R         21,5%  34,1%  42,5%   +0,0171    +28,5
+  a la entrada en +1,0R         24,1%  26,3%  47,4%   +0,0214    +35,8
+  a la entrada en +1,2R         26,7%  17,4%  53,1%   +0,0187    +31,3
+  a la entrada en +1,5R         29,7%   9,6%  57,7%   +0,0313    +52,3
+```
+
+Salvas perdedoras y matas ganadoras casi en la misma proporción. Y el mejor
+valor sale de barrer cinco parámetros sobre datos ya vistos, así que ni eso.
+
+**Nota de método**: la primera versión de este cálculo suponía que mover el stop
+no cortaba ninguna ganadora y daba +285 R en vez de +35,8. Era falso y no se
+publicó. Simular una regla de salida exige recorrer el precio vela a vela; no se
+puede hacer con aritmética sobre el resultado final.
