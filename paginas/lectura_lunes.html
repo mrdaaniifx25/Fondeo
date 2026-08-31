@@ -73,6 +73,9 @@ h2 span{color:var(--tinta)}
 .hora i{position:absolute; right:-6px; top:24px; width:10px; height:10px;
   border-radius:50%; background:var(--marca); box-shadow:0 0 0 3px var(--papel)}
 .op.corta .hora{color:var(--baja)} .op.corta .hora i{background:var(--baja)}
+.op.saltada .hora{color:var(--tenue)}
+.op.saltada .hora i{background:var(--papel); box-shadow:0 0 0 2px var(--linea2), 0 0 0 5px var(--papel)}
+.lado.n{background:var(--hueco); color:var(--tenue); box-shadow:inset 0 0 0 1px var(--linea2)}
 .cuerpo{padding:14px 0 26px 22px; display:flex; flex-direction:column; gap:11px}
 .tit{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
 .tit h3{margin:0; font-size:20px; font-weight:600; letter-spacing:-.01em}
@@ -159,13 +162,14 @@ tr.suyo td{background:var(--bajaF); color:var(--tinta); font-weight:600}
 
 <header>
   <h1>Tu lunes, operación a operación</h1>
-  <p class="sub">Lo que se ve en las once capturas de la sesión del 31 de agosto, y las reglas que esas cinco operaciones definen si se las toma como si fuesen toda la estrategia.</p>
+  <p class="sub">Lo que se ve en las capturas de la sesión del 31 de agosto, y las reglas que esas operaciones definen si se las toma como si fuesen toda la estrategia.</p>
   <div class="sello">
     <span><b>OANDA:EURUSD</b></span>
     <span>lunes 31 ago 2026</span>
     <span>demo, en directo</span>
     <span>M5 marca · M1 ejecuta</span>
-    <span><b>5</b> operaciones · 4 compras, 1 venta</span>
+    <span><b>4</b> operaciones · 3 compras, 1 venta</span>
+    <span>1 medida y descartada</span>
   </div>
 </header>
 
@@ -197,12 +201,13 @@ tr.suyo td{background:var(--bajaF); color:var(--tinta); font-weight:600}
       </div>
     </div>
 
-    <div class="op">
-      <div class="hora">10:55<i></i></div>
+    <div class="op saltada">
+      <div class="hora">10:50<i></i></div>
       <div class="cuerpo">
-        <div class="tit"><h3>Tercera, tras la corrección de las 10:45</h3><span class="lado c">compra</span></div>
-        <p><span class="et v">visto</span> El precio había caído desde el techo de las 10:00 hasta las 10:45. Hay una línea verde horizontal hacia <span class="mono">1,1594</span> y una caja pequeña justo después. El encabezado marca <span class="mono">H 1,15959 · L 1,15931 · C 1,15942</span>.</p>
-        <p><span class="et d">deducido</span> Esperas a que la corrección termine y vuelves a comprar en el mismo esquema, sobre un nivel que ya venía marcado de antes. La caja es más pequeña que las dos primeras: <b>menos recorrido esperado</b>.</p>
+        <div class="tit"><h3>La que mediste y no tomaste</h3><span class="lado n">sin entrar</span></div>
+        <p><span class="et v">visto</span> Aquí <b>no hay caja de posición</b>: hay una línea verde arriba y una roja abajo, dibujadas a mano y unidas por un trazo vertical. En tus operaciones de verdad el gráfico pinta rectángulos rellenos, verde y rosa. Esto es la herramienta de medir, no una entrada.</p>
+        <p><span class="et v">visto</span> La vela roja anterior rompe el mínimo de la de las 09:40, pero lo hace <b>pegada al alto de Asia</b> —la línea negra gruesa—. Justo después, una vela verde larga rebota en ella.</p>
+        <p><span class="et d">deducido</span> Dejaste el objetivo y el stop dibujados para ver luego qué habría pasado. El precio llegó a la línea verde, así que <b>el 1:2 habría entrado</b>.</p>
         <p class="fuente">capturas 7 y 8 · 5m</p>
       </div>
     </div>
@@ -210,9 +215,9 @@ tr.suyo td{background:var(--bajaF); color:var(--tinta); font-weight:600}
     <div class="op">
       <div class="hora">13:12<i></i></div>
       <div class="cuerpo">
-        <div class="tit"><h3>Cuarta, ya por la tarde</h3><span class="lado c">compra</span></div>
+        <div class="tit"><h3>Tercera, ya por la tarde</h3><span class="lado c">compra</span></div>
         <p><span class="et v">visto</span> Caja en M1 entre las 13:12 y las 13:25 aproximadamente. La parte verde es bastante más alta que la roja. El precio sube en escalera y llega al techo de la caja hacia las <b>13:22</b>.</p>
-        <p><span class="et d">deducido</span> Mismo patrón que las tres anteriores, fuera ya de la sesión de Londres. Es la que mejor se ve completa: entrada, subida limpia y objetivo tocado sin sobresaltos.</p>
+        <p><span class="et d">deducido</span> Mismo patrón que las dos de la mañana, fuera ya de la sesión de Londres. Es la que mejor se ve completa: entrada, subida limpia y objetivo tocado sin sobresaltos.</p>
         <p class="fuente">capturas 10 y 11 · 1m</p>
       </div>
     </div>
@@ -221,8 +226,8 @@ tr.suyo td{background:var(--bajaF); color:var(--tinta); font-weight:600}
       <div class="hora">13:45<i></i></div>
       <div class="cuerpo">
         <div class="tit"><h3>La excepción</h3><span class="lado v">venta</span></div>
-        <p><span class="et v">visto</span> Una caja <b>invertida</b> —la rosa arriba, la verde abajo— pequeña, justo después de que el precio hiciera techo. Es la única de las cinco en esa dirección.</p>
-        <p><span class="et d">deducido</span> Es la del retroceso que mencionas. Y no está montada sobre una rotura de nivel como las otras cuatro, sino sobre <b>un techo</b>: el mismo sitio donde la cuarta cerró en beneficio.</p>
+        <p><span class="et v">visto</span> Una caja <b>invertida</b> —la rosa arriba, la verde abajo— pequeña, justo después de que el precio hiciera techo. Es la única del día en esa dirección.</p>
+        <p><span class="et d">deducido</span> Es la del retroceso que mencionas. Y no está montada sobre una rotura de nivel como las otras tres, sino sobre <b>un techo</b>: el mismo sitio donde la anterior cerró en beneficio.</p>
         <p class="fuente">captura 10 · 5m</p>
       </div>
     </div>
@@ -231,34 +236,35 @@ tr.suyo td{background:var(--bajaF); color:var(--tinta); font-weight:600}
 </section>
 
 <section>
-  <h2>Las reglas <span>que esas cinco operaciones definen</span></h2>
+  <h2>Las reglas <span>que ese día define</span></h2>
   <ol class="reglas">
-    <li><div><span class="rt">Decidir la dirección del día, antes de nada</span><p>Miras el gráfico y te quedas con un sesgo. Hoy: alcista. A partir de ahí <b>solo buscas compras</b>. Las cinco operaciones respetan esto salvo una, y esa una la tomas a sabiendas.</p></div></li>
+    <li><div><span class="rt">Decidir la dirección del día, antes de nada</span><p>Miras el gráfico y te quedas con un sesgo. Hoy: alcista. A partir de ahí <b>solo buscas compras</b>. Las cuatro respetan esto salvo una, y esa una la tomas a sabiendas.</p></div></li>
     <li><div><span class="rt">Marcar los altos y bajos de Asia, en M5</span><p>Los niveles no los improvisas: son los <b>extremos de la sesión asiática</b>, marcados sobre el gráfico de 5 minutos y dibujados antes de que el precio llegue. Vienen puestos de antes de abrir Londres, y son los mismos toda la mañana.</p></div></li>
     <li><div><span class="rt">Esperar a que el precio llegue al nivel</span><p>No persigues. La operación empieza cuando el precio vuelve a una línea que ya estaba puesta.</p></div></li>
     <li><div><span class="rt">Confirmar en M5: cierre, no mecha</span><p>La vela de M5 tiene que <b>cerrar al otro lado del nivel</b>. Si solo lo atraviesa con la mecha y vuelve, no ha pasado nada y no se entra. Manda el cierre de M5 aunque en M1 parezca una rotura clarísima: <b>M1 enseña, M5 decide</b>.</p></div></li>
+    <li><div><span class="rt">Mirar qué hay delante antes de ejecutar</span><p>Si la señal salta <b>pegada a un nivel de Asia</b>, no se entra. Se espera a que el precio llegue a esa línea y se mira cómo reacciona: entonces la reacción es la señal, y la rotura ya no. Es la regla que te hizo saltarte la de las 10:50.</p></div></li>
     <li><div><span class="rt">Ejecutar en M1</span><p>Bajas a M1 y entras en la vela siguiente a la que confirma. Aquí es donde ganas precio: entras <b>pegado al nivel</b>, no donde cerró la vela de M5.</p></div></li>
     <li><div><span class="rt">Stop pegado, debajo del nivel</span><p>El stop va justo al otro lado de la línea o del último apoyo de M1. En la única que tengo con números son <b>2,8 pips</b>. En las cajas de las capturas ninguno parece pasar de los seis o siete.</p></div></li>
     <li><div><span class="rt">Objetivo fijo, el doble del riesgo</span><p>Se cierra ahí. No se deja correr, no se mueve. Las cajas dan entre 1:2 y 1:3 medidas a ojo.</p></div></li>
     <li><div><span class="rt">Repetir mientras el día siga dando niveles</span><p>Si la subida crea un nivel nuevo más arriba y también lo rompe, vuelves a entrar. Hoy cuatro veces, entre las 09:20 y las 13:12.</p></div></li>
-    <li class="excepcion"><div><span class="rt">La excepción: vender un techo</span><p>Cuando ves que el movimiento se agota, tomas una en contra del sesgo del día, con la caja invertida y más pequeña. <b>Es la única de las cinco que la regla 1 prohíbe</b>, y no está escrita en ninguna parte: solo existe en tu cabeza.</p></div></li>
+    <li class="excepcion"><div><span class="rt">La excepción: vender un techo</span><p>Cuando ves que el movimiento se agota, tomas una en contra del sesgo del día, con la caja invertida y más pequeña. <b>Es la única que la regla 1 prohíbe</b>, y no está escrita en ninguna parte: solo existe en tu cabeza.</p></div></li>
   </ol>
 </section>
 
 <section>
-  <h2>Lo que estas cinco <span>todavía no definen</span></h2>
+  <h2>Lo que <span>todavía no está definido</span></h2>
   <p style="margin:0;color:var(--suave);max-width:70ch">Con las reglas de arriba, otra persona no podría repetir tu lunes. Eran seis. <b>Dos ya están contestadas</b> y viven ahora en las reglas 2 y 4 — los niveles son los extremos de Asia, y romper es cerrar al otro lado en M5, no rozarlo con la mecha. Una tercera, los descartes, tiene su propio registro aquí debajo. Quedan estas cuatro.</p>
   <div class="huecos">
     <div class="hueco"><b>Cómo decides el sesgo del día</b><span>«Vi que era alcista» no es una regla. ¿Qué miras, en qué temporalidad, y a qué hora queda decidido? Si se decide a las 11:00 mirando lo que ya ha pasado, el sesgo no existía a las 09:20.</span></div>
     <div class="hueco"><b>Cuántos niveles son, exactamente</b><span>Dijiste alto y bajo de Asia, que son dos. En la captura del día entero cuento <b>seis o siete líneas discontinuas</b>, y cada una empieza en un punto distinto del gráfico. ¿Son varios días de Asia? ¿Las pinta el indicador de sesiones? ¿Operas todas o solo las dos del día?</span></div>
     <div class="hueco"><b>Cuándo paras</b><span>¿Cuatro al día es el tope, o es lo que salió? ¿Hay una hora a la que cierras el día? ¿Paras si encadenas dos pérdidas?</span></div>
-    <div class="hueco"><b>Qué es «se va a retroceder»</b><span>La quinta operación es la más interesante de las cinco justo porque rompe tu propia regla. Si eso se puede escribir, tienes una segunda estrategia. Si no, es una corazonada, y una corazonada no se puede probar ni repetir en un mal día.</span></div>
+    <div class="hueco"><b>Qué es «se va a retroceder»</b><span>La venta de las 13:45 es la más interesante del día justo porque rompe tu propia regla. Si eso se puede escribir, tienes una segunda estrategia. Si no, es una corazonada, y una corazonada no se puede probar ni repetir en un mal día.</span></div>
   </div>
 </section>
 
 <section>
   <h2>Las que <span>no tomaste</span></h2>
-  <p style="margin:0;color:var(--suave);max-width:70ch">Los descartes definen la estrategia tanto como las entradas. Estos son los momentos del lunes en los que veo algo parecido a tu patrón y ninguna caja. Según vas contestando, se van cerrando.</p>
+  <p style="margin:0;color:var(--suave);max-width:70ch">Los descartes definen la estrategia tanto como las entradas. Estos son los momentos del lunes en los que veo algo parecido a tu patrón y ninguna caja. <b>Dos de los seis los cierra la misma regla</b>: en M5 no hubo cuerpo al otro lado del nivel. La de las 10:50 ha subido a la línea del día, porque la explica una regla nueva.</p>
   <div class="desc">
 
     <div class="d1"><div class="h">08:25<br>08:35</div><div>
@@ -270,18 +276,12 @@ tr.suyo td{background:var(--bajaF); color:var(--tinta); font-weight:600}
     <div class="d1"><div class="h">~08:50</div><div>
       <span class="q">Vela roja grande justo antes de las 09:00</span>
       <p>Rompe hacia abajo con cuerpo. En espejo sería una venta.</p>
-      <p class="pend">pendiente</p>
+      <p class="resp"><em>tu respuesta</em>La misma regla: en toda la mañana <b>ninguna vela de M5 dejó cuerpo al otro lado de un nivel</b> salvo la que operaste. Lo que en M1 parecen roturas, en M5 son mechas.</p>
     </div></div>
 
     <div class="d1"><div class="h">10:00<br>10:15</div><div>
       <span class="q">La vuelta de la mañana</span>
       <p>Dos velas rojas enormes se comen toda la subida. Es la ruptura a la baja más limpia del día. <b>Es la que más importa</b>: a las 13:45 sí tomaste una venta contra el sesgo, y ésta no.</p>
-      <p class="pend">pendiente</p>
-    </div></div>
-
-    <div class="d1"><div class="h">10:45<br>10:50</div><div>
-      <span class="q">La barrida del nivel</span>
-      <p>Una roja larga perfora el nivel hacia abajo y cierra por encima otra vez. Compraste la recuperación cinco minutos después, pero no vendiste la perforación.</p>
       <p class="pend">pendiente</p>
     </div></div>
 
