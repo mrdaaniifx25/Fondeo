@@ -1,47 +1,56 @@
 // This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
 // at https://mozilla.org/MPL/2.0/
 //
-//  Asia · alto y mínimo, histórico completo
+//  Asia · caja e histórico
 //
-//  Dibuja el máximo y el mínimo de la sesión de Asia de cada día, desde el
-//  principio del histórico que cargue el gráfico. Usa plot en vez de cajas o
-//  líneas, así que NO tiene el límite de 500 objetos: si el gráfico carga
-//  cinco años, se dibujan cinco años.
+//  La caja gris de la sesión de Asia de cada día, con su alto y su mínimo
+//  proyectados hacia la derecha.
 //
-//  El nivel aparece cuando Asia CIERRA, no mientras se forma. Antes de esa
-//  hora el máximo todavía puede subir, así que pintarlo sería enseñar algo
-//  que en directo no sabrías.
+//  Por qué hay dos formas de dibujarlo:
+//    · Las CAJAS son objetos y TradingView sólo admite 500. Como aquí se gasta
+//      una por día, llegan a unos dos años, que es mucho más de lo que daba el
+//      indicador de tres sesiones.
+//    · Las LÍNEAS van con plot, que no tiene límite. Sirven para cuando te vas
+//      más atrás de donde alcanzan las cajas.
+//  Puedes tener las dos cosas a la vez, que es como viene por defecto.
 //
-//  Las etiquetas con los números sí están limitadas por TradingView, así que
-//  se dibujan sólo en los últimos N días (ajustable).
+//  El nivel se fija cuando Asia CIERRA. Mientras la sesión se forma el máximo
+//  todavía puede subir, así que dibujarlo antes sería enseñar algo que en
+//  directo no tendrías.
 //@version=6
-indicator("Asia · histórico", overlay = true, max_labels_count = 500)
+indicator("Asia · caja e histórico", overlay = true,
+     max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500)
 
-// ─── ajustes ──────────────────────────────────────────────────────────────
+// ─── sesión ───────────────────────────────────────────────────────────────
 gA = "Sesión"
 tz     = input.string("Europe/Madrid", "Huso horario", group = gA,
      options = ["Europe/Madrid", "Europe/London", "America/New_York", "UTC"],
      tooltip = "Con Europe/Madrid la sesión cae a la misma hora de tu reloj en " +
      "invierno y en verano.")
 hIni   = input.int(0, "Asia empieza a las", 0, 23, group = gA)
-hFin   = input.int(8, "Asia acaba a las",   1, 23, group = gA,
-     tooltip = "El nivel se fija a esta hora y se dibuja desde aquí hasta la " +
-     "siguiente sesión.")
+hFin   = input.int(8, "Asia acaba a las",   1, 23, group = gA)
 soloLV = input.bool(true, "Sólo de lunes a viernes", group = gA)
 
-gD = "Dibujo"
-cAlto  = input.color(#B07D18,           "Color del alto",   inline = "c", group = gD)
-cBajo  = input.color(#B07D18,           "Color del mínimo", inline = "c", group = gD)
-grosor = input.int(1, "Grosor", 1, 4, group = gD)
-verMed = input.bool(false, "Marcar también el 50 % del rango", group = gD)
+// ─── caja ─────────────────────────────────────────────────────────────────
+gC = "La caja"
+verCaja = input.bool(true, "Dibujar la caja de la sesión", group = gC)
+cRell   = input.color(color.new(#8E8E93, 88), "Relleno", inline = "k", group = gC)
+cBorde  = input.color(color.new(#8E8E93, 40), "Borde",   inline = "k", group = gC)
+nCajas  = input.int(300, "Días con caja", 1, 500, group = gC,
+     tooltip = "Una caja por día. El tope de TradingView son 500.")
 
+// ─── proyección ───────────────────────────────────────────────────────────
+gP = "Alto y mínimo proyectados"
+verProy = input.bool(true, "Prolongar los niveles hacia la derecha", group = gP)
+cNivel  = input.color(#B07D18, "Color", group = gP)
+grosor  = input.int(1, "Grosor", 1, 4, group = gP)
+verMed  = input.bool(false, "Marcar también el 50 % del rango", group = gP)
+
+// ─── etiquetas ────────────────────────────────────────────────────────────
 gE = "Etiquetas"
-verEtq = input.bool(true, "Escribir los números", group = gE)
-nEtq   = input.int(90, "Días hacia atrás con etiqueta", 1, 240, group = gE,
-     tooltip = "TradingView admite 500 etiquetas y cada día gasta dos, así que " +
-     "el techo real son 250 días. Bajarlo aquí no cambia el dibujo de las " +
-     "líneas, que llega al histórico entero.")
-tamEtq = input.string("Pequeño", "Tamaño", options = ["Diminuto", "Pequeño", "Normal"], group = gE)
+verEtq   = input.bool(true, "Escribir los números", group = gE)
+nEtq     = input.int(90, "Días hacia atrás con etiqueta", 1, 240, group = gE)
+tamEtq   = input.string("Pequeño", "Tamaño", options = ["Diminuto", "Pequeño", "Normal"], group = gE)
 verRango = input.bool(true, "Añadir el rango en pips", group = gE)
 
 // ─── tamaño del pip ───────────────────────────────────────────────────────
@@ -49,24 +58,26 @@ dig = math.round(-math.log10(syminfo.mintick))
 pip = (dig == 5 or dig == 3) ? syminfo.mintick * 10 : syminfo.mintick
 
 // ─── ¿estamos en Asia? ────────────────────────────────────────────────────
-h    = hour(time, tz)
-dSem = dayofweek(time, tz)
+h     = hour(time, tz)
+dSem  = dayofweek(time, tz)
 habil = not soloLV or (dSem != dayofweek.saturday and dSem != dayofweek.sunday)
 enAsia = habil and (hIni < hFin ? (h >= hIni and h < hFin) : (h >= hIni or h < hFin))
-
-// ─── acumulación y cierre de la sesión ────────────────────────────────────
-var float acHi = na
-var float acLo = na
-var float niHi = na
-var float niLo = na
-var int   nDia = 0
 
 empieza = enAsia and not enAsia[1]
 acaba   = not enAsia and enAsia[1]
 
+// ─── acumulación ──────────────────────────────────────────────────────────
+var float acHi  = na
+var float acLo  = na
+var int   iIni  = na
+var float niHi  = na
+var float niLo  = na
+var int   nDia  = 0
+
 if empieza
     acHi := high
     acLo := low
+    iIni := bar_index
 else if enAsia
     acHi := math.max(nz(acHi, high), high)
     acLo := math.min(nz(acLo, low),  low)
@@ -76,38 +87,64 @@ if acaba
     niLo := acLo
     nDia += 1
 
-// ─── dibujo ───────────────────────────────────────────────────────────────
-plot(niHi, "Alto de Asia",   color = cAlto, linewidth = grosor, style = plot.style_linebr)
-plot(niLo, "Mínimo de Asia", color = cBajo, linewidth = grosor, style = plot.style_linebr)
-plot(verMed ? (niHi + niLo) / 2 : na, "Mitad del rango",
-     color = color.new(cAlto, 55), linewidth = 1, style = plot.style_linebr)
+// ─── la caja ──────────────────────────────────────────────────────────────
+var box cajaViva = na
 
+if verCaja and empieza
+    cajaViva := box.new(bar_index, high, bar_index, low,
+         border_color = cBorde, bgcolor = cRell, border_width = 1)
+
+if verCaja and enAsia and not na(cajaViva)
+    box.set_right(cajaViva, bar_index)
+    box.set_top(cajaViva, acHi)
+    box.set_bottom(cajaViva, acLo)
+
+// se borran las cajas viejas para no agotar el cupo
+var box[] cajas = array.new<box>()
+if verCaja and acaba and not na(cajaViva)
+    array.push(cajas, cajaViva)
+    if array.size(cajas) > nCajas
+        box.delete(array.shift(cajas))
+    cajaViva := na
+
+// ─── proyección de los niveles ────────────────────────────────────────────
+plot(verProy ? niHi : na, "Alto de Asia",   color = cNivel, linewidth = grosor,
+     style = plot.style_linebr)
+plot(verProy ? niLo : na, "Mínimo de Asia", color = cNivel, linewidth = grosor,
+     style = plot.style_linebr)
+plot(verProy and verMed ? (niHi + niLo) / 2 : na, "Mitad del rango",
+     color = color.new(cNivel, 55), linewidth = 1, style = plot.style_linebr)
+
+// ─── etiquetas ────────────────────────────────────────────────────────────
 tam = tamEtq == "Diminuto" ? size.tiny : tamEtq == "Pequeño" ? size.small : size.normal
-
 recientes = time > timenow - nEtq * 86400000
 
 if acaba and verEtq and recientes
     rango = (niHi - niLo) / pip
-    txtA = str.tostring(niHi, format.mintick) + (verRango ? "  ·  " + str.tostring(rango, "#.0") + " p" : "")
+    txtA = str.tostring(niHi, format.mintick) +
+         (verRango ? "  ·  " + str.tostring(rango, "#.0") + " p" : "")
     label.new(bar_index, niHi, txtA, style = label.style_label_down,
-         color = color.new(cAlto, 88), textcolor = cAlto, size = tam)
-    label.new(bar_index, niLo, str.tostring(niLo, format.mintick), style = label.style_label_up,
-         color = color.new(cBajo, 88), textcolor = cBajo, size = tam)
+         color = color.new(cNivel, 88), textcolor = cNivel, size = tam)
+    label.new(bar_index, niLo, str.tostring(niLo, format.mintick),
+         style = label.style_label_up,
+         color = color.new(cNivel, 88), textcolor = cNivel, size = tam)
 
-// ─── tabla de consulta rápida ─────────────────────────────────────────────
+// ─── tabla ────────────────────────────────────────────────────────────────
 var table t = table.new(position.top_right, 2, 5, border_width = 1)
-if barstate.islast and not na(niHi)
-    table.cell(t, 0, 0, "ASIA", text_color = cAlto, text_size = size.small,
-         bgcolor = color.new(cAlto, 90))
+if barstate.islast
+    hayDatos = not na(niHi)
+    table.cell(t, 0, 0, "ASIA", text_color = cNivel, text_size = size.small,
+         bgcolor = color.new(cNivel, 90))
     table.cell(t, 1, 0, str.format("{0}:00-{1}:00", hIni, hFin), text_size = size.small,
-         text_color = color.gray, bgcolor = color.new(cAlto, 90))
-    table.cell(t, 0, 1, "alto",   text_size = size.small, text_color = color.gray)
-    table.cell(t, 1, 1, str.tostring(niHi, format.mintick), text_size = size.small)
+         text_color = color.gray, bgcolor = color.new(cNivel, 90))
+    table.cell(t, 0, 1, "alto", text_size = size.small, text_color = color.gray)
+    table.cell(t, 1, 1, hayDatos ? str.tostring(niHi, format.mintick) : "—", text_size = size.small)
     table.cell(t, 0, 2, "mínimo", text_size = size.small, text_color = color.gray)
-    table.cell(t, 1, 2, str.tostring(niLo, format.mintick), text_size = size.small)
-    table.cell(t, 0, 3, "rango",  text_size = size.small, text_color = color.gray)
-    table.cell(t, 1, 3, str.tostring((niHi - niLo) / pip, "#.0") + " p", text_size = size.small)
-    table.cell(t, 0, 4, "días",   text_size = size.small, text_color = color.gray)
+    table.cell(t, 1, 2, hayDatos ? str.tostring(niLo, format.mintick) : "—", text_size = size.small)
+    table.cell(t, 0, 3, "rango", text_size = size.small, text_color = color.gray)
+    table.cell(t, 1, 3, hayDatos ? str.tostring((niHi - niLo) / pip, "#.0") + " p" : "—",
+         text_size = size.small)
+    table.cell(t, 0, 4, "días", text_size = size.small, text_color = color.gray)
     table.cell(t, 1, 4, str.tostring(nDia), text_size = size.small)
 
 // ─── avisos ───────────────────────────────────────────────────────────────
