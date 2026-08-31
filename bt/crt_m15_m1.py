@@ -9,9 +9,10 @@ Cuatro formas de ejecutar LA MISMA senal, para aislar que aporta bajar a M1:
   D  C, pero con el stop pegado a las 3 velas M1 cerradas  <- su metodo
   D2 D con objetivo fijo 1:2 en vez del extremo del rango
 
-  python3 bt/crt_m15_m1.py
+  python3 bt/crt_m15_m1.py [minutos de la rejilla, 15 por defecto]
 """
 import sys; sys.path.insert(0, "bt")
+import types
 import numpy as np, pandas as pd
 from math import sqrt, erf
 
@@ -26,22 +27,22 @@ INS = [("EURUSD", "data/eurusd_m1.parquet", 0.0001),
        ("USDJPY", "data/usdjpy_m1.parquet", 0.01)]
 
 
-def m15_desde_m1(m1):
-    """Rejilla M15 alineada a :00/:15/:30/:45. El indice es la APERTURA."""
-    g = (m1.set_index("ts").resample("15min", label="left", closed="left")
+def rejilla(m1, tf):
+    """Rejilla de `tf` minutos alineada a la hora. El indice es la APERTURA."""
+    g = (m1.set_index("ts").resample(f"{tf}min", label="left", closed="left")
            .agg(open=("open", "first"), high=("high", "max"),
                 low=("low", "min"), close=("close", "last"), n=("close", "size")))
-    return g[g.n >= 8].reset_index()          # media vela como minimo
+    return g[g.n >= tf/2].reset_index()       # media vela como minimo
 
 
-def senales(m15):
+def senales(m15, tf):
     """Vela 1 rango, Vela 2 barre un lado y cierra dentro, Vela 3 la ventana."""
     hi, lo, cl = (m15[c].to_numpy() for c in ("high", "low", "close"))
     ts = m15["ts"].to_numpy()
     i = np.arange(1, len(m15) - 1)
     r_hi, r_lo = hi[i-1], lo[i-1]
     # la Vela 3 tiene que ser la barra siguiente de verdad, sin hueco de sesion
-    seguida = (ts[i+1] - ts[i]) == np.timedelta64(15, "m")
+    seguida = (ts[i+1] - ts[i]) == np.timedelta64(tf, "m")
     barre_lo = lo[i] < r_lo
     barre_hi = hi[i] > r_hi
     uno = barre_lo ^ barre_hi                              # uno de los dos, no ambos
@@ -77,15 +78,27 @@ def resuelve(T, H, L, C, O, it, e, sl, tp, largo):
     return tp, "TP"
 
 
-def corre(sig, m1, unit, modo, zonas):
+def corre(sig, m1, unit, modo, zonas, tf):
     T = m1["ts"].to_numpy(); H = m1["high"].to_numpy()
     L = m1["low"].to_numpy(); C = m1["close"].to_numpy(); O = m1["open"].to_numpy()
     buf = BUFFER * unit
-    out = []
-    for r in sig.itertuples():
-        i0 = int(np.searchsorted(T, r.t3))
-        i1 = int(np.searchsorted(T, r.t3 + np.timedelta64(15, "m")))
+    if sig.empty:
+        return pd.DataFrame(columns=["ts", "largo", "motivo", "rr", "riesgo_p",
+                                     "bruto_p", "R", "R_neto"])
+    # Los indices se calculan de una vez y vectorizados. Llamar a searchsorted
+    # dentro del bucle con un Timestamp de pandas contra un array datetime64
+    # obliga a numpy a recorrer los 2,4 M de elementos uno a uno: 170 ms por
+    # llamada. Asi son dos llamadas en total.
+    t3 = sig["t3"].to_numpy()
+    I0 = np.searchsorted(T, t3)
+    I1 = np.searchsorted(T, t3 + np.timedelta64(tf, "m"))
+    cols = {c: sig[c].to_numpy() for c in
+            ("largo", "r_hi", "r_lo", "v2_hi", "v2_lo", "sweep")}
+    out, descartadas = [], [0]
+    for k in range(len(sig)):
+        i0, i1 = int(I0[k]), int(I1[k])
         if i0 >= len(T) or i1 <= i0: continue
+        r = types.SimpleNamespace(**{c: v[k] for c, v in cols.items()})
         niv = r.v2_hi if r.largo else r.v2_lo
 
         if modo == "A":
@@ -111,7 +124,13 @@ def corre(sig, m1, unit, modo, zonas):
             sl = r.sweep - buf if r.largo else r.sweep + buf
 
         riesgo = (e - sl) if r.largo else (sl - e)
-        if riesgo <= 0: continue
+        # Si el precio abre con hueco AL OTRO LADO del extremo que da el stop,
+        # el riesgo puede salir de una milesima de pip y la R se dispara a
+        # millones. Un stop mas estrecho que el propio buffer no es ejecutable
+        # en ningun broker, asi que esas se descartan y se cuentan aparte.
+        if riesgo < BUFFER * unit:
+            descartadas[0] += 1
+            continue
         tp = (e + 2*riesgo if r.largo else e - 2*riesgo) if modo == "D2" \
              else (r.r_hi if r.largo else r.r_lo)
         premio = (tp - e) if r.largo else (e - tp)
@@ -124,6 +143,9 @@ def corre(sig, m1, unit, modo, zonas):
                     (br - COSTE)/rg))
     d = pd.DataFrame(out, columns=["ts", "largo", "motivo", "rr", "riesgo_p",
                                    "bruto_p", "R", "R_neto"])
+    if descartadas[0]:
+        print(f"   {modo}: {descartadas[0]} señales descartadas por hueco "
+              f"(stop mas estrecho que el buffer)")
     if not d.empty and zonas is not None:
         d = d[en_kz(d.ts, zonas)].reset_index(drop=True)
     return d
@@ -157,32 +179,38 @@ def bloque(titulo, res):
               f"{d.R_neto.sum():+9.1f}")
 
 
-MODOS = [("A", "A"), ("B", "B"), ("C", "C"), ("D", "D"), ("D2", "D2")]
+def main():
+    MODOS = [("A", "A"), ("B", "B"), ("C", "C"), ("D", "D"), ("D2", "D2")]
 
-print("=" * 100)
-print("CRT EN M15 CON ENTRADA EN M1")
-print(f"  coste {COSTE} pips · buffer {BUFFER} p · tope {MAX_MIN//60} h · "
-      f"umbral Bonferroni |z| > 2,50")
-print("=" * 100)
+    TF = int(sys.argv[1]) if len(sys.argv) > 1 else 15
+    print("=" * 100)
+    print(f"CRT EN M{TF} CON ENTRADA EN M1")
+    print(f"  coste {COSTE} pips · buffer {BUFFER} p · tope {MAX_MIN//60} h · "
+          f"umbral Bonferroni |z| > 2,50")
+    print("=" * 100)
 
-for nom_ins, ruta, unit in INS:
-    m1 = pd.read_parquet(ruta)
-    m1["ts"] = pd.to_datetime(m1["ts"])
-    m1 = m1.sort_values("ts").reset_index(drop=True)
-    m15 = m15_desde_m1(m1)
-    sig = senales(m15)
-    print(f"\n{'='*100}\n{nom_ins}  ·  {len(m15):,} velas M15  ·  "
-          f"{len(sig):,} señales del patrón\n{'='*100}")
-    guarda = {}
-    for etq, modo in MODOS:
-        guarda[etq] = corre(sig, m1, unit, modo, None)   # sin filtro horario
-    bloque("SIN FILTRO HORARIO", [(e, guarda[e]) for e, _ in MODOS])
-    bloque("PRINCIPAL · las tres killzones de la guía",
-           [(e, guarda[e][en_kz(guarda[e].ts, KZ_FX)].reset_index(drop=True))
-            for e, _ in MODOS])
-    bloque("SOLO LONDRES 08-11 CET",
-           [(e, guarda[e][en_kz(guarda[e].ts, KZ_LON)].reset_index(drop=True))
-            for e, _ in MODOS])
-    if nom_ins == "EURUSD":
-        guarda["D"].to_csv("data/crt_m15_m1_D.csv", index=False)
-        guarda["A"].to_csv("data/crt_m15_m1_A.csv", index=False)
+    for nom_ins, ruta, unit in INS:
+        m1 = pd.read_parquet(ruta)
+        m1["ts"] = pd.to_datetime(m1["ts"])
+        m1 = m1.sort_values("ts").reset_index(drop=True)
+        m15 = rejilla(m1, TF)
+        sig = senales(m15, TF)
+        print(f"\n{'='*100}\n{nom_ins}  ·  {len(m15):,} velas M{TF}  ·  "
+              f"{len(sig):,} señales del patrón\n{'='*100}")
+        guarda = {}
+        for etq, modo in MODOS:
+            guarda[etq] = corre(sig, m1, unit, modo, None, TF)  # sin filtro horario
+        bloque("SIN FILTRO HORARIO", [(e, guarda[e]) for e, _ in MODOS])
+        bloque("PRINCIPAL · las tres killzones de la guía",
+               [(e, guarda[e][en_kz(guarda[e].ts, KZ_FX)].reset_index(drop=True))
+                for e, _ in MODOS])
+        bloque("SOLO LONDRES 08-11 CET",
+               [(e, guarda[e][en_kz(guarda[e].ts, KZ_LON)].reset_index(drop=True))
+                for e, _ in MODOS])
+        if nom_ins == "EURUSD":
+            guarda["D"].to_csv(f"data/crt_m{TF}_m1_D.csv", index=False)
+            guarda["A"].to_csv(f"data/crt_m{TF}_m1_A.csv", index=False)
+
+
+if __name__ == "__main__":
+    main()
