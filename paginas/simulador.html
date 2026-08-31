@@ -102,6 +102,14 @@ input:focus-visible, textarea:focus-visible{outline:2px solid var(--marca); outl
   padding:9px 11px; background:var(--hueco); border-radius:3px; font-variant-numeric:tabular-nums}
 .previo b{color:var(--tinta)}
 .previo .mal{color:var(--baja)}
+.previo .aviso{color:var(--asia)}
+.previo .num{font-size:15px}
+.dos{display:grid; grid-template-columns:1fr 1fr; gap:13px}
+.pista{font-size:13.5px; color:var(--suave); background:var(--hueco);
+  padding:9px 11px; border-radius:3px; line-height:1.45}
+.pista b{color:var(--tinta); font-weight:600}
+.panel.arrastra svg{touch-action:none; cursor:ns-resize}
+@media (max-width:520px){ .dos{grid-template-columns:1fr} }
 
 .hecho{margin-top:12px; padding:14px 16px; border-radius:3px; display:none;
   border:1px solid var(--linea2); background:var(--hueco)}
@@ -147,6 +155,7 @@ input:focus-visible, textarea:focus-visible{outline:2px solid var(--marca); outl
     <div class="regla"><b>La decisión se cierra al tomarla</b><span>Una vez entras o pasas, ese caso queda cerrado. No se puede volver atrás.</span></div>
     <div class="regla"><b>Los días los eligió un sorteo</b><span>Semilla fija, preregistrada, sobre los 447 días elegibles. Sin filtrar por resultado ni por si el patrón salió bien.</span></div>
     <div class="regla"><b>H1 y M15 sin etiquetas</b><span>Tienes los dos gráficos, pero no te digo si van «a favor». Eso lo juzgas tú, como en el gráfico de verdad.</span></div>
+    <div class="regla"><b>Caja de entrada arrastrable</b><span>Al pulsar «Entrar» y elegir dirección aparece la caja sobre el gráfico, como la de TradingView. Arrastras la línea roja del stop y la verde del objetivo, y abajo te salen los pips, el ratio, el lotaje y lo que se lleva el coste.</span></div>
     <div class="regla"><b>Puedes parar cuando quieras</b><span>Se guarda solo en este navegador. Cierras, vuelves y sigues donde lo dejaste.</span></div>
   </div>
 
@@ -186,12 +195,20 @@ input:focus-visible, textarea:focus-visible{outline:2px solid var(--marca); outl
         <button type="button" data-v="-1" aria-pressed="false">Venta</button>
       </div>
     </div>
-    <div class="fila">
-      <label>Stop, en pips desde la entrada</label>
-      <input type="number" id="inStop" min="0.5" max="120" step="0.1" inputmode="decimal" placeholder="por ejemplo 20">
+    <div class="pista" id="pista">Elige compra o venta y aparece la caja en el gráfico de 5 minutos.
+      Después <b>arrastra la línea roja</b> para el stop y <b>la verde</b> para el objetivo, o escribe los pips aquí abajo.</div>
+    <div class="dos">
+      <div class="fila">
+        <label>Stop, pips desde la entrada</label>
+        <input type="number" id="inStop" min="0.5" max="200" step="0.1" inputmode="decimal" placeholder="20">
+      </div>
+      <div class="fila">
+        <label>Objetivo, pips desde la entrada</label>
+        <input type="number" id="inObj" min="0.5" max="400" step="0.1" inputmode="decimal" placeholder="40">
+      </div>
     </div>
     <div class="fila">
-      <label>Objetivo</label>
+      <label>Atajos de objetivo</label>
       <div class="grupo" id="grRatio">
         <button type="button" data-v="1" aria-pressed="false">1:1</button>
         <button type="button" data-v="1.5" aria-pressed="false">1:1,5</button>
@@ -200,7 +217,15 @@ input:focus-visible, textarea:focus-visible{outline:2px solid var(--marca); outl
         <button type="button" data-v="3" aria-pressed="false">1:3</button>
       </div>
     </div>
-    <div class="previo" id="previo">Elige dirección y stop.</div>
+    <div class="fila">
+      <label>Riesgo por operación, cuenta de 10.000</label>
+      <div class="grupo" id="grRiesgo">
+        <button type="button" data-v="0.5" aria-pressed="false">0,5 %</button>
+        <button type="button" data-v="1" aria-pressed="true">1 %</button>
+        <button type="button" data-v="2" aria-pressed="false">2 %</button>
+      </div>
+    </div>
+    <div class="previo" id="previo">Elige dirección.</div>
     <div class="fila">
       <label>Por qué entras (opcional, pero ayuda)</label>
       <textarea id="txEntrar" placeholder="qué ves aquí"></textarea>
@@ -248,13 +273,19 @@ const $ = id => document.getElementById(id);
 
 /* ---------- dibujo ---------- */
 function velas(svg, datos, opts){
-  const {w, h, niveles = [], marcarUltima = false} = opts;
-  if (!datos.length) { svg.innerHTML = ""; return; }
-  let lo = Math.min(...datos.map(v => v[3])), hi = Math.max(...datos.map(v => v[2]));
-  for (const [p] of niveles) if (p > lo - 40*U && p < hi + 40*U){ lo = Math.min(lo,p); hi = Math.max(hi,p); }
-  const m = (hi - lo) * 0.06 || U; lo -= m; hi += m;
+  const {w, h, niveles = [], marcarUltima = false, caja = null, escala = null} = opts;
+  if (!datos.length) { svg.innerHTML = ""; return null; }
+  let lo, hi;
+  if (escala){ lo = escala.lo; hi = escala.hi; }
+  else {
+    lo = Math.min(...datos.map(v => v[3])); hi = Math.max(...datos.map(v => v[2]));
+    for (const [p] of niveles) if (p > lo - 40*U && p < hi + 40*U){ lo = Math.min(lo,p); hi = Math.max(hi,p); }
+    if (caja) for (const p of [caja.ent, caja.sl, caja.tp]){ lo = Math.min(lo,p); hi = Math.max(hi,p); }
+    const m = (hi - lo) * 0.06 || U; lo -= m; hi += m;
+  }
   const MI = 4, MD = 52, MT = 8, MB = 16;
   const y = p => MT + (hi - p) / (hi - lo) * (h - MT - MB);
+  const py = q => hi - (q - MT) / (h - MT - MB) * (hi - lo);
   const paso = (w - MI - MD) / datos.length;
   const cw = Math.max(1.6, paso * 0.66);
   let s = "";
@@ -283,6 +314,22 @@ function velas(svg, datos, opts){
     s += `<line x1="${MI}" y1="${yy}" x2="${w-MD}" y2="${yy}" stroke="var(--tinta)" stroke-width="1" stroke-dasharray="1 3"/>`;
     s += `<path d="M ${w-MD} ${yy} l 7 -4.5 l 0 9 z" fill="var(--tinta)"/>`;
   }
+  if (caja){
+    const x0 = MI, x1 = w - MD, yE = y(caja.ent), yS = y(caja.sl), yT = y(caja.tp);
+    s += `<rect x="${x0}" y="${Math.min(yE,yS)}" width="${x1-x0}" height="${Math.abs(yS-yE)}" fill="var(--baja)" opacity=".12"/>`;
+    s += `<rect x="${x0}" y="${Math.min(yE,yT)}" width="${x1-x0}" height="${Math.abs(yT-yE)}" fill="var(--alza)" opacity=".12"/>`;
+    s += `<line x1="${x0}" y1="${yE}" x2="${x1}" y2="${yE}" stroke="var(--tinta)" stroke-width="1.6"/>`;
+    const pp = q => (Math.abs(q - caja.ent)/U).toFixed(1).replace(".", ",");
+    for (const [q, col, et] of [[caja.sl, "var(--baja)", "SL " + pp(caja.sl)],
+                                [caja.tp, "var(--alza)", "TP " + pp(caja.tp)]]){
+      const yy = y(q);
+      s += `<line x1="${x0}" y1="${yy}" x2="${x1}" y2="${yy}" stroke="${col}" stroke-width="2"/>`;
+      s += `<rect x="${x1-60}" y="${yy-8.5}" width="60" height="17" rx="2.5" fill="${col}"/>`;
+      s += `<text x="${x1-30}" y="${yy+4.2}" text-anchor="middle" fill="var(--ficha)" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="600">${et}</text>`;
+      for (const dx of [0, 4, 8])
+        s += `<line x1="${x1-52+dx}" y1="${yy-3.5}" x2="${x1-52+dx}" y2="${yy+3.5}" stroke="var(--ficha)" stroke-width="1" opacity=".6"/>`;
+    }
+  }
   for (const [p, col, txt] of niveles){
     if (p < lo || p > hi || !txt) continue;
     s += `<text x="${MI+3}" y="${Math.max(10, y(p)-4)}" fill="${col}" stroke="var(--ficha)" stroke-width="3.2" paint-order="stroke" font-family="IBM Plex Sans Condensed, sans-serif" font-size="10" font-weight="700" letter-spacing=".08em">${txt}</text>`;
@@ -290,6 +337,7 @@ function velas(svg, datos, opts){
   s += `<text x="${MI+1}" y="${h-3}" fill="var(--tenue)" font-family="IBM Plex Mono, monospace" font-size="10">${datos[0][0]}</text>`;
   s += `<text x="${w-MD}" y="${h-3}" text-anchor="end" fill="var(--tinta)" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600">${datos[datos.length-1][0]}</text>`;
   svg.innerHTML = s;
+  return {lo, hi, y, py};
 }
 
 /* ---------- estado ---------- */
@@ -297,20 +345,22 @@ const caso = () => CASOS[S.i];
 const ultima = () => caso().m5[S.pos];
 const precio = () => ultima()[4];
 
-function pinta(){
+function pinta(rapido){
   const c = caso();
   const estrecho = window.innerWidth < 640;
   const W5 = estrecho ? 460 : 960, H5 = estrecho ? 330 : 340;
+  const vistas = c.m5.slice(Math.max(0, S.pos+1 - (estrecho ? 42 : 200)), S.pos+1);
   $("g5").setAttribute("viewBox", `0 0 ${W5} ${H5}`);
+  escalaActual = velas($("g5"), vistas, {w:W5, h:H5, marcarUltima:true,
+    caja: cajaViva(), escala: arrastrando ? escalaFija : null,
+    niveles:[[c.hi,"var(--asia)","ALTO ASIA"],[c.lo,"var(--asia)","MÍNIMO ASIA"]]});
+  if (rapido){ previo(); return; }
   $("nCaso").textContent = S.i + 1;
   $("prog").style.width = (100 * Object.keys(S.dec).length / CASOS.length) + "%";
   $("titDia").textContent = c.dsem.charAt(0).toUpperCase() + c.dsem.slice(1) + ", " + c.dia.split("-").reverse().join("/");
   $("titHora").textContent = ultima()[0].split(" ")[1];
   const av = S.pos - c.k0;
   $("titAvance").textContent = av > 0 ? `has avanzado ${av} ${av===1?"vela":"velas"}` : "";
-  const vistas = c.m5.slice(Math.max(0, S.pos+1 - (estrecho ? 42 : 200)), S.pos+1);
-  velas($("g5"), vistas, {w:W5, h:H5, marcarUltima:true,
-    niveles:[[c.hi,"var(--asia)","ALTO ASIA"],[c.lo,"var(--asia)","MÍNIMO ASIA"]]});
   velas($("gh1"), c.h1.slice(0, c.nh1[S.pos]), {w:460, h:estrecho ? 210 : 170});
   velas($("g15"), c.m15.slice(0, c.n15[S.pos]), {w:460, h:estrecho ? 210 : 170});
   $("gh1").setAttribute("viewBox", `0 0 460 ${estrecho ? 210 : 170}`);
@@ -331,53 +381,144 @@ function abre(i){
   S.i = i; S.pos = CASOS[i].k0; guarda();
   ["formaEntrar","formaPasar","hecho"].forEach(x => $(x).classList.remove("ver"));
   $("mandos").style.display = "flex";
-  lado = null; ratio = null;
+  $("g5").closest(".panel").classList.remove("arrastra");
+  lado = null; caja = null; arrastrando = null; escalaFija = null;
   document.querySelectorAll("#grLado button, #grRatio button").forEach(b => b.setAttribute("aria-pressed","false"));
-  $("inStop").value = ""; $("txEntrar").value = ""; $("txPasar").value = "";
+  $("inStop").value = ""; $("inObj").value = ""; $("txEntrar").value = ""; $("txPasar").value = "";
   pinta();
 }
 
-/* ---------- formulario ---------- */
-let lado = null, ratio = null;
+/* ---------- caja de entrada ---------- */
+let lado = null, riesgo = 1, caja = null;
+let escalaActual = null, escalaFija = null, arrastrando = null;
+
+const cajaViva = () => (lado && caja && $("formaEntrar").classList.contains("ver")) ? caja : null;
+const stopPips = () => { const q = parseFloat($("inStop").value); return q > 0 ? q : null; };
+const objPips  = () => { const q = parseFloat($("inObj").value);  return q > 0 ? q : null; };
+const sueltaRatio = () =>
+  document.querySelectorAll("#grRatio button").forEach(b => b.setAttribute("aria-pressed","false"));
+
+/** Los campos mandan sobre la caja: reconstruye las lineas desde los pips. */
+function deCampos(){
+  if (!lado){ caja = null; return; }
+  const ent = precio(), st = stopPips() || 20, ob = objPips() || 40;
+  caja = {ent, sl: ent - lado*st*U, tp: ent + lado*ob*U};
+}
+/** La caja manda sobre los campos: al arrastrar, los pips siguen a las lineas. */
+function aCampos(){
+  if (!caja) return;
+  $("inStop").value = (Math.abs(caja.ent - caja.sl)/U).toFixed(1);
+  $("inObj").value  = (Math.abs(caja.tp - caja.ent)/U).toFixed(1);
+}
+function ponPips(st, ob){
+  $("inStop").value = st.toFixed(1);
+  $("inObj").value  = ob.toFixed(1);
+  deCampos();
+}
+
 function grupo(id, set){
   $(id).addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     [...$(id).children].forEach(x => x.setAttribute("aria-pressed","false"));
-    b.setAttribute("aria-pressed","true"); set(parseFloat(b.dataset.v)); previo();
+    b.setAttribute("aria-pressed","true"); set(parseFloat(b.dataset.v));
   });
 }
-grupo("grLado", v => lado = v);
-grupo("grRatio", v => ratio = v);
-$("inStop").addEventListener("input", previo);
+grupo("grLado",  v => { lado = v; ponPips(stopPips() || 20, objPips() || 40); pinta(); });
+grupo("grRatio", v => { const st = stopPips() || 20; ponPips(st, st*v); pinta(); });
+grupo("grRiesgo", v => { riesgo = v; previo(); });
+["inStop","inObj"].forEach(id => $(id).addEventListener("input", () => {
+  sueltaRatio(); deCampos(); pinta();
+}));
 
+/* ---------- arrastre sobre el grafico ---------- */
+function coordY(ev){
+  const svg = $("g5"), m = svg.getScreenCTM();
+  if (!m) return null;
+  const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+  return pt.matrixTransform(m.inverse()).y;
+}
+function arrastra(ev){
+  const yy = coordY(ev);
+  if (yy == null || !escalaActual || !caja) return;
+  const ent = precio(), min = 1*U;   // un pip de suelo, para que un manotazo no deje 0,1
+  let q = escalaActual.py(yy);
+  // el stop siempre al lado perdedor de la entrada y el objetivo al ganador
+  if (arrastrando === "sl") q = lado > 0 ? Math.min(q, ent-min) : Math.max(q, ent+min);
+  else                      q = lado > 0 ? Math.max(q, ent+min) : Math.min(q, ent-min);
+  caja[arrastrando] = Math.round(q / (0.1*U)) * (0.1*U);
+  aCampos(); sueltaRatio(); pinta(true);
+}
+$("g5").addEventListener("pointerdown", ev => {
+  if (!cajaViva() || !escalaActual) return;
+  const yy = coordY(ev); if (yy == null) return;
+  const dS = Math.abs(escalaActual.y(caja.sl) - yy);
+  const dT = Math.abs(escalaActual.y(caja.tp) - yy);
+  if (Math.min(dS, dT) > 36) return;            // no ha cogido ninguna linea
+  arrastrando = dS <= dT ? "sl" : "tp";
+  escalaFija = {lo: escalaActual.lo, hi: escalaActual.hi};   // la escala se congela
+  try { $("g5").setPointerCapture(ev.pointerId); } catch(e){}
+  ev.preventDefault(); arrastra(ev);
+});
+$("g5").addEventListener("pointermove", ev => {
+  if (arrastrando){ ev.preventDefault(); arrastra(ev); }
+});
+["pointerup","pointercancel"].forEach(ev => $("g5").addEventListener(ev, () => {
+  if (!arrastrando) return;
+  arrastrando = null; escalaFija = null; pinta();
+}));
+
+/* ---------- lectura ---------- */
+function dirH1(){
+  const c = caso(), H = c.h1.slice(0, c.nh1[S.pos]);
+  if (H.length < 5) return 0;
+  const d = H[H.length-1][4] - H[H.length-5][4];
+  return d > 0 ? 1 : d < 0 ? -1 : 0;
+}
 function previo(){
-  const st = parseFloat($("inStop").value);
   const el = $("previo");
-  if (!lado || !st || !ratio){ el.innerHTML = "Elige dirección, stop y objetivo."; return; }
-  const p = precio(), sp = p - lado*st*U, tp = p + lado*st*ratio*U;
-  const coste = 1.43 / st * 100;
-  el.innerHTML = `entrada <b>${p.toFixed(5)}</b> &nbsp; stop <b>${sp.toFixed(5)}</b> `
-    + `&nbsp; objetivo <b>${tp.toFixed(5)}</b> (${(st*ratio).toFixed(1)} p)<br>`
-    + `el coste se lleva el <b class="${coste>30?'mal':''}">${coste.toFixed(0)} %</b> de tu riesgo`;
+  if (!lado){ el.innerHTML = "Elige compra o venta."; return; }
+  const st = stopPips(), ob = objPips();
+  if (!st || !ob || !caja){ el.innerHTML = "Pon el stop y el objetivo, o arrastra las líneas."; return; }
+  const p = precio(), rr = ob/st, coste = 1.43/st*100;
+  const eur = 10000*riesgo/100, lotes = eur / (st*10);
+  let s = `<span class="num">entrada <b>${p.toFixed(5)}</b> &nbsp; stop <b>${caja.sl.toFixed(5)}</b>`
+        + ` &nbsp; objetivo <b>${caja.tp.toFixed(5)}</b></span><br>`
+        + `riesgo <b>${st.toFixed(1)} p</b> &nbsp; recorrido <b>${ob.toFixed(1)} p</b>`
+        + ` &nbsp; ratio <b>1:${rr.toFixed(2).replace(".",",")}</b><br>`
+        + `lotaje <b>${lotes.toFixed(2)}</b> para arriesgar <b>${eur.toFixed(0)} €</b> &nbsp;·&nbsp; `
+        + `el coste se lleva el <b class="${coste>30?'mal':''}">${coste.toFixed(0)} %</b> de tu riesgo`;
+  const av = [];
+  if (st < 10) av.push("el stop baja de los 10 pips que te fijaste");
+  const dh = dirH1();
+  if (dh && dh !== lado) av.push("H1 va en tu contra");
+  if (av.length) s += `<br><b class="aviso">Ojo: ${av.join(" · ")}</b>`;
+  el.innerHTML = s;
 }
 
+const modoCaja = si => { $("g5").closest(".panel").classList.toggle("arrastra", si); pinta(); };
 $("btnEntrar").addEventListener("click", () => {
   $("formaPasar").classList.remove("ver"); $("formaEntrar").classList.add("ver");
+  modoCaja(true);
   $("formaEntrar").scrollIntoView({behavior:"smooth", block:"nearest"});
 });
 $("btnPasar").addEventListener("click", () => {
   $("formaEntrar").classList.remove("ver"); $("formaPasar").classList.add("ver");
+  modoCaja(false);
   $("formaPasar").scrollIntoView({behavior:"smooth", block:"nearest"});
 });
-$("btnCancelar").addEventListener("click", () => $("formaEntrar").classList.remove("ver"));
+$("btnCancelar").addEventListener("click", () => {
+  $("formaEntrar").classList.remove("ver"); modoCaja(false);
+});
 $("btnCancPasar").addEventListener("click", () => $("formaPasar").classList.remove("ver"));
 $("btnAvanzar").addEventListener("click", () => {
-  if (S.pos < caso().m5.length - 1){ S.pos++; guarda(); pinta(); }
+  // la caja sigue al precio: se mantienen los pips, no los niveles
+  if (S.pos < caso().m5.length - 1){ S.pos++; guarda(); deCampos(); pinta(); }
 });
 
 function cierra(txt){
   $("mandos").style.display = "none";
   ["formaEntrar","formaPasar"].forEach(x => $(x).classList.remove("ver"));
+  $("g5").closest(".panel").classList.remove("arrastra");
   $("hechoTxt").innerHTML = txt;
   $("hecho").classList.add("ver");
   $("prog").style.width = (100 * Object.keys(S.dec).length / CASOS.length) + "%";
@@ -385,15 +526,19 @@ function cierra(txt){
 }
 
 $("btnConfirmar").addEventListener("click", () => {
-  const st = parseFloat($("inStop").value);
-  if (!lado || !st || !ratio){ $("previo").innerHTML = "<b class='mal'>Falta la dirección, el stop o el objetivo.</b>"; return; }
-  const c = caso(), p = precio();
+  const st = stopPips(), ob = objPips();
+  if (!lado || !st || !ob || !caja){
+    $("previo").innerHTML = "<b class='mal'>Falta la dirección, el stop o el objetivo.</b>"; return; }
+  const c = caso(), p = precio(), rr = +(ob/st).toFixed(2);
   S.dec[c.n] = {n:c.n, dia:c.dia, hora:ultima()[0].split(" ")[1], avance:S.pos-c.k0,
-    accion:"entro", lado, entrada:+p.toFixed(5), stopP:st, ratio,
-    stop:+(p - lado*st*U).toFixed(5), obj:+(p + lado*st*ratio*U).toFixed(5),
+    accion:"entro", lado, entrada:+p.toFixed(5),
+    stopP:+st.toFixed(1), objP:+ob.toFixed(1), ratio:rr, riesgo,
+    stop:+caja.sl.toFixed(5), obj:+caja.tp.toFixed(5),
     nota:$("txEntrar").value.trim()};
   guarda();
-  cierra(`Entrada guardada: <b>${lado>0?"compra":"venta"}</b> en <b>${p.toFixed(5)}</b>, stop de <b>${st} pips</b>, objetivo a <b>1:${String(ratio).replace(".", ",")}</b>. No verás el resultado hasta el final.`);
+  cierra(`Entrada guardada: <b>${lado>0?"compra":"venta"}</b> en <b>${p.toFixed(5)}</b>, `
+    + `stop de <b>${st.toFixed(1)} pips</b>, objetivo de <b>${ob.toFixed(1)} pips</b> `
+    + `(1:${String(rr).replace(".", ",")}). No verás el resultado hasta el final.`);
 });
 
 $("btnConfPasar").addEventListener("click", () => {
@@ -421,7 +566,8 @@ function texto(){
     const d = S.dec[c.n];
     const base = `${String(d.n).padStart(3,"0")} ${d.dia} ${d.hora} (+${d.avance})`;
     if (d.accion === "paso") return `${base} · PASO${d.nota ? " · " + d.nota : ""}`;
-    return `${base} · ${d.lado>0?"COMPRA":"VENTA"} ent ${d.entrada} stop ${d.stop} (${d.stopP}p) obj ${d.obj} (1:${d.ratio})`
+    return `${base} · ${d.lado>0?"COMPRA":"VENTA"} ent ${d.entrada} stop ${d.stop} (${d.stopP}p)`
+      + ` obj ${d.obj} (${d.objP != null ? d.objP + "p, " : ""}1:${d.ratio})`
       + (d.nota ? " · " + d.nota : "");
   }).join("\n");
 }

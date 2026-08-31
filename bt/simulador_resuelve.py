@@ -19,6 +19,10 @@ for l in open(ENTRADA):
         e = re.search(r"ent ([\d.]+) stop ([\d.]+) \(([\d.]+)p\)", l)
         d.update(lado=1 if acc == "COMPRA" else -1, entrada=float(e.group(1)),
                  stop=float(e.group(2)), rgo=float(e.group(3)))
+        # Desde el bloque 50-100 el objetivo se arrastra a mano y ya no es
+        # siempre 1:2, asi que se lee el declarado y solo se supone si falta.
+        o = re.search(r"obj ([\d.]+)", l)
+        d["obj"] = float(o.group(1)) if o else None
     nota = l.split("·")[-1].strip()
     d["nota"] = nota if nota and not nota.startswith(("COMPRA","VENTA","PASO")) else ""
     filas.append(d)
@@ -47,7 +51,8 @@ for r in e.itertuples():
     t1 = pd.Timestamp(r.dia) + pd.Timedelta(hours=22)
     j0 = int(np.searchsorted(loc, np.datetime64(t0), side="left"))
     j1 = max(int(np.searchsorted(loc, np.datetime64(t1), side="left")), j0+1)
-    rgo = abs(r.entrada - r.stop); tp = r.entrada + 2*rgo*r.lado
+    rgo = abs(r.entrada - r.stop)
+    tp = r.obj if getattr(r, "obj", None) else r.entrada + 2*rgo*r.lado
     hh, ll = H[j0:j1], L[j0:j1]
     gt, gs = ((hh >= tp, ll <= r.stop) if r.lado > 0 else (ll <= tp, hh >= r.stop))
     it  = int(np.argmax(gt)) if gt.any() else 10**9
