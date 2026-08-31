@@ -37,9 +37,10 @@ verMed = input.bool(false, "Marcar también el 50 % del rango", group = gD)
 
 gE = "Etiquetas"
 verEtq = input.bool(true, "Escribir los números", group = gE)
-nEtq   = input.int(60, "Días con etiqueta", 1, 240, group = gE,
-     tooltip = "TradingView admite 500 etiquetas. Cada día gasta una, así que " +
-     "con 60 vas sobrado para comprobar un par de meses.")
+nEtq   = input.int(90, "Días hacia atrás con etiqueta", 1, 240, group = gE,
+     tooltip = "TradingView admite 500 etiquetas y cada día gasta dos, así que " +
+     "el techo real son 250 días. Bajarlo aquí no cambia el dibujo de las " +
+     "líneas, que llega al histórico entero.")
 tamEtq = input.string("Pequeño", "Tamaño", options = ["Diminuto", "Pequeño", "Normal"], group = gE)
 verRango = input.bool(true, "Añadir el rango en pips", group = gE)
 
@@ -83,7 +84,9 @@ plot(verMed ? (niHi + niLo) / 2 : na, "Mitad del rango",
 
 tam = tamEtq == "Diminuto" ? size.tiny : tamEtq == "Pequeño" ? size.small : size.normal
 
-if acaba and verEtq and nDia > 0
+recientes = time > timenow - nEtq * 86400000
+
+if acaba and verEtq and recientes
     rango = (niHi - niLo) / pip
     txtA = str.tostring(niHi, format.mintick) + (verRango ? "  ·  " + str.tostring(rango, "#.0") + " p" : "")
     label.new(bar_index, niHi, txtA, style = label.style_label_down,
