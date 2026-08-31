@@ -1,0 +1,257 @@
+<title>Tu lunes, operación a operación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --papel:#F2F4F6; --ficha:#FFFFFF; --hueco:#E8ECEF;
+  --tinta:#101418; --suave:#5E666E; --tenue:#8A9299;
+  --linea:#D8DEE3; --linea2:#BFC8CF; --marca:#2A4A7F;
+  --alza:#23735A; --alzaF:#E2EFEA; --baja:#A8382C; --bajaF:#F7E5E3;
+  --duda:#8F6410; --dudaF:#F6EEDC;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --papel:#0D1114; --ficha:#151A1F; --hueco:#111619;
+    --tinta:#E4E8EB; --suave:#949CA4; --tenue:#727A82;
+    --linea:#242B31; --linea2:#38424A; --marca:#8AAAE0;
+    --alza:#4FA98C; --alzaF:#152722; --baja:#D26E62; --bajaF:#2A1A18;
+    --duda:#CB9A34; --dudaF:#26200F;
+  }
+}
+:root[data-theme="dark"]{
+  --papel:#0D1114; --ficha:#151A1F; --hueco:#111619;
+  --tinta:#E4E8EB; --suave:#949CA4; --tenue:#727A82;
+  --linea:#242B31; --linea2:#38424A; --marca:#8AAAE0;
+  --alza:#4FA98C; --alzaF:#152722; --baja:#D26E62; --bajaF:#2A1A18;
+  --duda:#CB9A34; --dudaF:#26200F;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--papel); color:var(--tinta);
+  font-family:"IBM Plex Serif",Georgia,serif; font-size:16.5px; line-height:1.6;
+  -webkit-text-size-adjust:100%}
+.env{max-width:940px; margin:0 auto; padding:38px 20px 72px;
+  display:flex; flex-direction:column; gap:38px}
+h1,h2,h3,.ui,.et{font-family:"IBM Plex Sans Condensed","Helvetica Neue",Arial,sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+
+/* ---- cabecera ---- */
+header{display:flex; flex-direction:column; gap:10px;
+  border-bottom:2px solid var(--tinta); padding-bottom:18px}
+h1{margin:0; font-size:38px; font-weight:700; line-height:1.1; letter-spacing:-.015em;
+  text-wrap:balance}
+.sub{margin:0; color:var(--suave); max-width:62ch}
+.sello{display:flex; gap:16px; flex-wrap:wrap; font-family:"IBM Plex Mono",monospace;
+  font-size:12.5px; color:var(--tenue); letter-spacing:.02em}
+.sello b{color:var(--tinta); font-weight:500}
+
+/* ---- avisos ---- */
+.nota{background:var(--dudaF); border-left:3px solid var(--duda);
+  padding:13px 16px; font-size:15px; color:var(--suave)}
+.nota b{color:var(--tinta)}
+
+/* ---- etiquetas de certeza ---- */
+.et{display:inline-block; font-size:10px; font-weight:700; letter-spacing:.12em;
+  text-transform:uppercase; padding:2px 7px; border-radius:2px; vertical-align:1px}
+.et.v{background:var(--marca); color:var(--papel)}
+.et.d{background:var(--dudaF); color:var(--duda); box-shadow:inset 0 0 0 1px var(--duda)}
+
+/* ---- seccion ---- */
+section{display:flex; flex-direction:column; gap:16px}
+h2{margin:0; font-size:13px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--tenue)}
+h2 span{color:var(--tinta)}
+
+/* ---- linea de tiempo ---- */
+.dia{display:flex; flex-direction:column; gap:0}
+.op{display:grid; grid-template-columns:82px 1fr; gap:0}
+.hora{font-family:"IBM Plex Mono",monospace; font-size:15px; font-weight:600;
+  padding:18px 14px 0 0; text-align:right; color:var(--marca);
+  border-right:2px solid var(--linea); position:relative}
+.op:first-child .hora{border-image:linear-gradient(var(--papel) 0 18px, var(--linea) 18px) 1}
+.op:last-child .hora{border-image:linear-gradient(var(--linea) 0 calc(100% - 30px), var(--papel) 0) 1}
+.hora i{position:absolute; right:-6px; top:24px; width:10px; height:10px;
+  border-radius:50%; background:var(--marca); box-shadow:0 0 0 3px var(--papel)}
+.op.corta .hora{color:var(--baja)} .op.corta .hora i{background:var(--baja)}
+.cuerpo{padding:14px 0 26px 22px; display:flex; flex-direction:column; gap:11px}
+.tit{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.tit h3{margin:0; font-size:20px; font-weight:600; letter-spacing:-.01em}
+.lado{font-family:"IBM Plex Sans Condensed",sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; padding:3px 9px; border-radius:2px}
+.lado.c{background:var(--alzaF); color:var(--alza)}
+.lado.v{background:var(--bajaF); color:var(--baja)}
+.cuerpo p{margin:0; color:var(--suave)}
+.cuerpo p b{color:var(--tinta); font-weight:600}
+.fuente{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--tenue)}
+
+/* ---- reglas ---- */
+ol.reglas{margin:0; padding:0; list-style:none; counter-reset:r 0;
+  display:flex; flex-direction:column; gap:1px; background:var(--linea);
+  border:1px solid var(--linea)}
+ol.reglas li{background:var(--ficha); padding:16px 18px;
+  display:grid; grid-template-columns:38px 1fr; gap:16px; align-items:start}
+ol.reglas li::before{counter-increment:r; content:counter(r);
+  font-family:"IBM Plex Mono",monospace; font-size:22px; font-weight:600;
+  color:var(--linea2); line-height:1.05}
+.rt{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:700;
+  font-size:16.5px; display:block; margin-bottom:3px}
+ol.reglas p{margin:0; color:var(--suave); font-size:15.5px}
+ol.reglas p b{color:var(--tinta); font-weight:600}
+li.excepcion{background:var(--bajaF)}
+li.excepcion .rt{color:var(--baja)}
+
+/* ---- huecos ---- */
+.huecos{display:flex; flex-direction:column; gap:1px; background:var(--linea);
+  border:1px solid var(--linea)}
+.hueco{background:var(--ficha); padding:15px 18px}
+.hueco > b{font-family:"IBM Plex Sans Condensed",sans-serif; display:block;
+  font-size:16px; margin-bottom:2px}
+.hueco span{color:var(--suave); font-size:15.5px}
+
+/* ---- tabla ---- */
+.tabla{overflow-x:auto; border:1px solid var(--linea); background:var(--ficha)}
+table{border-collapse:collapse; width:100%; font-family:"IBM Plex Mono",monospace;
+  font-size:14px; font-variant-numeric:tabular-nums}
+th{font-family:"IBM Plex Sans Condensed",sans-serif; font-size:10.5px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--tenue);
+  text-align:right; padding:11px 14px; border-bottom:1px solid var(--linea2);
+  white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:10px 14px; text-align:right; border-bottom:1px solid var(--linea);
+  color:var(--suave); white-space:nowrap}
+td:first-child{text-align:left; color:var(--tinta); font-weight:500}
+tr:last-child td{border-bottom:none}
+tr.suyo td{background:var(--bajaF); color:var(--tinta); font-weight:600}
+.pie{font-size:14px; color:var(--tenue); margin:0}
+
+@media (max-width:600px){
+  h1{font-size:29px}
+  .op{grid-template-columns:62px 1fr}
+  .hora{font-size:13.5px; padding-right:10px}
+  .cuerpo{padding-left:16px}
+  ol.reglas li{grid-template-columns:26px 1fr; gap:11px; padding:14px}
+  ol.reglas li::before{font-size:18px}
+}
+</style>
+
+<div class="env">
+
+<header>
+  <h1>Tu lunes, operación a operación</h1>
+  <p class="sub">Lo que se ve en las once capturas de la sesión del 31 de agosto, y las reglas que esas cinco operaciones definen si se las toma como si fuesen toda la estrategia.</p>
+  <div class="sello">
+    <span><b>OANDA:EURUSD</b></span>
+    <span>lunes 31 ago 2026</span>
+    <span>demo, en directo</span>
+    <span>M5 marca · M1 ejecuta</span>
+    <span><b>5</b> operaciones · 4 compras, 1 venta</span>
+  </div>
+</header>
+
+<div class="nota">
+  <b>Cómo leer esto.</b> Todo lo que va marcado <span class="et v">visto</span> se distingue en las capturas. Lo que va marcado <span class="et d">deducido</span> es mi lectura, y puede estar mal: son fotos de una pantalla y no tengo los precios exactos salvo donde salen escritos. Corrígeme lo que no cuadre y lo reescribo.
+</div>
+
+<section>
+  <h2>La sesión, <span>operación a operación</span></h2>
+  <div class="dia">
+
+    <div class="op">
+      <div class="hora">09:20<i></i></div>
+      <div class="cuerpo">
+        <div class="tit"><h3>Rotura del primer nivel</h3><span class="lado c">compra</span></div>
+        <p><span class="et v">visto</span> En M1 hay una línea horizontal <b>ya dibujada</b> antes de que el precio llegue. El precio sube hacia ella y una vela de M1 mucho más larga que las anteriores la atraviesa de golpe. La caja de posición empieza justo ahí: verde hacia arriba, roja hacia abajo, y la frontera entre las dos coincide con la línea.</p>
+        <p><span class="et d">deducido</span> Entras en la rotura, con el stop debajo del nivel y el objetivo a algo más del doble del riesgo. La caja se cierra hacia las <b>09:40</b>, así que la operación dura unos veinte minutos.</p>
+        <p class="fuente">capturas 1 y 2 · 5m y 1m</p>
+      </div>
+    </div>
+
+    <div class="op">
+      <div class="hora">09:37<i></i></div>
+      <div class="cuerpo">
+        <div class="tit"><h3>Segunda entrada, nivel nuevo</h3><span class="lado c">compra</span></div>
+        <p><span class="et v">visto</span> Otra caja en M1, unos quince minutos después y <b>más arriba</b>. Hay una línea horizontal distinta, dibujada donde el precio se paró entre las 09:30 y las 09:35. La parte roja es notablemente más corta que la verde.</p>
+        <p><span class="et d">deducido</span> No es una reentrada en el mismo nivel: es un nivel nuevo, creado por la propia subida. Es la que encaja con lo que me contaste por escrito — <span class="mono">entrada 1,15965 · stop 1,15937 · objetivo 1,16021</span> —, es decir <b>2,8 pips de riesgo y 5,6 de objetivo, un 1:2 exacto</b>. Pero eso no lo puedo confirmar desde la imagen; dime tú si era ésta.</p>
+        <p class="fuente">capturas 3, 4 y 6 · 5m y 1m</p>
+      </div>
+    </div>
+
+    <div class="op">
+      <div class="hora">10:55<i></i></div>
+      <div class="cuerpo">
+        <div class="tit"><h3>Tercera, tras la corrección de las 10:45</h3><span class="lado c">compra</span></div>
+        <p><span class="et v">visto</span> El precio había caído desde el techo de las 10:00 hasta las 10:45. Hay una línea verde horizontal hacia <span class="mono">1,1594</span> y una caja pequeña justo después. El encabezado marca <span class="mono">H 1,15959 · L 1,15931 · C 1,15942</span>.</p>
+        <p><span class="et d">deducido</span> Esperas a que la corrección termine y vuelves a comprar en el mismo esquema, sobre un nivel que ya venía marcado de antes. La caja es más pequeña que las dos primeras: <b>menos recorrido esperado</b>.</p>
+        <p class="fuente">capturas 7 y 8 · 5m</p>
+      </div>
+    </div>
+
+    <div class="op">
+      <div class="hora">13:12<i></i></div>
+      <div class="cuerpo">
+        <div class="tit"><h3>Cuarta, ya por la tarde</h3><span class="lado c">compra</span></div>
+        <p><span class="et v">visto</span> Caja en M1 entre las 13:12 y las 13:25 aproximadamente. La parte verde es bastante más alta que la roja. El precio sube en escalera y llega al techo de la caja hacia las <b>13:22</b>.</p>
+        <p><span class="et d">deducido</span> Mismo patrón que las tres anteriores, fuera ya de la sesión de Londres. Es la que mejor se ve completa: entrada, subida limpia y objetivo tocado sin sobresaltos.</p>
+        <p class="fuente">capturas 10 y 11 · 1m</p>
+      </div>
+    </div>
+
+    <div class="op corta">
+      <div class="hora">13:45<i></i></div>
+      <div class="cuerpo">
+        <div class="tit"><h3>La excepción</h3><span class="lado v">venta</span></div>
+        <p><span class="et v">visto</span> Una caja <b>invertida</b> —la rosa arriba, la verde abajo— pequeña, justo después de que el precio hiciera techo. Es la única de las cinco en esa dirección.</p>
+        <p><span class="et d">deducido</span> Es la del retroceso que mencionas. Y no está montada sobre una rotura de nivel como las otras cuatro, sino sobre <b>un techo</b>: el mismo sitio donde la cuarta cerró en beneficio.</p>
+        <p class="fuente">captura 10 · 5m</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Las reglas <span>que esas cinco operaciones definen</span></h2>
+  <ol class="reglas">
+    <li><div><span class="rt">Decidir la dirección del día, antes de nada</span><p>Miras el gráfico y te quedas con un sesgo. Hoy: alcista. A partir de ahí <b>solo buscas compras</b>. Las cinco operaciones respetan esto salvo una, y esa una la tomas a sabiendas.</p></div></li>
+    <li><div><span class="rt">Marcar niveles horizontales en M5</span><p>Cada operación tiene su línea dibujada <b>antes</b> de que el precio llegue. En la sesión hay al menos tres distintas, y aparecen donde el precio se había parado antes: techos y suelos de M5 dentro del mismo día.</p></div></li>
+    <li><div><span class="rt">Esperar a que el precio llegue al nivel</span><p>No persigues. La operación empieza cuando el precio vuelve a una línea que ya estaba puesta.</p></div></li>
+    <li><div><span class="rt">Confirmar en M5</span><p>Una vela de M5 rompe el nivel con cuerpo, no solo con la mecha. Es la señal de que el nivel ha cedido.</p></div></li>
+    <li><div><span class="rt">Ejecutar en M1</span><p>Bajas a M1 y entras en la vela siguiente a la que confirma. Aquí es donde ganas precio: entras <b>pegado al nivel</b>, no donde cerró la vela de M5.</p></div></li>
+    <li><div><span class="rt">Stop pegado, debajo del nivel</span><p>El stop va justo al otro lado de la línea o del último apoyo de M1. En la única que tengo con números son <b>2,8 pips</b>. En las cajas de las capturas ninguno parece pasar de los seis o siete.</p></div></li>
+    <li><div><span class="rt">Objetivo fijo, el doble del riesgo</span><p>Se cierra ahí. No se deja correr, no se mueve. Las cajas dan entre 1:2 y 1:3 medidas a ojo.</p></div></li>
+    <li><div><span class="rt">Repetir mientras el día siga dando niveles</span><p>Si la subida crea un nivel nuevo más arriba y también lo rompe, vuelves a entrar. Hoy cuatro veces, entre las 09:20 y las 13:12.</p></div></li>
+    <li class="excepcion"><div><span class="rt">La excepción: vender un techo</span><p>Cuando ves que el movimiento se agota, tomas una en contra del sesgo del día, con la caja invertida y más pequeña. <b>Es la única de las cinco que la regla 1 prohíbe</b>, y no está escrita en ninguna parte: solo existe en tu cabeza.</p></div></li>
+  </ol>
+</section>
+
+<section>
+  <h2>Lo que estas cinco <span>todavía no definen</span></h2>
+  <p style="margin:0;color:var(--suave);max-width:70ch">Con las reglas de arriba, otra persona no podría repetir tu lunes. Faltan seis cosas, y son exactamente las seis que hay que contestar para poder probarlo en histórico.</p>
+  <div class="huecos">
+    <div class="hueco"><b>Cómo decides el sesgo del día</b><span>«Vi que era alcista» no es una regla. ¿Qué miras, en qué temporalidad, y a qué hora queda decidido? Si se decide a las 11:00 mirando lo que ya ha pasado, el sesgo no existía a las 09:20.</span></div>
+    <div class="hueco"><b>De dónde sale cada nivel</b><span>Hoy hay tres o cuatro líneas. ¿Son máximos y mínimos de M5 del propio día? ¿Del rango de Asia? ¿Cuántas velas hacia atrás miras? Sin esto, los niveles no se pueden dibujar solos.</span></div>
+    <div class="hueco"><b>Qué es «romper con cuerpo»</b><span>¿Cuánto cuerpo? ¿La mitad de la vela? ¿El cierre por encima del nivel y punto? Es la diferencia entre una señal y ninguna en la mitad de los casos.</span></div>
+    <div class="hueco"><b>Cuáles descartaste</b><span>Esto es lo que más falta. Hoy el precio cruzó niveles más veces de las cinco que operaste. <b>Las que no tomaste definen la estrategia tanto como las que tomaste</b>, y de esas no hay ninguna captura.</span></div>
+    <div class="hueco"><b>Cuándo paras</b><span>¿Cuatro al día es el tope, o es lo que salió? ¿Hay una hora a la que cierras el día? ¿Paras si encadenas dos pérdidas?</span></div>
+    <div class="hueco"><b>Qué es «se va a retroceder»</b><span>La quinta operación es la más interesante de las cinco justo porque rompe tu propia regla. Si eso se puede escribir, tienes una segunda estrategia. Si no, es una corazonada, y una corazonada no se puede probar ni repetir en un mal día.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Lo que estas reglas <span>implican en aritmética</span></h2>
+  <p style="margin:0;color:var(--suave);max-width:70ch">Las reglas 6 y 7 —stop pegado, objetivo al doble— fijan solas cuánto tienes que acertar. La geometría de un 1:2 acierta el 33,3 % sin coste; con 1,43 pips de coste redondo, el listón sube según lo estrecho que sea el stop.</p>
+  <div class="tabla">
+    <table>
+      <thead><tr><th>stop</th><th>el coste se lleva</th><th>tienes que acertar</th><th>por encima del azar</th><th>neta acertando el 50 %</th></tr></thead>
+      <tbody>
+        <tr class="suyo"><td>2,8 p</td><td>51 %</td><td>50,4 %</td><td>+17,0 pp</td><td>−0,011 R</td></tr>
+        <tr><td>5 p</td><td>29 %</td><td>42,9 %</td><td>+9,5 pp</td><td>+0,214 R</td></tr>
+        <tr><td>10 p</td><td>14 %</td><td>38,1 %</td><td>+4,8 pp</td><td>+0,357 R</td></tr>
+        <tr><td>20 p</td><td>7 %</td><td>35,7 %</td><td>+2,4 pp</td><td>+0,429 R</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="pie">La fila marcada es la única operación de hoy de la que tengo los números exactos. Mismo patrón, misma mano y mismo 1:2: lo único que cambia entre las filas es dónde pones el stop.</p>
+</section>
+
+</div>
