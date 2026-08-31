@@ -74,6 +74,28 @@ en euros, con 150 € de riesgo: +3.590 € en el mes
 Sobre lo que **sí** he podido verificar (3 al 20), a nivel de día: bruta +0,803
 (z +2,14), neta +0,488 (z +1,21), 8 de 10 días en positivo.
 
+## Descarga del 31 de agosto: sin novedad
+
+Volvió a bajar el mes de HistData y el fichero es **el mismo**: 21.485 velas,
+mismo primer minuto y mismo último, `2026-08-02 21:00` → `2026-08-21 20:58` UTC.
+Cargado con la conversión de siempre da un parquet **idéntico bit a bit** al que
+ya había. HistData publica el mes en curso como instantánea parcial y solo cierra
+el mes completo unos días después de acabarlo; esta copia se generó el 23 de
+agosto y llega al cierre del viernes 21.
+
+Del 24 al 28 sigue sin haber datos, y ese tramo son 9 operaciones, +20,19 R
+declaradas, el 67 % del beneficio del mes.
+
+Efecto secundario útil: al reconstruir el parquet desde cero salió el mismo
+fichero, así que la conversión horaria queda confirmada por segunda vía.
+
+`bt/carga_mes.py` deja la ingesta en un comando y avisa cuando la descarga no
+amplía la cobertura, para no rehacer cálculos en balde:
+
+```
+python3 bt/carga_mes.py material/HISTDATA_..._M1202608.zip
+```
+
 ## Lo que queda por resolver
 
 1. **La semana del 24 al 28 es 9 de 9 y no la puedo comprobar.** Y hace la mitad
