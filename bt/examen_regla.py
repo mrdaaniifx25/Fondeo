@@ -7,12 +7,13 @@ cerrando a mercado lo que quede abierto.
 
   python3 bt/examen_regla.py
 """
-import json, numpy as np, pandas as pd
+import json, sys, numpy as np, pandas as pd
 from math import sqrt, erf
 
 U, COSTE, TZ = 0.0001, 1.43, "Europe/Madrid"
 VENTANA, REARME, ATRAS = (800, 1130), 10.0, 10
-DIAS = {pd.Timestamp(v).date() for v in json.load(open("data/examen_dias.json")).values()}
+SUF = sys.argv[1] if len(sys.argv) > 1 else ""
+DIAS = {pd.Timestamp(v).date() for v in json.load(open(f"data/examen_dias{SUF}.json")).values()}
 
 m1 = pd.concat([pd.read_parquet("data/eurusd_m1.parquet"),
                 pd.read_parquet("data/eurusd_m1_2026_08.parquet")], ignore_index=True)
@@ -96,4 +97,4 @@ print(f"  R NETA  por disparo    {d.neta.mean():+.3f}   ·   z = {z(d.neta.to_nu
 print(f"  suma neta              {d.neta.sum():+.2f} R  en 20 días")
 por = d.groupby("dia").neta.sum().reindex(sorted(DIAS)).fillna(0)
 print(f"  por sesión             {por.mean():+.3f}   ·   z = {z(por.to_numpy()):+.2f}")
-d.to_csv("data/examen_regla.csv", index=False)
+d.to_csv(f"data/examen_regla{SUF}.csv", index=False)
