@@ -11,11 +11,12 @@ Regla de construccion, para que no pueda colarse el futuro:
 """
 import json, sys, numpy as np, pandas as pd
 
-TZ, N = "Europe/Madrid", 20
+TZ = "Europe/Madrid"
 SEMILLA = int(sys.argv[1]) if len(sys.argv) > 1 else 20260901
-SUFIJO  = sys.argv[2] if len(sys.argv) > 2 else ""
+N = int(sys.argv[2]) if len(sys.argv) > 2 else 20
+SUFIJO  = sys.argv[3] if len(sys.argv) > 3 else ""
 EXCLUYE = set()
-for f in sys.argv[3:]:                       # dias ya usados en otro bloque
+for f in sys.argv[4:]:                       # dias ya usados en otro bloque
     EXCLUYE |= {pd.Timestamp(v).date() for v in json.load(open(f)).values()}
 INI, FIN, PRE = 800, 1130, 600        # sesion, y desde que hora se manda M1
 H_H4, H_M15, H_M5 = 60, 80, 96        # velas cerradas de historia
