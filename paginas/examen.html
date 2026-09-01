@@ -77,6 +77,7 @@ button.pri{background:var(--tinta); border-color:var(--tinta); color:var(--ficha
 button.compra{background:var(--alza); border-color:var(--alza); color:#fff}
 button.venta{background:var(--baja); border-color:var(--baja); color:#fff}
 button.chico{padding:7px 12px; font-size:13px}
+button.peligro{border-color:var(--baja); color:var(--baja); font-weight:700}
 .mandos{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
 
 /* ---- formulario ---- */
@@ -157,6 +158,7 @@ textarea{font-family:"IBM Plex Serif",Georgia,serif; min-height:52px; resize:ver
     <span class="prog"><i id="prog"></i></span>
     <span class="marcador" id="marcador"></span>
     <button class="chico" id="btnSalir">Copiar todo</button>
+    <button class="chico" id="btnReset">Reiniciar</button>
   </div>
 </div>
 
@@ -604,10 +606,30 @@ $("btnEmpezar").addEventListener("click", () => {
   $("intro").hidden = true; $("juego").hidden = false; $("barra").hidden = false;
   guarda(); pinta();
 });
-$("btnBorrar").addEventListener("click", () => {
-  if (!confirm("Se borran todas tus sesiones. ¿Seguro?")) return;
-  S = {i:0, t:0, dec:{}, pos:null}; guarda(); location.reload();
-});
+function borraTodo(){
+  try { localStorage.removeItem(CLAVE); } catch(e) {}
+  S = {i:0, t:0, dec:{}, pos:null};
+  try { location.reload(); }
+  catch(e) {                                     // por si la recarga no sale
+    caja = null; dir = null; S.pos = null;
+    $("juego").hidden = true; $("final").hidden = true; $("barra").hidden = true;
+    $("intro").hidden = false; window.scrollTo({top:0});
+  }
+}
+/** Dos pulsaciones en vez de confirm(): dentro del marco del artefacto los
+    diálogos nativos están bloqueados y el botón no hacía nada. */
+function doblePulsacion(btn, texto, hacer){
+  let armado = false, reloj = null, orig = btn.textContent;
+  btn.addEventListener("click", () => {
+    if (armado){ clearTimeout(reloj); hacer(); return; }
+    armado = true; btn.textContent = texto; btn.classList.add("peligro");
+    reloj = setTimeout(() => {
+      armado = false; btn.textContent = orig; btn.classList.remove("peligro");
+    }, 4000);
+  });
+}
+doblePulsacion($("btnBorrar"), "Pulsa otra vez para borrarlo todo", borraTodo);
+doblePulsacion($("btnReset"),  "¿Seguro? Otra vez", borraTodo);
 const hechas = SES.filter(s => S.dec[s.n] && S.dec[s.n].fin).length;
 if (hechas || Object.keys(S.dec).length){
   $("btnEmpezar").textContent = hechas >= SES.length ? "Ver el resumen" : `Seguir por la ${hechas+1}`;
