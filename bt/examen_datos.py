@@ -9,9 +9,14 @@ Regla de construccion, para que no pueda colarse el futuro:
 
   python3 bt/examen_datos.py
 """
-import json, numpy as np, pandas as pd
+import json, sys, numpy as np, pandas as pd
 
-TZ, SEMILLA, N = "Europe/Madrid", 20260901, 20
+TZ, N = "Europe/Madrid", 20
+SEMILLA = int(sys.argv[1]) if len(sys.argv) > 1 else 20260901
+SUFIJO  = sys.argv[2] if len(sys.argv) > 2 else ""
+EXCLUYE = set()
+for f in sys.argv[3:]:                       # dias ya usados en otro bloque
+    EXCLUYE |= {pd.Timestamp(v).date() for v in json.load(open(f)).values()}
 INI, FIN, PRE = 800, 1130, 600        # sesion, y desde que hora se manda M1
 H_H4, H_M15, H_M5 = 60, 80, 96        # velas cerradas de historia
 
@@ -38,6 +43,7 @@ for dia, g in m1.groupby("dia"):
     a = g[g.hm < INI]
     s = g[(g.hm >= INI) & (g.hm <= FIN)]
     if len(a) < 420 or len(s) < 200: continue      # Asia casi entera y sesion entera
+    if dia in EXCLUYE: continue
     ok.append(dia)
 print(f"{len(ok):,} días elegibles")
 
@@ -72,9 +78,9 @@ for k, idx in enumerate(elegidos, 1):
 # el fichero de respuestas, que NO se publica
 claves = {s["n"]: d for s, d in zip(sesiones, [ok[i] for i in elegidos])}
 json.dump({str(k): str(v) for k, v in claves.items()},
-          open("data/examen_dias.json", "w"), indent=1)
+          open(f"data/examen_dias{SUFIJO}.json", "w"), indent=1)
 txt = json.dumps(sesiones, separators=(",", ":"))
-open("data/examen_sesiones.json", "w").write(txt)
+open(f"data/examen_sesiones{SUFIJO}.json", "w").write(txt)
 print(f"\n{len(sesiones)} sesiones · {len(txt)/1024:,.0f} KB")
 print(f"comprobación de corte: el minuto más alto es {max(b[0] for s in sesiones for b in s['m1'])}"
       f" (11:30 son {(FIN//100)*60 + FIN%100 - (INI//100)*60})")
