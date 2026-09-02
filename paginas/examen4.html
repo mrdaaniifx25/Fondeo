@@ -537,8 +537,8 @@ function multi(id){
             $(id).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed","false")); }};
 }
 const POR = multi("grPor"), FALLO = multi("grFallo");
-$("btnCompra").addEventListener("click", () => nuevaCaja(1));
-$("btnVenta").addEventListener("click",  () => nuevaCaja(-1));
+$("btnCompra").addEventListener("click", () => { sinPor = false; nuevaCaja(1); });
+$("btnVenta").addEventListener("click",  () => { sinPor = false; nuevaCaja(-1); });
 $("btnCancelar").addEventListener("click", cancela);
 
 function previo(){
@@ -586,10 +586,22 @@ $("gm1").addEventListener("pointermove", ev => { if (arrastrando){ ev.preventDef
 }));
 
 /* ---------- abrir y cerrar operaciones ---------- */
+/** En el bloque 4 no marco el motivo ni una sola vez de 64. No se bloquea la
+    entrada -eso cambiaria como opera-, pero la primera pulsacion sin motivo
+    pregunta y la segunda entra igual: saltarselo pasa a ser una decision. */
+let sinPor = false;
 $("btnConfirmar").addEventListener("click", () => {
   if (!caja) return;
   const st = Math.abs(caja.ent - caja.sl)/U;
   if (!(st > 0)){ $("previo").innerHTML = "<b class='mal'>Falta el stop.</b>"; return; }
+  if (!POR.lee() && !sinPor){
+    sinPor = true;
+    $("previo").innerHTML = "<b class='mal'>¿Por qué entras?</b> Toca una etiqueta de arriba. "
+      + "Si no quieres decirlo, vuelve a pulsar Confirmar y entras igual.";
+    return;
+  }
+  sinPor = false;
+  if (S.fallo) cierraFallo(FALLO.lee());    // el panel del stop anterior, a su dueño
   S.pos = {dir, ent:caja.ent, sl:caja.sl, tp:caja.tp, rgo:st, tEnt:S.t,
            por:POR.lee(), nota:$("txNota").value.trim()};
   $("txNota").value = ""; POR.limpia();
@@ -616,18 +628,28 @@ function cierra(motivo, R, salida){
   else if (gan <= -LIM_TOT)       cierraCuenta("revienta", "Has superado la pérdida máxima total de 1.000 $.");
   else if (gan >= OBJ && c.dias >= 3) cierraCuenta("pasa", "Has llegado al objetivo del 8 % con 3 días operados.");
   if (motivo === "SL" && c.estado === "viva"){
+    S.fallo = {s: ses().n, k: reg().ops.length - 1};   // a QUÉ operación pertenece el panel
     FALLO.limpia();
     $("fallo").classList.add("ver");
     $("fallo").scrollIntoView({behavior:"smooth", block:"nearest"});
   }
   guarda();
 }
-$("btnFallo").addEventListener("click", () => {
-  const o = reg().ops[reg().ops.length-1];
-  if (o) o.fallo = FALLO.lee();
+/** Escribe la etiqueta en la operacion que abrio el panel, no en la ultima.
+    Antes leia reg().ops[length-1]: si abria otra operacion antes de pulsar
+    «Seguir», la etiqueta se colgaba de la siguiente. En el bloque 4 acabaron
+    cuatro diagnosticos de stop pegados a operaciones que habian ganado. */
+function cierraFallo(etq){
+  const f = S.fallo;
+  if (f){
+    const o = ((S.dec[f.s] || {}).ops || [])[f.k];
+    if (o && etq) o.fallo = etq;
+  }
+  S.fallo = null;
   $("fallo").classList.remove("ver");
   guarda();
-});
+}
+$("btnFallo").addEventListener("click", () => cierraFallo(FALLO.lee()));
 
 /** Cierra el intento y arranca uno nuevo con la cuenta a 10.000. */
 function cierraCuenta(estado, texto){
@@ -693,6 +715,7 @@ function termina_(){
   if (hechas > 0 && hechas % 10 === 0 && hechas < SES.length)
     $("resTxt").innerHTML += `<br><br><b style="color:var(--baja)">Llevas ${hechas} sesiones: `
       + `para y estírate.</b> Diez minutos bastan. Fresco aciertas el 73 %; cansado, el 30 %.`;
+  if (S.fallo) cierraFallo(FALLO.lee());
   $("resumen").classList.add("ver");
   $("resumen").scrollIntoView({behavior:"smooth", block:"nearest"});
   guarda();
@@ -707,7 +730,8 @@ $("btnSiguiente").addEventListener("click", () => {
   if (c.estado !== "viva"){ c.n++; c.saldo = CUENTA; c.ini = CUENTA; c.estado = "viva"; c.dias = 0; }
   c.diaIni = c.saldo;                       // el límite diario se mide desde aquí
   $("veredicto").classList.remove("ver");
-  $("resumen").classList.remove("ver"); $("fallo").classList.remove("ver"); tapa();
+  $("resumen").classList.remove("ver"); S.fallo = null;
+  $("fallo").classList.remove("ver"); tapa();
   guarda(); pinta();
   window.scrollTo({top:0, behavior:"smooth"});
 });
