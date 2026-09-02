@@ -87,6 +87,22 @@ h1,h2,h3,button,label,.ui{font-family:"IBM Plex Sans Condensed","Helvetica Neue"
   font-variant-numeric:tabular-nums}
 .tira b{color:var(--tinta); font-weight:600}
 
+/* El indicador, solo en las sesiones sorteadas. Mismas filas que la tabla del
+   indicador de TradingView, para que lo que se mide aqui sea lo que veria alli. */
+.indic{margin-bottom:12px; border:1px solid var(--linea); border-radius:3px;
+  background:var(--ficha); overflow:hidden}
+.indic table{border-collapse:collapse; width:100%;
+  font-family:"IBM Plex Mono",monospace; font-size:13px;
+  font-variant-numeric:tabular-nums}
+.indic td{padding:4px 12px; border-bottom:1px solid var(--linea2); text-align:right;
+  white-space:nowrap}
+.indic td:first-child{text-align:left; font-family:"IBM Plex Sans Condensed",sans-serif;
+  color:var(--suave)}
+.indic tr:last-child td{border-bottom:none}
+.indic tr.clave td{font-weight:600; font-size:14px}
+.indic tr.ver td{font-weight:600; text-align:left}
+@media (max-width:900px){ .indic td{padding:4px 9px; font-size:12px} }
+
 /* ---- botones ---- */
 button{font-size:15px; font-weight:600; padding:11px 17px; border-radius:3px;
   border:1px solid var(--linea2); background:var(--ficha); color:var(--tinta);
@@ -197,7 +213,11 @@ textarea{font-family:"IBM Plex Serif",Georgia,serif; min-height:52px; resize:ver
     <div class="regla"><b>Sí ves el resultado de cada operación</b><span>A diferencia del simulador anterior. Lo necesitas para poder parar tras dos pérdidas, que es tu regla.</span></div>
     <div class="regla"><b>Lo que descartas cuenta tanto como lo que tomas</b><span>Al abrir la caja de entrada verás cuatro botones para cerrarla diciendo por qué no entras: <i>no me convence · falta confirmación · voy tarde · me he equivocado</i>. Un toque, sin panel extra. Con eso puedo comparar lo que tomas contra lo que descartas, que es el contraste que llevo dos meses sin poder hacer.</span></div>
     <div class="regla"><b>Al entrar, dices cómo de claro lo ves</b><span>Tres botones en vez de uno: dudando, normal o claro. Si tu confianza predice el resultado, es un filtro que puedes usar mañana: operar solo lo claro, o arriesgar menos en lo dudoso.</span></div>
-    <div class="regla"><b>La mitad de las sesiones llevan el indicador</b><span>Sorteadas de antemano con semilla fija. En esas verás el <b>cuerpo de la vela de M5</b> —lo único medido que separa tus ganadoras de tus perdedoras— y los extremos de la sesión. La otra mitad va sin nada, como siempre. Así se mide si ayuda en vez de suponerlo.</span></div>
+    <div class="regla"><b>La mitad de las sesiones llevan el indicador</b><span>Sorteadas de antemano con semilla fija. En esas aparece bajo la tira de datos un panel con las mismas filas que el indicador de TradingView. La otra mitad va sin nada, como siempre, para poder medir si ayuda en vez de suponerlo.
+      <br><br><b>Cómo se lee, en dos filas:</b>
+      <br>· <b>CUERPO de esta vela</b> — qué parte de la vela de M5 es cuerpo, en vivo. Verde por debajo del 60 %, rojo por encima. Es lo único que en tus 150 operaciones separa las que ganan de las que pierden: 78 % contra 50 %.
+      <br>· <b>si entras aquí: 82 %</b> — cruza el cuerpo con el nivel de Asia y te dice en cuál de tus cuatro cajas estás: 42 % (cuerpo lleno y lejos del nivel), 65 %, 68 % u 82 %.
+      <br><br>Ese porcentaje <b>no</b> es la probabilidad de que la vela suba: es el acierto de las operaciones que tomaste tú estando en esa caja. Hay decenas de velas al día en la caja del 82 %. Es un filtro, nunca una señal de entrada.</span></div>
     <div class="regla"><b>Las reglas reales de FundingPips · 2 Step Standard, 10.000 $</b><span>Objetivo de fase 1 <b>+8 %</b> (800 $) con <b>mínimo 3 días operados</b> y sin límite de tiempo. Pérdida máxima diaria <b>5 %</b> (500 $) y total <b>10 %</b> (1.000 $). Riesgo del <b>1 % por operación</b> —100 $, con el lotaje calculado desde tu stop—. Si revientas un límite, la cuenta se acaba y empiezas otra; las sesiones siguen donde estaban.</span></div>
     <div class="regla"><b>Para cada diez sesiones</b><span>Fresco aciertas el 73 %, cansado el 30 %. Está medido en dos bloques. Levántate diez minutos.</span></div>
     <div class="regla"><b>Se anota la hora de cada decisión</b><span>Para medir el cansancio en vez de tener que recordarlo. Solo la hora, nada más.</span></div>
@@ -244,6 +264,7 @@ textarea{font-family:"IBM Plex Serif",Georgia,serif; min-height:52px; resize:ver
   </div>
 
   <div class="tira" id="tira"></div>
+  <div class="indic" id="indic" hidden></div>
 
   <div class="mandos" id="mandos">
     <button class="pri" id="btn1">Avanzar 1 minuto</button>
@@ -427,27 +448,35 @@ let dir = null, caja = null;
 const cajaViva = () => caja || (S.pos ? {ent:S.pos.ent, sl:S.pos.sl, tp:S.pos.tp} : null);
 
 /** El indicador, solo en la mitad de las sesiones que salieron sorteadas.
-    Enseña lo único medido que separa sus ganadoras de sus perdedoras: el cuerpo
-    de la vela de M5. Cuerpo lleno = 50 % de acierto en sus 150; el resto = 78 %.
-    Y el extremo que lleva la sesión, donde está su mejor caja. */
+    Mismas filas que la tabla del indicador de TradingView -docs/INDICADOR_londres.md-
+    para que lo que se mide aqui sea exactamente lo que veria en directo.
+    La tira de arriba NO cambia: es la que ya tenian los bloques 1 a 4, asi que
+    la rama sin indicador queda igual que siempre. */
 function indicador(p, c){
   const v5 = serie("m5", 5), u = v5[v5.length-1];
   const o = P(u[1]), hh = P(u[2]), ll = P(u[3]), cc = P(u[4]);
   const pct = Math.round(Math.abs(cc-o)/Math.max(hh-ll, 1e-9)*100);
   const lleno = pct >= 60;
-  const vis = m1Vis();
   let sh = -Infinity, sl = Infinity;
-  for (const b of vis){ sh = Math.max(sh, P(b[2])); sl = Math.min(sl, P(b[3])); }
-  const toca = ll <= P(c.hi) && hh >= P(c.hi) || ll <= P(c.lo) && hh >= P(c.lo);
-  const caja4 = lleno && !toca ? ["si entras aquí: 42 %", "var(--baja)"]
-              : lleno          ? ["si entras aquí: 65 %", "var(--asia)"]
-              : toca           ? ["si entras aquí: 68 %", "var(--marca)"]
-              :                  ["si entras aquí: 82 %", "var(--alza)"];
-  return `<span style="color:${lleno ? "var(--baja)" : "var(--alza)"}">cuerpo M5 `
-       + `<b>${pct} %</b>${lleno ? " LLENO" : ""}</span>`
-       + `<span>alto sesión <b>${sh.toFixed(5)}</b> (${((p-sh)/U).toFixed(1)} p)</span>`
-       + `<span>bajo sesión <b>${sl.toFixed(5)}</b> (${((p-sl)/U).toFixed(1)} p)</span>`
-       + `<span style="color:${caja4[1]}"><b>${caja4[0]}</b></span>`;
+  for (const b of m1Vis()){ sh = Math.max(sh, P(b[2])); sl = Math.min(sl, P(b[3])); }
+  const toca = (ll <= P(c.hi) && hh >= P(c.hi)) || (ll <= P(c.lo) && hh >= P(c.lo));
+  const v = lleno && !toca ? ["si entras aquí: 42 %", "var(--baja)", "tu peor caja"]
+          : lleno          ? ["si entras aquí: 65 %", "var(--asia)", "cuerpo lleno, pero en el nivel"]
+          : toca           ? ["si entras aquí: 68 %", "var(--marca)", "cuerpo normal, en el nivel"]
+          :                  ["si entras aquí: 82 %", "var(--alza)", "tu mejor caja"];
+  const pips = q => ((p - q)/U).toFixed(1).replace(".", ",") + " p";   // mismo signo que la tira
+  const col = lleno ? "var(--baja)" : "var(--alza)";
+  return `<table>
+    <tr class="clave"><td style="color:${col}">CUERPO de esta vela</td>
+      <td style="color:${col}">${pct} %</td>
+      <td style="color:${col}">${lleno ? "LLENO" : "normal"}</td></tr>
+    <tr><td>nivel de Asia</td><td>${toca ? "TOCANDO" : "lejos"}</td>
+      <td>${toca ? "el cuerpo importa menos" : "el cuerpo manda"}</td></tr>
+    <tr><td>alto Londres</td><td>${sh.toFixed(5)}</td><td>${pips(sh)}</td></tr>
+    <tr><td>bajo Londres</td><td>${sl.toFixed(5)}</td><td>${pips(sl)}</td></tr>
+    <tr class="ver"><td colspan="3" style="color:${v[1]}">${v[0]}
+      <span style="color:var(--tenue); font-weight:400"> · ${v[2]}</span></td></tr>
+  </table>`;
 }
 
 function pinta(rapido){
@@ -476,7 +505,10 @@ function pinta(rapido){
     + `<span>alto Asia <b>${P(c.hi).toFixed(5)}</b> (${((p-P(c.hi))/U).toFixed(1)} p)</span>`
     + `<span>mínimo Asia <b>${P(c.lo).toFixed(5)}</b> (${((p-P(c.lo))/U).toFixed(1)} p)</span>`
     + `<span>rango de Asia <b>${((P(c.hi)-P(c.lo))/U).toFixed(1)} p</b></span>`
-    + (conInd() ? indicador(p, c) : "");
+;
+  const gI = $("indic");
+  gI.hidden = !conInd();
+  if (!gI.hidden) gI.innerHTML = indicador(p, c);
   const fin = S.t >= FIN;
   $("btn1").disabled = $("btn5").disabled = $("btn15").disabled = fin;
   $("btnCompra").disabled = $("btnVenta").disabled = fin || !!S.pos || !!caja;
