@@ -1,0 +1,345 @@
+<title>Leer el indicador de Londres</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root{
+  --papel:#F2F4F6; --tarjeta:#FFFFFF; --tinta:#101418; --suave:#5C6672;
+  --linea:#D6DBE2; --linea2:#E6EAEF; --hueco:#EDF0F4;
+  --marca:#2A4A7F; --alza:#23735A; --baja:#A8382C; --asia:#8F6410;
+  --serif:"IBM Plex Serif",Georgia,serif;
+  --cond:"IBM Plex Sans Condensed","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --papel:#10141A; --tarjeta:#171C24; --tinta:#E7ECF2; --suave:#96A1AE;
+    --linea:#2A323D; --linea2:#212934; --hueco:#1C222B;
+    --marca:#7FA3D8; --alza:#4FA98A; --baja:#D9705F; --asia:#C39A3A;
+  }
+}
+:root[data-theme="dark"]{
+  --papel:#10141A; --tarjeta:#171C24; --tinta:#E7ECF2; --suave:#96A1AE;
+  --linea:#2A323D; --linea2:#212934; --hueco:#1C222B;
+  --marca:#7FA3D8; --alza:#4FA98A; --baja:#D9705F; --asia:#C39A3A;
+}
+*{box-sizing:border-box}
+body{background:var(--papel);color:var(--tinta);font-family:var(--cond);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.env{max-width:1000px;margin:0 auto;padding:0 24px 96px}
+.col{max-width:640px}
+h1,h2,h3{font-family:var(--serif);text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,4.4vw,44px);line-height:1.1;font-weight:600;letter-spacing:-.015em}
+h2{font-size:25px;font-weight:600;line-height:1.2}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--suave)}
+header{padding:56px 0 34px;border-bottom:2px solid var(--tinta)}
+header p{font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--suave);
+  margin-top:16px;max-width:620px}
+header p em{color:var(--tinta);font-style:italic}
+section{padding-top:50px;display:flex;flex-direction:column;gap:18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.nota{font-size:13.5px;color:var(--suave);line-height:1.5;max-width:640px}
+
+/* leyenda de lineas */
+.lineas{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;
+  background:var(--linea2);border:1px solid var(--linea2)}
+.linea{background:var(--tarjeta);padding:13px 15px;display:flex;flex-direction:column;gap:4px}
+.muestra{height:0;border-top-width:2.5px;width:38px;margin-bottom:5px}
+.linea b{font-size:14.5px}
+.linea span{font-size:12.5px;color:var(--suave);line-height:1.45}
+
+/* momentos */
+.momento{background:var(--tarjeta);border:1px solid var(--linea);display:grid;
+  grid-template-columns:1fr 300px}
+.momento .g{padding:16px 8px 12px 16px;min-width:0}
+.momento svg{width:100%;height:auto;display:block}
+.panel{border-left:1px solid var(--linea);padding:16px 18px;display:flex;
+  flex-direction:column;gap:10px}
+.cab{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cab .h{font-family:var(--mono);font-size:19px;font-weight:600}
+.cab .d{font-size:12px;color:var(--suave);font-family:var(--mono)}
+table.t{border-collapse:collapse;width:100%;font-size:13px}
+table.t td{padding:3px 0;border-bottom:1px solid var(--linea2);font-family:var(--mono);
+  font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+table.t td:first-child{text-align:left;font-family:var(--cond);color:var(--suave);
+  padding-right:12px}
+table.t td:nth-child(2){padding-right:12px}
+tr.clave td{font-weight:600;font-size:14px;border-bottom:1px solid var(--linea)}
+.ver{padding:9px 11px;font-size:13px;line-height:1.4;border-left:3px solid currentColor}
+.g1{color:var(--alza)} .r1{color:var(--baja)} .a1{color:var(--asia)} .m1{color:var(--marca)}
+.num{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;
+  border-radius:50%;background:var(--tinta);color:var(--papel);font-family:var(--mono);
+  font-size:10.5px;font-weight:600;flex:none}
+/* filas de la tabla explicada */
+.filas{display:flex;flex-direction:column;gap:1px;background:var(--linea2);
+  border:1px solid var(--linea2)}
+.fila{background:var(--tarjeta);padding:12px 15px;display:grid;
+  grid-template-columns:180px 1fr;gap:16px;align-items:start}
+.fila code{font-family:var(--mono);font-size:13px;color:var(--tinta);font-weight:500}
+.fila div{font-size:14px;line-height:1.5}
+.fila em{font-style:normal;color:var(--suave)}
+.pasos{counter-reset:p;display:flex;flex-direction:column;gap:12px;max-width:640px}
+.paso{display:grid;grid-template-columns:26px 1fr;gap:13px;align-items:start}
+.paso::before{counter-increment:p;content:counter(p);font-family:var(--mono);font-size:12px;
+  font-weight:600;color:var(--papel);background:var(--tinta);width:22px;height:22px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.paso b{display:block;font-size:15.5px}
+.paso span{font-size:14px;color:var(--suave);line-height:1.5}
+.aviso{border-left:3px solid var(--asia);padding:3px 0 3px 15px;color:var(--suave);
+  font-family:var(--serif);font-size:15.5px;line-height:1.55;max-width:640px}
+@media (max-width:860px){
+  .momento{grid-template-columns:1fr}
+  .panel{border-left:none;border-top:1px solid var(--linea)}
+  .fila{grid-template-columns:1fr;gap:4px}
+}
+@media (max-width:640px){ .env{padding:0 16px 72px} }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<div class="env">
+
+<header>
+  <div class="eyebrow">EURUSD · 08:00-11:30 · Europe/Madrid</div>
+  <h1>Leer el indicador de Londres</h1>
+  <p>Cuatro líneas en el gráfico y una tabla en la esquina. No te dice cuándo
+  entrar — <em>eso sigue siendo tuyo</em>. Te pone los niveles, te calcula el stop
+  y el lotaje, y te avisa cuando estás en la caja donde históricamente peor te va.</p>
+</header>
+
+<section>
+  <div class="col">
+    <div class="eyebrow">En el gráfico</div>
+    <h2 style="margin-top:6px">Las cuatro líneas</h2>
+  </div>
+  <div class="lineas">
+    <div class="linea">
+      <div class="muestra" style="border-top:2.5px solid var(--asia)"></div>
+      <b>Alto y bajo de Asia</b>
+      <span>El máximo y el mínimo entre las 00:00 y las 08:00. Se fijan cuando Asia
+      cierra y ya no se mueven. Es lo que marcabas tú a mano.</span>
+    </div>
+    <div class="linea">
+      <div class="muestra" style="border-top:2.5px solid var(--marca)"></div>
+      <b>Alto y bajo de Londres</b>
+      <span>El máximo y el mínimo que lleva la sesión desde las 08:00. Se mueven
+      durante la mañana. Ahí está el 36,7 % de tus entradas y tu mejor caja.</span>
+    </div>
+    <div class="linea">
+      <div class="muestra" style="border-top:2.5px dotted var(--baja)"></div>
+      <b>El stop</b>
+      <span>El extremo de los últimos 10 minutos. No me lo he inventado: es donde
+      pones tú el stop, con 1,3 pips de error mediano sobre tus 150 operaciones.</span>
+    </div>
+    <div class="linea">
+      <div class="muestra" style="border-top:2.5px dotted var(--alza)"></div>
+      <b>El objetivo</b>
+      <span>El 1:2 que sale de ese stop. Dos líneas de cada, una para comprar y
+      otra para vender, porque hasta que no decides no sé hacia dónde vas.</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <div class="eyebrow">Dos momentos reales</div>
+    <h2 style="margin-top:6px">Lo mismo, con dos velas distintas</h2>
+    <p style="margin-top:12px">Mismo día, misma mañana, mismos niveles. Lo único que
+    cambia es <b>la vela en la que estarías entrando</b>. Los números son los que el
+    indicador calcularía de verdad en ese minuto.</p>
+  </div>
+  <div id="momentos" style="display:flex;flex-direction:column;gap:20px"></div>
+  <p class="nota"><b>Cuidado con leer el porcentaje al revés.</b> El 82 % y el 42 %
+  son el acierto de las operaciones que <em>tú tomaste</em> estando en cada caja, no
+  la probabilidad de que la vela suba. En una mañana hay decenas de velas en la caja
+  del 82 %. Es un filtro que se aplica después de que tú veas algo, nunca una señal.</p>
+</section>
+
+<section>
+  <div class="col">
+    <div class="eyebrow">En la esquina</div>
+    <h2 style="margin-top:6px">La tabla, fila por fila</h2>
+  </div>
+  <div class="filas">
+    <div class="fila"><code>LONDRES · 09:14 · 136 min</code>
+      <div>La hora de la vela y <em>cuánto queda</em> hasta las 11:30.</div></div>
+    <div class="fila"><code>ventana · BUENA · +74 min</code>
+      <div>Verde los primeros 90 minutos, ámbar después. Tu mediana de entrada de
+      150 operaciones son las 08:40. <em>Si pone «tardía», vas fuera de tu sitio.</em></div></div>
+    <div class="fila"><code>CUERPO de esta vela · 47 % · normal</code>
+      <div><b>La fila que decide.</b> Qué porcentaje del rango de la vela de M5 ocupa
+      el cuerpo, en vivo, cambiando minuto a minuto hasta que cierra. Verde por debajo
+      del 60 %, rojo por encima. <em>Es lo único que en 150 operaciones separa tus
+      ganadoras de tus perdedoras: 78 % contra 50 %.</em></div></div>
+    <div class="fila"><code>la anterior cerró con · 63 % · lleno</code>
+      <div>Lo mismo, de la vela que acaba de cerrarse. Para cuando entras justo
+      después del cierre.</div></div>
+    <div class="fila"><code>nivel de Asia · lejos</code>
+      <div>Si la vela toca un nivel de Asia o no. <em>Importa porque el efecto del
+      cuerpo solo existe cuando estás lejos:</em> ahí es 42 % contra 82 %. Pegado al
+      nivel, la vela llena no te hace daño.</div></div>
+    <div class="fila"><code>alto de Asia · 1.16584 · +8,3 p</code>
+      <div>El nivel y a cuántos pips lo tienes. Cuatro filas: alto y bajo de Asia,
+      alto y bajo de Londres.</div></div>
+    <div class="fila"><code>stop compra · 1.16510 · 4,3 p</code>
+      <div>Dónde iría el stop si compras ahora, y cuántos pips son. Debajo, el
+      objetivo. Y lo mismo para vender.</div></div>
+    <div class="fila"><code>0,5 % de 10000 · 0,23 lotes</code>
+      <div><b>El lotaje exacto</b> para arriesgar lo que hayas puesto en los ajustes,
+      con este stop concreto. <em>Sin calculadora.</em> Un lotaje mal metido una vez
+      te puede costar la cuenta.</div></div>
+    <div class="fila"><code>si entras aquí: 82 %</code>
+      <div>El veredicto: cruza el cuerpo con el nivel de Asia y te dice en cuál de
+      tus cuatro cajas estás.</div></div>
+    <div class="fila"><code>CRT en H4 · no hay</code>
+      <div>Apagado por defecto. Está porque tú lo miras. Lo medí sobre tus 150 y
+      <em>ninguno de los ocho contrastes llega al umbral</em>; el 71 % de tus entradas
+      no tiene CRT ni en H4 ni en M15.</div></div>
+    <div class="fila"><code>dos pérdidas y paras · 1:2 siempre</code>
+      <div>Tu regla, escrita donde la veas.</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <div class="eyebrow">Cómo se usa</div>
+    <h2 style="margin-top:6px">Tu mañana en tres pasos</h2>
+  </div>
+  <div class="pasos">
+    <div class="paso"><div><b>08:00 · lo abres y ya está todo puesto</b>
+      <span>Gráfico de M1 o M5 —por encima de M5 el stop pierde sentido y la tabla te
+      lo avisa—. Niveles de Asia dibujados, ventana sombreada. No marcas nada a mano.</span></div></div>
+    <div class="paso"><div><b>Cuando veas tu setup, miras dos filas</b>
+      <span>El <b>cuerpo</b> y el <b>veredicto</b>. Si dice «cuerpo lleno y lejos del
+      nivel», déjala pasar: son 42 operaciones tuyas al 42,5 %. Todo lo demás, tú
+      decides como siempre.</span></div></div>
+    <div class="paso"><div><b>Entras con el lotaje que pone la tabla</b>
+      <span>El stop ya está calculado, el objetivo también. Pones la orden con esos
+      números y no tocas nada más. Dos pérdidas o las 11:30, y cierras el portátil.</span></div></div>
+  </div>
+  <div class="aviso" style="margin-top:6px">El indicador no ha compilado nunca en
+  TradingView — lo escribí sin poder probarlo aquí. Si al pegarlo se queja, pásame el
+  error tal cual y lo arreglo en un minuto.</div>
+</section>
+
+<section>
+  <div class="col">
+    <div class="eyebrow">En el examen</div>
+    <h2 style="margin-top:6px">Es lo mismo, en una línea</h2>
+    <p style="margin-top:12px">En el quinto bloque, la mitad de las sesiones llevan
+    el indicador y la mitad no —sorteadas de antemano—. En las que lo llevan aparece
+    en la tira de datos de arriba, sin tabla:</p>
+  </div>
+  <div style="background:var(--tarjeta);border:1px solid var(--linea);padding:13px 16px;
+       font-family:var(--mono);font-size:12.5px;display:flex;gap:20px;flex-wrap:wrap">
+    <span>precio <b>1.16553</b></span>
+    <span>alto Asia <b>1.16584</b> (−3,1 p)</span>
+    <span>mínimo Asia <b>1.16415</b> (13,8 p)</span>
+    <span class="g1">cuerpo M5 <b>29 %</b></span>
+    <span>alto sesión <b>1.16560</b> (−0,7 p)</span>
+    <span class="g1"><b>si entras aquí: 82 %</b></span>
+  </div>
+  <p class="nota">La mitad sin indicador va como siempre. Así se mide si te ayuda en
+  vez de suponerlo — que era tu pregunta.</p>
+</section>
+
+</div>
+<script>
+const D = {"mejor": {"dia": "2026-06-24", "minuto": 545, "pct": 20, "toca": false, "rango_p": 5.9, "asiaHi": 1.13835, "asiaLo": 1.13611, "sesHi": 1.13749, "sesLo": 1.13549, "precio": 1.1358, "stopL": 1.13549, "stopC": 1.1366, "objL": 1.13642, "objC": 1.1342, "pipsL": 3.1, "pipsC": 8.0, "velas": [[480, 1.13677, 1.13695, 1.13669, 1.13693], [485, 1.13693, 1.13723, 1.13688, 1.13721], [490, 1.13722, 1.13749, 1.13715, 1.13738], [495, 1.13737, 1.13737, 1.13659, 1.13679], [500, 1.13675, 1.13704, 1.13667, 1.13687], [505, 1.13685, 1.13685, 1.13643, 1.13652], [510, 1.13653, 1.13669, 1.13639, 1.13658], [515, 1.1366, 1.13675, 1.13642, 1.13644], [520, 1.13643, 1.13673, 1.13642, 1.13669], [525, 1.13668, 1.13679, 1.13652, 1.13653], [530, 1.13652, 1.13652, 1.13623, 1.13633], [535, 1.13634, 1.1366, 1.13574, 1.13594], [540, 1.13592, 1.13608, 1.13549, 1.1358]]}, "peor": {"dia": "2026-06-24", "minuto": 620, "pct": 94, "toca": false, "rango_p": 9.5, "asiaHi": 1.13835, "asiaLo": 1.13611, "sesHi": 1.13749, "sesLo": 1.13378, "precio": 1.13483, "stopL": 1.13378, "stopC": 1.13522, "objL": 1.13693, "objC": 1.13405, "pipsL": 10.5, "pipsC": 3.9, "velas": [[490, 1.13722, 1.13749, 1.13715, 1.13738], [495, 1.13737, 1.13737, 1.13659, 1.13679], [500, 1.13675, 1.13704, 1.13667, 1.13687], [505, 1.13685, 1.13685, 1.13643, 1.13652], [510, 1.13653, 1.13669, 1.13639, 1.13658], [515, 1.1366, 1.13675, 1.13642, 1.13644], [520, 1.13643, 1.13673, 1.13642, 1.13669], [525, 1.13668, 1.13679, 1.13652, 1.13653], [530, 1.13652, 1.13652, 1.13623, 1.13633], [535, 1.13634, 1.1366, 1.13574, 1.13594], [540, 1.13592, 1.13608, 1.13549, 1.1358], [545, 1.1358, 1.13588, 1.1354, 1.13546], [550, 1.13546, 1.13553, 1.13514, 1.13535], [555, 1.13533, 1.13567, 1.13532, 1.13557], [560, 1.13559, 1.13567, 1.1354, 1.13547], [565, 1.13546, 1.1357, 1.1353, 1.13552], [570, 1.13552, 1.13565, 1.13538, 1.13549], [575, 1.13551, 1.13553, 1.13523, 1.13524], [580, 1.13525, 1.13595, 1.1352, 1.13591], [585, 1.1359, 1.13607, 1.13573, 1.13593], [590, 1.13593, 1.13597, 1.13559, 1.13577], [595, 1.13577, 1.13579, 1.13513, 1.13517], [600, 1.13517, 1.13559, 1.13511, 1.13543], [605, 1.13542, 1.13542, 1.13516, 1.13522], [610, 1.1352, 1.13522, 1.13378, 1.13394], [615, 1.13394, 1.13483, 1.13388, 1.13483]]}};
+const U = 1e-4;
+const n5 = x => x.toFixed(5);
+const p1 = x => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(1).replace(".", ",");
+
+function grafico(m){
+  const W = 560, H = 300, MI = 6, MD = 96, MT = 10, MB = 10;
+  const v = m.velas.slice(-26);
+  const niveles = [
+    [m.asiaHi, "var(--asia)", "alto Asia",   "solid"],
+    [m.asiaLo, "var(--asia)", "bajo Asia",   "solid"],
+    [m.sesHi,  "var(--marca)", "alto Londres","solid"],
+    [m.sesLo,  "var(--marca)", "bajo Londres","solid"],
+    [m.stopL,  "var(--baja)",  "stop compra", "dot"],
+    [m.objL,   "var(--alza)",  "objetivo 1:2","dot"]];
+  let lo = Math.min(...v.map(c => c[3])), hi = Math.max(...v.map(c => c[2]));
+  for (const [p] of niveles){ lo = Math.min(lo, p); hi = Math.max(hi, p); }
+  const m0 = (hi - lo) * 0.06 || U; lo -= m0; hi += m0;
+  const y = p => MT + (hi - p) / (hi - lo) * (H - MT - MB);
+  const paso = (W - MI - MD) / v.length, cw = Math.max(3, paso * 0.6);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico de M5 de EURUSD">`;
+  // niveles: la linea va en su sitio, la etiqueta se aparta si dos coinciden
+  for (const [p, col, et, tipo] of niveles)
+    s += `<line x1="${MI}" y1="${y(p).toFixed(1)}" x2="${W-MD}" y2="${y(p).toFixed(1)}"
+           stroke="${col}" stroke-width="1.4" fill="none"
+           ${tipo === "dot" ? 'stroke-dasharray="3 3"' : ""}/>`;
+  const etq = niveles.map(([p, col, et]) => ({y: y(p), col, et, y0: y(p)}))
+                     .sort((a, b) => a.y - b.y);
+  for (let i = 1; i < etq.length; i++)
+    if (etq[i].y - etq[i-1].y < 12) etq[i].y = etq[i-1].y + 12;
+  const sobra = etq.length ? etq[etq.length-1].y - (H - 4) : 0;
+  if (sobra > 0) for (const e of etq) e.y -= sobra;
+  for (const e of etq){
+    if (Math.abs(e.y - e.y0) > 2)
+      s += `<path d="M ${W-MD} ${e.y0.toFixed(1)} L ${W-MD+5} ${e.y.toFixed(1)}"
+             stroke="${e.col}" stroke-width="0.8" fill="none" opacity=".6"/>`;
+    s += `<text x="${W-MD+7}" y="${(e.y+3.6).toFixed(1)}" fill="${e.col}"
+           font-family="IBM Plex Mono,monospace" font-size="10.5">${e.et}</text>`;
+  }
+  // velas
+  v.forEach((c, i) => {
+    const x = MI + i*paso + paso/2, ult = i === v.length - 1;
+    const sube = c[4] >= c[1];
+    const col = ult ? "var(--tinta)" : sube ? "var(--alza)" : "var(--baja)";
+    const a = y(Math.max(c[1], c[4])), b = y(Math.min(c[1], c[4]));
+    s += `<line x1="${x.toFixed(1)}" y1="${y(c[2]).toFixed(1)}" x2="${x.toFixed(1)}"
+           y2="${y(c[3]).toFixed(1)}" stroke="${col}" stroke-width="${ult ? 1.6 : 1.1}" fill="none"/>`
+       + `<rect x="${(x-cw/2).toFixed(1)}" y="${a.toFixed(1)}" width="${cw.toFixed(1)}"
+           height="${Math.max(1.4, b-a).toFixed(1)}" stroke="${col}"
+           stroke-width="${ult ? 1.6 : 1.1}"
+           fill="${sube ? "var(--tarjeta)" : col}"/>`;
+    if (ult){
+      const xt = Math.min(x, W - MD - 34);
+      s += `<line x1="${x.toFixed(1)}" y1="${(MT+16).toFixed(1)}" x2="${x.toFixed(1)}"
+             y2="${(y(c[2])-4).toFixed(1)}" stroke="var(--tinta)" stroke-width="0.8"
+             stroke-dasharray="2 2" fill="none"/>`
+         + `<text x="${xt.toFixed(1)}" y="${(MT+9).toFixed(1)}" fill="var(--tinta)"
+             text-anchor="middle" font-family="IBM Plex Sans Condensed,sans-serif"
+             font-size="10.5" font-weight="600">entras aquí</text>`;
+    }
+  });
+  return s + "</svg>";
+}
+
+function panel(m){
+  const lleno = m.pct >= 60;
+  const caja = lleno && !m.toca ? ["si entras aquí: 42 %", "r1", "tu peor caja"]
+             : lleno            ? ["si entras aquí: 65 %", "a1", "cuerpo lleno, pero en el nivel"]
+             : m.toca           ? ["si entras aquí: 68 %", "m1", "cuerpo normal, en el nivel"]
+             :                    ["si entras aquí: 82 %", "g1", "tu mejor caja"];
+  const [Y, M, DD] = m.dia.split("-");
+  const hh = String(Math.floor(m.minuto/60)).padStart(2,"0") + ":" +
+             String(m.minuto%60).padStart(2,"0");
+  const lotes = (10000 * 0.005) / (m.pipsL * 10);
+  return `<div class="panel">
+    <div class="cab"><span class="h">${hh}</span>
+      <span class="d">${DD}.${M}.${Y} · EURUSD</span></div>
+    <table class="t">
+      <tr class="clave ${lleno ? "r1" : "g1"}"><td style="color:inherit">CUERPO de esta vela</td>
+        <td>${m.pct} %</td><td>${lleno ? "LLENO" : "normal"}</td></tr>
+      <tr><td>nivel de Asia</td><td colspan="2">${m.toca ? "TOCANDO" : "lejos"}</td></tr>
+      <tr><td>alto de Asia</td><td>${n5(m.asiaHi)}</td><td>${p1((m.asiaHi-m.precio)/U)} p</td></tr>
+      <tr><td>bajo de Asia</td><td>${n5(m.asiaLo)}</td><td>${p1((m.asiaLo-m.precio)/U)} p</td></tr>
+      <tr><td>alto Londres</td><td>${n5(m.sesHi)}</td><td>${p1((m.sesHi-m.precio)/U)} p</td></tr>
+      <tr><td>bajo Londres</td><td>${n5(m.sesLo)}</td><td>${p1((m.sesLo-m.precio)/U)} p</td></tr>
+      <tr><td>stop compra</td><td>${n5(m.stopL)}</td><td>${m.pipsL.toFixed(1).replace(".",",")} p</td></tr>
+      <tr><td>objetivo</td><td>${n5(m.objL)}</td><td>2,0 R</td></tr>
+      <tr><td>stop venta</td><td>${n5(m.stopC)}</td><td>${m.pipsC.toFixed(1).replace(".",",")} p</td></tr>
+      <tr><td>objetivo</td><td>${n5(m.objC)}</td><td>2,0 R</td></tr>
+      <tr><td>0,5 % de 10.000</td><td colspan="2">${lotes.toFixed(2).replace(".",",")} lotes</td></tr>
+    </table>
+    <div class="ver ${caja[1]}"><b>${caja[0]}</b><br><span style="color:var(--suave)">${caja[2]}</span></div>
+  </div>`;
+}
+
+document.getElementById("momentos").innerHTML =
+  [D.mejor, D.peor].map(m =>
+    `<div class="momento"><div class="g">${grafico(m)}</div>${panel(m)}</div>`).join("");
+</script>
