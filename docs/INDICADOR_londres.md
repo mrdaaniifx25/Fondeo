@@ -18,6 +18,38 @@ Lo que sí está medido, y es lo que el indicador automatiza:
 | los lotes | riesgo elegido ÷ (pips de stop × valor del pip) |
 | aviso de rotura | cuerpo cerrado fuera del nivel de Asia: su peor caja, 33,3 % |
 | ventana buena | los primeros 90 minutos; su mediana de entrada es 08:40 |
+| **el cuerpo de la vela de M5** | lo único que en 150 operaciones separa sus ganadoras de sus perdedoras: cuerpo ≥ 60 % del rango, 50,0 %; por debajo, 78,0 % (p = 0,0006, y se repite en los cuatro bloques) |
+| el veredicto de las cuatro cajas | cuerpo × nivel de Asia: 42 % / 65 % / 68 % / 82 % |
+| el estado del CRT en H4 y M15 | apagado por defecto: se midió y **no separa nada** |
+
+## El cuerpo de la vela: lo que decide
+
+La fila **CUERPO de esta vela** enseña, en vivo, qué porcentaje del rango de la
+vela de M5 en curso ocupa el cuerpo. Se arma desde el gráfico, así que en M1 se
+ve formarse minuto a minuto y se cierra en el minuto en que él entraría.
+
+| lo que ve | de sus 150 operaciones |
+|---|---|
+| cuerpo lleno, lejos del nivel de Asia | 42 % de acierto · 42 operaciones |
+| cuerpo lleno, tocando el nivel | 65 % · 22 |
+| cuerpo normal, tocando el nivel | 68 % · 23 |
+| cuerpo normal, lejos del nivel | 82 % · 63 |
+
+**Cuidado con leer esos porcentajes al revés.** Son el acierto de las operaciones
+que él tomó estando en cada caja, no la probabilidad de que la vela suba. Que una
+vela caiga en la caja del 82 % no es una señal de entrada: en una mañana hay
+decenas de velas ahí. Es el filtro que se aplica *después* de que él vea algo.
+
+## El CRT: está, pero no funciona
+
+Se midieron ocho contrastes sobre sus 150 —CRT en la H4 cerrada, en la H4 viva,
+en la última M15, en la M15 viva, y cada uno a favor o en contra de su
+dirección— y **ninguno llega al umbral**. El mejor se queda en p = 0,05 y apunta
+en su contra: cuando el CRT de M15 va en su dirección, aparece en el 7,4 % de sus
+ganadoras y el 18,8 % de sus perdedoras.
+
+El 71,3 % de sus entradas no tiene CRT ni en H4 ni en M15. Está en el indicador
+porque él lo mira, apagado por defecto, y con la advertencia al lado.
 
 ## Cómo se pone
 

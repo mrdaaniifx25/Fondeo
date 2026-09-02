@@ -21,6 +21,14 @@
 //    · el objetivo 1:2 que sale de ese stop, y los lotes para el riesgo elegido
 //    · aviso cuando el precio cierra el cuerpo FUERA del nivel de Asia, que es
 //      su peor caja: 33,3 %, el azar exacto
+//    · EL CUERPO DE LA VELA DE M5, que es lo unico que en 150 operaciones separa
+//      sus ganadoras de sus perdedoras: con el cuerpo por encima del 60 % del
+//      rango acierta el 50,0 % y por debajo el 78,0 % (Fisher p = 0,0006, y se
+//      repite en los cuatro bloques). El efecto vive lejos del nivel de Asia:
+//      alli es 42,5 % contra 81,7 %.
+//    · el estado del CRT en H4 y en M15, apagado por defecto: se midio sobre sus
+//      150 y no separa nada (el mejor de los ocho contrastes se queda en p=0,05
+//      y apunta en su contra). Esta porque el lo mira, no porque funcione.
 //
 //  Todo en docs/RESULTADOS_modelo_entradas.md
 //
@@ -51,6 +59,21 @@ ratio    = input.float(2.0, "Objetivo (R)", 0.5, 10.0, step = 0.5, group = gS)
 colchon  = input.float(0.0, "Colchón por debajo del extremo (pips)", 0.0, 10.0,
      step = 0.1, group = gS)
 verLin   = input.bool(true, "Dibujar stop y objetivo", group = gS)
+
+// ─── el cuerpo de la vela ─────────────────────────────────────────────────
+gB = "El cuerpo de la vela (lo único medido que separa)"
+umbCuerpo = input.float(60, "Cuerpo lleno a partir de (% del rango)", 30, 95, step = 5,
+     group = gB, tooltip = "Por encima de este porcentaje acierta el 50 %; por " +
+     "debajo, el 78 %. La separacion sale significativa en todos los cortes " +
+     "entre el 40 % y el 80 %.")
+verVer = input.bool(true, "Veredicto sobre la vela en curso", group = gB)
+marcaLlena = input.bool(true, "Marcar en el gráfico las velas de cuerpo lleno", group = gB)
+
+// ─── CRT ──────────────────────────────────────────────────────────────────
+gR = "CRT en H4 y M15 (medido: no separa nada)"
+verCRT = input.bool(false, "Mostrar el estado del CRT", group = gR,
+     tooltip = "En sus 150 operaciones ninguno de los ocho contrastes del CRT " +
+     "llega al umbral. El 71 % de sus entradas no tiene CRT ni en H4 ni en M15.")
 
 // ─── cuenta ───────────────────────────────────────────────────────────────
 gC = "Cuenta"
@@ -124,6 +147,125 @@ else if enVentana
     sesHi := math.max(nz(sesHi, high), high)
     sesLo := math.min(nz(sesLo, low),  low)
 
+hayAsiaPre = not na(asiaHi) and not na(asiaLo)
+
+// ─── velas de M5, M15 y H4 armadas desde el gráfico ───────────────────────
+//  Se arman a mano en vez de con request.security porque con lookahead_off el
+//  valor de M5 llega con hasta cinco minutos de retraso en un gráfico de M1, y
+//  el cuerpo hay que verlo formarse.
+var float o5 = na
+var float h5 = na
+var float l5 = na
+var float p5o = na
+var float p5h = na
+var float p5l = na
+var float p5c = na
+b5 = math.floor(mDia / 5)
+nuevo5 = na(b5[1]) or b5 != b5[1]
+if nuevo5
+    p5o := o5
+    p5h := h5
+    p5l := l5
+    p5c := nz(close[1])
+    o5 := open
+    h5 := high
+    l5 := low
+else
+    h5 := math.max(nz(h5, high), high)
+    l5 := math.min(nz(l5, low),  low)
+
+var float o15 = na
+var float h15 = na
+var float l15 = na
+var float p15o = na
+var float p15h = na
+var float p15l = na
+var float p15c = na
+var float q15o = na
+var float q15h = na
+var float q15l = na
+var float q15c = na
+b15 = math.floor(mDia / 15)
+if na(b15[1]) or b15 != b15[1]
+    q15o := p15o
+    q15h := p15h
+    q15l := p15l
+    q15c := p15c
+    p15o := o15
+    p15h := h15
+    p15l := l15
+    p15c := nz(close[1])
+    o15 := open
+    h15 := high
+    l15 := low
+else
+    h15 := math.max(nz(h15, high), high)
+    l15 := math.min(nz(l15, low),  low)
+
+var float o4 = na
+var float h4v = na
+var float l4v = na
+var float p4o = na
+var float p4h = na
+var float p4l = na
+var float p4c = na
+var float q4o = na
+var float q4h = na
+var float q4l = na
+var float q4c = na
+b4 = math.floor(mDia / 240)
+if na(b4[1]) or b4 != b4[1]
+    q4o := p4o
+    q4h := p4h
+    q4l := p4l
+    q4c := p4c
+    p4o := o4
+    p4h := h4v
+    p4l := l4v
+    p4c := nz(close[1])
+    o4 := open
+    h4v := high
+    l4v := low
+else
+    h4v := math.max(nz(h4v, high), high)
+    l4v := math.min(nz(l4v, low),  low)
+
+// ─── el cuerpo, que es lo que decide ──────────────────────────────────────
+rango5  = math.max(nz(h5, high) - nz(l5, low), syminfo.mintick)
+cuerpo5 = math.abs(close - nz(o5, open)) / rango5 * 100
+rangoP  = math.max(nz(p5h) - nz(p5l), syminfo.mintick)
+cuerpoP = na(p5o) ? na : math.abs(nz(p5c) - nz(p5o)) / rangoP * 100
+llenaViva  = cuerpo5 >= umbCuerpo
+llenaCerr  = not na(cuerpoP) and cuerpoP >= umbCuerpo
+
+// ¿la vela de M5 en curso toca un nivel de Asia? Ahi el cuerpo deja de importar
+tocaNivel = hayAsiaPre and ((nz(l5, low) <= asiaHi and nz(h5, high) >= asiaHi) or
+                            (nz(l5, low) <= asiaLo and nz(h5, high) >= asiaLo))
+
+// ─── CRT ──────────────────────────────────────────────────────────────────
+//  Una vela barre el extremo de la anterior y CIERRA DENTRO DE SU CUERPO.
+crt(float qo, float qh, float ql, float qc, float ph, float pl, float pc) =>
+    int r = 0
+    if not na(qo) and not na(pc)
+        cA = math.min(qo, qc)
+        cB = math.max(qo, qc)
+        dentro = pc >= cA and pc <= cB
+        if pl < ql and dentro
+            r := 1
+        else if ph > qh and dentro
+            r := -1
+    r
+crtH4  = verCRT ? crt(q4o,  q4h,  q4l,  q4c,  p4h,  p4l,  p4c)  : 0
+crtM15 = verCRT ? crt(q15o, q15h, q15l, q15c, p15h, p15l, p15c) : 0
+crtH4v = 0
+if verCRT and not na(p4o)
+    cA = math.min(p4o, p4c)
+    cB = math.max(p4o, p4c)
+    if nz(l4v, low) < p4l and close >= cA and close <= cB
+        crtH4v := 1
+    else if nz(h4v, high) > p4h and close >= cA and close <= cB
+        crtH4v := -1
+
 // ─── el stop que el pone ──────────────────────────────────────────────────
 int nBar = math.max(1, retroMin * 60 / timeframe.in_seconds())
 tfAlto = timeframe.in_seconds() > 300      // por encima de M5 el stop pierde sentido
@@ -140,16 +282,39 @@ lotes(float rgo) =>
     p <= 0 ? 0.0 : (capital * riesgoPc / 100) / (p * valorPip)
 
 // ─── avisos ───────────────────────────────────────────────────────────────
-hayAsia = not na(asiaHi) and not na(asiaLo)
-cuerpoAlto = hayAsia and math.min(open, close) > asiaHi
-cuerpoBajo = hayAsia and math.max(open, close) < asiaLo
+hayAsia = hayAsiaPre
+//  Todo esto se midió sobre la vela de M5, así que se lee de la vela de M5
+//  armada arriba y no de la del gráfico, que en M1 sería otra cosa.
+ap5 = nz(o5, open)
+hi5 = nz(h5, high)
+lo5 = nz(l5, low)
+cuerpoAlto = hayAsia and math.min(ap5, close) > asiaHi
+cuerpoBajo = hayAsia and math.max(ap5, close) < asiaLo
 rotura     = enVentana and (cuerpoAlto or cuerpoBajo)
 
-rechAlto = enVentana and hayAsia and low <= asiaHi and high >= asiaHi and close < asiaHi
-rechBajo = enVentana and hayAsia and low <= asiaLo and high >= asiaLo and close > asiaLo
+rechAlto = enVentana and hayAsia and lo5 <= asiaHi and hi5 >= asiaHi and close < asiaHi
+rechBajo = enVentana and hayAsia and lo5 <= asiaLo and hi5 >= asiaLo and close > asiaLo
 
 pegAlto = enVentana and not na(sesHi) and pips(sesHi - close) <= 3
 pegBajo = enVentana and not na(sesLo) and pips(close - sesLo) <= 3
+
+// ─── el veredicto, que son las cuatro cajas medidas en sus 150 ────────────
+//    cuerpo lleno + lejos del nivel   42,5 %   (42 operaciones)
+//    cuerpo lleno + en el nivel       65,0 %   (22)
+//    cuerpo normal + en el nivel      68,2 %   (23)
+//    cuerpo normal + lejos del nivel  81,7 %   (63)
+//  OJO con leer estos porcentajes al reves: son el acierto de las operaciones
+//  que EL TOMO estando en cada caja, no la probabilidad de que la vela suba.
+//  Que una vela caiga en la caja del 82 % no es una señal de entrada.
+verTxt = not enVentana ? "fuera de ventana"
+     : llenaViva and not tocaNivel ? "si entras aquí: 42 % · tu peor caja"
+     : llenaViva                   ? "si entras aquí: 65 % · cuerpo lleno, pero en el nivel"
+     : tocaNivel                   ? "si entras aquí: 68 %"
+     :                               "si entras aquí: 82 % · tu mejor caja"
+verCol = not enVentana ? color.new(color.gray, 20)
+     : llenaViva and not tocaNivel ? cStop
+     : llenaViva                   ? cAsia
+     :                               cObj
 
 // ─── dibujo ───────────────────────────────────────────────────────────────
 plot(hayAsia and (enAsia or enVentana) ? asiaHi : na, "Alto de Asia",
@@ -171,6 +336,8 @@ plot(verLin and enVentana ? objC : na, "Objetivo de venta",  color = color.new(c
      linewidth = 1, style = plot.style_circles)
 
 bgcolor(verFon and enVentana ? color.new(cSes, buena ? 93 : 96) : na, title = "Ventana")
+bgcolor(marcaLlena and enVentana and llenaViva ? color.new(cStop, 88) : na,
+     title = "Vela de cuerpo lleno")
 
 plotshape(verAvi and rechAlto, "Rechazo del alto de Asia", shape.triangledown,
      location.abovebar, color.new(cStop, 20), size = size.tiny)
@@ -184,58 +351,92 @@ plotshape(verAvi and rotura and not rotura[1], "Cuerpo fuera del nivel", shape.x
 f2(float x) => str.tostring(x, format.mintick)
 f1(float x) => str.tostring(x, "#.0")
 
-var table T = table.new(position.top_right, 3, 13, border_width = 1,
+var table T = table.new(position.top_right, 3, 20, border_width = 1,
      frame_width = 1, frame_color = color.new(color.gray, 60))
 
-fila(int r, string a, string b, string c, color col) =>
-    table.cell(T, 0, r, a, text_size = size.small, text_halign = text.align_left,
-         text_color = col)
-    table.cell(T, 1, r, b, text_size = size.small, text_halign = text.align_right,
-         text_color = col)
-    table.cell(T, 2, r, c, text_size = size.small, text_halign = text.align_right,
-         text_color = col)
+//  Las filas se juntan en arrays y luego se vuelcan: asi el numero de filas puede
+//  cambiar -el CRT es opcional- sin tener que llevar indices a mano.
+var string[] fA = array.new<string>()
+var string[] fB = array.new<string>()
+var string[] fC = array.new<string>()
+var color[]  fK = array.new<color>()
+
+pon(string a, string b, string c, color k) =>
+    array.push(fA, a)
+    array.push(fB, b)
+    array.push(fC, c)
+    array.push(fK, k)
+
+nombre(int x) => x > 0 ? "alcista" : x < 0 ? "bajista" : "no hay"
 
 if verTab and barstate.islast
-    gris = color.new(color.gray, 20)
+    array.clear(fA)
+    array.clear(fB)
+    array.clear(fC)
+    array.clear(fK)
+    gris  = color.new(color.gray, 20)
     tinta = chart.fg_color
-
     transc = mDia - aFinM
     quedan = vFinMin - mDia
     reloj = (h < 10 ? "0" : "") + str.tostring(h) + ":" + (mi < 10 ? "0" : "") + str.tostring(mi)
-    fila(0, "LONDRES", reloj,
-         enVentana ? str.tostring(quedan) + " min" : "fuera", tinta)
-    fila(1, "ventana", enVentana ? (buena ? "BUENA" : "tardía") : "cerrada",
-         enVentana ? "+" + str.tostring(transc) + " min" : "",
-         enVentana ? (buena ? cObj : cAsia) : gris)
 
-    fila(2, "alto de Asia",  hayAsia ? f2(asiaHi) : "—",
-         hayAsia ? f1(pips(asiaHi - close)) + " p" : "", cAsia)
-    fila(3, "bajo de Asia",  hayAsia ? f2(asiaLo) : "—",
-         hayAsia ? f1(pips(close - asiaLo)) + " p" : "", cAsia)
-    fila(4, "alto Londres",  na(sesHi) ? "—" : f2(sesHi),
-         na(sesHi) ? "" : f1(pips(sesHi - close)) + " p", cSes)
-    fila(5, "bajo Londres",  na(sesLo) ? "—" : f2(sesLo),
-         na(sesLo) ? "" : f1(pips(close - sesLo)) + " p", cSes)
+    pon("LONDRES", reloj, enVentana ? str.tostring(quedan) + " min" : "fuera", tinta)
+    pon("ventana", enVentana ? (buena ? "BUENA" : "tardía") : "cerrada",
+        enVentana ? "+" + str.tostring(transc) + " min" : "",
+        enVentana ? (buena ? cObj : cAsia) : gris)
 
-    fila(6, "stop compra", f2(stopL), f1(pips(rgoL)) + " p", cStop)
-    fila(7, "objetivo",    f2(objL),  str.tostring(ratio, "#.#") + " R", cObj)
-    fila(8, "stop venta",  f2(stopC), f1(pips(rgoC)) + " p", cStop)
-    fila(9, "objetivo",    f2(objC),  str.tostring(ratio, "#.#") + " R", cObj)
+    // lo unico que separa sus ganadoras de sus perdedoras
+    pon("CUERPO de esta vela", str.tostring(cuerpo5, "#") + " %",
+        llenaViva ? "LLENO" : "normal", llenaViva ? cStop : cObj)
+    pon("la anterior cerró con", na(cuerpoP) ? "—" : str.tostring(cuerpoP, "#") + " %",
+        na(cuerpoP) ? "" : (llenaCerr ? "lleno" : "normal"),
+        na(cuerpoP) ? gris : (llenaCerr ? cStop : cObj))
+    pon("nivel de Asia", tocaNivel ? "TOCANDO" : "lejos",
+        tocaNivel ? "el cuerpo importa menos" : "el cuerpo manda",
+        tocaNivel ? cAsia : gris)
 
-    fila(10, str.tostring(riesgoPc, "#.##") + " % de " + str.tostring(capital, "#"),
-         str.tostring(lotes(rgoL), "#.##") + " lotes",
-         str.tostring(lotes(rgoC), "#.##") + " lotes", tinta)
+    pon("alto de Asia", hayAsia ? f2(asiaHi) : "—",
+        hayAsia ? f1(pips(asiaHi - close)) + " p" : "", cAsia)
+    pon("bajo de Asia", hayAsia ? f2(asiaLo) : "—",
+        hayAsia ? f1(pips(close - asiaLo)) + " p" : "", cAsia)
+    pon("alto Londres", na(sesHi) ? "—" : f2(sesHi),
+        na(sesHi) ? "" : f1(pips(sesHi - close)) + " p", cSes)
+    pon("bajo Londres", na(sesLo) ? "—" : f2(sesLo),
+        na(sesLo) ? "" : f1(pips(close - sesLo)) + " p", cSes)
 
-    aviso = tfAlto ? "gráfico por encima de M5: el stop no vale" :
-            rotura ? "CUERPO FUERA DEL NIVEL · tu peor caja, 33 %" :
-            pegAlto ? "pegado al alto de Londres · tu mejor caja" :
-            pegBajo ? "pegado al bajo de Londres · tu mejor caja" :
+    pon("stop compra", f2(stopL), f1(pips(rgoL)) + " p", cStop)
+    pon("objetivo",    f2(objL),  str.tostring(ratio, "#.#") + " R", cObj)
+    pon("stop venta",  f2(stopC), f1(pips(rgoC)) + " p", cStop)
+    pon("objetivo",    f2(objC),  str.tostring(ratio, "#.#") + " R", cObj)
+    pon(str.tostring(riesgoPc, "#.##") + " % de " + str.tostring(capital, "#"),
+        str.tostring(lotes(rgoL), "#.##") + " lotes",
+        str.tostring(lotes(rgoC), "#.##") + " lotes", tinta)
+
+    if verCRT
+        pon("CRT en H4", nombre(crtH4), crtH4v != 0 ? "vivo: " + nombre(crtH4v) : "", gris)
+        pon("CRT en M15", nombre(crtM15), "no separó nada en tus 150", gris)
+
+    if verVer
+        pon(verTxt, "", "", verCol)
+
+    aviso = tfAlto   ? "gráfico por encima de M5: el stop no vale" :
+            rotura   ? "cuerpo fuera del nivel de Asia · tu peor caja, 33 %" :
+            pegAlto  ? "pegado al alto de Londres" :
+            pegBajo  ? "pegado al bajo de Londres" :
             rechAlto ? "rechazo del alto de Asia" :
-            rechBajo ? "rechazo del bajo de Asia" :
-            not enVentana ? "fuera de ventana" : "sin nada pegado"
-    cAv = tfAlto or rotura ? cStop : (pegAlto or pegBajo or rechAlto or rechBajo) ? cObj : gris
-    fila(11, aviso, "", "", cAv)
-    fila(12, "dos pérdidas y paras · 1:2 siempre", "", "", gris)
+            rechBajo ? "rechazo del bajo de Asia" : ""
+    if aviso != ""
+        pon(aviso, "", "", tfAlto or rotura ? cStop : cSes)
+    pon("dos pérdidas y paras · 1:2 siempre", "", "", gris)
+
+    table.clear(T, 0, 0, 2, 19)
+    for i = 0 to array.size(fA) - 1
+        table.cell(T, 0, i, array.get(fA, i), text_size = size.small,
+             text_halign = text.align_left,  text_color = array.get(fK, i))
+        table.cell(T, 1, i, array.get(fB, i), text_size = size.small,
+             text_halign = text.align_right, text_color = array.get(fK, i))
+        table.cell(T, 2, i, array.get(fC, i), text_size = size.small,
+             text_halign = text.align_right, text_color = array.get(fK, i))
 
 // ─── alertas ──────────────────────────────────────────────────────────────
 alertcondition(rechAlto, "Rechazo del alto de Asia",
