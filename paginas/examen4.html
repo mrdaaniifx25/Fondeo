@@ -195,7 +195,7 @@ textarea{font-family:"IBM Plex Serif",Georgia,serif; min-height:52px; resize:ver
     <div class="regla"><b>No sabes qué día es</b><span>Veinte días laborables elegidos con semilla fija sobre 1.661 candidatos, sin filtrar por resultado. No verás la fecha hasta el final.</span></div>
     <div class="regla"><b>Sí ves el resultado de cada operación</b><span>A diferencia del simulador anterior. Lo necesitas para poder parar tras dos pérdidas, que es tu regla.</span></div>
     <div class="regla"><b>Ahora dices por qué entras, y por qué crees que falló</b><span>Es el cambio que más importa de este bloque. Con solo el resultado harían falta cientos de operaciones para encontrar un rasgo pequeño; con tu razonamiento, muchas menos. Un toque en una etiqueta basta.</span></div>
-    <div class="regla"><b>Empiezas con 10.000 € y las reglas del reto</b><span>Riesgo del <b>1 % por operación</b> —100 €, con el lotaje calculado según tu stop—. Objetivo <b>+800 €</b>. Si pierdes <b>500 € en un día</b> o <b>1.000 € en total</b>, la cuenta se acaba y empiezas otra. Las sesiones siguen donde estaban.</span></div>
+    <div class="regla"><b>Las reglas reales de FundingPips · 2 Step Standard, 10.000 $</b><span>Objetivo de fase 1 <b>+8 %</b> (800 $) con <b>mínimo 3 días operados</b> y sin límite de tiempo. Pérdida máxima diaria <b>5 %</b> (500 $) y total <b>10 %</b> (1.000 $). Riesgo del <b>1 % por operación</b> —100 $, con el lotaje calculado desde tu stop—. Si revientas un límite, la cuenta se acaba y empiezas otra; las sesiones siguen donde estaban.</span></div>
     <div class="regla"><b>Para cada diez sesiones</b><span>Fresco aciertas el 73 %, cansado el 30 %. Está medido en dos bloques. Levántate diez minutos.</span></div>
     <div class="regla"><b>Se anota la hora de cada decisión</b><span>Para medir el cansancio en vez de tener que recordarlo. Solo la hora, nada más.</span></div>
     <div class="regla"><b>Se guarda solo</b><span>En este navegador. Cierras, vuelves y sigues donde lo dejaste.</span></div>
@@ -212,13 +212,13 @@ textarea{font-family:"IBM Plex Serif",Georgia,serif; min-height:52px; resize:ver
   <div class="veredicto" id="veredicto"></div>
 
   <div class="cta" id="cta">
-    <div><span class="et">saldo</span><span class="va mono" id="ctaSaldo">10.000 €</span>
-      <span class="su" id="ctaIntento">intento 1</span></div>
-    <div><span class="et">objetivo · 10.800</span><span class="va mono" id="ctaObj">0 €</span>
+    <div><span class="et">saldo</span><span class="va mono" id="ctaSaldo">10.000 $</span>
+      <span class="su" id="ctaIntento">intento 1 · 0 días</span></div>
+    <div><span class="et">objetivo · 10.800 $</span><span class="va mono" id="ctaObj">0 $</span>
       <span class="barrita"><i class="ok" id="ctaBarObj"></i></span></div>
-    <div><span class="et">hoy · límite −500</span><span class="va mono" id="ctaDia">0 €</span>
+    <div><span class="et">hoy · límite −500 $</span><span class="va mono" id="ctaDia">0 $</span>
       <span class="barrita"><i class="no" id="ctaBarDia"></i></span></div>
-    <div><span class="et">colchón total · 9.000</span><span class="va mono" id="ctaTot">1.000 €</span>
+    <div><span class="et">colchón total · 9.000 $</span><span class="va mono" id="ctaTot">1.000 $</span>
       <span class="su">antes de perder la cuenta</span></div>
   </div>
 
@@ -315,9 +315,9 @@ const U = 1e-4, FIN = 210, CLAVE = "examen-londres-4c";
 const P = x => x/100000;
 const CUENTA = 10000, RIESGO = 0.01;          // 1 % del inicial del intento
 const LIM_DIA = 0.05*CUENTA, LIM_TOT = 0.10*CUENTA, OBJ = 0.08*CUENTA;
-const EURO = R => R * CUENTA * RIESGO;         // 100 € por R
+const DOLAR = R => R * CUENTA * RIESGO;        // 100 $ por R
 let S = {i:0, t:0, dec:{}, pos:null,
-         cta:{n:1, saldo:CUENTA, ini:CUENTA, diaIni:CUENTA, estado:"viva", historia:[]}};
+         cta:{n:1, saldo:CUENTA, ini:CUENTA, diaIni:CUENTA, estado:"viva", dias:0, historia:[]}};
 try { S = Object.assign(S, JSON.parse(localStorage.getItem(CLAVE) || "{}")); } catch(e) {}
 const guarda = () => { try { localStorage.setItem(CLAVE, JSON.stringify(S)); } catch(e) {} };
 const $ = id => document.getElementById(id);
@@ -455,13 +455,14 @@ function pinta(rapido){
   previo();
 }
 
-const eur = x => (x<0?"−":"") + Math.abs(Math.round(x)).toLocaleString("es-ES") + " €";
+const eur = x => (x<0?"−":"") + Math.abs(Math.round(x)).toLocaleString("es-ES") + " $";
 function ctaPinta(){
   const c = S.cta;
   const gan = c.saldo - c.ini, dia = c.saldo - c.diaIni, colchon = c.saldo - (c.ini - LIM_TOT);
   $("ctaSaldo").textContent = eur(c.saldo);
   $("ctaSaldo").className = "va mono " + (gan>0?"bien":gan<0?"mal":"");
-  $("ctaIntento").textContent = "intento " + c.n;
+  $("ctaIntento").textContent = `intento ${c.n} · ${c.dias||0} ${(c.dias||0)===1?"día":"días"}`
+    + ((c.dias||0) < 3 ? " (mín. 3)" : "");
   $("ctaObj").textContent = eur(gan);
   $("ctaObj").className = "va mono " + (gan>0?"bien":gan<0?"mal":"");
   $("ctaBarObj").style.width = Math.max(0, Math.min(100, 100*gan/OBJ)) + "%";
@@ -608,11 +609,12 @@ function cierra(motivo, R, salida){
     + ` · ${R >= 0 ? "+" : ""}${R.toFixed(2)} R a las ${hhmm(S.t)}`
     + (per >= 2 && R < 0 ? " · llevas dos pérdidas, tu regla dice parar" : ""));
   const c = S.cta;
-  c.saldo += EURO(R);
+  c.saldo += DOLAR(R);
+  if (!reg().contado){ reg().contado = true; c.dias++; }   // día operado, para el mínimo de 3
   const dia = c.saldo - c.diaIni, gan = c.saldo - c.ini;
-  if (dia <= -LIM_DIA)            cierraCuenta("revienta", "Has superado la pérdida máxima diaria de 500 €.");
-  else if (gan <= -LIM_TOT)       cierraCuenta("revienta", "Has superado la pérdida máxima total de 1.000 €.");
-  else if (gan >= OBJ)            cierraCuenta("pasa", "Has llegado al objetivo del 8 %.");
+  if (dia <= -LIM_DIA)            cierraCuenta("revienta", "Has superado la pérdida máxima diaria de 500 $.");
+  else if (gan <= -LIM_TOT)       cierraCuenta("revienta", "Has superado la pérdida máxima total de 1.000 $.");
+  else if (gan >= OBJ && c.dias >= 3) cierraCuenta("pasa", "Has llegado al objetivo del 8 % con 3 días operados.");
   if (motivo === "SL" && c.estado === "viva"){
     FALLO.limpia();
     $("fallo").classList.add("ver");
@@ -636,7 +638,7 @@ function cierraCuenta(estado, texto){
   v.className = "veredicto ver " + estado;
   v.innerHTML = `<h3>${estado === "pasa" ? "Reto superado · intento " + c.n
                                           : "Cuenta reventada · intento " + c.n}</h3>`
-    + `<p>${texto} Saldo final ${eur(c.saldo)}. Empiezas el intento ${c.n+1} con 10.000 € `
+    + `<p>${texto} Saldo final ${eur(c.saldo)}. Empiezas el intento ${c.n+1} con 10.000 $ `
     + `en la siguiente sesión.</p>`;
   S.pos = null;
   S.t = FIN;
@@ -702,7 +704,7 @@ $("btnSiguiente").addEventListener("click", () => {
   if (j < 0){ final(); return; }
   S.i = j; S.t = 0; S.pos = null;
   const c = S.cta;
-  if (c.estado !== "viva"){ c.n++; c.saldo = CUENTA; c.ini = CUENTA; c.estado = "viva"; }
+  if (c.estado !== "viva"){ c.n++; c.saldo = CUENTA; c.ini = CUENTA; c.estado = "viva"; c.dias = 0; }
   c.diaIni = c.saldo;                       // el límite diario se mide desde aquí
   $("veredicto").classList.remove("ver");
   $("resumen").classList.remove("ver"); $("fallo").classList.remove("ver"); tapa();
@@ -741,9 +743,9 @@ function texto(){
   if (h.length || S.cta.saldo !== CUENTA){
     L.push("", "CUENTAS");
     for (const x of h)
-      L.push(`  intento ${x.n}: ${x.estado.toUpperCase()} con ${x.saldo} € en la sesión ${x.ses}`);
+      L.push(`  intento ${x.n}: ${x.estado.toUpperCase()} con ${x.saldo} $ en la sesión ${x.ses}`);
     if (S.cta.estado === "viva")
-      L.push(`  intento ${S.cta.n}: en curso con ${Math.round(S.cta.saldo)} €`);
+      L.push(`  intento ${S.cta.n}: en curso con ${Math.round(S.cta.saldo)} $`);
     L.push(`  ${h.filter(x=>x.estado==="pasa").length} superados · `
       + `${h.filter(x=>x.estado==="revienta").length} reventados`);
   }
@@ -780,7 +782,7 @@ $("btnEmpezar").addEventListener("click", () => {
 function borraTodo(){
   try { localStorage.removeItem(CLAVE); } catch(e) {}
   S = {i:0, t:0, dec:{}, pos:null,
-       cta:{n:1, saldo:CUENTA, ini:CUENTA, diaIni:CUENTA, estado:"viva", historia:[]}};
+       cta:{n:1, saldo:CUENTA, ini:CUENTA, diaIni:CUENTA, estado:"viva", dias:0, historia:[]}};
   try { location.reload(); }
   catch(e) {                                     // por si la recarga no sale
     caja = null; dir = null; S.pos = null;

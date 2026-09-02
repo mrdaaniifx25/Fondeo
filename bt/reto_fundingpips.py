@@ -41,17 +41,21 @@ TODO  = sesiones([("data/examen_respuestas_1.txt", "data/examen_dias.json"),
 FLOJO = sesiones([("data/examen_respuestas_1.txt", "data/examen_dias.json"),
                   ("data/examen_respuestas_2.txt", "data/examen_dias2.json")])
 
-def fase(ses, riesgo, objetivo, rng, saldo0):
-    """Devuelve 'pasa', 'revienta' o 'tiempo'. El riesgo es fijo sobre el inicial."""
+def fase(ses, riesgo, objetivo, rng, saldo0, arrastra=False):
+    """Devuelve 'pasa', 'revienta' o 'tiempo'. El riesgo es fijo sobre el inicial.
+
+    `arrastra` = el suelo de perdida total sigue al maximo alcanzado (trailing)
+    en vez de quedarse fijo en el saldo inicial menos el 10 %.
+    """
     unidad = saldo0 * riesgo
     saldo, pico = saldo0, saldo0
-    suelo_tot = saldo0 - CUENTA*LIM_TOT
     for dia in range(DIAS_MAX):
         s = ses[rng.integers(len(ses))]
-        ini_dia = saldo
-        suelo_dia = ini_dia - CUENTA*LIM_DIA
+        suelo_dia = saldo - CUENTA*LIM_DIA
         for R in s:
             saldo += R*unidad
+            pico = max(pico, saldo)
+            suelo_tot = (pico if arrastra else saldo0) - CUENTA*LIM_TOT
             if saldo <= suelo_dia or saldo <= suelo_tot:
                 return "revienta", dia+1, saldo
         if saldo >= saldo0 + CUENTA*objetivo and dia+1 >= DIAS_MIN:
