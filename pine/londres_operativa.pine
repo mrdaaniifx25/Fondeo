@@ -1,0 +1,248 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// at https://mozilla.org/MPL/2.0/
+//
+//  Londres · niveles, stop y 1:2
+//
+//  Esto NO da señales de entrada. Se midieron sus 150 operaciones contra los
+//  147.690 momentos que tenia disponibles y la parte mecanizable de su metodo
+//  -donde mira, donde pone el stop, cuando opera- se reproduce con AUC 0,800,
+//  pero puesta a operar sola saca un 37,4 % en 1.032 dias nuevos y el
+//  equilibrio con coste esta en el 41,3 %. O sea: la seleccion de la vela es
+//  suya y no se automatiza. Lo que si esta medido y se automatiza es todo lo
+//  demas, y es lo que hace este indicador.
+//
+//  Lo que dibuja:
+//    · alto y bajo de Asia (00:00-08:00), fijados cuando Asia cierra
+//    · alto y bajo que lleva la propia sesion de Londres, en vivo
+//        -> el 36,7 % de sus entradas estan pegadas a estos, y son su mejor
+//           caja: 73,5 % de acierto
+//    · el stop que el pone, medido: el extremo de los ultimos 10 minutos
+//        -> mediana 5,9 p contra los 6,0 p que pone el, error mediano 1,3 p
+//    · el objetivo 1:2 que sale de ese stop, y los lotes para el riesgo elegido
+//    · aviso cuando el precio cierra el cuerpo FUERA del nivel de Asia, que es
+//      su peor caja: 33,3 %, el azar exacto
+//
+//  Todo en docs/RESULTADOS_modelo_entradas.md
+//
+//  AVISO: escrito sin poder compilarlo. Si TradingView se queja de algo, pega
+//  el error tal cual y se arregla en un minuto.
+//@version=6
+indicator("Londres · niveles, stop y 1:2", overlay = true, max_labels_count = 200)
+
+// ─── ventana ──────────────────────────────────────────────────────────────
+gV = "Ventana"
+tz    = input.string("Europe/Madrid", "Huso horario", group = gV,
+     options = ["Europe/Madrid", "Europe/London", "America/New_York", "UTC"])
+aIni  = input.int(0,  "Asia empieza a las",     0, 23, group = gV)
+aFin  = input.int(8,  "Asia acaba a las",       1, 23, group = gV)
+vFinH = input.int(11, "Dejas de operar a las",  1, 23, group = gV, inline = "f")
+vFinM = input.int(30, ":",                      0, 59, group = gV, inline = "f")
+buenaM= input.int(90, "Minutos de ventana buena", 15, 210, group = gV,
+     tooltip = "Sus 150 entradas tienen la mediana a los 40 minutos de la " +
+     "apertura. Pasada esta marca el indicador lo avisa.")
+
+// ─── stop ─────────────────────────────────────────────────────────────────
+gS = "Stop y objetivo"
+retroMin = input.int(10, "El stop es el extremo de los últimos (minutos)", 5, 60,
+     group = gS, tooltip = "10 minutos es lo que mejor reproduce donde pone el " +
+     "stop: mediana 5,9 p contra sus 6,0 p, con 1,3 p de error mediano. Dos " +
+     "velas de M5 dan practicamente lo mismo.")
+ratio    = input.float(2.0, "Objetivo (R)", 0.5, 10.0, step = 0.5, group = gS)
+colchon  = input.float(0.0, "Colchón por debajo del extremo (pips)", 0.0, 10.0,
+     step = 0.1, group = gS)
+verLin   = input.bool(true, "Dibujar stop y objetivo", group = gS)
+
+// ─── cuenta ───────────────────────────────────────────────────────────────
+gC = "Cuenta"
+capital  = input.float(10000, "Capital", 100, 10000000, group = gC)
+riesgoPc = input.float(0.5, "Riesgo por operación (%)", 0.05, 5.0, step = 0.05,
+     group = gC, tooltip = "0,5 % las primeras 20 operaciones en directo, que " +
+     "son la medicion. Si el acierto aguanta por encima del 55 %, 1 %. Al 2 % " +
+     "revientan cuentas.")
+valorPip = input.float(10.0, "Valor del pip por lote estándar", 0.01, 1000,
+     group = gC, tooltip = "10 $ en EURUSD con lote de 100.000.")
+
+// ─── aspecto ──────────────────────────────────────────────────────────────
+gA = "Aspecto"
+cAsia = input.color(#B07D18, "Niveles de Asia",   group = gA)
+cSes  = input.color(#2A4A7F, "Extremos de Londres", group = gA)
+cStop = input.color(#A8382C, "Stop",              group = gA)
+cObj  = input.color(#23735A, "Objetivo",          group = gA)
+verTab= input.bool(true,  "Tabla",  group = gA)
+verFon= input.bool(true,  "Sombrear la ventana", group = gA)
+verAvi= input.bool(true,  "Avisos sobre el gráfico", group = gA)
+
+// ─── pip ──────────────────────────────────────────────────────────────────
+dig = math.round(-math.log10(syminfo.mintick))
+pip = (dig == 5 or dig == 3) ? syminfo.mintick * 10 : syminfo.mintick
+pips(float d) => d / pip
+
+// ─── reloj ────────────────────────────────────────────────────────────────
+h    = hour(time, tz)
+mi   = minute(time, tz)
+mDia = h * 60 + mi
+dSem = dayofweek(time, tz)
+habil = dSem != dayofweek.saturday and dSem != dayofweek.sunday
+
+aIniM = aIni * 60
+aFinM = aFin * 60
+vFinMin = vFinH * 60 + vFinM
+
+enAsia    = habil and (aIniM < aFinM ? (mDia >= aIniM and mDia < aFinM)
+                                     : (mDia >= aIniM or  mDia < aFinM))
+enVentana = habil and mDia >= aFinM and mDia < vFinMin
+buena     = enVentana and (mDia - aFinM) <= buenaM
+
+abreAsia  = enAsia    and not enAsia[1]
+cierraAsia= not enAsia and enAsia[1]
+abreLon   = enVentana and not enVentana[1]
+
+// ─── Asia ─────────────────────────────────────────────────────────────────
+var float acHi   = na
+var float acLo   = na
+var float asiaHi = na
+var float asiaLo = na
+if abreAsia
+    acHi   := high
+    acLo   := low
+    asiaHi := na            // el de ayer deja de valer en cuanto empieza el nuevo
+    asiaLo := na
+else if enAsia
+    acHi := math.max(nz(acHi, high), high)
+    acLo := math.min(nz(acLo, low),  low)
+if cierraAsia
+    asiaHi := acHi
+    asiaLo := acLo
+
+// ─── extremos que lleva Londres ───────────────────────────────────────────
+var float sesHi = na
+var float sesLo = na
+if abreLon
+    sesHi := high
+    sesLo := low
+else if enVentana
+    sesHi := math.max(nz(sesHi, high), high)
+    sesLo := math.min(nz(sesLo, low),  low)
+
+// ─── el stop que el pone ──────────────────────────────────────────────────
+int nBar = math.max(1, retroMin * 60 / timeframe.in_seconds())
+tfAlto = timeframe.in_seconds() > 300      // por encima de M5 el stop pierde sentido
+
+stopL = ta.lowest(low,   nBar) - colchon * pip
+stopC = ta.highest(high, nBar) + colchon * pip
+rgoL  = close - stopL
+rgoC  = stopC - close
+objL  = close + ratio * rgoL
+objC  = close - ratio * rgoC
+
+lotes(float rgo) =>
+    p = pips(rgo)
+    p <= 0 ? 0.0 : (capital * riesgoPc / 100) / (p * valorPip)
+
+// ─── avisos ───────────────────────────────────────────────────────────────
+hayAsia = not na(asiaHi) and not na(asiaLo)
+cuerpoAlto = hayAsia and math.min(open, close) > asiaHi
+cuerpoBajo = hayAsia and math.max(open, close) < asiaLo
+rotura     = enVentana and (cuerpoAlto or cuerpoBajo)
+
+rechAlto = enVentana and hayAsia and low <= asiaHi and high >= asiaHi and close < asiaHi
+rechBajo = enVentana and hayAsia and low <= asiaLo and high >= asiaLo and close > asiaLo
+
+pegAlto = enVentana and not na(sesHi) and pips(sesHi - close) <= 3
+pegBajo = enVentana and not na(sesLo) and pips(close - sesLo) <= 3
+
+// ─── dibujo ───────────────────────────────────────────────────────────────
+plot(hayAsia and (enAsia or enVentana) ? asiaHi : na, "Alto de Asia",
+     color = cAsia, linewidth = 2, style = plot.style_linebr)
+plot(hayAsia and (enAsia or enVentana) ? asiaLo : na, "Bajo de Asia",
+     color = cAsia, linewidth = 2, style = plot.style_linebr)
+plot(enVentana ? sesHi : na, "Alto de Londres", color = cSes, linewidth = 1,
+     style = plot.style_linebr)
+plot(enVentana ? sesLo : na, "Bajo de Londres", color = cSes, linewidth = 1,
+     style = plot.style_linebr)
+
+plot(verLin and enVentana ? stopL : na, "Stop de compra", color = color.new(cStop, 40),
+     linewidth = 1, style = plot.style_circles)
+plot(verLin and enVentana ? stopC : na, "Stop de venta",  color = color.new(cStop, 40),
+     linewidth = 1, style = plot.style_circles)
+plot(verLin and enVentana ? objL : na, "Objetivo de compra", color = color.new(cObj, 55),
+     linewidth = 1, style = plot.style_circles)
+plot(verLin and enVentana ? objC : na, "Objetivo de venta",  color = color.new(cObj, 55),
+     linewidth = 1, style = plot.style_circles)
+
+bgcolor(verFon and enVentana ? color.new(cSes, buena ? 93 : 96) : na, title = "Ventana")
+
+plotshape(verAvi and rechAlto, "Rechazo del alto de Asia", shape.triangledown,
+     location.abovebar, color.new(cStop, 20), size = size.tiny)
+plotshape(verAvi and rechBajo, "Rechazo del bajo de Asia", shape.triangleup,
+     location.belowbar, color.new(cObj, 20), size = size.tiny)
+plotshape(verAvi and rotura and not rotura[1], "Cuerpo fuera del nivel", shape.xcross,
+     location.abovebar, color.new(color.gray, 20), size = size.tiny,
+     text = "rotura")
+
+// ─── tabla ────────────────────────────────────────────────────────────────
+f2(float x) => str.tostring(x, format.mintick)
+f1(float x) => str.tostring(x, "#.0")
+
+var table T = table.new(position.top_right, 3, 13, border_width = 1,
+     frame_width = 1, frame_color = color.new(color.gray, 60))
+
+fila(int r, string a, string b, string c, color col) =>
+    table.cell(T, 0, r, a, text_size = size.small, text_halign = text.align_left,
+         text_color = col)
+    table.cell(T, 1, r, b, text_size = size.small, text_halign = text.align_right,
+         text_color = col)
+    table.cell(T, 2, r, c, text_size = size.small, text_halign = text.align_right,
+         text_color = col)
+
+if verTab and barstate.islast
+    gris = color.new(color.gray, 20)
+    tinta = chart.fg_color
+
+    transc = mDia - aFinM
+    quedan = vFinMin - mDia
+    reloj = (h < 10 ? "0" : "") + str.tostring(h) + ":" + (mi < 10 ? "0" : "") + str.tostring(mi)
+    fila(0, "LONDRES", reloj,
+         enVentana ? str.tostring(quedan) + " min" : "fuera", tinta)
+    fila(1, "ventana", enVentana ? (buena ? "BUENA" : "tardía") : "cerrada",
+         enVentana ? "+" + str.tostring(transc) + " min" : "",
+         enVentana ? (buena ? cObj : cAsia) : gris)
+
+    fila(2, "alto de Asia",  hayAsia ? f2(asiaHi) : "—",
+         hayAsia ? f1(pips(asiaHi - close)) + " p" : "", cAsia)
+    fila(3, "bajo de Asia",  hayAsia ? f2(asiaLo) : "—",
+         hayAsia ? f1(pips(close - asiaLo)) + " p" : "", cAsia)
+    fila(4, "alto Londres",  na(sesHi) ? "—" : f2(sesHi),
+         na(sesHi) ? "" : f1(pips(sesHi - close)) + " p", cSes)
+    fila(5, "bajo Londres",  na(sesLo) ? "—" : f2(sesLo),
+         na(sesLo) ? "" : f1(pips(close - sesLo)) + " p", cSes)
+
+    fila(6, "stop compra", f2(stopL), f1(pips(rgoL)) + " p", cStop)
+    fila(7, "objetivo",    f2(objL),  str.tostring(ratio, "#.#") + " R", cObj)
+    fila(8, "stop venta",  f2(stopC), f1(pips(rgoC)) + " p", cStop)
+    fila(9, "objetivo",    f2(objC),  str.tostring(ratio, "#.#") + " R", cObj)
+
+    fila(10, str.tostring(riesgoPc, "#.##") + " % de " + str.tostring(capital, "#"),
+         str.tostring(lotes(rgoL), "#.##") + " lotes",
+         str.tostring(lotes(rgoC), "#.##") + " lotes", tinta)
+
+    aviso = tfAlto ? "gráfico por encima de M5: el stop no vale" :
+            rotura ? "CUERPO FUERA DEL NIVEL · tu peor caja, 33 %" :
+            pegAlto ? "pegado al alto de Londres · tu mejor caja" :
+            pegBajo ? "pegado al bajo de Londres · tu mejor caja" :
+            rechAlto ? "rechazo del alto de Asia" :
+            rechBajo ? "rechazo del bajo de Asia" :
+            not enVentana ? "fuera de ventana" : "sin nada pegado"
+    cAv = tfAlto or rotura ? cStop : (pegAlto or pegBajo or rechAlto or rechBajo) ? cObj : gris
+    fila(11, aviso, "", "", cAv)
+    fila(12, "dos pérdidas y paras · 1:2 siempre", "", "", gris)
+
+// ─── alertas ──────────────────────────────────────────────────────────────
+alertcondition(rechAlto, "Rechazo del alto de Asia",
+     "Londres: mecha en el alto de Asia y cierre por debajo")
+alertcondition(rechBajo, "Rechazo del bajo de Asia",
+     "Londres: mecha en el bajo de Asia y cierre por encima")
+alertcondition(pegAlto and not pegAlto[1], "Pegado al alto de Londres",
+     "Londres: el precio está en el máximo de la sesión")
+alertcondition(pegBajo and not pegBajo[1], "Pegado al bajo de Londres",
+     "Londres: el precio está en el mínimo de la sesión")
