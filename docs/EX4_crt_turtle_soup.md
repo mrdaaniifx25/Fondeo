@@ -102,3 +102,49 @@ Para que el barrido tuviera alguna opción habría que ejecutarlo en la
 temporalidad de la referencia, no en M5. Eso es lo que se midió en
 `RESULTADOS_escala_diaria.md`: con stop de 64 pips el muro baja a +0,8 puntos, y
 allí el barrido diario sacó **−2,5**.
+
+## Cómo se mide SU código, y no una reimplementación
+
+Un indicador **no se backtestea**: el Strategy Tester de MT4 solo prueba Expert
+Advisors. Para medir el suyo hace falta un EA que lea sus buffers con
+`iCustom()` y opere lo que marquen. Eso es `mql4/CRT_TS_Test.mq4`.
+
+Va en dos pasadas:
+
+```
+1 · DIAGNOSTICO   ModoDiagnostico = true, un mes por el Tester.
+                  En el Diario sale, por cada vela con señal, que buffer se ha
+                  encendido y con que valor. Asi se sabe cual es la compra y
+                  cual la venta, sin necesidad de leer su codigo.
+
+2 · MEDICION      ModoDiagnostico = false, se meten esos numeros de buffer,
+                  y se pasa por los años que se quieran.
+```
+
+El EA calcula el lotaje desde el riesgo elegido y el stop real de cada señal,
+descarta las señales ambiguas —los dos buffers encendidos a la vez—, respeta el
+`STOPLEVEL` del broker y permite stop en la mecha de la vela de señal o fijo en
+pips.
+
+**Lo que hay que vigilar en el Tester**, porque es donde se falsean casi todos
+los backtests que circulan:
+
+- Modelado **«Cada tick»**. Con «Solo precios de apertura» en M5 el resultado no
+  vale nada.
+- **Calidad del modelado** al acabar: por debajo del 90 % no es fiable.
+- **Spread real** del broker, no el de por defecto. Con stops de 3 a 6 pips el
+  spread decide el resultado entero.
+- Y antes de nada, **la prueba del repintado**: si el indicador cambia sus marcas
+  al recargar el histórico, ningún backtest de este EA significa nada, porque en
+  directo no habría marcado eso.
+
+## Lo que no se puede hacer desde aquí
+
+Ejecutar el binario. Necesita MetaTrader 4 sobre Windows, y este entorno no tiene
+MT4 ni salida a internet salvo a GitHub. Tampoco se puede reimplementar su código
+exacto: está comprimido.
+
+Lo que sí se ha hecho es medir **el patrón** con todas las configuraciones que el
+indicador plausiblemente ofrece —cuatro referencias, 38.811 operaciones— y el
+resultado está arriba: el acierto cae en la geometría, y hacen falta entre 8 y 15
+puntos por encima.
