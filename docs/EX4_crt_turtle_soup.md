@@ -73,3 +73,32 @@ leer— sino el patrón implementado desde su definición:
 - La tabla lleva escrito el 34,7 % al lado, para que no se lea como una señal.
 
 Sin compilar en TradingView: escrito aquí sin poder probarlo.
+
+## Y la comprobación que de verdad contesta «¿funciona?»
+
+El indicador deja elegir la referencia. Se mide el patrón con **todas**,
+ejecutando en M5 que es donde él opera, stop en la mecha del barrido y 1:2:
+
+| referencia | n | stop mediano | coste/riesgo | ventaja que hace falta | la que tiene | R neta | z |
+|---|---|---|---|---|---|---|---|
+| M15 | 22.105 | 3,1 p | 46,1 % | **+15,4 pt** | **+0,1 pt** | −0,488 | −50,69 |
+| H1 | 11.854 | 3,6 p | 39,7 % | **+13,2 pt** | **0,0 pt** | −0,433 | −33,03 |
+| H4 | 4.297 | 4,3 p | 33,3 % | **+11,1 pt** | **−0,7 pt** | −0,397 | −18,32 |
+| D1 | 555 | 6,2 p | 23,1 % | **+7,7 pt** | **0,0 pt** | −0,279 | −4,63 |
+
+`ventaja que hace falta = (coste/stop)/(1+k)`, los puntos sobre el 33,3 %
+geométrico que hay que sacar solo para empatar.
+
+**38.811 operaciones y el acierto cae en el 33,3 % geométrico con una décima de
+punto de margen, cuatro veces seguidas.** El patrón no es bueno ni malo: es
+exactamente una moneda. Y hacen falta entre 8 y 15 puntos.
+
+Lo importante para él: **da igual qué referencia le ponga al indicador.** Cambiar
+M15 por H4 o por diario no cambia nada, porque el stop sigue siendo la mecha del
+barrido en M5 —tres a seis pips— y ahí el coste se lleva entre el 23 % y el 46 %
+del riesgo.
+
+Para que el barrido tuviera alguna opción habría que ejecutarlo en la
+temporalidad de la referencia, no en M5. Eso es lo que se midió en
+`RESULTADOS_escala_diaria.md`: con stop de 64 pips el muro baja a +0,8 puntos, y
+allí el barrido diario sacó **−2,5**.
