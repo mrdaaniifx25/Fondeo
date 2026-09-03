@@ -33,6 +33,19 @@ Lo que sí se puede decir:
 - **v7 y v8 comparten el 0,8 % de los bytes.** Son compilaciones distintas y no
   se puede saber qué cambió entre una y otra.
 
+### Se intentó abrirlos, y no se puede
+
+Por si alguna sección estuviera solo comprimida y no cifrada, se buscaron
+cabeceras de zlib, gzip, bz2 y lzma en los dos ficheros y se intentó
+descomprimir desde cada una. Salen 18-19 candidatas y cinco descomprimen, pero
+lo que sale es **relleno de ceros**: el bloque de 65.664 bytes tiene 47.006
+ceros y ni una sola cadena de texto. No hay ninguna sección legible.
+
+El cuerpo del `.ex4` de build 600+ va **cifrado**, no solo comprimido, y la clave
+vive en el propio terminal de MetaTrader. Sin MT4 no hay forma de leerlo, y con
+MT4 tampoco sin un descompilador —que para este formato no existe de forma
+fiable y además iría contra los términos de MetaQuotes—.
+
 **Recomendación de uso**: terminal de MT4 aparte, cuenta demo, y «Permitir
 trading automático» desactivado. Un indicador de MQL4 puede mandar órdenes si se
 le deja. Nunca en la cuenta del reto.
