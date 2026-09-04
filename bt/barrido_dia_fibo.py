@@ -111,10 +111,15 @@ def corre(nom):
                     # objetivo "nivel": el mas cercano en la direccion del trade
                     cand = [v for v in niv[x] if (v < ent if lado < 0 else v > ent)]
                     obj_niv = (max(cand) if lado < 0 else min(cand)) if cand else None
-                    j = int(np.searchsorted(T1, tEnt))
+                    # tEnt es la APERTURA de la vela de M5 en la que entra: el
+                    # relleno cae en algun punto de esos cinco minutos y no se
+                    # cual. Se resuelve desde que esa vela CIERRA, que es lo
+                    # conservador; contar desde j+1 regalaria minutos que quiza
+                    # son anteriores al relleno.
+                    j = int(np.searchsorted(T1, tEnt + np.timedelta64(5, "m")))
                     j2 = int(np.searchsorted(T1, tEnt + np.timedelta64(VIDA, "h")))
                     if j2 <= j+1: continue
-                    hs, ls = H1a[j+1:j2], L1a[j+1:j2]
+                    hs, ls = H1a[j:j2], L1a[j:j2]
                     for et, tp in (("nivel", obj_niv), ("1:2", ent + lado*2*rgo)):
                         if tp is None: continue
                         if (lado < 0 and tp >= ent) or (lado > 0 and tp <= ent): continue
