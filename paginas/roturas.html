@@ -188,7 +188,11 @@ textarea{font-family:"IBM Plex Serif",Georgia,serif; min-height:52px; resize:ver
 #mandosDec button{font-size:19px; padding:16px 34px; min-width:170px; letter-spacing:.02em}
 #btnSi{background:var(--alza); border-color:var(--alza); color:#fff}
 #btnSi:hover:not(:disabled){filter:brightness(1.08)}
-#btnNo{background:var(--ficha)}
+#btnNo{background:var(--baja); border-color:var(--baja); color:#fff}
+#btnNo:hover:not(:disabled){filter:brightness(1.08)}
+#btnFuera{font-size:13px; padding:9px 14px; min-width:0; margin-left:auto;
+  color:var(--tenue)}
+#btnDeshacer{background:var(--ficha)}
 .tira{font-size:13px}
 .pista-teclas{font-size:12.5px; color:var(--tenue); margin-top:9px;
   font-family:"IBM Plex Mono",monospace}
@@ -229,15 +233,16 @@ textarea{font-family:"IBM Plex Serif",Georgia,serif; min-height:52px; resize:ver
     <div class="panel" id="panelM1"><h3>M1 · la vela que lo rompe</h3><svg id="gm1"></svg></div>
   </div>
 
-  <p class="pista-teclas">teclado: <b>S</b> entro · <b>N</b> no entro · <b>intro</b> siguiente</p>
+  <p class="pista-teclas">teclado: <b>S</b> la tomo · <b>N</b> la dejo · <b>intro</b> siguiente · <b>Z</b> deshacer</p>
   <div class="mandos" id="mandosDec">
-    <button class="pri compra" id="btnSi">ENTRO</button>
-    <button class="pri" id="btnNo">no entro</button>
+    <button class="pri" id="btnSi">SÍ · la tomo</button>
+    <button class="pri" id="btnNo">NO · la dejo pasar</button>
+    <button id="btnFuera">Reiniciar todo</button>
   </div>
 
   <div class="forma" id="resu">
     <div class="previo" id="resTxt"></div>
-    <div class="mandos"><button class="pri" id="btnSig">Siguiente</button></div>
+    <div class="mandos"><button class="pri" id="btnSig">Siguiente</button><button id="btnDeshacer">Deshacer · me he equivocado</button></div>
   </div>
 </section>
 
@@ -408,6 +413,17 @@ function decide(si){
 $("btnSi").addEventListener("click", () => decide(true));
 $("btnNo").addEventListener("click", () => decide(false));
 
+/** Con 250 decisiones de un toque, pulsar el boton que no era es cuestion de
+    tiempo. Deshacer solo actua sobre la decision que se acaba de tomar, antes
+    de pasar a la siguiente: quita la ultima del registro y vuelve a preguntar. */
+$("btnDeshacer").addEventListener("click", () => {
+  if (!esperando) return;
+  reg().pop();
+  esperando = false;
+  $("resu").classList.remove("ver");
+  guarda(); pinta();
+});
+
 $("btnSig").addEventListener("click", () => {
   esperando = false;
   $("resu").classList.remove("ver");
@@ -422,6 +438,8 @@ $("btnSig").addEventListener("click", () => {
 document.addEventListener("keydown", e => {
   if ($("juego").hidden) return;
   if (esperando && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); $("btnSig").click(); }
+  else if (esperando && (e.key === "Backspace" || e.key === "z")){ e.preventDefault();
+                                                                   $("btnDeshacer").click(); }
   else if (!esperando && (e.key === "s" || e.key === "S" || e.key === "ArrowRight")) decide(true);
   else if (!esperando && (e.key === "n" || e.key === "N" || e.key === "ArrowLeft")) decide(false);
 });
@@ -478,6 +496,7 @@ function doblePulsacion(btn, texto, hacer){
   });
 }
 doblePulsacion($("btnBorrar"), "¿Seguro? Pulsa otra vez", borraTodo);
+doblePulsacion($("btnFuera"), "¿Seguro? Se pierde todo", borraTodo);
 doblePulsacion($("btnBorrar2"), "¿Seguro? Pulsa otra vez", borraTodo);
 
 /* ---------- arranque ---------- */
