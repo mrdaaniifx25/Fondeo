@@ -51,6 +51,8 @@ def corre(nom):
     t, o, h, l, c = (E.ts.to_numpy(), E.o.to_numpy(), E.h.to_numpy(),
                      E.l.to_numpy(), E.c.to_numpy())
     n = len(E)
+    hloc = pd.DatetimeIndex(E.ts).tz_localize('UTC').tz_convert('Europe/Madrid')
+    hloc = hloc.tz_localize(None).hour.to_numpy()
     # fractales de Williams, confirmados dos velas despues (causal)
     fh = np.zeros(n, bool); fl = np.zeros(n, bool)
     for i in range(2, n-2):
@@ -66,15 +68,15 @@ def corre(nom):
         # 2 · barrido: mecha pasa un fractal alto previo y el cuerpo cierra dentro
         for lado in (-1, +1):
             if lado < 0:
-                prev = [h[j] for j in range(max(2,i-60), i-1) if fh[j] and j+2 <= i]
-                if not prev: continue
-                niv = prev[-1]                       # el MAS RECIENTE, no el mas alto
+                pj = [j for j in range(max(2,i-60), i-1) if fh[j] and j+2 <= i]
+                if not pj: continue
+                jf = pj[-1]; niv = h[jf]             # el MAS RECIENTE, no el mas alto
                 if not (h[i] > niv and c[i] < niv): continue
                 ext = h[i]
             else:
-                prev = [l[j] for j in range(max(2,i-60), i-1) if fl[j] and j+2 <= i]
-                if not prev: continue
-                niv = prev[-1]                       # el MAS RECIENTE
+                pj = [j for j in range(max(2,i-60), i-1) if fl[j] and j+2 <= i]
+                if not pj: continue
+                jf = pj[-1]; niv = l[jf]             # el MAS RECIENTE
                 if not (l[i] < niv and c[i] > niv): continue
                 ext = l[i]
             # 1 · sesgo de H4 (premium -> ventas, discount -> compras)
@@ -132,6 +134,7 @@ def corre(nom):
                 sal = c[min(j2,n)-1]
                 R = ((sal-ent) if lado > 0 else (ent-sal))/rgo
             filas.append(dict(R=R, neta=R-COSTE*U/rgo, rgo=rgo/U, lado=lado,
+                              hfrac=int(hloc[jf]), hbar=int(hloc[i]),
                               gana=R > 0, fvg=hay, pos=pos,
                               anio=pd.Timestamp(t[i]).year))
     return pd.DataFrame(filas)
