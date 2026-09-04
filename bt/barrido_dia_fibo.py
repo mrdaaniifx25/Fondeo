@@ -21,15 +21,16 @@ Empate dentro del minuto = STOP. El coste se resta en R.
 
   python3 bt/barrido_dia_fibo.py [instrumento ...]
 """
-import sys
+import os, sys
 import numpy as np, pandas as pd
 
 FIBS    = [0.500, 0.618, 0.705, 0.790]
 NDIAS   = 5      # cuantos dias previos se marcan
 MINLEG  = 1.0    # la pierna tiene que valer esto por el rango de la vela de sweep
-COLCHON = 0.10
+COLCHON = float(os.environ.get("COLCHON", 0.10))
 VENTANA = 8      # horas para que entre la limitada, desde el cierre del sweep
-VIDA    = 24     # horas para que resuelva
+VIDA    = int(os.environ.get("VIDA", 24))   # horas para que resuelva
+TF      = int(os.environ.get("TF", 5))   # temporalidad donde se dibuja el fibo
 
 INSTR = {
  "EURUSD": (["data/eurusd_m1.parquet"], 1e-4, 1.43),
@@ -53,7 +54,7 @@ def corre(nom):
             o=("open","first"), h=("high","max"), l=("low","min"),
             c=("close","last"), n=("close","size")).dropna()
         return g[g.n >= max(1, minutos*0.4)].reset_index()
-    H, M5 = agr(60), agr(5)
+    H, M5 = agr(60), agr(TF)
     dia = d.groupby("dia").agg(hi=("high","max"), lo=("low","min"))
     dias = list(dia.index); pos = {x: k for k, x in enumerate(dias)}
     niv = {}                                   # dia -> niveles de los NDIAS previos
@@ -116,7 +117,7 @@ def corre(nom):
                     # cual. Se resuelve desde que esa vela CIERRA, que es lo
                     # conservador; contar desde j+1 regalaria minutos que quiza
                     # son anteriores al relleno.
-                    j = int(np.searchsorted(T1, tEnt + np.timedelta64(5, "m")))
+                    j = int(np.searchsorted(T1, tEnt + np.timedelta64(TF, "m")))
                     j2 = int(np.searchsorted(T1, tEnt + np.timedelta64(VIDA, "h")))
                     if j2 <= j+1: continue
                     hs, ls = H1a[j:j2], L1a[j:j2]
@@ -133,17 +134,20 @@ def corre(nom):
                         else:
                             R, mot = (-1.0, "SL") if isl <= itp else \
                                      (abs(tp-ent)/rgo, "TP")
-                        filas.append((F, et, mot, R, R - COSTE*U/rgo, rgo/U, lado))
-    return pd.DataFrame(filas, columns=["F","obj","mot","R","neta","rgo","lado"])
+                        filas.append((F, et, mot, R, R - COSTE*U/rgo, rgo/U, lado,
+                                      pd.Timestamp(tEnt).year))
+    return pd.DataFrame(filas, columns=["F","obj","mot","R","neta","rgo","lado","anio"])
 
 if __name__ == "__main__":
     nombres = sys.argv[1:] or ["EURUSD","GBPUSD","USDJPY"]
+    print(f"fibo dibujado en M{TF}")
     print(f"{'instr':>7s} {'fibo':>6s} {'objetivo':>9s} {'n':>6s} {'acierto':>9s} "
           f"{'R bruta':>9s} {'R NETA':>9s} {'stop':>8s} {'z':>8s}")
     print("-"*80)
     todo = []
     for nom in nombres:
         df = corre(nom)
+        df.to_csv(f"data/bdf_ops_{nom}_tf{TF}_c{COLCHON}.csv", index=False)
         if not len(df): print(f"{nom:>7s}  sin operaciones"); continue
         for (F, ob), g in df.groupby(["F","obj"]):
             r = g[g.mot.isin(["TP","SL"])]
@@ -156,7 +160,7 @@ if __name__ == "__main__":
         print("-"*80)
     t = pd.DataFrame(todo)
     if len(t):
-        t.to_csv("data/barrido_dia_fibo.csv", index=False)
+        t.to_csv(f"data/barrido_dia_fibo_tf{TF}.csv", index=False)
         print("\nRESUMEN por celda, sobre los instrumentos")
         for (F, ob), g in t.groupby(["F","obj"]):
             print(f"  fibo {F:.3f} obj {ob:>6s}: R neta positiva en {(g.neta>0).sum()} de {len(g)}"
