@@ -26,6 +26,7 @@ import numpy as np, pandas as pd
 
 FIBS    = [0.500, 0.618, 0.705, 0.790]
 NDIAS   = 5      # cuantos dias previos se marcan
+SEMANAS = int(os.environ.get("SEMANAS", 0))  # si >0, niveles de N SEMANAS previas
 MINLEG  = 1.0    # la pierna tiene que valer esto por el rango de la vela de sweep
 COLCHON = float(os.environ.get("COLCHON", 0.10))
 VENTANA = 8      # horas para que entre la limitada, desde el cierre del sweep
@@ -57,13 +58,28 @@ def corre(nom):
     H, M5 = agr(60), agr(TF)
     dia = d.groupby("dia").agg(hi=("high","max"), lo=("low","min"))
     dias = list(dia.index); pos = {x: k for k, x in enumerate(dias)}
-    niv = {}                                   # dia -> niveles de los NDIAS previos
-    for k, x in enumerate(dias):
-        if k < NDIAS: continue
-        v = []
-        for j in range(k-NDIAS, k):
-            v += [float(dia.hi.iloc[j]), float(dia.lo.iloc[j])]
-        niv[x] = sorted(set(v))
+    niv = {}                                   # dia -> niveles previos
+    if SEMANAS:
+        sem = pd.Series(dias).apply(lambda x: (x.isocalendar()[0], x.isocalendar()[1]))
+        rango = {}
+        for s_, g_ in pd.DataFrame({"d": dias, "s": sem}).groupby("s"):
+            idx = [pos[z] for z in g_.d]
+            rango[s_] = (float(dia.hi.iloc[idx].max()), float(dia.lo.iloc[idx].min()))
+        orden = sorted(rango)
+        ks = {s_: k for k, s_ in enumerate(orden)}
+        for k, x in enumerate(dias):
+            s_ = sem.iloc[k]; j = ks[s_]
+            if j < SEMANAS: continue
+            v = []
+            for q in orden[j-SEMANAS:j]: v += list(rango[q])
+            niv[x] = sorted(set(v))
+    else:
+        for k, x in enumerate(dias):
+            if k < NDIAS: continue
+            v = []
+            for j in range(k-NDIAS, k):
+                v += [float(dia.hi.iloc[j]), float(dia.lo.iloc[j])]
+            niv[x] = sorted(set(v))
     # arrays
     T1, O1, H1a, L1a = (d.ts.to_numpy(), d.open.to_numpy(),
                         d.high.to_numpy(), d.low.to_numpy())
