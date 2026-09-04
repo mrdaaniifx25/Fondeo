@@ -107,3 +107,55 @@ tiempo**, así que medir no cuesta nada.
 
 Por encima del 55 % a las veinte, sube a 1 % y va a por el 8 %. Por debajo del
 45 %, para: era el simulador.
+
+---
+
+# `pine/londres_roturas.pine` · el que dice compra y vende
+
+Pidió un indicador que diga compra o vende. Este lo dice —con dirección, stop,
+objetivo y lotaje— pero hay que entender qué es y qué no.
+
+## Lo que detecta
+
+**Su regla, exactamente**: el cuerpo de la última vela de M5 cerrada, roto por el
+cierre de una vela de M1. Cubre el **83 %** de sus 223 entradas, z +4,88 contra
+los minutos de control.
+
+## Lo que hay que saber antes de usarlo
+
+**La flecha sola pierde dinero.** Medido:
+
+| | n | acierto | R neta |
+|---|---|---|---|
+| la primera rotura del día | 164 | 37,9 % | −0,255 |
+| las tres primeras | 478 | 33,0 % | −0,348 |
+| todas | 930 | 30,8 % | −0,346 |
+| **sus 223 elegidas** | 223 | **64,8 %** | **+0,682** |
+
+La diferencia es **su elección**, medida a ciegas en el examen de las roturas:
++16,1 puntos, z +2,65, p = 0,004.
+
+**Por eso no es un sistema de señales, es un detector de candidatas.** La flecha
+dice dónde mirar. Quien decide sigue siendo él.
+
+## Los tres filtros, todos medidos
+
+```
+1 · el cuerpo de la vela de M5 por debajo del 80 % del rango
+    (>= 80 % da 38,9 % en 37 operaciones suyas, contra 70,1 % del resto,
+     Fisher p = 0,00054 sobre cinco bloques)
+2 · stop entre 4 y 10 pips
+    (entre 5 y 8 su eleccion separo 50,0 % contra 13,0 %)
+3 · dentro de su ventana; entre las 09:00 y las 10:00 separo 46,2 % contra 17,9 %
+```
+
+Las roturas que no pasan un filtro se pintan en gris, para que vea lo que se está
+saltando y por qué.
+
+## El contador, que es la otra mitad
+
+La tabla lleva la cuenta de candidatas del día y avisa a partir de la segunda.
+No es prudencia: en el examen de las roturas aceptó **145 de 250** y perdió
+dinero **aun eligiendo bien**. Operando de verdad toma **una de cada 28**.
+
+**Elegir poco está medido como parte de lo que le hace ganar.**
