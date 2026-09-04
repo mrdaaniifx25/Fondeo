@@ -70,3 +70,54 @@ siempre estuvo ahí.
 Exploratorio y declarado como tal. Seis contrastes: **p < 0,008** (Bonferroni).
 Y para el 5, el número se reporta tal cual: qué porcentaje de sus 223 entradas
 cumple su propia descripción.
+
+---
+
+# Anexo · su definición, dicha por él
+
+> «el OB es el cuerpo de la última vela antes del movimiento alcista, me marco
+> esa vela de M5 y en M1 cuando la rompe con cuerpo entonces es cuando entro»
+
+**Mi medición anterior preguntaba lo contrario de lo que él hace.** Yo medí si su
+entrada cae *dentro* de la zona del OB. Su regla es entrar cuando el precio la
+**rompe**, así que en el momento de entrar está fuera por definición. El −2,61
+de antes no dice nada sobre su método.
+
+## La regla, como la describe
+
+```
+OB          el CUERPO de la ultima vela de M5 cerrada
+ROTURA      una vela de M1 CIERRA pasado ese cuerpo -no vale la mecha-
+DIRECCION   la de la rotura
+ENTRADA     al cierre de esa vela de M1
+```
+
+Esto explica algo que llevaba cinco bloques sin explicar: **por qué entra en
+minutos arbitrarios** —08:32, 09:41, 10:13— y no en los cierres de M5. No espera
+a que cierre la vela de M5: entra en el minuto en que M1 atraviesa el cuerpo de
+la anterior.
+
+## Dos lecturas, las dos se miden
+
+```
+A · DIRECTA    la vela de M1 cierra pasado el cuerpo de la ultima M5 cerrada.
+B · CON VUELTA idem, pero exigiendo que antes el precio hubiera vuelto dentro
+               de ese cuerpo (mitigacion) tras un impulso previo.
+```
+
+## Predicción firmada
+
+1. La lectura **A cubrirá más del 50 %** de sus 223 entradas. Es la primera vez
+   que predigo que una descripción suya sí describe lo que hace, y lo hago
+   porque la geometría encaja: entra en minutos sueltos y eso solo tiene sentido
+   si el gatillo es de M1.
+2. Pero **A no será selectiva**: la misma condición se cumplirá en más del 30 %
+   de los minutos de control, así que describe el gatillo, no la elección.
+3. **B cubrirá menos del 20 %.**
+4. La regla mecánica pura —entrar en cada rotura de A— **saldrá negativa**, con
+   el stop pegado y el coste al 25-40 % del riesgo.
+
+## Umbral
+
+Cuatro contrastes, **p < 0,0125**. Y para la 1 y la 3, el número se reporta tal
+cual: qué porcentaje de sus entradas cumple cada lectura.
