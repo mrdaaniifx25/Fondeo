@@ -18,9 +18,18 @@ Todo lo medido hasta aquí dice lo mismo:
 máquina de ponerle momentos delante: en estas cuarenta sesiones dibuja **14,4
 flechas por sesión** de media, y 38 roturas contando las grises. Él toma 1,5.
 
-En el bloque 5 hubo una comparación con y sin indicador —58,3 % contra 65,7 %—
-pero **la eligió él**, así que no vale: pudo encenderlo justo en las sesiones
-difíciles. Aquí lo sortea la semilla.
+En el bloque 5 ya hubo una comparación con y sin indicador, **y estaba sorteada
+por sesión** —lo escribí mal en la primera versión de este documento y lo corrijo
+aquí—. Salió 58,3 % contra 65,7 % sobre 37 y 36 operaciones: sin potencia para
+decidir nada.
+
+Pero además **el tratamiento era otro**: en el bloque 5 el «indicador» era una
+tabla de niveles y distancias al lado del gráfico. Aquí son **las flechas
+dibujadas encima de las velas**, que es lo que de verdad pondría en TradingView, y
+es una intervención mucho más fuerte: la tabla no le cambió el número de
+operaciones (1,48 contra 1,44 por sesión), y catorce flechas por mañana sí pueden.
+
+Por eso los dos bloques **no se juntan**: son intervenciones distintas.
 
 ## El montaje
 
