@@ -52,6 +52,23 @@ acierta el 60 %, contra el 25 % de las 225 rechazadas, sale z ≈ +3,5. Con 15
 aceptadas todavía sale z ≈ +2,7. **Está bien dimensionado incluso si es muy
 selectivo.**
 
+## Un sesgo del material, declarado antes de verlo
+
+Las 250 roturas tienen un **stop mediano de 4,2 pips** y el 47 % está por debajo
+de 4. Sus 223 entradas reales tienen 5,6 de mediana. Es decir: **las roturas que
+su regla genera son más estrechas que las que él acaba tomando.**
+
+No se filtran. Si rechaza sistemáticamente las de stop pegado, *eso es el
+hallazgo* y hay que poder verlo. Queda declarado como candidato:
+
+```
+la anchura del stop es un discriminador posible entre sus aceptadas y sus
+rechazadas, y se mira antes que ninguna otra variable.
+```
+
+Con todo, la anchura no puede ser la explicación entera: a 4,2 pips el equilibrio
+está en el 44,6 % y a 5,6 en el 41,3 %. Son tres puntos. Él saca veintisiete.
+
 ## Declarados de antemano como secundarios
 
 1. Cuántas acepta: se espera entre el 4 % y el 15 %.
