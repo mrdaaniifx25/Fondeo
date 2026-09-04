@@ -24,7 +24,8 @@ Empate dentro del minuto = STOP. El coste se resta en R.
 import os, sys
 import numpy as np, pandas as pd
 
-FIBS    = [0.500, 0.618, 0.705, 0.790]
+FIBS    = [float(x) for x in os.environ.get("FIBS","0.500,0.618,0.705,0.790").split(",")]
+RATIO   = float(os.environ.get("RATIO", 2.0))
 NDIAS   = 5      # cuantos dias previos se marcan
 SEMANAS = int(os.environ.get("SEMANAS", 0))  # si >0, niveles de N SEMANAS previas
 MINLEG  = 1.0    # la pierna tiene que valer esto por el rango de la vela de sweep
@@ -137,9 +138,11 @@ def corre(nom):
                     j2 = int(np.searchsorted(T1, tEnt + np.timedelta64(VIDA, "h")))
                     if j2 <= j+1: continue
                     hs, ls = H1a[j:j2], L1a[j:j2]
-                    for et, tp in (("nivel", obj_niv), ("1:2", ent + lado*2*rgo)):
+                    for et, tp in (("nivel", obj_niv), (f"1:{RATIO:g}", ent + lado*RATIO*rgo)):
                         if tp is None: continue
                         if (lado < 0 and tp >= ent) or (lado > 0 and tp <= ent): continue
+                        # invalidez del 75 %: el retroceso no puede pasar de ahi
+                        if abs(ent-ext)/max(abs(ext-run),1e-12) > 0.75 + 1e-9: continue
                         gs = (hs >= stp) if lado < 0 else (ls <= stp)
                         gt = (ls <= tp)  if lado < 0 else (hs >= tp)
                         isl = int(np.argmax(gs)) if gs.any() else 10**9
