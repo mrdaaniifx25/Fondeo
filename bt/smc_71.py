@@ -24,6 +24,8 @@ ENTR = float(os.environ.get("ENTR", 0.71))
 VIDA = int(os.environ.get("VIDA", 96))   # horas de vida de la idea
 EXIGE_FVG = os.environ.get("FVG", "si") == "si"
 EXIGE_H4  = os.environ.get("H4", "si") == "si"
+PESIMISTA = os.environ.get("PESIM", "no") == "si"
+SUF       = os.environ.get("SUF", "")
 
 INSTR = {
  "EURUSD": (["data/eurusd_m1.parquet"], 1e-4, 1.43),
@@ -121,7 +123,7 @@ def corre(nom):
                 if (h[k] >= ent) if lado < 0 else (l[k] <= ent): lleno = k; break
             if lleno is None: continue
             R = None
-            for k in range(lleno+1, j2):
+            for k in range(lleno if PESIMISTA else lleno+1, j2):
                 golpeS = (h[k] >= stp) if lado < 0 else (l[k] <= stp)
                 golpeT = (l[k] <= tp)  if lado < 0 else (h[k] >= tp)
                 if golpeS: R = -1.0; break            # empate en la vela = stop
@@ -145,7 +147,7 @@ if __name__ == "__main__":
     for nm in (sys.argv[1:] or list(INSTR)):
         g = corre(nm)
         if len(g) < 30: print(f"{nm:>7s}  {len(g)} operaciones"); continue
-        g.to_csv(f"data/smc71_{nm}.csv", index=False)
+        g.to_csv(f"data/smc71{SUF}_{nm}.csv", index=False)
         z = g.R.mean()/(g.R.std(ddof=1)/np.sqrt(len(g)))
         cr = 100*INSTR[nm][2]/g.rgo.median()
         print(f"{nm:>7s} {len(g):6d} {100*g.gana.mean():8.1f} % {g.R.mean():+9.3f} "
