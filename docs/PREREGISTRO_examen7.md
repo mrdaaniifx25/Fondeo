@@ -74,6 +74,10 @@ coincidencia natural.
   ~30 operaciones por brazo · detecta una diferencia de 25 puntos
 ```
 
+**Calibrado antes de empezar:** una entrada al azar cae sobre una flecha el
+**20,7 %** de las veces (200.000 sorteos sobre estas mismas 40 sesiones). Ese es
+el suelo, no el cero.
+
 Umbral: **|z| > 1,96**. Predicción firmada: **más coincidencia con indicador**.
 
 ## Secundarias SIN potencia · descriptivas, no deciden nada
@@ -111,6 +115,20 @@ Que la métrica principal salga plana o a favor —que no le multiplique las
 operaciones— **y** que la R neta con indicador no sea peor. Si le sube las
 operaciones sin subirle el acierto, se retira, porque su ventaja necesita las dos
 mitades: elegir bien **y** elegir poco.
+
+## El analizador, probado antes de que opere
+
+Escrito y validado con dos volcados sintéticos antes de darle la página:
+
+```
+  volcado NULO      (indicador sin efecto)   principal z -1,55   no pasa   ✓
+                                             secundaria z -0,36  no pasa   ✓
+  CONTROL POSITIVO  (dobla las operaciones)  principal z +3,78   PASA      ✓
+                                             secundaria z +3,58  PASA      ✓
+```
+
+Y comprueba que la marca `[ind]` del volcado cuadra con el sorteo guardado, para
+que un fallo de la página no se cuele como resultado.
 
 ## Reproducir
 
