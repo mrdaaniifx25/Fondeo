@@ -96,3 +96,55 @@ Nada de esto dice que mienta. Dice que 26 operaciones no son una prueba.
 ## Reproducir
 
 `python3 bt/gpso_filtros.py`
+
+---
+
+# Ampliación · el live 159 y su regla horaria exacta
+
+En el live 159 da la regla con números, cosa que no hace en los otros dos:
+
+> *«Todos los horarios válidos de Asia son **las 2, las 3 y las 4** de la mañana…
+> si hay un mínimo en una de estas [otras] horas, no puedo buscar manipulación
+> porque es un horario inválido»*
+
+Y se le ve rechazar un setup que él mismo llama perfecto: *«este mínimo no me
+sirve porque es el de las 6 de la mañana. Horario de Asia no válido.»*
+
+## Su regla exacta NO se sostiene
+
+| bloque | n | acierto | R bruta |
+|---|---|---|---|
+| **horas 2-4** · las que él llama válidas | 1.223 | 33,9 % | **+0,025** |
+| horas 0-1 · las que llama inválidas | 1.538 | 33,4 % | +0,007 |
+| **horas 5-7** · rechazó una de las 6 | 568 | **36,6 %** | **+0,102** |
+
+**El bloque que descarta es mejor que el que acepta.** La hora de las 07:00 sola
+da 39,8 % y +0,202 sobre 253 casos.
+
+## Pero el efecto horario es real, y el corte está en otro sitio
+
+| bloque | EURUSD | GBPUSD | NSXUSD | USDJPY | todos | n | z |
+|---|---|---|---|---|---|---|---|
+| 00-04 | −0,062 | +0,133 | −0,068 | +0,040 | +0,015 | 2.761 | +0,55 |
+| 05-07 | +0,001 | +0,092 | — | +0,186 | +0,102 | 568 | +1,69 |
+| 08-12 | +0,096 | +0,021 | −0,098 | −0,120 | −0,003 | 2.396 | −0,11 |
+| **13-17** | +0,087 | +0,026 | +0,033 | +0,072 | **+0,054** | 5.022 | **+2,69** |
+| **18-23** | −0,019 | −0,001 | −0,079 | −0,017 | **−0,026** | 9.669 | **−1,82** |
+
+```
+  BUENAS (05-07 y 13-17)  n=5.590  acierto 35,1 %  bruta +0,059  z +3,09  4/4 positivos
+  MALAS  (18-22)          n=5.512  acierto 31,6 %  bruta -0,043  z -2,32  0/4 positivos
+```
+
+**Acierta en el principio y falla en los números.** El corte real no separa Asia
+temprana de Asia tardía: separa **los niveles formados en sesión** (Londres tarde
+y Nueva York, 13-17 h de Madrid) de **los formados de noche** (18-23 h).
+
+Es exactamente el tipo de error que cabe esperar de una regla aprendida por
+experiencia y no medida: el efecto existe, la explicación no.
+
+## Lo que queda sin probar del live 159
+
+La regla del CRT que da: la entrada vale más cuando **a la vela de H4 y a la de
+H1 les queda el mismo tiempo para cerrar**, o sea cuando el barrido cae en la
+última hora de la vela de H4. Es específica y falsable, y no se ha medido.
