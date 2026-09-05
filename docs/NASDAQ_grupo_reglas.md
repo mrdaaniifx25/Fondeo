@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 13 de 35.
+Estado: 16 de 35.
 
 ## Esqueleto provisional
 
@@ -521,3 +521,84 @@ del grupo, con sus precios.
     3. elección de temporalidad del gatillo   RESUELTO
     4. se salta sesiones enteras              SIGUE ABIERTO
     5. NUEVO: la balanza                      IRREDUCTIBLE
+
+---
+
+# Actualización tras las nº14, nº15 y nº16
+
+## Su lista de confluencias, enumerada por él (nº16)
+
+Es la formulación más limpia de las dieciséis:
+
+    "Yo siempre busco confluencias que pueden ser tapeos en un FVG de 15
+     minutos o de 5, o barridos de liquidez muy claros, Judas Swing, LRL a
+     mi favor y barrer LRL en contra."
+
+Cinco cosas, todas programables:
+
+    1. tapeo de FVG de M15 o M5
+    2. barrido de liquidez claro (niveles de sesión)
+    3. Judas Swing (acumulación premarket -> manipulación -> distribución)
+    4. LRL a favor: liquidez acumulada en la dirección del trade
+    5. LRL en contra YA BARRIDA antes de entrar
+
+Curioso, porque en la nº14 dice *"no es memorizar y una checklist mecánica
+la fórmula mágica"* y dos vídeos después da la checklist.
+
+## El TP tiene tope numérico
+
+    "yo no suelo hacer trades de más del 1 a 1 y medio. Normalmente lo cojo
+     al 1 a 1"                                                    (nº15)
+
+    "como operamos fondeadas, tampoco puedo dejar un trade en el 1 a 3.
+     Yo siempre lo pongo en un a uno"                              (nº14)
+
+Regla final del TP: **el DOL si cae entre 1:1 y 1:1,5; si no, 1:1.**
+En la nº15 el DOL daba 1:2,5 y no lo tomó por eso.
+
+## El sesgo puede darse la vuelta a mitad de sesión
+
+Esto complica la mecanización y hay que tenerlo en cuenta. En la nº14 abre
+la sesión buscando compras hasta unos altos, y acaba vendiendo:
+
+    "no quedarte casado con el bias que tengas al principio de la sesión...
+     si al principio se me alinea todo para compras y luego en el premarket
+     se me alinea todo para ventas, voy a saber adaptarme"
+
+Consecuencia: el sesgo no se fija en la apertura, se **reevalúa vela a
+vela**. En código eso es más fácil, no más difícil: se evalúa la condición
+de H4/H1 en cada barra y se opera la primera confluencia que aparezca.
+
+## LRL a favor / LRL en contra
+
+Concepto que aparece por fin claro (nº14):
+
+    a favor  = liquidez acumulada en la dirección del trade -> combustible
+    en contra = liquidez acumulada en dirección opuesta
+
+    "yo siempre intento que haya la máxima LRL a mi favor posible"
+    "hemos borrado toda la LRL que teníamos en contra y teníamos todo esto
+     a nuestro favor"
+
+Regla: la LRL en contra debe estar **ya barrida** antes de entrar.
+
+## Ventana del premarket
+
+    acumulación de 9:00 a 9:29 hora de Nueva York               (nº15)
+    manipulación justo en el open
+    distribución = la operación
+
+## Reconfirmaciones
+
+    - DOL: nº16 descarta unos altos "porque ya estaban barridos en el
+      SP500". Tercera vez que aplica la regla.
+    - CISD: nº14 vuelve a definirlo igual y vuelve a exigir fuerza.
+    - Sin SMT en la nº16 y aun así entra. Cuarta confirmación de que no es
+      requisito.
+    - BE: nº15 lo omite tras hacer balanza. "muchas veces te va a echar en
+      break even si lo pones muy justito".
+
+## Estado: ya se puede escribir el código
+
+Con dieciséis transcripciones el esqueleto está completo salvo un umbral:
+qué es "invalidar con fuerza". Todo lo demás tiene definición.
