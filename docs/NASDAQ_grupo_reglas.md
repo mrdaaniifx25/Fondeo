@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 19 de 35.
+Estado: 21 transcripciones.
 
 ## Esqueleto provisional
 
@@ -696,3 +696,63 @@ El rango real del gatillo es 30s - M5, no M1 - M5.
     3. temporalidad del gatillo       resuelto (mayor con R válido, 30s-M5)
     4. se salta sesiones enteras      SIGUE ABIERTO
     5. la balanza                     IRREDUCTIBLE
+
+---
+
+# Actualización tras la nº21 (TP, entrada a las 9:01 NY)
+
+## ERROR MÍO EN EL BACKTEST: el DOL no son los extremos de sesión
+
+    "la liquidez de las sesiones la miro más que nada para CONTEXTO y
+     saber qué ha pasado un poco antes"
+
+    "yo siempre intento que la liquidez que voy a buscar esté DENTRO DE
+     UN FVG"
+
+En los dos pases usé como candidatos a DOL los altos y bajos de Asia,
+Londres y la sesión de NY previa. Él dice que eso es contexto. El DOL
+real son niveles de H4/H1 **que están dentro de un FVG** de esa misma
+temporalidad. En la nº21 el objetivo es un alto de H4 metido en un FVG de
+H4, y descarta expresamente uno más cercano por ser menos relevante.
+
+Esto afecta a las 12.535 operaciones de los dos pases: el objetivo estaba
+mal elegido. La variante A (TP a 1:1) no se ve afectada, porque no usa el
+DOL. La variante B y la EL sí.
+
+## CONTRADICCIÓN con la nº18, sin resolver
+
+    nº18: "si no lo invierte en el Nasdaq no me gusta entrar"  -> el
+          gatillo tiene que darse en el activo que se opera
+
+    nº21: el tapeo de M15 lo ve en el SP500, y la entrada -un FVG de M3
+          invalidado- también dice verlo en el SP500... y entra en NASDAQ
+
+Las dos no pueden ser ciertas. O el gatillo vale cruzado (y la nº18 era
+una preferencia de ese día) o la nº21 está mal explicada. Lo dejo
+anotado como pendiente; es una pregunta buena para el grupo.
+
+## El premarket: la regla era más estrecha de lo que programé
+
+En la nº20 descarta un Judas Swing porque "el inverse se dio a las 9:27,
+que es premarket". En la nº21 entra a las **9:01**, también premarket, y
+lo defiende. La diferencia es que la nº21 no es un Judas Swing sino una
+continuación.
+
+Regla correcta: el premarket invalida el JUDAS SWING, no toda entrada.
+
+## Concepto nuevo, y confirma la regla del DOL
+
+    "no tiene sentido marcarse este bajo porque ya pasa a ser un BAJO
+     PROTEGIDO, porque ya ha estado barrido"
+
+Es el nombre que le da a la regla de la nº8/nº16: un nivel ya barrido en
+cualquiera de los dos índices deja de ser objetivo. Tercera vez que la
+formula, ahora con nombre.
+
+## Break even y TP: cuando hay dos niveles
+
+    BE en el nivel de liquidez MÁS CERCANO (posible reversión)
+    TP en el MÁS LEJANO, si es el que tiene la liquidez de verdad
+
+En la nº21 el BE queda en 0,5R y el TP más allá del 1:1. Encaja con la
+nº10: el BE va en liquidez interna, el TP en la externa.
