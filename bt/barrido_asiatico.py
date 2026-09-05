@@ -155,3 +155,59 @@ if res:
     pos = sum(1 for k in res if res[k]['neto'] > 0)
     print(f"  CRITERIO 5 (>=4 de 6 netas positivas): {pos}/6  "
           f"{'PASA' if pos>=4 else 'FALLA'}")
+
+# --------------------------------------------------------------------------
+# CONTROL · ¿es culpa del filtro (barrido+MSS+FVG) o de la ventana y la
+# geometria? Entradas al azar en la MISMA ventana, con el MISMO tipo de stop
+# (2 pips mas alla del extremo del rango asiatico) y el MISMO objetivo.
+# --------------------------------------------------------------------------
+def dia_azar(g, obj, rg):
+    A = g[(g["m"] >= 120) & (g["m"] < 540)]
+    if len(A) < 200: return None
+    AH, AL = A.high.max(), A.low.min()
+    L = g[(g["m"] >= 540) & (g["m"] <= 1380)]
+    if len(L) < 60: return None
+    P = L[(L["m"] >= 540) & (L["m"] <= 720)]
+    if len(P) < 20: return None
+    k = int(rg.integers(0, len(P)))
+    ent  = float(P.open.to_numpy()[k])
+    lado = +1 if rg.random() < .5 else -1
+    ext  = AL if lado > 0 else AH
+    stop = ext - 2*U if lado > 0 else ext + 2*U
+    rgo  = abs(ent-stop)
+    if rgo < 1.5*U: return None
+    tp = ent + lado*3*rgo if obj == "r3" else (AH if lado > 0 else AL)
+    if (tp-ent)*lado <= 0: return None
+    Q = L[L["tloc"] >= P["tloc"].to_numpy()[k]]
+    ph, pl = Q.high.to_numpy(), Q.low.to_numpy()
+    a = np.flatnonzero(ph[1:] >= tp) if lado > 0 else np.flatnonzero(pl[1:] <= tp)
+    b = np.flatnonzero(pl >= -1e9) if False else (
+        np.flatnonzero(pl <= stop) if lado > 0 else np.flatnonzero(ph >= stop))
+    ia = int(a[0])+1 if len(a) else 10**9
+    ib = int(b[0])   if len(b) else 10**9
+    if ia == ib == 10**9:
+        R = (float(Q.close.to_numpy()[-1])-ent)*lado/rgo
+    else:
+        R = (abs(tp-ent)/rgo) if ia < ib else -1.0
+    return R, rgo/U
+
+print(f"\n=== CONTROL · entradas al AZAR en la misma ventana y geometria ===")
+print(f"  {'rep':>4} {'objetivo':>9} {'n':>5} {'stop':>7} {'BRUTO':>8} {'z':>6} "
+      f"{'acierto':>8}")
+for obj in ("r3","rango"):
+    br = []
+    for rep in range(5):
+        rg = np.random.default_rng(1000+rep)
+        R, S = [], []
+        for d, g in G.items():
+            r = dia_azar(g, obj, rg)
+            if r: R.append(r[0]); S.append(r[1])
+        if len(R) < 40: continue
+        R = np.array(R); S = np.array(S); br.append(R.mean())
+        print(f"  {rep+1:>4} {obj:>9} {len(R):>5} {np.median(S):>6.1f}p "
+              f"{R.mean():>+8.4f} {R.mean()/(R.std(ddof=1)/np.sqrt(len(R))):>+6.2f} "
+              f"{(R>0).mean()*100:>7.1f}%", flush=True)
+    if br:
+        b = np.array(br); e = res[("cerca",obj)]["bruto"]
+        print(f"       azar bruto medio {b.mean():+.4f}  ·  la estrategia {e:+.4f}"
+              f"  ->  la estrategia es {'PEOR' if e < b.mean() else 'MEJOR'} que el azar\n")
