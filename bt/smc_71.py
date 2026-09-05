@@ -133,7 +133,8 @@ def corre(nom):
             if R is None:
                 sal = c[min(j2,n)-1]
                 R = ((sal-ent) if lado > 0 else (ent-sal))/rgo
-            filas.append(dict(R=R, neta=R-COSTE*U/rgo, rgo=rgo/U, lado=lado,
+            filas.append(dict(ts=pd.Timestamp(t[i]), R=R, neta=R-COSTE*U/rgo,
+                              rgo=rgo/U, lado=lado,
                               hfrac=int(hloc[jf]), hbar=int(hloc[i]),
                               gana=R > 0, fvg=hay, pos=pos,
                               anio=pd.Timestamp(t[i]).year))
