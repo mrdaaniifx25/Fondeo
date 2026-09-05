@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 4 de 35.
+Estado: 6 de 35.
 
 ## Esqueleto provisional
 
@@ -184,3 +184,90 @@ Estructura real de la entrada, entonces:
     nº2  barre BAJOS  -> compra
     nº3  barre ALTOS  -> venta
     nº4  barre BAJOS  -> compra
+
+---
+
+# Actualización tras las nº5 (TP) y nº6 (stop loss)
+
+## CORRECCIÓN: la regla "en contra del barrido" era mía y es falsa
+
+Con cuatro casos parecía que siempre entraba contra el barrido. Las nº5 y
+nº6 lo rompen las dos:
+
+    nº5  barre los BAJOS de Asia  ->  VENDE
+    nº6  barre los ALTOS de Asia  ->  COMPRA
+
+Coincidencia de las cuatro primeras. La regla real es otra, y en la nº5 la
+dice él explícitamente.
+
+## LA REGLA DE SESGO, por fin
+
+El punto de decisión es el **FVG de H4**. Textual de la nº5:
+
+    "cuando hemos invalidado este FVG de 4 horas hemos acabado de decidir
+     el bias... si el precio hubiese empezado a revertir después de barrer
+     esos bajos de Asia fileando este FVG SIN INVALIDARLO, podríamos haber
+     llegado a buscar las compras"
+
+O sea:
+
+    el precio llega a un FVG de H4 (normalmente tras barrer liquidez
+    de sesión)
+
+      -> lo TAPEA y AGUANTA      = REVERSIÓN, se opera en la dirección
+                                   del FVG
+      -> lo INVALIDA (lo rompe)  = CONTINUACIÓN, se opera en la dirección
+                                   de la rotura
+
+Esto es completamente mecanizable: es una prueba sobre velas de H4 y no
+depende de ninguna lectura subjetiva. Y explica las seis, incluidas las dos
+que rompían el patrón anterior.
+
+## El DOL es dinámico
+
+En la nº6, el DOL era un FVG de H4 por encima. Cuando el precio lo invalidó,
+el DOL pasó a ser los altos siguientes. Textual: *"una vez el FVG de 4 horas
+se invalidó, pasó de ser mi doll el FVG a estos altos de aquí"*.
+
+Así que el DOL se recalcula: es el siguiente charco de liquidez en la
+dirección que marca el FVG de H4.
+
+## El gatillo de M1 tiene alternativa: el CISD
+
+    si hay un FVG de M1 limpio  ->  se entra en su invalidación
+    si NO lo hay                ->  se espera al CISD de la manipulation leg
+    si el FVG se invalida con POCA FUERZA -> también se espera al CISD
+
+Textual nº5: *"como no había ningún FVG pequeño aquí, me esperaba al CISD"*.
+Textual nº6: *"si hubiese visto que este FVG se invalidaba superpoquito, con
+poca fuerza, me hubiese esperado al CISD"*.
+
+"Con fuerza" no está definido numéricamente. Hueco.
+
+## Confirmación intermedia: tapeo de FVG de M5
+
+En las dos entra tras **tapear un FVG de M5 haciendo SMT con el otro
+índice**. Esa parece ser la capa intermedia estable entre el nivel de H4/H1
+y el gatillo de M1.
+
+## Colocación del stop
+
+Prefiere el **cuerpo** de la vela, no la mecha, cuando la mecha deja un R
+malo. Textual: *"si el precio baja hasta el body, ya baja hasta aquí porque
+hace un reswip"*.
+
+## Confirmación del TP
+
+nº5: el 1:1 cayó justo en el DOL (bajos de H4). Y da la razón de por qué no
+alarga: *"no tiene sentido dejar un trade tantos R, sobre todo en empresas
+de fondeo"*. El 1:1 no es una lectura del mercado, es una regla de gestión
+de challenge.
+
+## Huecos nuevos, y son los peores hasta ahora
+
+    - DESCARTA setups válidos "porque los RS no me gustan" (nº6). Es
+      discrecional y afecta a qué operaciones existen. Si no se puede
+      formalizar, el backtest medirá una estrategia distinta a la suya.
+    - "invalidar con mucha fuerza" no tiene definición.
+    - jerarquía de temporalidades: prefiere M5 sobre M3 "si dan los mismos
+      RS". Otra decisión sin umbral.
