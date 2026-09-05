@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 1 de 35.
+Estado: 3 de 35.
 
 ## Esqueleto provisional
 
@@ -55,3 +55,66 @@ medirse.
     - a qué hora se puede entrar y hasta cuándo
     - qué se hace si no llega al TP: ¿cierre a la hora? ¿se deja correr?
     - qué días NO se opera
+
+---
+
+# Actualización tras las nº2 (día 19, pérdida) y nº3 (día 22, ganancia)
+
+## Lo más importante: el sesgo puede que no sea un problema
+
+Él habla de "continuaciones" y de "reversiones" como si fueran dos modos
+distintos, y eso parecía imposible de mecanizar. Pero mirando las TRES
+operaciones, las tres son el mismo patrón:
+
+    nº1  barre los BAJOS de Asia y Londres   ->  COMPRA
+    nº2  barre los BAJOS de Asia y Londres   ->  COMPRA
+    nº3  barre los ALTOS (H4 y sesiones)     ->  VENTA
+
+Siempre opera **en contra del barrido**. Lo que él llama "continuación" en
+la nº1 es mecánicamente idéntico a lo que llama "reversión" en la nº2: en
+las dos barrió bajos y compró. La etiqueta la pone el contexto de tendencia,
+pero el disparo es el mismo.
+
+Si esto aguanta en las 32 restantes, el sesgo deja de ser discrecional y la
+estrategia es mecanizable entera.
+
+## Reglas nuevas, ya concretas
+
+    HORARIO   ventana de Nueva York: 9:30 a 10:30/11:00.
+              "No suelo mirar más tarde de las 11:30." (nº3)
+              -> regla dura y testeable.
+
+    ENTRADA   definición textual de la nº2:
+              "siempre busco que después de la inducción haya un impulso,
+               un retroceso sano y que invalide un FVG. Al formarse el
+               IFVG, yo entro."
+              Y en la nº3 añade la confirmación de estructura: espera el
+              primer bajo más bajo en M1 (quiebre estructural) antes de
+              tomar el IFVG.
+
+    SMT       divergencia entre SP500 y NASDAQ. En la nº2: "no hubo ningún
+              SMT". Es la versión precisa de la regla cruzada de la nº1:
+              un índice barre el nivel y el otro NO.
+              -> comprobable directamente con los dos parquet.
+
+    NIVELES   alto/bajo de Asia, alto/bajo de Londres, alto/bajo de la
+              sesión de Nueva York del día anterior, y niveles de H4.
+
+    NOTICIAS  no opera días de noticias (nº2, miércoles).
+
+    R:R       1:1 confirmado por tercera vez.
+
+## Secuencia de sesiones que describe (nº3, la más detallada)
+
+    Asia acumula
+    solapamiento Asia/Londres barre los ALTOS de Asia
+    Londres baja y barre los BAJOS de Asia
+    Londres sube haciendo altos  <- ESTO es la "inducción"
+    Nueva York abre, extiende la inducción, y revierte  <- la entrada
+
+## Huecos que siguen abiertos
+
+    - "desequilibrio" / movimiento extendido: sin definición numérica
+    - qué barrido cuenta (¿mecha? ¿cierre? ¿cuántos puntos por encima?)
+    - si el SMT es obligatorio o solo una confluencia más
+    - qué pasa si el 1:1 no se alcanza dentro de la ventana horaria
