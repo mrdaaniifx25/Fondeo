@@ -113,3 +113,64 @@ puntos. Ése es el único ajuste que hay que hacerle.
 
 En cuenta propia, en cambio, el 1 % es lo correcto: 12,1 % anual esperado con
 un peor año típico de -17,7 %. Al 2 % el peor año típico es -35,5 %.
+
+## Control 5 · la prueba más dura: otros instrumentos, otro periodo
+
+StrategyQuant optimizó sobre XAUUSD, probablemente en un tramo que solapa con
+mis datos. Los índices americanos y el forex cubren **2020-2026**, que esa
+búsqueda no vio. Mismas reglas (sin el filtro GannHiLo, que no aporta):
+
+    instr                periodo     n       ret     CAGR     PF      t
+    XAUUSD    2023-01 -> 2026-07   597     +87,8 % +19,40 %  1,202  +1,80
+    US100     2020-01 -> 2026-07  1279      -5,4 %  -0,84 %  0,992  -0,11
+    US500     2020-01 -> 2026-07  1291     -82,4 % -23,29 %  0,773  -3,58
+    GER40     2023-01 -> 2026-07   606    +896,3 % +91,15 %  1,247  +0,75
+    EURUSD    2020-01 -> 2026-07   974     -83,7 % -24,18 %  0,744  -3,31
+    GBPUSD    2020-01 -> 2026-07  1032     -77,5 % -20,41 %  0,782  -2,96
+
+**Funciona en 2 de 6.** Y los dos que funcionan -oro y GER40- son justo los
+dos cuyos datos empiezan en 2023.
+
+El +896 % del GER40 no es lo que parece: su `t` es **+0,75**. Es interés
+compuesto sobre unos pocos aciertos grandes, no una ventaja demostrada.
+
+### ¿es del instrumento o del régimen alcista?
+
+2023-2026 fue alcista puro. Si la ventaja fuera "romper al alza en un mercado
+alcista", debería aparecer también en el US100 de 2023-2026, que subió mucho.
+Partiendo cada instrumento en los dos tramos:
+
+    instr           tramo     n       ret     PF      t
+    XAUUSD      2023-2026   597    +87,8 %  1,202  +1,80
+    GER40       2023-2026   606   +896,3 %  1,247  +0,75
+    US100       2020-2022   585     -2,2 %  0,992  -0,08
+    US100       2023-2026   694     -3,2 %  0,992  -0,08
+    US500       2020-2022   588    -45,8 %  0,784  -2,42
+    US500       2023-2026   703    -36,6 %  0,758  -2,79
+    EURUSD      2023-2026   506    -39,6 %  0,631  -4,04
+    GBPUSD      2023-2026   560    -28,8 %  0,769  -2,29
+
+**No es el régimen.** El US100 subió con fuerza en 2023-2026 y la estrategia
+no gana nada ahí (PF 0,992). Es específica del oro (y del GER40).
+
+## Veredicto
+
+Lo que tiene a favor, y no es poco -nada en este proyecto lo había logrado:
+
+    · bate a 8 de 8 controles de entrada al azar con su misma geometría
+    · 19 de 19 vecinos de parámetros positivos: meseta, no filo
+    · bate a 4 de 4 nulos con los bloques permutados
+    · mejor retorno/drawdown que comprar y esperar oro (5,09 contra 4,22)
+    · positiva los cuatro años
+
+Lo que tiene en contra:
+
+    · t = +1,80 sobre 597 operaciones: NO llega a 2
+    · Sharpe +0,81 necesita 6,1 años para demostrarse; hay 3,55
+    · no generaliza: 2 de 6 instrumentos, y los 2 son los del mismo tramo
+    · el tramo más limpio (2026) es el más flojo: +3,2 % en siete meses
+    · el filtro GannHiLo, que es la parte "inteligente", no aporta nada
+
+**Puede ser real y 3,55 años de un solo instrumento no bastan para saberlo.**
+Es la misma conclusión de siempre, pero por primera vez con un candidato que
+supera sus propios controles internos.
