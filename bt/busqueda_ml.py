@@ -45,21 +45,33 @@ def carga():
     return D
 
 def baraja(D):
-    """Mismos bloques en los cuatro: conserva su correlacion, mata el patron."""
-    n = min(len(x) for x in D.values())
-    nb = n//BLOQ
-    st = rng.integers(0, n-BLOQ, size=nb)
-    idx = (st[:, None] + np.arange(BLOQ)[None, :]).ravel()
+    """PERMUTACION de bloques consecutivos, sin repeticion ni solapamiento.
+
+    La primera version sorteaba inicios de bloque al azar CON reemplazo, asi
+    que muchos bloques se solapaban y trozos casi identicos caian en
+    entrenamiento y en prueba: el modelo los memorizaba. El nulo salia MEJOR
+    que los datos reales (IC +0.037 contra +0.013), que es como se detecto.
+
+    Ahora la serie se parte en bloques consecutivos disjuntos y solo se
+    permuta su orden: cada minuto aparece exactamente una vez. Los mismos
+    bloques en todos los instrumentos, para conservar su correlacion.
+    """
+    n  = min(len(x) for x in D.values())
+    nb = (n-1)//BLOQ
+    orden = rng.permutation(nb)
+    idx = (orden[:, None]*BLOQ + np.arange(BLOQ)[None, :]).ravel()
     out = {}
     for k, x in D.items():
-        lr = np.diff(np.log(x.close.to_numpy()[:n]))
-        px = x.close.iloc[0]*np.exp(np.cumsum(lr[np.clip(idx, 0, len(lr)-1)]))
-        m  = len(px)
-        o  = np.r_[x.close.iloc[0], px[:-1]]
-        amp = (x.high.to_numpy()[:m] - x.low.to_numpy()[:m])
+        c   = x.close.to_numpy()[:n]
+        lr  = np.diff(np.log(c))
+        amp = (x.high.to_numpy()[:n] - x.low.to_numpy()[:n])[1:]
+        px  = c[0]*np.exp(np.cumsum(lr[idx]))
+        m   = len(px)
+        o   = np.r_[c[0], px[:-1]]
+        a   = amp[idx]                     # el rango viaja CON su retorno
         out[k] = pd.DataFrame(dict(ts=x.ts.to_numpy()[:m], open=o,
-            high=np.maximum(o,px)+amp*rng.random(m)*0.5,
-            low =np.minimum(o,px)-amp*rng.random(m)*0.5, close=px))
+            high=np.maximum(o, px) + a*rng.random(m)*0.5,
+            low =np.minimum(o, px) - a*rng.random(m)*0.5, close=px))
     return out
 
 def barras(x, m):
