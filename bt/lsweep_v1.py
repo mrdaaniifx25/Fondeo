@@ -155,7 +155,10 @@ for di in range(1, len(DIAS)):
         if R > 0: parar = True        # "+2R y se acaba el dia" (regla 20)
 
 O = pd.DataFrame(ops)
-O.to_csv(f"data/lsweep_v1_{PAR}_{VIDA}.csv", index=False)
+# el buffer va en el nombre: los hijos de la sensibilidad sobrescribian
+# el fichero del protocolo y el analisis por subgrupos salia de la
+# muestra equivocada.
+O.to_csv(f"data/lsweep_v1_{PAR}_b{BUFFER:g}.csv", index=False)
 print(f"\n=== POR QUE NO SE OPERA · dias descartados y en que paso ===")
 for k, v in sorted(motivos.items(), key=lambda x: -x[1]):
     print(f"  {k:32s} {v:5d}")
