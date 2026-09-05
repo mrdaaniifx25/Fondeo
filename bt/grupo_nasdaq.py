@@ -107,6 +107,76 @@ def sesiones(dia):
             "londres": (ini+pd.Timedelta(hours=8),    ini+pd.Timedelta(hours=16.5)),
             "nyprev":  (ini-pd.Timedelta(hours=9.5),  ini-pd.Timedelta(hours=3))}
 
+
+# ------------------------------- las tres confluencias del segundo pase
+# Definiciones cerradas en docs/PREREGISTRO_grupo_nasdaq_2.md (dcfbfe7)
+
+def pivotes(H, L):
+    """Pivotes de M1 confirmados por la vela siguiente. Causal: el pivote
+    en j solo se conoce en j+1, y aqui el array llega hasta la barra de
+    entrada, asi que el ultimo utilizable es len-2."""
+    n = len(H)
+    if n < 5: return np.array([]), np.array([])
+    ph = np.array([H[j] for j in range(1, n-1) if H[j] >= H[j-1] and H[j] >= H[j+1]])
+    pl = np.array([L[j] for j in range(1, n-1) if L[j] <= L[j-1] and L[j] <= L[j+1]])
+    return ph, pl
+
+def grupo_lrl(piv, tol):
+    """Niveles donde se acumulan 3 o mas pivotes dentro de `tol`.
+    Es la LRL: liquidez de baja resistencia."""
+    if len(piv) < 3: return []
+    p = np.sort(piv); out = []
+    i = 0
+    while i < len(p):
+        j = i
+        while j+1 < len(p) and p[j+1]-p[i] <= tol: j += 1
+        if j-i+1 >= 3: out.append(float(p[i:j+1].mean()))
+        i = j+1 if j > i else i+1
+    return out
+
+def confluencias_extra(mh, ml, mo, mc, i0, k, ini_v, s, ent, rgo, acum):
+    """Devuelve (judas, lrl_favor, lrl_contra_ok)."""
+    a = max(0, i0+k-120); b = i0+k+1          # 2 horas hasta la entrada
+    H, L = mh[a:b], ml[a:b]
+    if len(H) < 10: return False, False, False
+    rango = float(H.max()-L.min())
+    tol = 0.10*rango if rango > 0 else 0.0
+
+    ph, pl = pivotes(H, L)
+    # a favor = liquidez en la direccion del OBJETIVO
+    favor  = grupo_lrl(ph if s > 0 else pl, tol)
+    favor  = [x for x in favor if (x-ent)*s > 0]
+    # en contra = liquidez en la direccion del STOP, tiene que estar barrida
+    contra = grupo_lrl(pl if s > 0 else ph, tol)
+    contra = [x for x in contra if (ent-x)*s > 0 and abs(ent-x) <= 2*rgo]
+    sin_barrer_contra = []
+    for x in contra:
+        tocado = (L[:len(L)-1] <= x).any() if s > 0 else (H[:len(H)-1] >= x).any()
+        if not tocado: sin_barrer_contra.append(x)
+
+    # Judas: acumulacion estrecha + manipulacion en contra dentro de la ventana
+    judas = False
+    if acum is not None:
+        alo, ahi, estrecha = acum
+        if estrecha:
+            V_h = mh[ini_v:i0+k+1]; V_l = ml[ini_v:i0+k+1]
+            if len(V_h):
+                judas = bool(V_l.min() < alo) if s > 0 else bool(V_h.max() > ahi)
+    return judas, len(favor) > 0, len(sin_barrer_contra) == 0
+
+def acumulacion(mt, mh, ml, A, hist):
+    """Rango de los 30 min previos a la apertura, y si es estrecho frente
+    a la mediana de ese mismo rango en los 20 dias anteriores."""
+    j1 = int(np.searchsorted(mt, np.datetime64(A), "left"))
+    j0 = int(np.searchsorted(mt, np.datetime64(A)-np.timedelta64(30,"m"), "left"))
+    if j1-j0 < 10: return None
+    lo, hi = float(ml[j0:j1].min()), float(mh[j0:j1].max())
+    r = hi-lo
+    hist.append(r)
+    if len(hist) < 20: return (lo, hi, False)
+    med = float(np.median(hist[-21:-1]))
+    return (lo, hi, r <= med)
+
 def corre(op, otro, verbose=True):
     """op = instrumento en el que se entra; otro = el correlacionado."""
     Ma, Mb = carga(op), carga(otro)
@@ -126,6 +196,7 @@ def corre(op, otro, verbose=True):
     bt = Mb.ts.to_numpy(); bh = Mb.h.to_numpy(); bl = Mb.l.to_numpy()
 
     filas = []
+    HIST = {v[0]: [] for v in VENTANAS}
     dias = pd.Index(pd.Series(Ma.ts).dt.normalize().unique())
     for dia in dias:
         for nom, tz, h1, m1, h2, m2 in VENTANAS:
@@ -150,6 +221,8 @@ def corre(op, otro, verbose=True):
             PG = {m: recorta(GAT[m], aG, bB) for m in (5,3,2,1)}
             if not PC: continue
 
+            acum = acumulacion(mt, mh, ml, A, HIST[nom])
+
             rej = mt[i0:i1]
             S = serie_sesgo(P4, P1, rej)
 
@@ -164,6 +237,7 @@ def corre(op, otro, verbose=True):
                     niv.append((float(ml[j0:j1].min()), -1))
             if not niv: continue
 
+            visto = {}
             for k in range(5, i1-i0):
                 s = int(S[k])
                 if s == 0: continue
@@ -211,10 +285,22 @@ def corre(op, otro, verbose=True):
                 dol = (min(cand) if s>0 else max(cand)) if cand else None
                 rr = (abs(dol-px)/rgo) if dol is not None else np.nan
 
-                filas.append(dict(instr=op, ventana=nom, ts=pd.Timestamp(ah),
-                                  lado=s, ent=px, stp=ext, rgo=rgo, tf=disp,
-                                  rr_dol=rr, i=i0+k))
-                break        # una operacion por ventana
+                jud, fav, con = confluencias_extra(mh, ml, mo, mc, i0, k,
+                                                   i0, s, px, rgo, acum)
+                nconf = 2 + int(jud) + int(fav) + int(con)   # 1 y 2 ya pasaron
+
+                # UNA operacion por ventana y por nivel de exigencia: la
+                # PRIMERA barra que alcanza ese nivel. Un mismo dia puede
+                # dar una entrada distinta segun cuantas confluencias exijas.
+                fila = dict(instr=op, ventana=nom, ts=pd.Timestamp(ah),
+                            lado=s, ent=px, stp=ext, rgo=rgo, tf=disp,
+                            rr_dol=rr, i=i0+k, judas=jud, lrl_fav=fav,
+                            lrl_con=con, nconf=nconf)
+                for L in (3,4,5):
+                    if nconf >= L and L not in visto:
+                        visto[L] = True
+                        filas.append(dict(fila, nivel=L))
+                if 5 in visto: break
     return pd.DataFrame(filas), Ma
 
 def smt(Ma, Mb, i, ts, lado):
@@ -265,35 +351,43 @@ if __name__ == "__main__":
     TT=[]
     for op, otro in (("NASDAQ","SP500"), ("SP500","NASDAQ")):
         T, Ma = corre(op, otro)
-        if not len(T): print(f"  {op}: 0 señales"); continue
+        if not len(T): print(f"  {op}: 0 senales"); continue
         Mb = carga(otro)
         T["smt"] = [smt(Ma,Mb,int(r.i),r.ts,r.lado) for r in T.itertuples()]
         T = resuelve(Ma, T)
-        T.to_csv(f"data/grupo_{op}.csv", index=False)
-        print(f"  {op}: {len(T)} operaciones")
+        T.to_csv(f"data/grupo2_{op}.csv", index=False)
+        print(f"  {op}: {len(T)} filas")
         TT.append(T)
-    if not TT: raise SystemExit("sin señales")
     D = pd.concat(TT, ignore_index=True)
-    D.to_csv("data/grupo_todo.csv", index=False)
-    print(f"\n{'='*66}\n{len(D)} OPERACIONES · {D.ts.min().date()} a {D.ts.max().date()}\n{'='*66}")
-    print(f"\n{'variante':>26s} {'n':>6s} {'acierto':>9s} {'R bruta':>9s} {'z':>7s} {'R NETA':>9s}")
-    print("-"*72)
-    for v,nom in (("A","A · TP a 1:1"),("EL","EL · DOL si 1:1-1:1,5"),("B","B · DOL tope 4R")):
-        R,N = D[f"R_{v}"], D[f"Rn_{v}"]
-        print(f"{nom:>26s} {len(D):6d} {100*(R>0).mean():8.1f} % {R.mean():+9.3f} {z(R):+7.2f} {N.mean():+9.3f}")
-    print(f"\n{'por ventana (variante A)':>26s}")
-    for w,g in D.groupby("ventana"):
-        print(f"{w:>26s} {len(g):6d} {100*(g.R_A>0).mean():8.1f} % {g.R_A.mean():+9.3f} {z(g.R_A):+7.2f} {g.Rn_A.mean():+9.3f}")
-    print(f"\n{'por instrumento (A)':>26s}")
-    for w,g in D.groupby("instr"):
-        print(f"{w:>26s} {len(g):6d} {100*(g.R_A>0).mean():8.1f} % {g.R_A.mean():+9.3f} {z(g.R_A):+7.2f} {g.Rn_A.mean():+9.3f}")
-    S = D[D.smt.notna()]
-    if len(S) > 100:
-        print(f"\n{'SMT (variante A)':>26s}")
-        for w,g in S.groupby("smt"):
-            et = "C · CON SMT" if w else "D · SIN SMT"
-            print(f"{et:>26s} {len(g):6d} {100*(g.R_A>0).mean():8.1f} % {g.R_A.mean():+9.3f} {z(g.R_A):+7.2f} {g.Rn_A.mean():+9.3f}")
-        a,b = S[S.smt].R_A, S[~S.smt].R_A
-        if len(a)>2 and len(b)>2:
-            zz=(a.mean()-b.mean())/np.sqrt(a.var(ddof=1)/len(a)+b.var(ddof=1)/len(b))
-            print(f"{'diferencia C-D':>26s} {a.mean()-b.mean():+9.3f}  z = {zz:+.2f}")
+    D.to_csv("data/grupo2_todo.csv", index=False)
+
+    print(f"\n{'='*74}")
+    print(f"SEGUNDO PASE · {D.ts.min().date()} a {D.ts.max().date()}")
+    print(f"preregistro sellado en dcfbfe7, antes de implementar")
+    print("="*74)
+    print(f"\n{'exigencia':>28s} {'n':>6s} {'acierto':>9s} {'R bruta':>9s} {'z':>7s} {'R NETA':>9s}")
+    print("-"*74)
+    for L,nom in ((3,"3 de 5 confluencias"),(4,"4 de 5"),(5,"5 de 5  ·  PRINCIPAL")):
+        g=D[D.nivel==L]
+        if not len(g): continue
+        print(f"{nom:>28s} {len(g):6d} {100*(g.R_A>0).mean():8.1f} % {g.R_A.mean():+9.3f} {z(g.R_A):+7.2f} {g.Rn_A.mean():+9.3f}")
+    print(f"\n{'con TP al DOL (tope 4R)':>28s}")
+    for L,nom in ((3,"3 de 5"),(4,"4 de 5"),(5,"5 de 5")):
+        g=D[D.nivel==L]
+        if not len(g): continue
+        print(f"{nom:>28s} {len(g):6d} {100*(g.R_B>0).mean():8.1f} % {g.R_B.mean():+9.3f} {z(g.R_B):+7.2f} {g.Rn_B.mean():+9.3f}")
+    g5, g3 = D[D.nivel==5], D[D.nivel==3]
+    if len(g5)>2 and len(g3)>2:
+        zz=(g5.R_A.mean()-g3.R_A.mean())/np.sqrt(g5.R_A.var(ddof=1)/len(g5)+g3.R_A.var(ddof=1)/len(g3))
+        print(f"\n{'diferencia 5/5 menos 3/5':>28s} {g5.R_A.mean()-g3.R_A.mean():+9.3f}   z = {zz:+.2f}")
+    if len(g5) > 50:
+        print(f"\n{'5 de 5, por ventana':>28s}")
+        for w,g in g5.groupby("ventana"):
+            print(f"{w:>28s} {len(g):6d} {100*(g.R_A>0).mean():8.1f} % {g.R_A.mean():+9.3f} {z(g.R_A):+7.2f} {g.Rn_A.mean():+9.3f}")
+        print(f"\n{'5 de 5, por instrumento':>28s}")
+        for w,g in g5.groupby("instr"):
+            print(f"{w:>28s} {len(g):6d} {100*(g.R_A>0).mean():8.1f} % {g.R_A.mean():+9.3f} {z(g.R_A):+7.2f} {g.Rn_A.mean():+9.3f}")
+        print(f"\n{'5 de 5, por ano':>28s}")
+        for w,g in g5.groupby(g5.ts.dt.year):
+            if len(g)<20: continue
+            print(f"{str(w):>28s} {len(g):6d} {100*(g.R_A>0).mean():8.1f} % {g.R_A.mean():+9.3f} {z(g.R_A):+7.2f} {g.Rn_A.mean():+9.3f}")
