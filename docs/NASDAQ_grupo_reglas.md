@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 16 de 35.
+Estado: 19 de 35.
 
 ## Esqueleto provisional
 
@@ -602,3 +602,97 @@ Regla: la LRL en contra debe estar **ya barrida** antes de entrar.
 
 Con dieciséis transcripciones el esqueleto está completo salvo un umbral:
 qué es "invalidar con fuerza". Todo lo demás tiene definición.
+
+---
+
+# Actualización tras las nº17, nº18 y nº19
+
+## SE CIERRA EL ÚLTIMO HUECO: qué es invalidar
+
+La nº19 es un stop loss que él atribuye a un error propio, y al explicarlo
+suelta la definición que faltaba:
+
+    "esta vela negra no cuenta como una invalidación. Tiene que ser una vela
+     del mismo color, o sea, tiene que ser una vela ALCISTA que rompa esto"
+
+Invalidación válida de un FVG =
+
+    cierre al otro lado del FVG
+    Y la vela que lo hace es del color de la dirección buscada
+    (alcista para compras, bajista para ventas)
+
+Eso es programable en dos líneas y deja "la fuerza" degradada a preferencia
+de calidad, no a condición de entrada.
+
+## Detalle técnico que afecta a los datos
+
+Opera y analiza el **MINI** (NQ de la CME), no el micro. En la nº19 miró el
+micro, vio una invalidación que en el mini no existía, y se comió el stop.
+Para el backtest hay que usar la serie del mini.
+
+## Tercera ventana: la apertura de FRANKFURT
+
+    Frankfurt   8:00 - 9:00 hora de España   (2:00 - 3:00 NY)
+    Londres     9:00 - 10:00 hora de España  (3:00 - 4:00 NY)
+    Nueva York  9:30 - 11:30 NY
+
+Textual nº18: *"suelo operar de 8 a 10 de la mañana hora de España; en
+Londres solamente opero la primera hora, de 9 a 10. Los días grandes los
+suelo hacer en Nueva York."*
+
+En la nº17 opera Frankfurt y Londres el mismo día, en direcciones opuestas.
+Una operación por apertura.
+
+## LÍMITE a la regla cruzada: el gatillo va en el activo que se opera
+
+Importante, porque yo tenía la regla cruzada como universal y no lo es:
+
+    "en el SP500 sí que lo ha invalidado el FVG de un minuto, pero me da
+     igual. A mí lo que me interesa es el Nasdaq porque es el activo que voy
+     a operar. Si no lo invierte en el Nasdaq no me gusta entrar."   (nº18)
+
+Y añade que no entrar ahí le ahorró un stop loss. Queda:
+
+    barridos, tapeos de FVG, barridos de LRL  ->  valen en cualquiera
+    el GATILLO de entrada (IFVG o CISD)       ->  en el activo operado
+
+## El 1:1 es una atadura de la prop firm, confirmado sin ambigüedad
+
+La nº18 cierra casi en 1:4 y explica por qué puede:
+
+    "si estás pasando una Eval no puedes... por la consistencia. En mi caso
+     que estoy operando Fundeds, al no haber consistencia una vez tienes el
+     examen pasado, puedes alargar el TP todo lo que quieras"
+
+Confirma lo de la nº13. Su 1:1 habitual **no es el óptimo de la estrategia**:
+es lo que le deja hacer la regla de consistencia. El backtest debe medir
+los dos: TP a 1:1 y TP al DOL sin tope.
+
+## No entra en la reversión: entra en la continuación de la reversión
+
+    "yo no busco ser el primero en entrar en compras. Prefiero ser de los
+     que se enganchan a la ola, porque tiene mucho más win rate"      (nº19)
+
+En la nº19 el precio revierte al alza y él NO compra ahí: espera el
+retroceso que tapea el FVG de M5 dejado por el impulso, y compra eso.
+
+## Judas Swing, definición operativa (nº17)
+
+    que se barran los altos/bajos y RÁPIDAMENTE se dé un inverse o un CISD
+    con fuerza y buen delivery
+
+## Gatillo: puede bajar de M1 en las aperturas
+
+    "si está todo muy alineado, si barremos la LRL y la tenemos a favor,
+     puedo tener en cuenta los de 3 minutos, y más en un open"        (nº17)
+
+Y usa gatillos de 30 segundos en la nº17 y la nº18 como confirmación extra.
+El rango real del gatillo es 30s - M5, no M1 - M5.
+
+## Estado de los huecos
+
+    1. "los RS no me gustan"          resuelto (desempate del gatillo)
+    2. "invalidar con fuerza"         RESUELTO: vela del mismo color
+    3. temporalidad del gatillo       resuelto (mayor con R válido, 30s-M5)
+    4. se salta sesiones enteras      SIGUE ABIERTO
+    5. la balanza                     IRREDUCTIBLE
