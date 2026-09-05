@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 3 de 35.
+Estado: 4 de 35.
 
 ## Esqueleto provisional
 
@@ -118,3 +118,69 @@ estrategia es mecanizable entera.
     - qué barrido cuenta (¿mecha? ¿cierre? ¿cuántos puntos por encima?)
     - si el SMT es obligatorio o solo una confluencia más
     - qué pasa si el 1:1 no se alcanza dentro de la ventana horaria
+
+---
+
+# Actualización tras la nº4 (break even)
+
+## El DOL: el objetivo de liquidez de la sesión
+
+Lo llama "doll" (DOL, draw on liquidity). Es el nivel al que espera que vaya
+el precio en la sesión. Lo marca en **H4 y H1**, antes de operar, y son
+altos/bajos relevantes (en la nº4: unos altos por encima, más los altos del
+día anterior que descartó por lejanos).
+
+El DOL **no es el take profit**. El TP sigue siendo 1:1. El DOL sirve para
+otra cosa, y esa cosa es la regla más concreta que ha dado hasta ahora:
+
+## Regla de break even, mecánica y falsable
+
+    Si el OTRO índice barre el DOL mientras la operación está abierta,
+    se mueve el stop a break even.
+
+Textual: *"no tiene sentido seguir en este trade si nuestra Doll ya está
+barrida en uno de los dos activos"*. En la nº4 entró en NASDAQ, el SP500
+llegó antes a su DOL, y movió a BE. Perdió el TP por eso.
+
+Y hace una afirmación **directamente comprobable**:
+
+    "el break even que he puesto hoy podría haber sido TP, pero la mayoría
+     de los días hubiese sido stop loss"
+
+Eso se mide: cuando el otro índice barre el DOL, ¿la operación acaba peor
+que cuando no lo barre? Es una de las pocas cosas de todo el proyecto que
+se puede contrastar con un sí o un no limpio.
+
+## Jerarquía de temporalidades
+
+No entra en el primer FVG que aparece. Descartó FVGs de M1, M3 y M5 y esperó
+al **tapeo del FVG de H1**. Textual: *"por jerarquía de temporalidades
+tenemos que esperarnos al más grande"*. Después sí tomó un IFVG de M1, pero
+como gatillo dentro del nivel de H1, no como señal por sí mismo.
+
+Estructura real de la entrada, entonces:
+
+    NIVEL     tapeo de un FVG de temporalidad alta (H1/H4)
+    + SMT     divergencia con el otro índice en ese momento
+    + GATILLO IFVG de M1 dentro de ese nivel
+
+## Otras reglas nuevas
+
+    SMT           aquí es REQUISITO, no adorno: "hemos entrado cuando
+                  fileábamos un FVG de una hora y además hacíamos SMT".
+
+    JUDAS SWING   nombra explícitamente el movimiento falso de la apertura
+                  como lo que hay que esperar antes de entrar.
+
+    UNA AL DÍA    "nosotros normalmente solo cogemos un trade". La segunda
+                  oportunidad del día no se toma.
+
+    INSTRUMENTO   la entrada NO va siempre en el SP500. En la nº4 entró en
+                  NASDAQ. Entra donde el SMT le favorece.
+
+## El patrón "en contra del barrido" sigue aguantando: 4 de 4
+
+    nº1  barre BAJOS  -> compra
+    nº2  barre BAJOS  -> compra
+    nº3  barre ALTOS  -> venta
+    nº4  barre BAJOS  -> compra
