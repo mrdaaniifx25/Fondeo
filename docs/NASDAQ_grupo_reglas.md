@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 9 de 35.
+Estado: 11 de 35.
 
 ## Esqueleto provisional
 
@@ -355,3 +355,89 @@ La nº8 aclara algo que la nº5 dejaba a medias. Mira H4 **y H1** siempre.
 El 4 es el más caro: no es un filtro sobre la entrada, es un filtro sobre
 qué días existen. Si no se puede formalizar, el backtest medirá la
 estrategia sin su ojo, y hay que decirlo así de claro.
+
+---
+
+# Actualización tras las nº10 (BE) y nº11 (TP)
+
+## CORRECCIÓN: el TP no siempre es 1:1
+
+Lo tenía como regla fija y no lo es. El TP es el **DOL**; el 1:1 es lo que
+sale casi siempre porque el DOL suele caer por ahí. Cuando no coinciden,
+manda el DOL. Textual nº10:
+
+    "podría haberlo dejado hasta el 1 a 1, que era casi igual, pero para qué
+     voy a dejarlo en el 1 a 1 si mi objetivo es venir a barrer esto; si no
+     lo barre es que no he leído bien el movimiento"
+
+Esto importa para el backtest: el R:R deja de ser constante y el listón
+geométrico deja de ser el 50 % fijo. Hay que medir el ratio operación a
+operación.
+
+## CISD, ahora con definición
+
+    cierre de CUERPO a través del CUERPO de la última manipulation leg
+
+Textual nº10: *"ha cruzado la manipulation leg, la última que ha habido, la
+ha cruzado con cuerpo desde el body de la manipulation leg"*.
+
+Y su jerarquía entre los dos gatillos: *"me gusta más utilizar el IFVG, pero
+tengo en cuenta también el CISD"*.
+
+## Selección del gatillo: hay tope, y es M5
+
+Cuando hay varios IFVG a la vez sube de temporalidad y coge el mayor
+disponible, **con techo en M5**:
+
+    nº10: había uno de M2 y uno de M5 -> cogió el de M5
+          "yo como máximo cojo un invers de 5 minutos"
+    nº11: había de M1, M2 y M3, ninguno de M5 -> cogió el de M3
+          "cuando hay muchos FVGs me fijo en el que tiene más valor, que es
+           el de temporalidad más alta. Como máximo 5 minutos."
+
+Esto cierra el hueco nº3 de la lista de discrecionales: **ya no es "depende
+del contexto", es el mayor disponible entre M1 y M5.**
+
+## Break even: cuándo NO ponerlo
+
+    "cuando no hay motivo de poner break even, no hay que ponerlo... si te
+     pillas un break even que no tiene sentido te echan cuando en verdad no
+     había motivos"                                              (nº11)
+
+Y la regla completa, dicha mejor que en la nº4:
+
+    "si ya has tocado tu objetivo de liquidez con uno de los dos activos,
+     protégete del trade o ciérralo, porque ya no tienes excusa para seguir
+     dentro"                                                     (nº11)
+
+El BE se coloca en un **nivel de liquidez interna** (nº10: "el break even lo
+hemos puesto en un internal low"), no en el 1:1 automáticamente.
+
+## El SMT y la regla cruzada son el mismo hecho visto dos veces
+
+    un evento (barrido, tapeo de FVG, barrido de LRL) que ocurre en UN
+    índice y no en el otro:
+
+      -> cuenta como ocurrido para los dos   ("solo con que lo haga un
+         activo ya sirve para los dos, van correlacionados")
+      -> y el que solo lo haga uno ES el SMT, que es confluencia a favor
+
+O sea: el caso bueno es exactamente la divergencia. Programable sin
+ambigüedad.
+
+## Liquidez interna / externa y HRL
+
+    externa  = el DOL, los extremos hacia los que va el precio
+    interna  = todo lo que hay entre medias, donde rebota por el camino
+               -> es donde se coloca el break even
+
+    HRL      = "high resistance liquidity": relative equal highs/lows en
+               temporalidad alta. El equivalente de la LRL pero en H1/H4.
+               Cuenta como DOL de calidad.
+
+## Huecos discrecionales: quedan tres
+
+    1. descarta setups "porque los RS no me gustan"       SIGUE ABIERTO
+    2. "invalidar con mucha fuerza" sin definición        SIGUE ABIERTO
+    3. elige M5 o M15 "depende del contexto"              RESUELTO (nº10/11)
+    4. se salta sesiones enteras                          SIGUE ABIERTO
