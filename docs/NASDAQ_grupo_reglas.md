@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 22 transcripciones.
+Estado: 23 transcripciones.
 
 ## Esqueleto provisional
 
@@ -814,3 +814,43 @@ continuando bajista · él compra la reversión.
 Es contrastable directamente: cuando la apertura de NY continúa la
 dirección de la manipulación de Londres, ¿revierte más de lo que da el
 azar? Queda pendiente de medir.
+
+---
+
+# Actualización tras la nº23 (TP 1:1)
+
+## Segundo filtro que me faltaba: el QUIEBRE ESTRUCTURAL antes del IFVG
+
+    "hemos esperado los quiebres estructurales. Hemos esperado que se
+     invalidara este FVG de un minuto"
+
+Ya aparecía en la nº3 ("el primer quiebre estructural que ha habido"),
+pero lo había anotado como descripción y no como requisito. Con la nº23
+queda claro que es un paso obligatorio de la secuencia:
+
+    barrido -> QUIEBRE ESTRUCTURAL -> IFVG -> entrada
+
+## Los dos filtros que faltan van en la misma dirección
+
+    nº22 · retroceso sano   -> no entrar en un impulso sin retroceso
+    nº23 · quiebre estructural -> no entrar antes de que la estructura gire
+
+Los dos RETRASAN la entrada. Los dos impiden entrar al cierre de la vela
+de impulso, que es exactamente lo que hacía mi implementación en las
+12.535 operaciones de los dos pases.
+
+Esto refuerza el diagnóstico de la nº22: el -0,044 puede ser el coste de
+perseguir el movimiento, no una propiedad de la estrategia.
+
+## Se resuelve del todo lo de "reversión" y "continuación"
+
+    "hemos buscado las reversiones en LOW TIME FRAME, obviamente en HIGH
+     TIME FRAME son continuaciones alcistas"
+
+Es la misma operación descrita a dos escalas. No son dos modos. Cierra
+definitivamente la confusión de las transcripciones 1 a 5.
+
+## Cuarta confirmación idéntica de la invalidación
+
+    "una vez se ha invalidado, la vela que cierra por encima CON CUERPO,
+     hemos entrado"
