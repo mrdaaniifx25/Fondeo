@@ -29,9 +29,26 @@ Se mira H4 y H1.                                            (nº7, nº11)
          · lo INVALIDA           -> CONTINUACIÓN, en dirección de la rotura
                                                                    (nº5)
 
-      NO · manda la tendencia -> CONTINUACIÓN
-           "no hay FVGs de los que estemos reaccionando en 4 horas, todo
-            superbajista, aquí veo ventas de manual"                (nº8)
+      NO · manda la TENDENCIA -> CONTINUACIÓN. Y su tendencia TAMBIÉN
+           se define con FVGs; no usa medias ni máximos crecientes:
+
+               ALCISTA = se invalidan los FVGs bajistas de H4/H1
+                         y se respetan los alcistas
+               BAJISTA = se invalidan los alcistas y se respetan
+                         los bajistas
+
+           "estamos invalidando FVGs alcistas y creando FVGs bajistas
+            que se respetan muy bien"                                (nº8)
+           "invalidando FVGs de una hora bajistas, respetando los
+            alcistas, todo muy bullish"                             (nº13)
+           "fuerza bajista invirtiendo FVGs de 4 horas alcistas, claro
+            control de los vendedores"                              (nº18)
+           "seguimos invalidando FVGs bajistas al alza, esto muestra que
+            los compradores tienen el control"                      (nº20)
+
+           NO existe el "día sin operar por falta de FVG": en la nº8 la
+           ausencia de FVG en juego es su setup MÁS limpio, porque no hay
+           nada que frene al precio.
 
     El sesgo puede darse la vuelta a media sesión y eso es correcto:
     "no quedarte casado con el bias que tengas al principio".       (nº14)
@@ -125,8 +142,11 @@ Se mira H4 y H1.                                            (nº7, nº11)
 
 Estas las tengo que elegir yo. Si alguna está mal, el resultado cambia.
 
-    a. TENDENCIA cuando no hay FVG en juego: la definiré como la posición
-       del cierre dentro del rango de las últimas 20 velas de H1.
+    a. RETIRADA. Su tendencia también se define con FVGs (ver sección 2),
+       así que no hace falta inventar nada. Toda la estrategia usa una
+       sola primitiva -el fair value gap- medida a cuatro escalas:
+       sesgo en H4/H1, DOL en FVGs sin tapear, confluencia en M15/M5,
+       gatillo en 30s-M5.
     b. LRL: grupo de 3 o más extremos dentro de un margen estrecho.
     c. "MANIPULATION LEG" para el CISD: el último tramo direccional
        contrario antes del giro.
