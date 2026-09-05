@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 11 de 35.
+Estado: 13 de 35.
 
 ## Esqueleto provisional
 
@@ -441,3 +441,83 @@ ambigüedad.
     2. "invalidar con mucha fuerza" sin definición        SIGUE ABIERTO
     3. elige M5 o M15 "depende del contexto"              RESUELTO (nº10/11)
     4. se salta sesiones enteras                          SIGUE ABIERTO
+
+---
+
+# Actualización tras las nº12 (TP 1:1) y nº13 (TP 1,44R)
+
+## CORRECCIÓN: el SMT no es requisito
+
+Lo tenía como obligatorio por la nº4. No lo es. En la nº12 entra sin SMT y
+lo dice expresamente:
+
+    "no hay SMT, eso es importante también... a mí me gusta que haya SMT.
+     Sería un setup A+ si hubiese SMT."                          (nº12)
+
+Y en la nº13 tampoco hay SMT en H1. Así que el SMT **sube la calidad del
+setup pero no lo condiciona**. Eso lo convierte en una variable a medir por
+separado en el backtest: ¿ganan más las operaciones con SMT que sin él?
+Pregunta limpia y contestable.
+
+## CORRECCIÓN: el TP puede pasar del 1:1, y el techo no es el mercado
+
+La nº13 cierra en **1,44R**, en el extremo lejano del FVG de M15. Y da la
+razón de por qué no alarga más, que es la admisión más reveladora de las
+trece:
+
+    "podríamos haber alargado el TP hasta aquí perfectamente. Lo que pasa
+     que como cuentas de fondeo no puedo ganar tanto, porque si no la
+     consistencia jugaría en mi contra"                          (nº13)
+
+El TP no está limitado por lo que hace el precio: está limitado por la
+**regla de consistencia de la empresa de fondeo**. Es una restricción de
+gestión, no una lectura del mercado. Para el backtest significa que la R
+que él realiza es un SUELO de lo que la estrategia daría sin esa atadura.
+
+## El gatillo: la temporalidad cede ante el R:R
+
+Refina lo de la nº10/11. En la nº12 había IFVG de M2, M3 y M5 y cogió el de
+**M1**, porque los mayores quedaban lejos:
+
+    "podríamos mirarlo en FVG de 2 minutos, pero ya quedaba bastante lejos
+     y los RS no tendrían tanto sentido"                         (nº12)
+
+Regla real: el IFVG de mayor temporalidad **cuyo R siga funcionando**, con
+techo en M5.
+
+## Noticias, con matiz
+
+No es que no opere días de noticias. Le gustan:
+
+    "me mola que haya noticias, es gasolina para el precio, es liquidez que
+     entra. Obviamente cuando hay una noticia de alto impacto no entro
+     mientras la noticia está saliendo."                         (nº12)
+
+O sea: se excluye la ventana del dato, no el día.
+
+## LA BALANZA: el núcleo discrecional, y él lo nombra
+
+Este es el concepto central de la nº12 y no se puede programar:
+
+    "nunca vas a encontrar el setup perfecto que no tenga nada en contra...
+     me gusta hacer balanza con las confluencias a favor y en contra"
+
+En la nº12 la única en contra era un FVG de M5 opuesto, y decidió que la
+balanza ganaba. Eso no es una regla: es un juicio sobre un conjunto abierto
+de factores, distinto en cada operación.
+
+Consecuencia para el proyecto: puedo mecanizar TODO lo demás. Lo que salga
+del backtest será **la estrategia sin la balanza**. Si sale positiva, la
+balanza es un extra. Si sale plana, entonces todo el valor está en la
+balanza, y eso solo se puede contrastar con el registro real de operaciones
+del grupo, con sus precios.
+
+## Estado de los huecos discrecionales
+
+    1. "los RS no me gustan"                  parcialmente resuelto: es el
+                                              criterio de desempate del
+                                              gatillo, no un filtro aparte
+    2. "invalidar con mucha fuerza"           SIGUE ABIERTO
+    3. elección de temporalidad del gatillo   RESUELTO
+    4. se salta sesiones enteras              SIGUE ABIERTO
+    5. NUEVO: la balanza                      IRREDUCTIBLE
