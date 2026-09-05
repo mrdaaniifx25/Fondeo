@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 21 transcripciones.
+Estado: 22 transcripciones.
 
 ## Esqueleto provisional
 
@@ -756,3 +756,61 @@ formula, ahora con nombre.
 
 En la nº21 el BE queda en 0,5R y el TP más allá del 1:1. Encaja con la
 nº10: el BE va en liquidez interna, el TP en la externa.
+
+---
+
+# Actualización tras la nº22 (stop loss)
+
+## EL "RETROCESO SANO" POR FIN TIENE DEFINICIÓN — y es lo más útil de las 22
+
+La secuencia de entrada, repetida igual que en la nº2:
+
+    después de la inducción -> un impulso fuerte -> un RETROCESO SANO ->
+    continuación invalidando un FVG
+
+Y aquí, por primera vez, dice qué es un retroceso sano:
+
+    "me refiero a que el impulso no esté muy extendido, y que esté EN
+     EQUILIBRIO. Eso lo miro con la cuadrícula de Gann."
+
+    "hay veces que el movimiento es así, literalmente, SIN NINGÚN TIPO DE
+     RETROCESO. Estos movimientos a mí NO ME GUSTA COGERLOS."
+
+Traducido a código: antes de entrar, el impulso tiene que haber retrocedido
+hasta cerca de su equilibrio (~50 %). Un impulso que no retrocede se
+descarta.
+
+## Por qué esto importa tanto
+
+Mis dos pases exigían que la vela del gatillo fuera del color de la
+dirección y que la invalidación tuviera fuerza. Eso significa que estaba
+entrando **sistemáticamente al cierre de velas de impulso**, que es
+exactamente el movimiento que él dice que NO coge.
+
+O sea: el filtro que falta no es un filtro más de la lista. Es el que
+ataca justo el modo de fallo que tenía mi implementación, y podría
+explicar por qué la R salió ligeramente NEGATIVA en vez de plana. Entrar
+persiguiendo el impulso es peor que entrar al azar.
+
+Es el primer candidato serio a explicar el -0,044.
+
+## Confirmación de la regla de invalidación (nº19)
+
+    "esta vela ha cerrado fuera, esta no ha llegado a quebrar. Hemos
+     entrado cuando ha cerrado esta, que sí ha cerrado por encima CON
+     CUERPO DE VELA"
+
+Tercera formulación idéntica. La invalidación es cierre de cuerpo, no mecha.
+
+## Afirmación nueva y falsable sobre las sesiones
+
+    "normalmente cuando pasa esto, que Nueva York continúa, Londres acaba
+     revertiendo"
+
+En la nº22: Asia acumula · Londres barre los altos de Asia y revierte a
+barrer los bajos de Asia y de Londres del día anterior · Nueva York abre
+continuando bajista · él compra la reversión.
+
+Es contrastable directamente: cuando la apertura de NY continúa la
+dirección de la manipulación de Londres, ¿revierte más de lo que da el
+azar? Queda pendiente de medir.
