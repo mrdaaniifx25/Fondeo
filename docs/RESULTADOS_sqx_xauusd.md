@@ -174,3 +174,44 @@ Lo que tiene en contra:
 **Puede ser real y 3,55 años de un solo instrumento no bastan para saberlo.**
 Es la misma conclusión de siempre, pero por primera vez con un candidato que
 supera sus propios controles internos.
+
+## Qué hace, en números reales de las 581 operaciones
+
+    distancia del stop (1 x ATR95)   mediana  6,82 $   (rango 2,45 a 88,24)
+    tamaño de posición               mediana  1,77 lotes = 177 onzas
+    riesgo por operación             mediana  1.227 $
+    tiempo en el mercado             mediana  4,2 h    (máximo 79,2 h)
+    noches aguantadas                0,20 de media (94 operaciones pagan swap)
+
+    cuando GANA (247, 42,5 %)    mediana +1.480 $    mayor +8.102 $
+    cuando PIERDE (334, 57,5 %)  mediana -1.199 $    mayor -1.929 $
+
+    salidas por TIEMPO (302): ganan el 82 %
+    salidas por STOP   (279): ganan el  0 %
+
+Pierde más veces de las que gana. Vive de que las ganancias son un 24 % más
+grandes que las pérdidas.
+
+## Control 6 · el coste, que es lo que decide si él puede operarla
+
+La especificación asume spread de 0,20 $. La estrategia opera de 01:30 a
+23:30, o sea también en horas asiáticas, donde el oro se ensancha.
+
+      spread   comisión   swap |   ret     CAGR     PF      DD       t
+        0,20          6     35 | +87,8 % +19,42 %  1,202  -13,2 %  +1,80
+        0,30          6     35 | +52,9 % +12,70 %  1,135  -14,1 %  +1,24
+        0,35          6     35 | +43,1 % +10,62 %  1,114  -14,6 %  +1,05
+        0,50          6     35 | +10,6 %  +2,88 %  1,032  -22,5 %  +0,30
+        0,65          6     35 | -19,9 %  -6,06 %  0,931  -40,5 %  -0,70
+        0,80          6     35 | -37,7 % -12,46 %  0,855  -51,1 %  -1,49
+        1,00          6     35 | -55,3 % -20,27 %  0,763  -62,9 %  -2,49
+        0,20          0      0 |+109,4 % +23,15 %  1,238  -12,7 %  +2,08
+
+**El punto de equilibrio está en un spread de 0,52 $ aproximadamente.** Por
+debajo gana, por encima pierde. Y entre 0,20 y 0,35 el resultado ya se parte
+por la mitad.
+
+Esto convierte la pregunta abierta de todo el proyecto en una pregunta con
+respuesta concreta y comprobable: **¿cuál es el spread medio real del XAUUSD
+en su cuenta, incluyendo las horas malas?** Si está por debajo de 0,35, la
+estrategia tiene sentido. Si ronda 0,50, no.
