@@ -1,0 +1,638 @@
+<title>Verificación CRT · 2025-2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+ --bg:#EFF2F1; --sf:#FFFFFF; --sf2:#F5F8F7;
+ --tx:#16201C; --tx2:#55635D; --tx3:#8A9992;
+ --bd:#D4DCD8; --bd2:#E5EBE8;
+ --lg:#1C6B58; --st:#9C4A2F; --ac:#3D5A8A; --ok:#1C6B58; --no:#9C4A2F;
+ --lg-s:#DCEBE6; --st-s:#F3E1DA; --ac-s:#DEE6F2; --wr:#FBF0D9; --wr-b:#B8891F;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#111714; --sf:#19211D; --sf2:#1F2823;
+ --tx:#E2E9E5; --tx2:#9AAAA3; --tx3:#6C7C75;
+ --bd:#293330; --bd2:#212A26;
+ --lg:#54BA9C; --st:#DC9174; --ac:#82A6D8; --ok:#54BA9C; --no:#DC9174;
+ --lg-s:#17322B; --st-s:#33211A; --ac-s:#1C2637; --wr:#2E2716; --wr-b:#D8AE52;
+}}
+:root[data-theme="dark"]{
+ --bg:#111714; --sf:#19211D; --sf2:#1F2823;
+ --tx:#E2E9E5; --tx2:#9AAAA3; --tx3:#6C7C75;
+ --bd:#293330; --bd2:#212A26;
+ --lg:#54BA9C; --st:#DC9174; --ac:#82A6D8; --ok:#54BA9C; --no:#DC9174;
+ --lg-s:#17322B; --st-s:#33211A; --ac-s:#1C2637; --wr:#2E2716; --wr-b:#D8AE52;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);
+ font-family:"Source Sans 3",system-ui,sans-serif;font-size:16px;line-height:1.55}
+.w{max-width:840px;margin:0 auto;padding:0 18px 90px}
+h1,h2{font-family:Bitter,Georgia,serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.8rem,4.5vw,2.5rem);font-weight:600;line-height:1.1;letter-spacing:-.015em}
+h2{font-size:1.25rem;font-weight:600}
+p{margin:0}
+header.top{padding:48px 0 6px}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.16em;
+ text-transform:uppercase;color:var(--ac);margin-bottom:11px}
+.lede{color:var(--tx2);margin-top:13px;max-width:62ch}
+.regla{background:var(--wr);border:1px solid var(--wr-b);border-radius:4px;
+ padding:14px 18px;margin-top:22px;color:var(--tx);font-size:.97rem}
+.regla b{color:var(--wr-b)}
+
+.barra{position:sticky;top:0;z-index:20;background:var(--bg);
+ padding:12px 0 10px;border-bottom:1px solid var(--bd);margin-top:26px;
+ display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.prog{flex:1;min-width:160px;height:7px;background:var(--bd2);border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--ac);transition:width .25s}
+.cont{font-family:"JetBrains Mono",monospace;font-size:.82rem;color:var(--tx2);white-space:nowrap}
+.ir{font-size:.82rem;color:var(--ac);text-decoration:none;border:1px solid var(--bd);
+ padding:5px 11px;border-radius:3px;background:var(--sf)}
+.ir:hover{background:var(--ac-s)}
+
+.ops{display:flex;flex-direction:column;gap:16px;margin-top:22px}
+.op{background:var(--sf);border:1px solid var(--bd);border-radius:5px;
+ padding:18px;display:flex;flex-direction:column;gap:15px;scroll-margin-top:70px}
+.op.done{border-color:var(--ok)}
+.op.fail{border-color:var(--no)}
+.cab{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+.num{font-family:"JetBrains Mono",monospace;font-size:.85rem;font-weight:700;
+ color:var(--tx3);background:var(--sf2);border:1px solid var(--bd2);
+ width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:3px}
+.ide{display:flex;flex-direction:column;line-height:1.25}
+.ide b{font-family:"JetBrains Mono",monospace;font-size:1rem;font-weight:500}
+.ide span{font-size:.78rem;color:var(--tx3)}
+.lado{font-family:"JetBrains Mono",monospace;font-size:.75rem;font-weight:700;
+ padding:5px 11px;border-radius:3px;letter-spacing:.05em}
+.l-c{background:var(--lg-s);color:var(--lg)} .l-v{background:var(--st-s);color:var(--st)}
+.est{margin-left:auto}
+.pill{font-size:.72rem;padding:4px 10px;border-radius:20px;background:var(--bd2);
+ color:var(--tx3);white-space:nowrap}
+.pill.ok{background:var(--lg-s);color:var(--ok);font-weight:600}
+.pill.no{background:var(--st-s);color:var(--no);font-weight:600}
+
+.precios{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bd);
+ border:1px solid var(--bd);border-radius:4px;overflow:hidden}
+.pr{background:var(--sf2);padding:13px 14px;display:flex;flex-direction:column;gap:2px}
+.pr span{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3)}
+.pr b{font-family:"JetBrains Mono",monospace;font-size:1.32rem;font-weight:500;
+ letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.2}
+.pr i{font-family:"JetBrains Mono",monospace;font-size:.7rem;color:var(--tx3);font-style:normal}
+.pr-e b{color:var(--ac)} .pr-s b{color:var(--st)} .pr-t b{color:var(--lg)}
+
+.apoyo{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:11px 18px}
+.apoyo div{display:flex;flex-direction:column}
+.apoyo span{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3)}
+.apoyo b{font-family:"JetBrains Mono",monospace;font-size:.86rem;font-weight:400;
+ font-variant-numeric:tabular-nums}
+
+.ver{border-top:1px solid var(--bd2);padding-top:13px;display:flex;flex-direction:column;gap:8px}
+.vt{font-size:.74rem;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);
+ margin-bottom:2px}
+.vt b{color:var(--ok)}
+.ver label{display:flex;gap:10px;align-items:flex-start;font-size:.92rem;
+ color:var(--tx2);cursor:pointer;line-height:1.45}
+.ver label span b{color:var(--tx);font-weight:600}
+.ver input[type=checkbox]{margin:3px 0 0;accent-color:var(--ok);flex-shrink:0;
+ cursor:pointer;width:16px;height:16px}
+.nota{margin-top:4px}
+.nota input{width:100%;padding:8px 11px;border:1px solid var(--bd);border-radius:3px;
+ background:var(--sf2);color:var(--tx);font-family:inherit;font-size:.88rem}
+.nota input::placeholder{color:var(--tx3)}
+
+.res{background:var(--sf);border:2px solid var(--ac);border-radius:5px;padding:22px;
+ margin-top:36px;display:flex;flex-direction:column;gap:14px}
+.res h2{color:var(--ac)}
+#salida{width:100%;min-height:230px;padding:14px;border:1px solid var(--bd);
+ border-radius:3px;background:var(--sf2);color:var(--tx);
+ font-family:"JetBrains Mono",monospace;font-size:.8rem;line-height:1.6;resize:vertical}
+.bts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{font-family:inherit;font-size:.92rem;font-weight:600;padding:10px 18px;
+ border-radius:3px;border:1px solid var(--ac);background:var(--ac);color:#fff;cursor:pointer}
+button.sec{background:transparent;color:var(--ac)}
+button:hover{opacity:.88}
+#aviso{font-size:.85rem;color:var(--ok);font-weight:600}
+.sc{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;
+ color:var(--tx3);padding:0 12px 8px 0;border-bottom:1px solid var(--bd)}
+td{padding:8px 12px 8px 0;border-bottom:1px solid var(--bd2)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+section{margin-top:40px}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media (max-width:600px){
+ .precios{grid-template-columns:1fr} header.top{padding-top:34px}
+ .pr b{font-size:1.18rem}
+}
+
+.parte{margin-top:46px}
+.ph{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.pn{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.14em;
+ text-transform:uppercase;padding:4px 10px;border-radius:3px;font-weight:700}
+.pn-a{background:var(--lg-s);color:var(--lg)}
+.pn-b{background:var(--ac-s);color:var(--ac)}
+.pd{color:var(--tx2);max-width:64ch;margin-top:8px}
+.pd b{color:var(--tx)}
+
+.vent{display:flex;flex-direction:column;gap:7px;background:var(--sf2);
+ border:1px solid var(--bd2);border-radius:4px;padding:12px 14px}
+.vf{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+.vl{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;
+ padding:3px 7px;border-radius:3px;white-space:nowrap;min-width:132px}
+.vl1{background:var(--bd2);color:var(--tx2)}
+.vl2{background:var(--st-s);color:var(--st)}
+.vl3{background:var(--ac-s);color:var(--ac)}
+.vf b{font-family:"JetBrains Mono",monospace;font-size:.86rem;font-weight:400;
+ font-variant-numeric:tabular-nums}
+.rej2{background:var(--ac-s);border:1px solid var(--bd);border-radius:4px;
+ padding:14px 18px;margin-top:14px;color:var(--tx2);font-size:.93rem;max-width:64ch}
+</style>
+
+<div class="w">
+<header class="top">
+ <p class="eyebrow">EURUSD · 2025-2026 · hora española</p>
+ <h1>Verificación CRT</h1>
+ <p class="lede">Todo dentro del alcance de tu gráfico. Las tres partes comprueban cosas distintas y van en orden: primero el patrón, después la ejecución, y al final el Fibonacci.</p>
+ <div class="regla"><b>Marca solo lo que esté BIEN.</b> Lo que dejes sin marcar lo leeré como que está mal. Si algo falla, apunta qué ves — eso es lo que más me sirve.</div>
+ <div class="rej2"><b>La rejilla H4 de la guía, en hora española:</b> las velas abren a las <b>03:00 · 07:00 · 11:00 · 15:00 · 19:00 · 23:00</b>. Tu plataforma seguramente las dibuja ancladas a las 00:00 de su servidor, así que probablemente <b>no coincidan</b>. Mide el rango a mano entre las horas que te doy en cada tarjeta.</div>
+</header>
+
+<div class="barra">
+ <div class="prog"><i id="pi"></i></div>
+ <div class="cont" id="pc">0 comprobaciones</div>
+ <a class="ir" href="#resultado">Ir al resultado ↓</a>
+</div>
+
+<section class="parte">
+ <div class="ph"><span class="pn pn-a">Parte A</span><h2>CRT puro · las operaciones</h2></div>
+ <p class="pd">Las <b>cinco únicas</b> operaciones de CRT puro que existen desde 2025. No es una muestra, es la población entera. Orden stop en el extremo de la Vela 2, stop tras la mecha, objetivo en el extremo opuesto. <b>Sin Fibonacci.</b></p>
+ <div class="ops"><article class="op" id="A1">
+ <div class="cab">
+  <div class="num">A1</div>
+  <div class="ide"><b>06/02/2025</b><span>15:10 · hora española</span></div>
+  <div class="lado l-c">COMPRA</div>
+  <div class="est"><span class="pill" data-pill="A1">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>06/02/2025 07:00 – 10:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>06/02/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>06/02/2025 15:00 – 18:59</b></div>
+  </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.03676</b><i>orden stop</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.03513</b><i>16.3 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.03923</b><i>24.7 pips · 1.52R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.03559 — 1.03923</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.03523</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.03676</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Marca solo lo que esté <b>bien</b></p>
+  <label><input type="checkbox" data-t="A1" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A1" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A1" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A1" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A1" placeholder="Si algo falla, dime qué ves"></div>
+ </div>
+</article><article class="op" id="A2">
+ <div class="cab">
+  <div class="num">A2</div>
+  <div class="ide"><b>19/05/2025</b><span>15:00 · hora española</span></div>
+  <div class="lado l-v">VENTA</div>
+  <div class="est"><span class="pill" data-pill="A2">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>19/05/2025 07:00 – 10:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>19/05/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>19/05/2025 15:00 – 18:59</b></div>
+  </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.12548</b><i>orden stop</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.12889</b><i>34.1 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.11761</b><i>78.7 pips · 2.31R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.11761 — 1.12591</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.12879</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.12548</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Marca solo lo que esté <b>bien</b></p>
+  <label><input type="checkbox" data-t="A2" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A2" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A2" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A2" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A2" placeholder="Si algo falla, dime qué ves"></div>
+ </div>
+</article><article class="op" id="A3">
+ <div class="cab">
+  <div class="num">A3</div>
+  <div class="ide"><b>02/06/2025</b><span>15:25 · hora española</span></div>
+  <div class="lado l-v">VENTA</div>
+  <div class="est"><span class="pill" data-pill="A3">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>02/06/2025 07:00 – 10:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>02/06/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>02/06/2025 15:00 – 18:59</b></div>
+  </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.14092</b><i>orden stop</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.14378</b><i>28.6 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.13635</b><i>45.7 pips · 1.6R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.13635 — 1.14367</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.14368</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.14092</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Marca solo lo que esté <b>bien</b></p>
+  <label><input type="checkbox" data-t="A3" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A3" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A3" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A3" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A3" placeholder="Si algo falla, dime qué ves"></div>
+ </div>
+</article><article class="op" id="A4">
+ <div class="cab">
+  <div class="num">A4</div>
+  <div class="ide"><b>20/02/2026</b><span>08:08 · hora española</span></div>
+  <div class="lado l-c">COMPRA</div>
+  <div class="est"><span class="pill" data-pill="A4">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>19/02/2026 23:00 – 02:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>20/02/2026 03:00 – 06:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>20/02/2026 07:00 – 10:59</b></div>
+  </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.17597</b><i>orden stop</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.17491</b><i>10.6 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.17757</b><i>16.0 pips · 1.51R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.17551 — 1.17757</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.17501</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.17597</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Marca solo lo que esté <b>bien</b></p>
+  <label><input type="checkbox" data-t="A4" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A4" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A4" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A4" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A4" placeholder="Si algo falla, dime qué ves"></div>
+ </div>
+</article><article class="op" id="A5">
+ <div class="cab">
+  <div class="num">A5</div>
+  <div class="ide"><b>13/04/2026</b><span>08:42 · hora española</span></div>
+  <div class="lado l-v">VENTA</div>
+  <div class="est"><span class="pill" data-pill="A5">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>12/04/2026 23:00 – 02:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>13/04/2026 03:00 – 06:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>13/04/2026 07:00 – 10:59</b></div>
+  </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.16804</b><i>orden stop</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.16911</b><i>10.7 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.16638</b><i>16.6 pips · 1.55R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.16638 — 1.16874</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.16901</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.16804</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Marca solo lo que esté <b>bien</b></p>
+  <label><input type="checkbox" data-t="A5" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide con tu gráfico</span></label>
+  <label><input type="checkbox" data-t="A5" data-c="barrido"><span>La Vela 2 <b>barrió hasta A</b> y <b>cerró de vuelta dentro</b></span></label>
+  <label><input type="checkbox" data-t="A5" data-c="entrada"><span>La <b>entrada</b> está en el extremo de la Vela 2</span></label>
+  <label><input type="checkbox" data-t="A5" data-c="sltp"><span>El <b>SL</b> va tras la mecha y el <b>TP</b> en el extremo opuesto</span></label>
+  <div class="nota"><input type="text" data-nota="A5" placeholder="Si algo falla, dime qué ves"></div>
+ </div>
+</article></div>
+</section>
+
+<section class="parte">
+ <div class="ph"><span class="pn pn-a">Parte B</span><h2>CRT puro · solo el patrón</h2></div>
+ <p class="pd">Cinco setups que mi código <b>sí detectó como CRT válidos</b> pero que no llegaron a operarse. Aquí no hay entrada ni stop: la única pregunta es si <b>tú los habrías marcado como CRT</b>. Esta parte aísla la detección del patrón de todo lo demás, y con cinco operaciones en la Parte A me hacen falta estos ejemplos extra.</p>
+ <div class="ops"><article class="op" id="B1">
+ <div class="cab">
+  <div class="num">B1</div>
+  <div class="ide"><b>Setup alcista</b><span>detectado, no operado</span></div>
+  <div class="est"><span class="pill" data-pill="B1">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>21/02/2025 07:00 – 10:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>21/02/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>21/02/2025 15:00 – 18:59</b></div>
+  </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.04665 — 1.04994</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.04592</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.04779</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B1" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B1" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B1" placeholder="¿Tú lo habrías marcado como CRT?"></div>
+ </div>
+</article><article class="op" id="B2">
+ <div class="cab">
+  <div class="num">B2</div>
+  <div class="ide"><b>Setup bajista</b><span>detectado, no operado</span></div>
+  <div class="est"><span class="pill" data-pill="B2">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>16/04/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>16/04/2025 15:00 – 18:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>16/04/2025 19:00 – 22:59</b></div>
+  </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.13403 — 1.13775</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.13868</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.13496</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B2" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B2" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B2" placeholder="¿Tú lo habrías marcado como CRT?"></div>
+ </div>
+</article><article class="op" id="B3">
+ <div class="cab">
+  <div class="num">B3</div>
+  <div class="ide"><b>Setup bajista</b><span>detectado, no operado</span></div>
+  <div class="est"><span class="pill" data-pill="B3">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>17/04/2025 11:00 – 14:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>17/04/2025 15:00 – 18:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>17/04/2025 19:00 – 22:59</b></div>
+  </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.13349 — 1.13807</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.13855</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.13383</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B3" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B3" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B3" placeholder="¿Tú lo habrías marcado como CRT?"></div>
+ </div>
+</article><article class="op" id="B4">
+ <div class="cab">
+  <div class="num">B4</div>
+  <div class="ide"><b>Setup alcista</b><span>detectado, no operado</span></div>
+  <div class="est"><span class="pill" data-pill="B4">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>15/05/2025 15:00 – 18:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>15/05/2025 19:00 – 22:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>15/05/2025 23:00 – 02:59</b></div>
+  </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.11724 — 1.12236</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.11700</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.11888</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B4" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B4" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B4" placeholder="¿Tú lo habrías marcado como CRT?"></div>
+ </div>
+</article><article class="op" id="B5">
+ <div class="cab">
+  <div class="num">B5</div>
+  <div class="ide"><b>Setup alcista</b><span>detectado, no operado</span></div>
+  <div class="est"><span class="pill" data-pill="B5">sin revisar</span></div>
+ </div>
+ <div class="vent">
+   <div class="vf"><span class="vl vl1">Vela 1 · el rango</span><b>27/03/2026 18:00 – 20:59</b></div>
+   <div class="vf"><span class="vl vl2">Vela 2 · el barrido</span><b>29/03/2026 23:00 – 02:59</b></div>
+   <div class="vf"><span class="vl vl3">Vela 3 · se opera</span><b>30/03/2026 03:00 – 06:59</b></div>
+  </div>
+ <div class="apoyo">
+  <div><span>Rango de la Vela 1</span><b>1.15052 — 1.15207</b></div>
+  <div><span>Barrido hasta (A)</span><b>1.14877</b></div>
+  <div><span>Extremo de la Vela 2</span><b>1.15127</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Solo el <b>patrón</b>, aquí no hay operación</p>
+  <label><input type="checkbox" data-t="B5" data-c="rango"><span>El <b>rango de la Vela 1</b> coincide</span></label>
+  <label><input type="checkbox" data-t="B5" data-c="barrido"><span>Hay <b>barrido y cierre de vuelta dentro</b>: es un CRT válido</span></label>
+  <div class="nota"><input type="text" data-nota="B5" placeholder="¿Tú lo habrías marcado como CRT?"></div>
+ </div>
+</article></div>
+</section>
+
+<section class="parte">
+ <div class="ph"><span class="pn pn-b">Parte C</span><h2>La capa del Fibonacci</h2></div>
+ <p class="pd">Cuatro operaciones y <b>una sola pregunta</b>. Aquí el patrón ya lo validaste antes. Lo único que cambia es de dónde sale el precio de entrada: una orden limitada al <b>50 % del rebote</b> entre el barrido (A) y el máximo del rebote (B). Te doy el punto medio ya calculado.</p>
+ <div class="ops"><article class="op" id="C1">
+ <div class="cab">
+  <div class="num">C1</div>
+  <div class="ide"><b>19/02/2025</b><span>09:25 · hora española</span></div>
+  <div class="lado l-c">COMPRA</div>
+  <div class="est"><span class="pill" data-pill="C1">sin revisar</span></div>
+ </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.04482</b><i>orden limitada</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.04340</b><i>14.2 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.04953</b><i>47.1 pips · 3.33R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Barrido (A)</span><b>1.04350</b></div>
+  <div><span>Rebote hasta (B)</span><b>1.04613</b></div>
+  <div><span>Punto medio A–B</span><b>1.04482</b></div>
+  <div><span>Vela 3</span><b>19/02/2025 07:00 – 06:59</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Una <b>sola</b> pregunta</p>
+  <label><input type="checkbox" data-t="C1" data-c="fib"><span>La entrada cae a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
+  <div class="nota"><input type="text" data-nota="C1" placeholder="Si no, ¿dónde debería estar?"></div>
+ </div>
+</article><article class="op" id="C2">
+ <div class="cab">
+  <div class="num">C2</div>
+  <div class="ide"><b>26/03/2025</b><span>08:20 · hora española</span></div>
+  <div class="lado l-c">COMPRA</div>
+  <div class="est"><span class="pill" data-pill="C2">sin revisar</span></div>
+ </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.07852</b><i>orden limitada</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.07757</b><i>9.5 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.08579</b><i>72.7 pips · 7.61R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Barrido (A)</span><b>1.07767</b></div>
+  <div><span>Rebote hasta (B)</span><b>1.07938</b></div>
+  <div><span>Punto medio A–B</span><b>1.07852</b></div>
+  <div><span>Vela 3</span><b>26/03/2025 06:00 – 05:59</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Una <b>sola</b> pregunta</p>
+  <label><input type="checkbox" data-t="C2" data-c="fib"><span>La entrada cae a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
+  <div class="nota"><input type="text" data-nota="C2" placeholder="Si no, ¿dónde debería estar?"></div>
+ </div>
+</article><article class="op" id="C3">
+ <div class="cab">
+  <div class="num">C3</div>
+  <div class="ide"><b>10/04/2025</b><span>09:55 · hora española</span></div>
+  <div class="lado l-v">VENTA</div>
+  <div class="est"><span class="pill" data-pill="C3">sin revisar</span></div>
+ </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.10286</b><i>orden limitada</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.10958</b><i>67.2 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.08886</b><i>140.0 pips · 2.08R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Barrido (A)</span><b>1.10948</b></div>
+  <div><span>Rebote hasta (B)</span><b>1.09624</b></div>
+  <div><span>Punto medio A–B</span><b>1.10286</b></div>
+  <div><span>Vela 3</span><b>10/04/2025 07:00 – 06:59</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Una <b>sola</b> pregunta</p>
+  <label><input type="checkbox" data-t="C3" data-c="fib"><span>La entrada cae a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
+  <div class="nota"><input type="text" data-nota="C3" placeholder="Si no, ¿dónde debería estar?"></div>
+ </div>
+</article><article class="op" id="C4">
+ <div class="cab">
+  <div class="num">C4</div>
+  <div class="ide"><b>10/04/2026</b><span>13:00 · hora española</span></div>
+  <div class="lado l-v">VENTA</div>
+  <div class="est"><span class="pill" data-pill="C4">sin revisar</span></div>
+ </div>
+ <div class="precios">
+  <div class="pr pr-e"><span>Entrada</span><b>1.17128</b><i>orden limitada</i></div>
+  <div class="pr pr-s"><span>Stop loss</span><b>1.17244</b><i>11.6 pips</i></div>
+  <div class="pr pr-t"><span>Take profit</span><b>1.16433</b><i>69.5 pips · 5.99R</i></div>
+ </div>
+ <div class="apoyo">
+  <div><span>Barrido (A)</span><b>1.17234</b></div>
+  <div><span>Rebote hasta (B)</span><b>1.17022</b></div>
+  <div><span>Punto medio A–B</span><b>1.17128</b></div>
+  <div><span>Vela 3</span><b>10/04/2026 07:00 – 22:59</b></div>
+ </div>
+ <div class="ver">
+  <p class="vt">Una <b>sola</b> pregunta</p>
+  <label><input type="checkbox" data-t="C4" data-c="fib"><span>La entrada cae a <b>media altura</b> entre A y B, no pegada a un extremo</span></label>
+  <div class="nota"><input type="text" data-nota="C4" placeholder="Si no, ¿dónde debería estar?"></div>
+ </div>
+</article></div>
+</section>
+
+<section id="resultado">
+ <div class="res">
+  <h2>Mándame esto</h2>
+  <p style="color:var(--tx2);font-size:.94rem">Se actualiza solo conforme marcas. Copia y pega en el chat.</p>
+  <textarea id="salida" readonly></textarea>
+  <div class="bts">
+   <button id="copiar">Copiar al portapapeles</button>
+   <button class="sec" id="limpiar">Empezar de cero</button>
+   <span id="aviso"></span>
+  </div>
+  <p style="color:var(--tx3);font-size:.85rem">Si el botón no funciona, pincha dentro del recuadro, Ctrl+A y Ctrl+C.</p>
+ </div>
+</section>
+</div>
+
+<script>
+(function(){
+ var A=[{"id": "A1", "f": "06/02/2025", "h": "15:10", "d": "COMPRA"}, {"id": "A2", "f": "19/05/2025", "h": "15:00", "d": "VENTA"}, {"id": "A3", "f": "02/06/2025", "h": "15:25", "d": "VENTA"}, {"id": "A4", "f": "20/02/2026", "h": "08:08", "d": "COMPRA"}, {"id": "A5", "f": "13/04/2026", "h": "08:42", "d": "VENTA"}], B=[{"id": "B1", "f": "21/02/2025", "h": "", "d": "setup alcista"}, {"id": "B2", "f": "16/04/2025", "h": "", "d": "setup bajista"}, {"id": "B3", "f": "17/04/2025", "h": "", "d": "setup bajista"}, {"id": "B4", "f": "15/05/2025", "h": "", "d": "setup alcista"}, {"id": "B5", "f": "30/03/2026", "h": "", "d": "setup alcista"}], C=[{"id": "C1", "f": "19/02/2025", "h": "09:25", "d": "COMPRA"}, {"id": "C2", "f": "26/03/2025", "h": "08:20", "d": "COMPRA"}, {"id": "C3", "f": "10/04/2025", "h": "09:55", "d": "VENTA"}, {"id": "C4", "f": "10/04/2026", "h": "13:00", "d": "VENTA"}];
+ var CA=["rango","barrido","entrada","sltp"], CB=["rango","barrido"], CC=["fib"];
+ var NOM={rango:"rango",barrido:"barrido",entrada:"entrada",sltp:"SL/TP",fib:"nivel fib"};
+ var K="crt-2025-v1", st={};
+ try{ st=JSON.parse(localStorage.getItem(K)||"{}"); }catch(e){ st={}; }
+ function guarda(){ try{ localStorage.setItem(K,JSON.stringify(st)); }catch(e){} }
+ function estado(id,chs){
+  var m=0,f=[];
+  for(var i=0;i<chs.length;i++){ if(st[id+"|"+chs[i]]) m++; else f.push(NOM[chs[i]]); }
+  return {m:m,f:f,total:chs.length};
+ }
+ function pinta(){
+  var h=0,mx=0, todo=[[A,CA],[B,CB],[C,CC]];
+  for(var g=0;g<todo.length;g++){
+   var li=todo[g][0], chs=todo[g][1];
+   for(var i=0;i<li.length;i++){
+    var id=li[i].id, e=estado(id,chs); h+=e.m; mx+=e.total;
+    var card=document.getElementById(id), pill=document.querySelector('[data-pill="'+id+'"]');
+    if(!card) continue;
+    card.classList.remove("done","fail"); pill.classList.remove("ok","no");
+    if(e.m===e.total){ card.classList.add("done"); pill.classList.add("ok"); pill.textContent="correcta"; }
+    else if(e.m>0){ card.classList.add("fail"); pill.classList.add("no"); pill.textContent="falla: "+e.f.join(", "); }
+    else { pill.textContent="sin revisar"; }
+   }
+  }
+  document.getElementById("pi").style.width=(h/mx*100)+"%";
+  document.getElementById("pc").textContent=h+" de "+mx+" comprobaciones";
+  texto();
+ }
+ function bloque(t,li,chs){
+  var ok=0,rev=0,ln=[];
+  for(var i=0;i<li.length;i++){
+   var o=li[i], e=estado(o.id,chs), nt=st[o.id+"|nota"]||"", et;
+   if(e.m===e.total){ et="OK"; ok++; rev++; }
+   else if(e.m>0||nt){ et="FALLA -> "+e.f.join(", "); rev++; }
+   else { et="sin revisar"; }
+   var l=o.id+". "+o.f+(o.h?" "+o.h:"")+" "+o.d+"  "+et;
+   if(nt) l+="\n     nota: "+nt;
+   ln.push(l);
+  }
+  return t+"  (correctas "+ok+"/"+li.length+", revisadas "+rev+"/"+li.length+")\n"+ln.join("\n");
+ }
+ function texto(){
+  var t="VERIFICACION CRT - EURUSD 2025-2026\n";
+  t+="=========================================\n";
+  t+=bloque("PARTE A - CRT PURO, OPERACIONES",A,CA);
+  t+="\n\n"+bloque("PARTE B - CRT PURO, SOLO PATRON",B,CB);
+  t+="\n\n"+bloque("PARTE C - CAPA FIBONACCI",C,CC);
+  document.getElementById("salida").value=t;
+ }
+ var cbs=document.querySelectorAll('input[type=checkbox][data-t]');
+ for(var i=0;i<cbs.length;i++){(function(c){
+  var k=c.dataset.t+"|"+c.dataset.c;
+  if(st[k]) c.checked=true;
+  c.addEventListener("change",function(){ st[k]=c.checked; guarda(); pinta(); });
+ })(cbs[i]);}
+ var nts=document.querySelectorAll('input[data-nota]');
+ for(var j=0;j<nts.length;j++){(function(nn){
+  var k=nn.dataset.nota+"|nota";
+  if(st[k]) nn.value=st[k];
+  nn.addEventListener("input",function(){ st[k]=nn.value; guarda(); texto(); });
+ })(nts[j]);}
+ document.getElementById("copiar").addEventListener("click",function(){
+  var ta=document.getElementById("salida"), av=document.getElementById("aviso");
+  ta.removeAttribute("readonly"); ta.select(); ta.setSelectionRange(0,99999);
+  var h=false; try{ h=document.execCommand("copy"); }catch(e){}
+  ta.setAttribute("readonly","");
+  if(navigator.clipboard&&!h){
+   navigator.clipboard.writeText(ta.value).then(function(){
+    av.textContent="Copiado"; setTimeout(function(){av.textContent="";},2200);
+   }).catch(function(){ av.textContent="Copia con Ctrl+C"; });
+  } else { av.textContent=h?"Copiado":"Copia con Ctrl+C";
+   setTimeout(function(){av.textContent="";},2200); }
+ });
+ document.getElementById("limpiar").addEventListener("click",function(){
+  if(!confirm("Se borran todas las marcas y notas. ¿Seguro?")) return;
+  st={}; guarda();
+  var a=document.querySelectorAll('input[type=checkbox][data-t]');
+  for(var i=0;i<a.length;i++) a[i].checked=false;
+  var b=document.querySelectorAll('input[data-nota]');
+  for(var j=0;j<b.length;j++) b[j].value="";
+  pinta();
+ });
+ pinta();
+})();
+</script>

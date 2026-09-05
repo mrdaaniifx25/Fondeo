@@ -1,0 +1,40 @@
+fibo dibujado en M60
+  instr   fibo  objetivo      n   acierto   R bruta    R NETA     stop        z
+--------------------------------------------------------------------------------
+ EURUSD  0.500       1:2   1902     29.4 %    -0.056    -0.179    14.5    -5.99
+ EURUSD  0.500     nivel   1660     36.1 %    -0.100    -0.225    14.4    -6.16
+ EURUSD  0.618       1:2   1655     32.4 %    +0.005    -0.153    11.4    -4.55
+ EURUSD  0.618     nivel   1503     39.4 %    -0.043    -0.201    11.2    -4.59
+ EURUSD  0.705       1:2   1511     35.5 %    +0.079    -0.116     9.0    -3.19
+ EURUSD  0.705     nivel   1398     42.4 %    -0.022    -0.217     9.0    -4.68
+ EURUSD  0.790       1:2   1340     36.0 %    +0.084    -0.176     6.8    -4.48
+ EURUSD  0.790     nivel   1265     43.2 %    -0.012    -0.270     6.8    -5.31
+--------------------------------------------------------------------------------
+ GBPUSD  0.500       1:2   2158     30.9 %    -0.025    -0.125    19.4    -4.37
+ GBPUSD  0.500     nivel   1917     34.7 %    -0.145    -0.246    19.1    -7.30
+ GBPUSD  0.618       1:2   1889     32.3 %    -0.009    -0.135    15.4    -4.28
+ GBPUSD  0.618     nivel   1733     38.1 %    -0.114    -0.243    15.1    -6.45
+ GBPUSD  0.705       1:2   1713     34.1 %    +0.035    -0.123    12.4    -3.61
+ GBPUSD  0.705     nivel   1601     40.5 %    -0.071    -0.231    12.0    -5.65
+ GBPUSD  0.790       1:2   1545     34.7 %    +0.049    -0.157     9.4    -4.31
+ GBPUSD  0.790     nivel   1471     41.9 %    -0.042    -0.249     9.3    -5.53
+--------------------------------------------------------------------------------
+ USDJPY  0.500       1:2   1820     30.7 %    -0.025    -0.123    19.9    -3.95
+ USDJPY  0.500     nivel   1598     37.6 %    -0.063    -0.163    19.6    -4.54
+ USDJPY  0.618       1:2   1581     33.2 %    +0.018    -0.107    15.6    -3.08
+ USDJPY  0.618     nivel   1420     39.7 %    -0.062    -0.189    15.3    -4.70
+ USDJPY  0.705       1:2   1412     33.6 %    +0.019    -0.138    12.4    -3.67
+ USDJPY  0.705     nivel   1304     41.1 %    -0.062    -0.220    12.3    -5.15
+ USDJPY  0.790       1:2   1273     34.6 %    +0.042    -0.162     9.5    -4.05
+ USDJPY  0.790     nivel   1212     42.0 %    -0.077    -0.283     9.5    -6.26
+--------------------------------------------------------------------------------
+
+RESUMEN por celda, sobre los instrumentos
+  fibo 0.500 obj    1:2: R neta positiva en 0 de 3  ·  bruta media -0.035  ·  neta media -0.142  ·  acierto 30.4 %
+  fibo 0.500 obj  nivel: R neta positiva en 0 de 3  ·  bruta media -0.103  ·  neta media -0.211  ·  acierto 36.1 %
+  fibo 0.618 obj    1:2: R neta positiva en 0 de 3  ·  bruta media +0.005  ·  neta media -0.132  ·  acierto 32.6 %
+  fibo 0.618 obj  nivel: R neta positiva en 0 de 3  ·  bruta media -0.073  ·  neta media -0.211  ·  acierto 39.0 %
+  fibo 0.705 obj    1:2: R neta positiva en 0 de 3  ·  bruta media +0.044  ·  neta media -0.126  ·  acierto 34.4 %
+  fibo 0.705 obj  nivel: R neta positiva en 0 de 3  ·  bruta media -0.052  ·  neta media -0.223  ·  acierto 41.3 %
+  fibo 0.790 obj    1:2: R neta positiva en 0 de 3  ·  bruta media +0.058  ·  neta media -0.165  ·  acierto 35.1 %
+  fibo 0.790 obj  nivel: R neta positiva en 0 de 3  ·  bruta media -0.044  ·  neta media -0.267  ·  acierto 42.4 %

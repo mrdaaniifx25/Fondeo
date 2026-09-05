@@ -1,0 +1,387 @@
+//@version=6
+// ═════════════════════════════════════════════════════════════════════════════
+//  LIQUIDEZ · 4 CONFIRMACIONES CON ORDER BLOCK
+//
+//  El modelo del vídeo, entero y en un solo sitio:
+//     C1  el precio elimina un nivel: alto/bajo de la SESIÓN anterior o del DÍA
+//     C2  ese barrido es un Liquidity Sweep en H4 (mecha fuera, cuerpo dentro)
+//     C3  lo mismo en H1
+//     C4  vela envolvente / order block en el marco del gráfico  ->  ENTRADA
+//
+//     Barrido de máximo = venta.  Barrido de mínimo = compra.
+//     Stop al otro lado de la toma de liquidez.  Objetivo 1:1.
+//
+//  Los extremos de H1 y H4 se acumulan con las velas del propio gráfico, no con
+//  request.security, así que no repinta ni mira al futuro: en cada barra solo se
+//  usa lo que ya había pasado.
+// ═════════════════════════════════════════════════════════════════════════════
+indicator("Liquidez · 4 confirmaciones con Order Block", "Liquidez OB", overlay = true,
+     max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500)
+
+// ── SESIONES ────────────────────────────────────────────────────────────────
+gS = "Sesiones"
+verSes  = input.bool(true, "Dibujar sesiones", group = gS)
+sAsia   = input.session("1800-0100:23456", "Asia   (hora de Nueva York)", group = gS)
+sLon    = input.session("0200-0800:23456", "Londres", group = gS)
+sNY     = input.session("0800-1400:23456", "Nueva York", group = gS)
+nSes    = input.int(6, "Cuántas sesiones dibujar de cada una", minval = 1, maxval = 30, group = gS)
+
+// ── NIVELES ─────────────────────────────────────────────────────────────────
+gN = "Niveles de liquidez"
+verNiv  = input.bool(true, "Extender los niveles hasta que los barra", group = gN)
+usarSes = input.bool(true, "Usar altos y bajos de SESIÓN", group = gN)
+usarDia = input.bool(true, "Usar alto y bajo del DÍA anterior", group = gN)
+verEtiq = input.bool(true, "Poner nombre a cada nivel", group = gN)
+nNiv    = input.int(24, "Cuántos niveles guardar", minval = 4, maxval = 80, group = gN)
+
+// ── ORDER BLOCK ─────────────────────────────────────────────────────────────
+gO = "Order Block"
+verOB   = input.bool(true, "Dibujar order blocks", group = gO)
+nOB     = input.int(10, "Cuántos guardar", minval = 1, maxval = 40, group = gO)
+cuerpoOB= input.float(0.5, "Cuerpo mínimo de la envolvente (fracción del rango)",
+     minval = 0.0, maxval = 1.0, step = 0.05, group = gO,
+     tooltip = "El vídeo descarta las velas que 'no cierran con cuerpo'. 0,5 = el cuerpo tiene que ser al menos la mitad de la vela.")
+soloSetup= input.bool(false, "Dibujar solo los que forman parte de un setup completo", group = gO)
+borrarOB = input.bool(true, "Quitar el order block cuando el precio lo atraviesa entero", group = gO)
+
+// ── SETUP ───────────────────────────────────────────────────────────────────
+gT = "Setup de las 4 confirmaciones"
+verSetup = input.bool(true, "Dibujar entrada, stop y objetivo", group = gT)
+exigirH4 = input.bool(true, "Exigir el Liquidity Sweep en H4", group = gT)
+exigirH1 = input.bool(true, "Exigir el Liquidity Sweep en H1", group = gT)
+colchon  = input.float(1.0, "Colchón del stop (ticks)", minval = 0.0, step = 0.5, group = gT)
+razonRR  = input.float(1.0, "Objetivo (R)", minval = 0.2, maxval = 5.0, step = 0.1, group = gT)
+nSetup   = input.int(8, "Cuántos setups dejar en pantalla", minval = 1, maxval = 30, group = gT)
+verPanel = input.bool(true, "Panel del checklist", group = gT)
+
+gA = "Rejilla horaria"
+anclaH = input.int(1, "El bloque de H4 empieza a las", minval = 0, maxval = 23, group = gA,
+     tooltip = "Con huso de Nueva York, 1 = la rejilla 01/05/09/13/17/21.")
+corteDia = input.int(17, "El día cambia a las", minval = 0, maxval = 23, group = gA,
+     tooltip = "17 con huso de Nueva York = el cierre diario que usan los CFD y las divisas. Pon 0 si tu gráfico corta el día a medianoche.")
+tzRef  = input.string("America/New_York", "Huso de referencia", group = gA,
+     options = ["America/New_York", "Europe/Madrid", "UTC"])
+
+gC = "Colores"
+cAl   = input.color(#2E9E85, "Alcista", group = gC, inline = "c1")
+cBa   = input.color(#C0563A, "Bajista", group = gC, inline = "c1")
+cDia  = input.color(#C9821B, "Día anterior", group = gC)
+cAsia = input.color(#8A8F98, "Asia", group = gC, inline = "c2")
+cLon  = input.color(#4C7FC4, "Londres", group = gC, inline = "c2")
+cNY   = input.color(#D08A3C, "Nueva York", group = gC, inline = "c2")
+cMuerto = input.color(#7A7F88, "Nivel ya barrido", group = gC)
+
+// ═══ RELOJ Y REJILLA ═══════════════════════════════════════════════════════
+tLocal = timestamp("UTC", year(time, tzRef), month(time, tzRef), dayofmonth(time, tzRef),
+     hour(time, tzRef), minute(time, tzRef), 0)
+MS_H1 = 3600000
+MS_H4 = 14400000
+MS_D  = 86400000
+idH1 = math.floor(tLocal / MS_H1)
+idH4 = math.floor((tLocal - anclaH * MS_H1) / MS_H4)
+idD  = math.floor((tLocal - corteDia * MS_H1) / MS_D)
+
+// extremos ACUMULADOS de la vela H1 y H4 en curso, hasta el cierre de esta barra
+var float h1o = na
+var float h1h = na
+var float h1l = na
+var float h4o = na
+var float h4h = na
+var float h4l = na
+if na(idH1[1]) or idH1 != idH1[1]
+    h1o := open
+    h1h := high
+    h1l := low
+else
+    h1h := math.max(h1h, high)
+    h1l := math.min(h1l, low)
+if na(idH4[1]) or idH4 != idH4[1]
+    h4o := open
+    h4h := high
+    h4l := low
+else
+    h4h := math.max(h4h, high)
+    h4l := math.min(h4l, low)
+
+// ═══ NIVELES DE LIQUIDEZ ═══════════════════════════════════════════════════
+type Nivel
+    float px
+    bool  arriba
+    bool  viva
+    line  ln
+    label et
+
+var array<Nivel> niveles = array.new<Nivel>()
+
+f_podaNiv() =>
+    while array.size(niveles) > nNiv
+        n = array.shift(niveles)
+        line.delete(n.ln)
+        label.delete(n.et)
+
+f_nuevoNivel(float px, bool arriba, string nom, color col) =>
+    if not na(px)
+        ln = line.new(bar_index, px, bar_index + 1, px, color = color.new(col, 25),
+             width = 1, style = line.style_solid)
+        et = label.new(bar_index + 1, px, verEtiq ? nom + (arriba ? " alto" : " bajo") : "",
+             style = label.style_label_left, color = color.new(color.gray, 100),
+             textcolor = color.new(col, verEtiq ? 15 : 100), size = size.tiny)
+        array.push(niveles, Nivel.new(px, arriba, true, ln, et))
+        f_podaNiv()
+
+// ═══ SESIONES ══════════════════════════════════════════════════════════════
+type Ses
+    string nom
+    color  col
+    float  hi
+    float  lo
+    box    cj
+    bool   dentro
+
+var array<Ses> sess = array.new<Ses>()
+var array<box> cajas = array.new<box>()
+
+if array.size(sess) == 0
+    array.push(sess, Ses.new("Asia",    cAsia, na, na, box(na), false))
+    array.push(sess, Ses.new("Londres", cLon,  na, na, box(na), false))
+    array.push(sess, Ses.new("NY",      cNY,   na, na, box(na), false))
+
+f_podaCajas() =>
+    while array.size(cajas) > nSes * 3
+        box.delete(array.shift(cajas))
+
+f_paso(int idx, bool dentro) =>
+    s = array.get(sess, idx)
+    if dentro and not s.dentro
+        s.hi := high
+        s.lo := low
+        s.dentro := true
+        if verSes
+            s.cj := box.new(bar_index, high, bar_index, low,
+                 bgcolor = color.new(s.col, 92), border_color = color.new(s.col, 60),
+                 border_width = 1)
+            array.push(cajas, s.cj)
+            f_podaCajas()
+    else if dentro
+        s.hi := math.max(s.hi, high)
+        s.lo := math.min(s.lo, low)
+        if verSes and not na(s.cj)
+            box.set_top(s.cj, s.hi)
+            box.set_bottom(s.cj, s.lo)
+            box.set_right(s.cj, bar_index)
+    else if s.dentro
+        // la sesión acaba de cerrar: sus extremos pasan a ser niveles vivos
+        s.dentro := false
+        if usarSes
+            f_nuevoNivel(s.hi, true,  s.nom, s.col)
+            f_nuevoNivel(s.lo, false, s.nom, s.col)
+
+// en ámbito global: el historial [1] de algo declarado dentro de un if no es fiable
+inA = not na(time(timeframe.period, sAsia, "America/New_York"))
+inL = not na(time(timeframe.period, sLon,  "America/New_York"))
+inN = not na(time(timeframe.period, sNY,   "America/New_York"))
+f_paso(0, inA)
+f_paso(1, inL)
+f_paso(2, inN)
+
+// ═══ DÍA ANTERIOR ══════════════════════════════════════════════════════════
+var float dh = na
+var float dl = na
+if na(idD[1]) or idD != idD[1]
+    if usarDia and not na(dh)
+        f_nuevoNivel(dh, true,  "Día", cDia)
+        f_nuevoNivel(dl, false, "Día", cDia)
+    dh := high
+    dl := low
+else
+    dh := math.max(dh, high)
+    dl := math.min(dl, low)
+
+// ═══ ESTADO DE LOS NIVELES ═════════════════════════════════════════════════
+// Se evalúa nivel por nivel y se agrega con un O lógico, igual que el motor del
+// backtest: basta con que UN nivel vivo cumpla las tres primeras condiciones.
+//   C1  la vela H1 en curso tomó el nivel con la mecha
+//   C2  Liquidity Sweep en H1: el CUERPO quedó entero del otro lado
+//   C3  lo mismo en H4
+// Si el cuerpo se queda más allá del nivel es un Liquidity Run y no vale.
+tomadoArriba = false
+tomadoAbajo  = false
+swH1Corto = false
+swH1Largo = false
+swH4Corto = false
+swH4Largo = false
+nivCorto = float(na)
+nivLargo = float(na)
+
+if array.size(niveles) > 0
+    for i = 0 to array.size(niveles) - 1
+        n = array.get(niveles, i)
+        if n.viva
+            if n.arriba
+                b  = h1h > n.px
+                s1 = b and math.max(h1o, close) < n.px
+                s4 = s1 and h4h > n.px and math.max(h4o, close) < n.px
+                tomadoArriba := tomadoArriba or b
+                swH1Corto := swH1Corto or s1
+                swH4Corto := swH4Corto or s4
+                if s1 and na(nivCorto)
+                    nivCorto := n.px
+            else
+                b  = h1l < n.px
+                s1 = b and math.min(h1o, close) > n.px
+                s4 = s1 and h4l < n.px and math.min(h4o, close) > n.px
+                tomadoAbajo := tomadoAbajo or b
+                swH1Largo := swH1Largo or s1
+                swH4Largo := swH4Largo or s4
+                if s1 and na(nivLargo)
+                    nivLargo := n.px
+            // el nivel se gasta cuando el precio lo deja atrás con el cuerpo:
+            // a partir de ahí ya no es liquidez pendiente
+            gastado = n.arriba ? (close > n.px) : (close < n.px)
+            if gastado
+                n.viva := false
+                line.set_color(n.ln, color.new(cMuerto, 55))
+                line.set_style(n.ln, line.style_dotted)
+                if verEtiq
+                    label.set_textcolor(n.et, color.new(cMuerto, 40))
+                    label.set_text(n.et, "gastado")
+            else if verNiv
+                line.set_x2(n.ln, bar_index + 1)
+                label.set_x(n.et, bar_index + 1)
+
+okCorto = tomadoArriba and (not exigirH1 or swH1Corto) and (not exigirH4 or swH4Corto)
+okLargo = tomadoAbajo  and (not exigirH1 or swH1Largo) and (not exigirH4 or swH4Largo)
+
+// ═══ C4 · ORDER BLOCK (VELA ENVOLVENTE) ════════════════════════════════════
+rango  = math.max(high - low, syminfo.mintick)
+cuerpo = math.abs(close - open) / rango
+envBaj = close < open and close[1] > open[1] and open >= close[1] and close <= open[1] and cuerpo >= cuerpoOB
+envAlc = close > open and close[1] < open[1] and open <= close[1] and close >= open[1] and cuerpo >= cuerpoOB
+
+type OB
+    float alto
+    float bajo
+    bool  alcista
+    box   caja
+    label et
+    bool  roto
+
+var array<OB> obs = array.new<OB>()
+
+f_podaOB() =>
+    while array.size(obs) > nOB
+        o = array.shift(obs)
+        box.delete(o.caja)
+        label.delete(o.et)
+
+// La zona del order block cubre la vela engullida y la envolvente: la última
+// vela contraria antes del giro más el cuerpo que se la come. Es la zona a la
+// que el precio suele volver.
+f_nuevoOB(bool alc) =>
+    col = alc ? cAl : cBa
+    alto = math.max(high[1], high)
+    bajo = math.min(low[1], low)
+    cj = box.new(bar_index - 1, alto, bar_index + 6, bajo,
+         bgcolor = color.new(col, 82), border_color = color.new(col, 40), border_width = 1)
+    et = label.new(bar_index, alc ? bajo : alto, alc ? "OB alcista" : "OB bajista",
+         style = alc ? label.style_label_up : label.style_label_down,
+         color = color.new(color.gray, 100), textcolor = color.new(col, 10), size = size.tiny)
+    array.push(obs, OB.new(alto, bajo, alc, cj, et, false))
+    f_podaOB()
+
+// ═══ SETUP COMPLETO ════════════════════════════════════════════════════════
+sigCorto = okCorto and envBaj
+sigLargo = okLargo and envAlc
+
+var array<line>  sl_lin = array.new<line>()
+var array<label> sl_lab = array.new<label>()
+
+f_podaSetup() =>
+    while array.size(sl_lin) > nSetup * 3
+        line.delete(array.shift(sl_lin))
+    while array.size(sl_lab) > nSetup
+        label.delete(array.shift(sl_lab))
+
+f_dibujaSetup(bool corto) =>
+    entrada = close
+    stop = corto ? math.max(h1h, high) + colchon * syminfo.mintick
+                 : math.min(h1l, low)  - colchon * syminfo.mintick
+    riesgo = math.abs(entrada - stop)
+    objetivo = corto ? entrada - razonRR * riesgo : entrada + razonRR * riesgo
+    col = corto ? cBa : cAl
+    x2 = bar_index + 22
+    a = line.new(bar_index, entrada,  x2, entrada,  color = color.new(#4C7FC4, 10), width = 2)
+    b = line.new(bar_index, stop,     x2, stop,     color = color.new(cBa, 20), width = 1, style = line.style_dashed)
+    c = line.new(bar_index, objetivo, x2, objetivo, color = color.new(cAl, 20), width = 1, style = line.style_dashed)
+    array.push(sl_lin, a)
+    array.push(sl_lin, b)
+    array.push(sl_lin, c)
+    txt = (corto ? "VENTA" : "COMPRA") + "\nentrada " + str.tostring(entrada, format.mintick) +
+          "\nstop "    + str.tostring(stop, format.mintick) +
+          "\nobjetivo "+ str.tostring(objetivo, format.mintick) +
+          "\nriesgo "  + str.tostring(riesgo, format.mintick)
+    e = label.new(x2, entrada, txt, style = label.style_label_left,
+         color = color.new(color.gray, 100), textcolor = color.new(col, 5),
+         size = size.small, textalign = text.align_left)
+    array.push(sl_lab, e)
+    f_podaSetup()
+
+if verOB and (envBaj or envAlc) and (not soloSetup or sigCorto or sigLargo)
+    f_nuevoOB(envAlc)
+
+if verSetup and (sigCorto or sigLargo)
+    f_dibujaSetup(sigCorto)
+
+// seguimiento de los order blocks
+if verOB and array.size(obs) > 0
+    for i = 0 to array.size(obs) - 1
+        o = array.get(obs, i)
+        if not o.roto
+            box.set_right(o.caja, bar_index + 6)
+            atravesado = o.alcista ? close < o.bajo : close > o.alto
+            if atravesado
+                o.roto := true
+                if borrarOB
+                    box.delete(o.caja)
+                    label.delete(o.et)
+                else
+                    box.set_bgcolor(o.caja, color.new(cMuerto, 90))
+                    box.set_border_color(o.caja, color.new(cMuerto, 60))
+
+// ═══ PANEL DEL CHECKLIST ═══════════════════════════════════════════════════
+f_marca(bool b) => b ? "✔" : "·"
+f_col(bool b) => b ? #2E9E85 : #7A7F88
+
+var table pn = table.new(position.top_right, 2, 6, border_width = 1)
+if verPanel and barstate.islast
+    hayCorto = tomadoArriba
+    hayLargo = tomadoAbajo
+    c1 = hayCorto or hayLargo
+    c2 = swH4Corto or swH4Largo
+    c3 = swH1Corto or swH1Largo
+    c4 = envBaj or envAlc
+    sentido = sigCorto ? "VENTA" : sigLargo ? "COMPRA" : c1 ? (hayCorto ? "vigilar venta" : "vigilar compra") : "sin nivel tomado"
+    table.cell(pn, 0, 0, "4 confirmaciones", text_size = size.small, text_color = #C8CCD2,
+         bgcolor = color.new(#1E222A, 10))
+    table.cell(pn, 1, 0, sentido, text_size = size.small, bgcolor = color.new(#1E222A, 10),
+         text_color = sigCorto ? cBa : sigLargo ? cAl : #C8CCD2)
+    table.cell(pn, 0, 1, "1 · nivel barrido",  text_size = size.small, text_color = #C8CCD2, bgcolor = color.new(#1E222A, 25))
+    table.cell(pn, 1, 1, f_marca(c1), text_size = size.small, text_color = f_col(c1), bgcolor = color.new(#1E222A, 25))
+    table.cell(pn, 0, 2, "2 · sweep en H4",    text_size = size.small, text_color = #C8CCD2, bgcolor = color.new(#1E222A, 25))
+    table.cell(pn, 1, 2, f_marca(c2), text_size = size.small, text_color = f_col(c2), bgcolor = color.new(#1E222A, 25))
+    table.cell(pn, 0, 3, "3 · sweep en H1",    text_size = size.small, text_color = #C8CCD2, bgcolor = color.new(#1E222A, 25))
+    table.cell(pn, 1, 3, f_marca(c3), text_size = size.small, text_color = f_col(c3), bgcolor = color.new(#1E222A, 25))
+    table.cell(pn, 0, 4, "4 · order block",    text_size = size.small, text_color = #C8CCD2, bgcolor = color.new(#1E222A, 25))
+    table.cell(pn, 1, 4, f_marca(c4), text_size = size.small, text_color = f_col(c4), bgcolor = color.new(#1E222A, 25))
+    nivTxt = not na(nivCorto) ? str.tostring(nivCorto, format.mintick) :
+             not na(nivLargo) ? str.tostring(nivLargo, format.mintick) : "—"
+    table.cell(pn, 0, 5, "nivel", text_size = size.tiny, text_color = #8A8F98, bgcolor = color.new(#1E222A, 40))
+    table.cell(pn, 1, 5, nivTxt,  text_size = size.tiny, text_color = #8A8F98, bgcolor = color.new(#1E222A, 40))
+
+// ═══ AVISOS ════════════════════════════════════════════════════════════════
+plotshape(sigCorto, "Venta", shape.triangledown, location.abovebar, cBa, size = size.tiny)
+plotshape(sigLargo, "Compra", shape.triangleup,  location.belowbar, cAl, size = size.tiny)
+
+alertcondition(sigCorto, "Setup de VENTA", "4 confirmaciones completas: venta")
+alertcondition(sigLargo, "Setup de COMPRA", "4 confirmaciones completas: compra")
+alertcondition(swH4Corto or swH4Largo, "Sweep en H4", "Liquidity sweep confirmado en H4")
