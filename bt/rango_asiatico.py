@@ -16,7 +16,11 @@ import numpy as np, pandas as pd
 INSTR = {"EURUSD":("data/eurusd_m1.parquet",1e-4,1.43),
          "GBPUSD":("data/gbpusd_m1.parquet",1e-4,1.60),
          "USDJPY":("data/usdjpy_m1.parquet",1e-2,1.50)}   # control
-RRMIN, SLMIN, SLMAX, MECHA = 3.0, 4.0, 8.0, 0.50
+import os
+MODO  = os.environ.get("MODO","TOPE")   # TOPE · A · B · C   (preregistro b503a21)
+RRMIN, MECHA = 3.0, 0.50
+SLMIN, SLMAX = {"TOPE":(4.0,8.0), "A":(0.5,1e9), "B":(0.5,1e9), "C":(12.0,1e9)}[MODO]
+MARGEN = 1.0 if MODO=="B" else 0.0       # pips de margen sobre el extremo
 
 def corre(nom, ruta, U, coste):
     d = pd.read_parquet(ruta); d["ts"]=pd.to_datetime(d.ts)
@@ -71,7 +75,7 @@ def corre(nom, ruta, U, coste):
                 tp  = bajo if lado<0 else alto
                 # stop al otro lado de la zona, acotado a 4-8 pips
                 base = (zhi-ent) if lado<0 else (ent-zlo)
-                sl_p = min(max(base/U, SLMIN), SLMAX)
+                sl_p = min(max(base/U + MARGEN, SLMIN), SLMAX)
                 rgo  = sl_p*U
                 if abs(tp-ent)/rgo < RRMIN: continue
                 # la limitada se rellena en alguna vela posterior de la ventana
@@ -96,7 +100,8 @@ def corre(nom, ruta, U, coste):
 
 if __name__=="__main__":
     T=pd.concat([corre(k,*v) for k,v in INSTR.items()], ignore_index=True)
-    T.to_csv("data/rango_asiatico.csv", index=False)
+    T.to_csv(f"data/rango_asiatico_{MODO}.csv", index=False)
+    print(f"MODO {MODO}\n")
     def z(x): x=np.asarray(x,float); return x.mean()/(x.std(ddof=1)/np.sqrt(len(x))) if len(x)>2 else 0
     print("liston geometrico a 1:3 = 25,0 % de acierto · R = 0\n")
     print(f"{'instr':>7s} {'n':>5s} {'acierto':>9s} {'R:R medio':>10s} {'stop':>7s} "
