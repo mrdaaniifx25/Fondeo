@@ -4,7 +4,7 @@ Notas extraídas de las transcripciones. **No se guarda el texto literal**: es
 contenido de un grupo privado y este repositorio es público. Aquí van solo
 las reglas mecánicas, que es lo que hace falta para el backtest.
 
-Estado: 6 de 35.
+Estado: 9 de 35.
 
 ## Esqueleto provisional
 
@@ -271,3 +271,87 @@ de challenge.
     - "invalidar con mucha fuerza" no tiene definición.
     - jerarquía de temporalidades: prefiere M5 sobre M3 "si dan los mismos
       RS". Otra decisión sin umbral.
+
+---
+
+# Actualización tras las nº7, nº8 y nº9 (tres TP)
+
+## CAMBIO DE ALCANCE: también opera LONDRES
+
+La nº7 y la nº9 son operaciones de la **sesión de Londres**, no de Nueva
+York. La nº8 es de Nueva York el mismo día que la nº7. Textual: *"opero las
+dos, normalmente me miro las dos sesiones"*.
+
+Esto invalida la ventana 9:30-11:30 NY como regla única. Son dos ventanas:
+la apertura de Londres y la apertura de Nueva York. Y **una operación por
+sesión**, no por día: en la nº8 dice *"yo meto un trade al día solo"* pero
+ese mismo día ya había operado Londres, así que se refiere a una por sesión.
+
+## Regla del DOL, ahora precisa y mecánica
+
+El objetivo de liquidez debe estar **sin barrer en LOS DOS índices**.
+Textual nº8:
+
+    "esos bajos ya estaban barridos en el NASDAQ, entonces para mí ya no
+     tiene relevancia; los que sí tenían relevancia eran estos, que no
+     estaban barridos en ninguno de los dos"
+
+Un nivel ya tomado en uno de los dos deja de ser objetivo. Esto es
+programable tal cual.
+
+## El stop, por fin explícito
+
+    "con el stop loss en la inducción, en los bajos de la inducción,
+     como suelo hacer siempre"   (nº9)
+
+El stop va al extremo de la pierna de inducción, no a la mecha de la vela de
+entrada. Con lo de la nº6 (preferir el cuerpo cuando la mecha da mal R),
+queda: extremo de la inducción, y cuerpo si la mecha estropea el ratio.
+
+## La confluencia de M15 vale en cualquiera de los dos índices
+
+Textual nº9:
+
+    "este pequeño FVG en el Nasdaq no llegó a ser tapeado... en el SP500 sí.
+     Una vez hemos tapeado en el SP500, para mí ya cuenta como si hubiésemos
+     tapeado los dos porque van correlacionados"
+
+Entró en NASDAQ por un tapeo que ocurrió en el SP500. La regla cruzada no es
+solo para el barrido: vale también para la confluencia de entrada.
+
+## El sesgo tiene dos ramas, no una
+
+La nº8 aclara algo que la nº5 dejaba a medias. Mira H4 **y H1** siempre.
+
+    si el precio está interactuando con un FVG de H4/H1
+        -> aguanta   = reversión en dirección del FVG
+        -> invalida  = continuación en dirección de la rotura
+
+    si NO hay ningún FVG relevante en juego
+        -> manda la tendencia: continuación
+        textual nº8: "no hay FVGs de los que estemos reaccionando en 4
+        horas, todo superbajista, aquí veo ventas de manual"
+
+## Confirmación de reglas ya anotadas
+
+    - TP 1:1 en las tres. En la nº9 dice que el trade ideal daba más pero
+      "por el tema de la entry no nos daba bien los RS, entonces lo he
+      dejado hasta el uno a uno, como suelo hacer siempre".
+    - BE en 1:1 o en un nivel relevante. nº7: "no siempre hay zona para
+      poner break even".
+    - No se entra al primer IFVG: hay que esperar la confluencia de M15/M5
+      primero. nº9: "si buscas continuaciones no puedes entrar al primer
+      invers que se haga".
+    - Fuerza de la invalidación: nº8 repite que un IFVG flojo no lo toma.
+
+## Huecos discrecionales acumulados (van cuatro)
+
+    1. descarta setups "porque los RS no me gustan"          (nº6, nº9)
+    2. "invalidar con mucha fuerza" sin definición           (nº6, nº8)
+    3. elige M5 o M15 "depende del contexto"                 (nº9)
+    4. NUEVO: se salta sesiones enteras. nº9: "Nueva York no me gustaba
+       cómo se está moviendo el precio"
+
+El 4 es el más caro: no es un filtro sobre la entrada, es un filtro sobre
+qué días existen. Si no se puede formalizar, el backtest medirá la
+estrategia sin su ojo, y hay que decirlo así de claro.
