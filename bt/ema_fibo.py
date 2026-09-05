@@ -93,13 +93,15 @@ def evalua(S, HL, fib, rr):
         e = np.flatnonzero(ll <= ent) if lado > 0 else np.flatnonzero(hh >= ent)
         if not len(e): continue
         k = e[0]
-        hh, ll = hh[k:], ll[k:]
-        if lado > 0:
-            a = np.flatnonzero(hh >= tp); b = np.flatnonzero(ll <= stop)
-        else:
-            a = np.flatnonzero(ll <= tp); b = np.flatnonzero(hh >= stop)
-        ia = a[0] if len(a) else 10**9
-        ib = b[0] if len(b) else 10**9
+        # La barra que EJECUTA la orden limitada no puede contar como objetivo:
+        # su maximo (en compras) es casi siempre anterior al llenado, porque el
+        # precio venia de arriba. Contarlo es mirar al futuro dentro de la vela.
+        # El stop SI se mira en esa barra, que es lo conservador.
+        st = (ll[k:] <= stop) if lado > 0 else (hh[k:] >= stop)
+        ob = (hh[k+1:] >= tp) if lado > 0 else (ll[k+1:] <= tp)
+        b = np.flatnonzero(st); a = np.flatnonzero(ob)
+        ia = a[0]+1 if len(a) else 10**9
+        ib = b[0]   if len(b) else 10**9
         if ia == ib == 10**9: continue
         R.append((rr if ia < ib else -1.0) - COSTE*U/rgo)    # empate = stop
     return np.array(R)
