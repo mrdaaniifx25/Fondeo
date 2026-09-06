@@ -1,0 +1,55 @@
+==========================================================================
+REGLA DE BARRIDO Y RECHAZO · ventana 08:00-11:30 · hasta el toque nº 2
+==========================================================================
+
+EN LOS 114 DÍAS DEL EXAMEN  (de donde salió: descriptivo)
+  disparos 110  en 79 días  ·  1.39 por día
+  acierto 37.8 %  (geométrico 33,3 %)   z = +0.93
+  stop mediano 3.0 p   ·   coste sobre riesgo 54.8 %
+  R bruta +0.173   ·   R NETA -0.375   z = -2.71   (p=0.006784)
+  suma neta -41.3 R
+
+FUERA DE MUESTRA · todos los demás días 2020-2026  (CONFIRMATORIO)
+  disparos 1473  en 1032 días  ·  1.43 por día
+  acierto 34.7 %  (geométrico 33,3 %)   z = +1.08
+  stop mediano 3.3 p   ·   coste sobre riesgo 51.2 %
+  R bruta +0.053   ·   R NETA -0.459   z = -12.31   (p=0.000000)
+  suma neta -675.4 R
+
+  por año, fuera de muestra:
+    2020  n= 231  acierto  33.3 %  neta -0.458  suma  -105.8 R
+    2021  n= 225  acierto  31.0 %  neta -0.615  suma  -138.4 R
+    2022  n= 246  acierto  38.2 %  neta -0.240  suma   -59.0 R
+    2023  n= 248  acierto  34.0 %  neta -0.475  suma  -117.8 R
+    2024  n= 220  acierto  30.5 %  neta -0.683  suma  -150.2 R
+    2025  n= 191  acierto  43.7 %  neta -0.181  suma   -34.5 R
+    2026  n= 112  acierto  31.4 %  neta -0.621  suma   -69.6 R
+
+  por lado y por toque, fuera de muestra:
+    rechazo del ALTO (venta)   n= 748  acierto  33.1 %  neta -0.511
+    rechazo del BAJO (compra)  n= 725  acierto  36.3 %  neta -0.404
+    primer toque               n= 743  acierto  35.5 %  neta -0.489
+    segundo toque              n= 730  acierto  33.9 %  neta -0.428
+
+==========================================================================
+DOS COMPROBACIONES MÁS  (secundarias, exploratorias)
+==========================================================================
+
+  a · con el stop ensanchado hasta la anchura que pone él:
+     stop mínimo      n  stop med  coste/riesgo  acierto   R neta       z
+             0 p   1473      3.3p         51.2%    34.7%   -0.459  -12.31
+             4 p   1473      4.0p         31.4%    34.6%   -0.255   -7.03
+             6 p   1473      6.0p         22.7%    32.6%   -0.194   -5.55
+             8 p   1473      8.0p         17.5%    30.8%   -0.160   -4.82
+            10 p   1473     10.0p         14.1%    29.9%   -0.099   -3.14
+
+  b · ¿elige la regla las mismas operaciones que él?
+    de sus 150, coinciden con un disparo de la regla (±15 min): 36 (24 %)
+    la regla dispara 110 veces en esos días y él entra 150
+
+  c · en los MISMOS disparos, ¿qué saca él y qué saca la regla?
+    36 parejas (su entrada y el disparo de la regla, a menos de 15 min)
+    van en la misma dirección: 22 de 36
+    él     acierto  65.7 %  stop 5.5p  R bruta +0.987  R neta +0.711
+    regla  acierto  55.9 %  stop 2.6p  R bruta +0.664  R neta +0.074
+    diferencia emparejada  +0.637 R por disparo   z = +1.94

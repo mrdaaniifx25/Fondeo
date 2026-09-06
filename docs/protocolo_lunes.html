@@ -1,0 +1,269 @@
+<title>El Lunes del NASDAQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --fondo:#EDF1F4; --panel:#FFFFFF; --panel2:#F5F8FA;
+  --tinta:#131A21; --tinta2:#4E5C68; --tinta3:#7C8B98;
+  --linea:#D3DBE1; --linea2:#E4EAEE;
+  --senal:#A8620A; --senal-suave:#F0E0CB; --senal-fuerte:#8A4F06;
+  --aviso:#8C2C3C; --aviso-suave:#F2DDE1;
+  --ok:#2C6152;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --fondo:#101519; --panel:#181F26; --panel2:#1E262E;
+  --tinta:#E3E9ED; --tinta2:#A0AEB9; --tinta3:#75838F;
+  --linea:#2B343D; --linea2:#232B33;
+  --senal:#DFA24B; --senal-suave:#3A2C17; --senal-fuerte:#F0BE73;
+  --aviso:#D97F8D; --aviso-suave:#392227;
+  --ok:#6FB49C;
+}}
+:root[data-theme="dark"]{
+  --fondo:#101519; --panel:#181F26; --panel2:#1E262E;
+  --tinta:#E3E9ED; --tinta2:#A0AEB9; --tinta3:#75838F;
+  --linea:#2B343D; --linea2:#232B33;
+  --senal:#DFA24B; --senal-suave:#3A2C17; --senal-fuerte:#F0BE73;
+  --aviso:#D97F8D; --aviso-suave:#392227;
+  --ok:#6FB49C;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.env{max-width:1080px;margin:0 auto;padding:0 24px 96px}
+.col{max-width:660px;margin:0 auto}
+h1,h2,h3{text-wrap:balance;margin:0}
+h1{font-family:Newsreader,Georgia,serif;font-weight:600;font-size:clamp(2.4rem,6vw,3.9rem);
+  line-height:1.02;letter-spacing:-.018em}
+h2{font-family:Newsreader,Georgia,serif;font-weight:600;font-size:1.72rem;line-height:1.2;
+  letter-spacing:-.012em}
+h3{font-size:.86rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--tinta3)}
+p{margin:0}
+a{color:var(--senal)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.74rem;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--senal);font-weight:500}
+header{padding:72px 0 12px}
+.lede{font-family:Newsreader,Georgia,serif;font-size:1.32rem;line-height:1.5;color:var(--tinta2);
+  margin-top:22px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;padding-top:18px;
+  border-top:1px solid var(--linea);font-family:"IBM Plex Mono",monospace;
+  font-size:.76rem;color:var(--tinta3);letter-spacing:.02em}
+section{margin-top:64px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.panel{background:var(--panel);border:1px solid var(--linea);border-radius:3px;padding:28px}
+.wide{max-width:1080px;margin:0 auto}
+figure{margin:0}
+figcaption{font-size:.83rem;color:var(--tinta3);margin-top:14px;line-height:1.5}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.grid{stroke:var(--linea2);stroke-width:1}
+.zero{stroke:var(--tinta3);stroke-width:1.2}
+.ax,.ax2{font-family:"IBM Plex Mono",monospace;font-size:10.5px;fill:var(--tinta3)}
+.ax{text-anchor:end}.ax2{text-anchor:middle}
+.b-mon{fill:var(--senal)}.b-pos{fill:var(--tinta3);opacity:.5}.b-neg{fill:var(--tinta3);opacity:.32}
+.v{font-family:"IBM Plex Mono",monospace;font-size:11.5px;fill:var(--tinta2);text-anchor:middle}
+.vm{fill:var(--senal);font-weight:600;font-size:13px}
+.d{font-family:"IBM Plex Sans",sans-serif;font-size:12.5px;fill:var(--tinta3);text-anchor:middle}
+.dm{fill:var(--tinta);font-weight:600}
+.area{fill:var(--senal);opacity:.11}
+.line{fill:none;stroke:var(--senal);stroke-width:2;stroke-linejoin:round}
+.pt{fill:var(--senal)}
+table{width:100%;border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+th{text-align:right;font-weight:600;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--tinta3);padding:0 0 10px;border-bottom:1px solid var(--linea)}
+th:first-child,td:first-child{text-align:left}
+td{padding:11px 0;border-bottom:1px solid var(--linea2);text-align:right;
+  font-family:"IBM Plex Mono",monospace;font-size:.85rem}
+td:first-child{font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+tr.hi td{color:var(--senal);font-weight:600}
+tr:last-child td{border-bottom:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--linea);border:1px solid var(--linea);border-radius:3px;overflow:hidden}
+.kpi{background:var(--panel);padding:20px 18px}
+.kpi .n{font-family:"IBM Plex Mono",monospace;font-size:1.6rem;font-weight:500;
+  letter-spacing:-.02em;display:block;line-height:1.1}
+.kpi .l{font-size:.75rem;color:var(--tinta3);margin-top:7px;display:block;line-height:1.35}
+.kpi.mark .n{color:var(--senal)}
+.paso{display:grid;grid-template-columns:34px 1fr;gap:18px;padding:18px 0;
+  border-bottom:1px solid var(--linea2)}
+.paso:last-child{border-bottom:none}
+.paso .num{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--senal);
+  font-weight:600;padding-top:3px}
+.paso b{display:block;font-weight:600;margin-bottom:3px}
+.paso span{color:var(--tinta2);font-size:.93rem}
+.res{border-left:2px solid var(--aviso);padding:2px 0 2px 20px}
+.res+.res{margin-top:22px}
+.res b{display:block;color:var(--aviso);font-size:.79rem;letter-spacing:.07em;
+  text-transform:uppercase;margin-bottom:5px}
+.res p{color:var(--tinta2);font-size:.94rem}
+.corte{background:var(--panel2);border:1px solid var(--linea);border-left:3px solid var(--senal);
+  border-radius:3px;padding:24px 26px}
+.corte ul{margin:12px 0 0;padding-left:20px;color:var(--tinta2);font-size:.94rem}
+.corte li{margin-bottom:8px}
+.nota{font-size:.9rem;color:var(--tinta3);font-style:italic}
+code{font-family:"IBM Plex Mono",monospace;font-size:.87em;background:var(--panel2);
+  padding:2px 6px;border-radius:2px;border:1px solid var(--linea2)}
+.cierre{margin-top:80px;padding-top:28px;border-top:1px solid var(--linea);
+  font-size:.9rem;color:var(--tinta3)}
+:focus-visible{outline:2px solid var(--senal);outline-offset:2px}
+@media (max-width:640px){header{padding-top:48px}.panel{padding:20px}section{margin-top:48px}}
+</style>
+
+<div class="env">
+<header class="col">
+  <p class="eyebrow">Fondeo · hallazgo 7 de 7</p>
+  <h1>El lunes del NASDAQ</h1>
+  <p class="lede">Después de refutar tres estrategias, dos familias mecánicas completas y cinco mercados, esto es lo único que ha quedado en pie. No es una ventaja demostrada. Es la primera hipótesis del proyecto con muestra suficiente para merecer una prueba real.</p>
+  <div class="meta">
+    <span>2020-01 → 2026-07</span><span>1.700 sesiones</span>
+    <span>286 lunes</span><span>NSXUSD · SPXUSD M1</span>
+  </div>
+</header>
+
+<section class="wide">
+  <figure class="panel">
+    <h3 style="margin-bottom:6px">Sesión de EEUU 09:30–16:00 · retorno medio por día de la semana · NAS100</h3>
+    <svg class="chart" viewBox="0 0 720 300" role="img" aria-label="El lunes rinde +0,214% de media mientras el resto de días quedan entre -0,08% y +0,04%"><line class="grid" x1="54" y1="49.5" x2="702" y2="49.5"/>
+<text class="ax" x="44" y="53.5">+0.20%</text>
+<line class="grid" x1="54" y1="118.4" x2="702" y2="118.4"/>
+<text class="ax" x="44" y="122.4">+0.10%</text>
+<line class="zero" x1="54" y1="187.2" x2="702" y2="187.2"/>
+<text class="ax" x="44" y="191.2">+0.00%</text>
+<line class="grid" x1="54" y1="256.0" x2="702" y2="256.0"/>
+<text class="ax" x="44" y="260.0">-0.10%</text>
+<rect class="b-mon" x="89.0" y="40.1" width="59.6" height="147.1" rx="2"/>
+<rect class="b-neg" x="218.6" y="187.2" width="59.6" height="9.2" rx="2"/>
+<rect class="b-pos" x="348.2" y="162.0" width="59.6" height="25.2" rx="2"/>
+<rect class="b-neg" x="477.8" y="187.2" width="59.6" height="54.4" rx="2"/>
+<rect class="b-pos" x="607.4" y="181.1" width="59.6" height="6.1" rx="2"/>
+<text class="v vm" x="118.8" y="32.1">+0.214%</text>
+<text class="d dm" x="118.8" y="276.0">lunes</text>
+<text class="v " x="248.4" y="211.4">-0.013%</text>
+<text class="d " x="248.4" y="276.0">martes</text>
+<text class="v " x="378.0" y="154.0">+0.037%</text>
+<text class="d " x="378.0" y="276.0">miércoles</text>
+<text class="v " x="507.6" y="256.5">-0.079%</text>
+<text class="d " x="507.6" y="276.0">jueves</text>
+<text class="v " x="637.2" y="173.1">+0.009%</text>
+<text class="d " x="637.2" y="276.0">viernes</text></svg>
+    <figcaption>Neto de 1,5 puntos de coste. En 6,5&nbsp;años la sesión diurna acumuló <strong style="color:var(--senal)">+85,7&nbsp;% los lunes</strong> frente a <strong>−11,7&nbsp;%</strong> de martes a viernes. Toda la ganancia intradía del índice ocurrió el mismo día de la semana.</figcaption>
+  </figure>
+</section>
+
+<section class="col stack">
+  <h2>Lo que dice el dato</h2>
+  <p>Escaneé 35 casillas de calendario sobre los cinco instrumentos: los cinco días de la semana y el cambio de mes. Con corrección de Bonferroni el umbral quedaba en <code>p &lt; 0,00143</code>. Dos casillas lo superaron, y las dos eran el lunes.</p>
+  <div class="kpis">
+    <div class="kpi mark"><span class="n">+0,214%</span><span class="l">por lunes, neto de costes, NAS100</span></div>
+    <div class="kpi mark"><span class="n">61,9%</span><span class="l">de lunes en positivo</span></div>
+    <div class="kpi"><span class="n">1,41</span><span class="l">Sharpe anualizado</span></div>
+    <div class="kpi"><span class="n">3,9%</span><span class="l">del tiempo expuesto</span></div>
+  </div>
+</section>
+
+<section class="wide">
+  <figure class="panel">
+    <h3 style="margin-bottom:6px">Capital operando solo los lunes · NAS100 · stop 1&nbsp;% · neto de costes</h3>
+    <svg class="chart" viewBox="0 0 720 250" role="img" aria-label="Curva de capital ascendente desde 0 hasta +57% entre 2020 y 2026, con una caída máxima del 7,5%"><line class="grid" x1="54" y1="26.0" x2="702" y2="26.0"/>
+<text class="ax" x="44" y="30.0">+60%</text>
+<line class="grid" x1="54" y1="86.3" x2="702" y2="86.3"/>
+<text class="ax" x="44" y="90.3">+40%</text>
+<line class="grid" x1="54" y1="146.6" x2="702" y2="146.6"/>
+<text class="ax" x="44" y="150.6">+20%</text>
+<line class="zero" x1="54" y1="207.0" x2="702" y2="207.0"/>
+<text class="ax" x="44" y="211.0">+0%</text>
+<text class="ax2" x="54.0" y="234.0">2020</text>
+<text class="ax2" x="162.0" y="234.0">2021</text>
+<text class="ax2" x="270.0" y="234.0">2022</text>
+<text class="ax2" x="371.2" y="234.0">2023</text>
+<text class="ax2" x="425.2" y="234.0">2024</text>
+<text class="ax2" x="533.2" y="234.0">2025</text>
+<text class="ax2" x="641.2" y="234.0">2026</text>
+<path class="area" d="M 54,207.0 L 54.0,202.6 L 60.8,196.8 L 67.5,196.0 L 74.2,205.4 L 81.0,183.8 L 87.8,180.3 L 94.5,171.0 L 101.2,154.5 L 108.0,157.5 L 114.8,143.0 L 121.5,148.6 L 128.2,137.8 L 135.0,131.8 L 141.8,143.1 L 148.5,147.4 L 155.2,141.8 L 162.0,146.4 L 168.8,145.0 L 175.5,147.7 L 182.2,141.6 L 189.0,139.9 L 195.8,145.2 L 202.5,140.4 L 209.2,132.4 L 216.0,130.9 L 222.8,136.0 L 229.5,131.8 L 236.2,139.3 L 243.0,133.2 L 249.8,133.6 L 256.5,137.6 L 263.2,135.7 L 270.0,140.7 L 276.8,133.3 L 283.5,136.2 L 290.2,119.3 L 297.0,113.9 L 303.8,123.8 L 310.5,126.5 L 317.2,138.0 L 324.0,143.5 L 330.8,143.6 L 337.5,135.1 L 344.2,128.4 L 351.0,127.5 L 357.8,133.7 L 364.5,137.5 L 371.2,134.5 L 378.0,129.5 L 384.8,118.8 L 391.5,116.1 L 398.2,105.0 L 405.0,96.8 L 411.8,90.6 L 418.5,86.2 L 425.2,78.3 L 432.0,77.0 L 438.8,78.6 L 445.5,82.1 L 452.2,85.6 L 459.0,83.5 L 465.8,82.4 L 472.5,79.8 L 479.2,78.3 L 486.0,67.6 L 492.8,65.2 L 499.5,63.5 L 506.2,63.1 L 513.0,63.8 L 519.8,67.5 L 526.5,60.5 L 533.2,52.6 L 540.0,52.0 L 546.8,59.0 L 553.5,57.2 L 560.2,70.8 L 567.0,68.0 L 573.8,59.5 L 580.5,57.2 L 587.2,53.4 L 594.0,50.6 L 600.8,48.1 L 607.5,45.8 L 614.2,39.1 L 621.0,42.9 L 627.8,34.7 L 634.5,40.3 L 641.2,36.2 L 648.0,30.1 L 654.8,12.6 L 661.5,20.6 L 668.2,15.1 L 675.0,19.8 L 681.8,13.8 L 688.5,21.9 L 695.2,35.5 L 702.0,35.5 L 702.0,207.0 Z"/>
+<polyline class="line" points="54.0,202.6 60.8,196.8 67.5,196.0 74.2,205.4 81.0,183.8 87.8,180.3 94.5,171.0 101.2,154.5 108.0,157.5 114.8,143.0 121.5,148.6 128.2,137.8 135.0,131.8 141.8,143.1 148.5,147.4 155.2,141.8 162.0,146.4 168.8,145.0 175.5,147.7 182.2,141.6 189.0,139.9 195.8,145.2 202.5,140.4 209.2,132.4 216.0,130.9 222.8,136.0 229.5,131.8 236.2,139.3 243.0,133.2 249.8,133.6 256.5,137.6 263.2,135.7 270.0,140.7 276.8,133.3 283.5,136.2 290.2,119.3 297.0,113.9 303.8,123.8 310.5,126.5 317.2,138.0 324.0,143.5 330.8,143.6 337.5,135.1 344.2,128.4 351.0,127.5 357.8,133.7 364.5,137.5 371.2,134.5 378.0,129.5 384.8,118.8 391.5,116.1 398.2,105.0 405.0,96.8 411.8,90.6 418.5,86.2 425.2,78.3 432.0,77.0 438.8,78.6 445.5,82.1 452.2,85.6 459.0,83.5 465.8,82.4 472.5,79.8 479.2,78.3 486.0,67.6 492.8,65.2 499.5,63.5 506.2,63.1 513.0,63.8 519.8,67.5 526.5,60.5 533.2,52.6 540.0,52.0 546.8,59.0 553.5,57.2 560.2,70.8 567.0,68.0 573.8,59.5 580.5,57.2 587.2,53.4 594.0,50.6 600.8,48.1 607.5,45.8 614.2,39.1 621.0,42.9 627.8,34.7 634.5,40.3 641.2,36.2 648.0,30.1 654.8,12.6 661.5,20.6 668.2,15.1 675.0,19.8 681.8,13.8 688.5,21.9 695.2,35.5 702.0,35.5"/>
+<circle class="pt" cx="702.0" cy="35.5" r="3.5"/></svg>
+    <figcaption><strong>+56,9&nbsp;%</strong> acumulado · caída máxima <strong>7,5&nbsp;%</strong> · positivo los siete años, sin excepción: 2020 +25,8&nbsp;% · 2021 +1,5&nbsp;% · 2022 +4,3&nbsp;% · 2023 +14,4&nbsp;% · 2024 +5,1&nbsp;% · 2025 +9,4&nbsp;% · 2026 +3,5&nbsp;%</figcaption>
+  </figure>
+</section>
+
+<section class="col stack">
+  <h2>Por qué me lo creo</h2>
+  <p>Un número bonito no vale nada sin intentar matarlo primero. Estas son las tres pruebas que le hice, en orden.</p>
+  <div class="panel">
+    <div class="paso"><span class="num">01</span><div><b>No es un artefacto de datos finos</b><span>Mi primera sospecha fue el cierre del domingo: es la sesión más fina de la semana, 357 velas, y un cierre mal marcado inflaría el lunes automáticamente. Localicé dónde ocurre el retorno dentro del lunes. En las horas de Asia: +0,008&nbsp;%, nada. En la sesión de Nueva York: +0,205&nbsp;%, p&nbsp;0,0004. <b style="display:inline">El efecto vive en la hora más líquida de la semana</b>, que es exactamente lo contrario de lo que haría un artefacto.</span></div></div>
+    <div class="paso"><span class="num">02</span><div><b>El resto de la semana es plano</b><span>Si fuera simplemente que el índice sube, todos los días serían positivos. De martes a viernes la sesión diurna da −0,0024&nbsp;% con p&nbsp;0,94: cero perfecto sobre 1.242 observaciones. El lunes no es el mejor de cinco días buenos. Es el único.</span></div></div>
+    <div class="paso"><span class="num">03</span><div><b>Por primera vez hay potencia estadística</b><span>La desviación es de 1,09&nbsp;% por operación. Para detectar un efecto de +0,22&nbsp;% al 80&nbsp;% de potencia hacen falta <b style="display:inline">189</b> observaciones. Hay <b style="display:inline">286</b>. Todo lo demás que probamos esta semana daba entre 25 y 90 operaciones, donde no se distingue nada de nada.</span></div></div>
+  </div>
+</section>
+
+<section class="col stack">
+  <h2>Por qué puedo estar equivocado</h2>
+  <p>Esto va aquí arriba y no en una nota al pie, porque es la parte que decide cuánto dinero le pones.</p>
+  <div>
+    <div class="res"><b>Es un hallazgo dentro de muestra</b><p>Lo encontré escaneando 35 casillas y después profundizando en la ganadora. No hay reserva ciega para esto, y no la puedo fabricar con estos datos. Es exactamente el pecado del que te he protegido toda la semana, y ahora lo estoy cometiendo yo.</p></div>
+    <div class="res"><b>La literatura clásica dice lo contrario</b><p>El «efecto fin de semana» documentado durante décadas tenía el lunes <em>negativo</em>. O se ha invertido, o 2020-2026 es un régimen particular. Ninguna de las dos se puede descartar con seis años y medio.</p></div>
+    <div class="res"><b>El S&amp;P 500 no aguanta sin 2020</b><p>Excluyendo el año del COVID, NAS100 mantiene +0,158&nbsp;% con p&nbsp;0,015, pero SP500 cae a +0,089&nbsp;% con p&nbsp;0,056 y deja de ser significativo. Por eso el protocolo es solo NASDAQ.</p></div>
+    <div class="res"><b>Medio efecto está en los primeros 30 minutos</b><p>De 09:30 a 16:00 da +0,214&nbsp;%. Entrando a las 10:00 y saliendo a las 15:30 se queda en +0,059&nbsp;% y deja de ser significativo. Necesita la apertura, que es el momento de peor horquilla y peor deslizamiento. Mi modelo de costes es ahí donde menos fiable es.</p></div>
+    <div class="res"><b>Dos índices al 0,9 de correlación son una observación</b><p>Que NASDAQ y S&amp;P lo muestren los dos no son dos confirmaciones independientes. Es la misma señal contada dos veces.</p></div>
+  </div>
+</section>
+
+<section class="col stack">
+  <h2>El protocolo</h2>
+  <p>Sin discreción en ningún punto. Si hay que decidir algo en el momento, está mal escrito.</p>
+  <div class="panel">
+    <div class="paso"><span class="num">01</span><div><b>Instrumento: NAS100 únicamente</b><span>No SP500, que pierde la significación sin 2020. No divisas.</span></div></div>
+    <div class="paso"><span class="num">02</span><div><b>Solo los lunes</b><span>Si el lunes es festivo en EEUU, esa semana no se opera. No se traslada al martes.</span></div></div>
+    <div class="paso"><span class="num">03</span><div><b>Compra en la apertura de 09:30 Nueva York</b><span>Con orden a mercado, en el primer minuto. Siempre largo. Nunca corto.</span></div></div>
+    <div class="paso"><span class="num">04</span><div><b>Stop del 1&nbsp;% bajo el precio de entrada</b><span>Fijo, colocado al abrir. No se mueve, no se lleva a break-even, no se toman parciales. Medimos que todo eso destruye el resultado.</span></div></div>
+    <div class="paso"><span class="num">05</span><div><b>Cierre en la campana de las 16:00</b><span>Pase lo que pase. Sin excepciones, sin dejarlo correr, sin objetivo de beneficio.</span></div></div>
+    <div class="paso"><span class="num">06</span><div><b>Tamaño: 1× a 2× el capital nocional</b><span>A 2× la caída típica ronda el 8&nbsp;% anual y la mediana es +17&nbsp;%/año. Por encima de 3× el riesgo de ruina crece más rápido que el rendimiento.</span></div></div>
+  </div>
+  <p class="nota">Una operación por semana. Seis horas y media de exposición. El resto del tiempo, la pantalla apagada — que es la mitad del valor del método.</p>
+</section>
+
+<section class="col stack">
+  <h2>Qué esperar, con su incertidumbre</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Tamaño</th><th>Mediana anual</th><th>Peor 5&nbsp;%</th><th>Mejor 5&nbsp;%</th><th>Caída típica</th></tr></thead>
+    <tbody>
+      <tr><td>1×</td><td>+8,5&nbsp;%</td><td>−2,7&nbsp;%</td><td>+21,1&nbsp;%</td><td>4,0&nbsp;%</td></tr>
+      <tr class="hi"><td>2×</td><td>+17,1&nbsp;%</td><td>−5,6&nbsp;%</td><td>+45,8&nbsp;%</td><td>7,9&nbsp;%</td></tr>
+      <tr><td>3×</td><td>+25,9&nbsp;%</td><td>−8,8&nbsp;%</td><td>+74,8&nbsp;%</td><td>11,7&nbsp;%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Y en un reto de fondeo de 10&nbsp;% / 10&nbsp;%, con la distribución real de los 286 lunes:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Tamaño</th><th>Pasa</th><th>Quiebra</th><th>Sin tiempo</th><th>Meses si pasa</th></tr></thead>
+    <tbody>
+      <tr><td>1×</td><td>59,5&nbsp;%</td><td>0,7&nbsp;%</td><td>39,9&nbsp;%</td><td>8,4</td></tr>
+      <tr class="hi"><td>2×</td><td>83,1&nbsp;%</td><td>9,0&nbsp;%</td><td>7,8&nbsp;%</td><td>5,3</td></tr>
+      <tr><td>3×</td><td>81,1&nbsp;%</td><td>17,8&nbsp;%</td><td>1,1&nbsp;%</td><td>3,5</td></tr>
+      <tr><td>6×</td><td>67,9&nbsp;%</td><td>32,1&nbsp;%</td><td>0,0&nbsp;%</td><td>1,3</td></tr>
+    </tbody>
+  </table></div>
+  <p class="nota">Contra el 48&nbsp;% que sale operando sin ninguna ventaja. La diferencia entre 48&nbsp;% y 83&nbsp;% es todo lo que compra este hallazgo — y solo si el hallazgo es real.</p>
+</section>
+
+<section class="col stack">
+  <h2>La regla de decisión, escrita antes de empezar</h2>
+  <p>Esta es la parte que impide que te engañes, y la única que no puedes saltarte. Escrita ahora, cuando aún no hay dinero encima.</p>
+  <div class="corte">
+    <h3 style="color:var(--senal)">Prueba hacia delante · 40 lunes</h3>
+    <ul>
+      <li><strong>Tamaño 1×</strong> durante los 40 primeros lunes. Nada de 2× hasta terminar. Son unos diez meses.</li>
+      <li>Se apunta <strong>cada lunes</strong>: fecha, precio de entrada, precio de salida, resultado en&nbsp;%. Todos, también los que duelen.</li>
+      <li><strong>Corte por resultado:</strong> si tras 40 lunes la media está por debajo de <code>+0,05&nbsp;%</code>, se abandona. Sin renegociar el umbral, sin «un trimestre más».</li>
+      <li><strong>Corte por caída:</strong> si en cualquier momento la caída acumulada supera el <strong>6&nbsp;%</strong>, se para y se revisa. Lo peor observado en 6,5&nbsp;años fue 7,5&nbsp;%.</li>
+      <li><strong>Corte por racha:</strong> ocho lunes perdedores seguidos. La peor racha histórica fue de seis.</li>
+      <li>No se toca ni una regla del protocolo durante los 40 lunes. Si se toca, el contador vuelve a cero.</li>
+    </ul>
+  </div>
+  <p>Cuarenta observaciones no confirman nada — hacen falta 189 y eso son casi cuatro años. Lo que sí hacen es <strong>detectar que está roto</strong> antes de que te cueste dinero de verdad. Ese es el objetivo realista de los primeros diez meses.</p>
+</section>
+
+<section class="col cierre">
+  <p><strong>Estado honesto:</strong> hipótesis viva, la mejor del proyecto, sin confirmar. Siete días de trabajo cerraron en negativo el CRT completo, la turtle soup, el order block, las confluencias multiactivo, el SMT, el scalping y el seguimiento de tendencia, en cinco mercados y con controles de espejo, entrada aleatoria y comparación contra comprar y mantener. Esto es lo que sobrevivió. Trátalo como lo que es.</p>
+</section>
+</div>

@@ -1,0 +1,473 @@
+<title>Diecisiete compras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --fondo:#F4F6F7; --tarjeta:#FFFFFF; --hueco:#EAEEF0;
+  --tinta:#14181C; --suave:#666E76; --tenue:#8B939A;
+  --linea:#DCE2E5; --linea2:#C6CED3;
+  --alza:#2E7D62; --baja:#B4453C; --asia:#A8761A;
+  --alzaSuave:#E4F0EA; --bajaSuave:#F6E4E2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --fondo:#0F1215; --tarjeta:#171B1F; --hueco:#12161A;
+    --tinta:#E6E9EB; --suave:#98A0A8; --tenue:#767E86;
+    --linea:#262C31; --linea2:#39424A;
+    --alza:#4CA983; --baja:#D46B60; --asia:#CF9E3C;
+    --alzaSuave:#1B2C26; --bajaSuave:#2E1F1E;
+  }
+}
+:root[data-theme="dark"]{
+  --fondo:#0F1215; --tarjeta:#171B1F; --hueco:#12161A;
+  --tinta:#E6E9EB; --suave:#98A0A8; --tenue:#767E86;
+  --linea:#262C31; --linea2:#39424A;
+  --alza:#4CA983; --baja:#D46B60; --asia:#CF9E3C;
+  --alzaSuave:#1B2C26; --bajaSuave:#2E1F1E;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--fondo); color:var(--tinta);
+  font-family:"Source Serif 4",Georgia,serif; font-size:17px; line-height:1.6;
+  -webkit-text-size-adjust:100%;
+}
+.env{max-width:1080px; margin:0 auto; padding:0 20px 132px}
+h1,h2,h3,.ui{font-family:Archivo,"Helvetica Neue",Arial,sans-serif}
+.num{font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+
+/* ---- cabecera ---- */
+header{padding:52px 0 34px; border-bottom:1px solid var(--linea);
+       display:grid; grid-template-columns:minmax(0,1fr) 244px; gap:26px 48px; align-items:start}
+@media (max-width:880px){header{grid-template-columns:1fr}}
+.eyebrow{
+  font-family:Archivo,sans-serif; font-size:12px; font-weight:600;
+  letter-spacing:.13em; text-transform:uppercase; color:var(--asia); margin:0 0 14px
+}
+h1{font-size:clamp(30px,5.4vw,46px); font-weight:700; letter-spacing:-.022em;
+   line-height:1.08; margin:0 0 18px; text-wrap:balance}
+.entrada{max-width:63ch; color:var(--suave); margin:0 0 18px}
+.entrada strong{color:var(--tinta); font-weight:600}
+.cabIzq{display:flex; flex-direction:column; gap:0}
+.cifras{display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:10px}
+.cifra{display:flex; flex-direction:column; gap:2px}
+.cifra b{font-family:"JetBrains Mono",monospace; font-size:23px; font-weight:600;
+         letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+.cifra span{font-family:Archivo,sans-serif; font-size:11px; font-weight:600;
+            letter-spacing:.09em; text-transform:uppercase; color:var(--tenue)}
+
+/* ---- secciones ---- */
+section{margin-top:52px}
+.tit{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px}
+h2{font-size:22px; font-weight:600; letter-spacing:-.015em; margin:0}
+.tit .cuenta{font-family:"JetBrains Mono",monospace; font-size:13px; color:var(--tenue)}
+.sub{max-width:63ch; color:var(--suave); font-size:15.5px; margin:0 0 26px}
+
+.par{margin-bottom:34px}
+.parCab{
+  display:flex; align-items:center; gap:12px; margin-bottom:12px;
+  font-family:Archivo,sans-serif; font-size:13px; font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--suave);
+}
+.parCab::after{content:""; flex:1; height:1px; background:var(--linea)}
+.rejilla{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; align-items:start}
+@media (max-width:760px){.rejilla{grid-template-columns:1fr}}
+
+/* ---- tarjeta ---- */
+.caso{
+  background:var(--tarjeta); border:1px solid var(--linea); border-radius:3px;
+  padding:14px 15px 13px; display:flex; flex-direction:column; gap:11px;
+}
+.caso.suya{border-left:3px solid var(--tinta)}
+.caso.otra{border-left:3px solid var(--linea2)}
+.cab{display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+.ref{font-family:"JetBrains Mono",monospace; font-size:15px; font-weight:600; letter-spacing:.01em}
+.chip{
+  font-family:Archivo,sans-serif; font-size:10px; font-weight:700; letter-spacing:.09em;
+  text-transform:uppercase; padding:3px 7px; border-radius:2px; white-space:nowrap;
+}
+.chip.mia{background:var(--tinta); color:var(--tarjeta)}
+.chip.no{background:transparent; color:var(--suave); border:1px solid var(--linea2)}
+.cuando{margin-left:auto; font-family:"JetBrains Mono",monospace; font-size:13px; color:var(--suave)}
+.res{
+  font-family:Archivo,sans-serif; font-size:11px; font-weight:700; letter-spacing:.07em;
+  padding:3px 8px; border-radius:2px;
+}
+.res.tp{background:var(--alzaSuave); color:var(--alza)}
+.res.sl{background:var(--bajaSuave); color:var(--baja)}
+.grafo{width:100%; display:block; overflow:visible}
+.pie{
+  display:flex; gap:16px; flex-wrap:wrap; font-family:"JetBrains Mono",monospace;
+  font-size:12px; color:var(--suave); font-variant-numeric:tabular-nums;
+  border-top:1px solid var(--linea); padding-top:9px;
+}
+.pie b{color:var(--tinta); font-weight:600}
+.dijo{
+  margin:0; padding:9px 11px; border-left:2px solid var(--asia); background:var(--hueco);
+  font-size:14.5px; line-height:1.45; color:var(--suave);
+}
+.dijo b{
+  display:block; font-family:Archivo,sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--asia); margin-bottom:3px;
+}
+.preguntas{display:flex; flex-direction:column; gap:13px}
+.preg{display:flex; flex-direction:column; gap:6px}
+.preg > p{
+  margin:0; font-family:Archivo,sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:.07em; text-transform:uppercase; color:var(--tenue);
+}
+.ops{display:flex; flex-wrap:wrap; gap:5px}
+.op{
+  font-family:"Source Serif 4",Georgia,serif; font-size:14px; line-height:1.25;
+  padding:7px 11px; border-radius:2px; border:1px solid var(--linea2);
+  background:var(--tarjeta); color:var(--suave); cursor:pointer; text-align:left;
+  letter-spacing:0; font-weight:400;
+}
+.op:hover{border-color:var(--tinta); color:var(--tinta)}
+.op[aria-pressed="true"]{background:var(--tinta); border-color:var(--tinta); color:var(--tarjeta)}
+.op:focus-visible{outline:2px solid var(--asia); outline-offset:2px}
+.caso.hecha{border-left-color:var(--asia)}
+textarea{
+  width:100%; min-height:52px; resize:vertical; background:var(--hueco);
+  border:1px solid var(--linea); border-radius:2px; padding:8px 9px;
+  font-family:"Source Serif 4",Georgia,serif; font-size:15px; color:var(--tinta);
+  line-height:1.45;
+}
+textarea::placeholder{color:var(--tenue)}
+textarea:focus-visible{outline:2px solid var(--asia); outline-offset:1px; border-color:transparent}
+
+/* ---- barra ---- */
+.barra{
+  position:fixed; left:0; right:0; bottom:0; z-index:9;
+  background:var(--tarjeta); border-top:1px solid var(--linea2);
+  padding:11px 20px calc(11px + env(safe-area-inset-bottom));
+}
+.barraIn{
+  max-width:1080px; margin:0 auto; display:flex; align-items:center; gap:14px;
+  font-family:Archivo,sans-serif; font-size:13px; color:var(--suave);
+}
+button{
+  font-family:Archivo,sans-serif; font-size:13px; font-weight:600; letter-spacing:.02em;
+  padding:9px 16px; border-radius:2px; border:1px solid var(--tinta);
+  background:var(--tinta); color:var(--tarjeta); cursor:pointer;
+}
+button.fantasma{background:transparent; color:var(--tinta)}
+button:focus-visible{outline:2px solid var(--asia); outline-offset:2px}
+button[disabled]{opacity:.4; cursor:default}
+.aviso{margin-left:auto; font-variant-numeric:tabular-nums}
+.volcado{
+  display:none; width:100%; max-width:1080px; margin:10px auto 0; min-height:130px;
+  font-family:"JetBrains Mono",monospace; font-size:12.5px;
+}
+.volcado.ver{display:block}
+@media (max-width:470px){.barraIn .larga{display:none}}
+
+/* ---- cierre ---- */
+.cierre{
+  margin-top:56px; padding:26px 0 0; border-top:1px solid var(--linea);
+  max-width:63ch; color:var(--suave);
+}
+.cierre h3{font-size:16px; font-weight:600; color:var(--tinta); margin:0 0 10px; letter-spacing:-.01em}
+.cierre p{margin:0 0 14px}
+.leyenda{
+  align-self:start; border:1px solid var(--linea); border-radius:3px; padding:15px 16px 16px;
+  display:flex; flex-direction:column; gap:9px;
+  font-family:Archivo,sans-serif; font-size:12.5px; color:var(--suave);
+}
+.leyenda h4{font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+            color:var(--tenue); margin:0 0 3px}
+.leyenda span{display:flex; align-items:center; gap:9px}
+.leyenda i{flex:0 0 22px; height:0; border-top:2px solid}
+.leyenda .nota{display:block; margin-top:4px; padding-top:10px; border-top:1px solid var(--linea);
+               color:var(--tenue); font-size:12px; line-height:1.45}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+</style>
+
+<div class="env">
+<header>
+  <div class="cabIzq">
+  <p class="eyebrow">EURUSD · M5 · agosto 2026</p>
+  <h1>Diecisiete compras en el nivel de Asia</h1>
+  <p class="entrada">Todas son lo mismo sobre el papel: una compra en un nivel de Asia, en Londres, con objetivo al doble del riesgo. Quince son en el alto; las dos del 18 de agosto, en el mínimo. <strong>Ocho las tomaste tú</strong> y salieron 7&nbsp;TP y 1&nbsp;SL. <strong>Nueve las disparó la regla y no las tomaste</strong>, y salieron 2&nbsp;TP y 7&nbsp;SL.</p>
+  <p class="entrada">Esa diferencia no la explica la dirección, ni la hora, ni dónde va el stop &mdash; ya lo comprobamos. Así que la explica algo que ves en el gráfico. Aquí están los diecisiete, todos a la misma escala y con las mismas doce velas de contexto, cortados justo en el momento de entrar. En los cuatro días emparejados, las dos gráficas comparten escala y altura: puedes ponerlas una al lado de la otra y leerlas igual.</p>
+  <p class="entrada"><strong>Lo que tienes que hacer</strong>: en cada uno, cinco preguntas de un toque. Las opciones están escritas con tus palabras &mdash; «pierde fuerza», «envuelve a la última bajista», «mecha de rechazo», «retroceso», «cambio de tendencia». Si ninguna encaja, la caja de abajo es para contarlo a tu manera.</p>
+  <p class="entrada">En trece de ellos verás lo que ya me dijiste, para que no tengas que volver a pensarlo desde cero. Los cuatro que faltan &mdash; N02, N06, N07 y N08 &mdash; son los emparejados, y son los que más falta me hacen.</p>
+  </div>
+  <div class="leyenda">
+    <h4>Cómo leer cada gráfico</h4>
+    <span><i style="border-color:var(--asia); border-top-style:dotted"></i>el nivel operado, en versalitas</span>
+    <span><i style="border-color:var(--tinta)"></i>tu entrada</span>
+    <span><i style="border-color:var(--baja); border-top-style:dashed"></i>el stop</span>
+    <span><i style="border-color:var(--linea2)"></i>cada raya, 5 pips</span>
+    <span class="nota">La última vela, la sombreada, es la de la entrada. El objetivo no se dibuja: siempre está al doble del riesgo y sólo aplastaría las velas. El otro nivel de Asia sale en minúscula, y sólo si cae dentro del encuadre.</span>
+  </div>
+  <div class="cifras">
+    <div class="cifra"><b>7 / 8</b><span>tuyas · TP</span></div>
+    <div class="cifra"><b>2 / 9</b><span>no tomadas · TP</span></div>
+    <div class="cifra"><b>4</b><span>días con las dos</span></div>
+    <div class="cifra"><b>5</b><span>preguntas por caso</span></div>
+  </div>
+</header>
+
+<section id="mixtos">
+  <div class="tit"><h2>Los cuatro días que tienen las dos</h2><span class="cuenta">8 casos</span></div>
+  <p class="sub">Mismo día, mismo nivel de Asia, la misma compra. En uno entraste y en el otro no. Si hay algo que decidir, está aquí dentro.</p>
+  <div id="paresMixtos"></div>
+</section>
+
+<section id="propio">
+  <div class="tit"><h2>El 18 de agosto, tus dos</h2><span class="cuenta">2 casos</span></div>
+  <p class="sub">Las dos tuyas, el mismo día y el mismo nivel &mdash; y las dos únicas del mínimo de Asia: la de las 08:20 se fue al stop y la de las 10:30 al objetivo. Este par es el único donde el que falla también es tuyo.</p>
+  <div id="parPropio"></div>
+</section>
+
+<section id="resto">
+  <div class="tit"><h2>El resto</h2><span class="cuenta">7 casos</span></div>
+  <p class="sub">Días sueltos, sin pareja con la que compararlos. Dos tuyas y cinco que no tomaste.</p>
+  <div class="rejilla" id="sueltos"></div>
+</section>
+
+<div class="cierre">
+  <h3>Por qué lo miras tú y no yo</h3>
+  <p>Con diecisiete casos y las dieciocho características que tengo calculadas, encuentro una separación seguro &mdash; y sería ruido. Es el mismo error que ya nos costó la anatomía de los 28 contrastes.</p>
+  <p>Así que esto es generar la hipótesis, no probarla. Tú dices qué ves; yo lo codifico y lo pruebo en 2020&ndash;2025 y en enero&ndash;mayo de 2026, que son datos que tú no has mirado nunca. Ahí es donde se gana el sitio o se cae.</p>
+  <p>Y que quede dicho: los nueve no tomados ya los viste con el resultado puesto. Esto no es una prueba ciega ni pretende serlo.</p>
+</div>
+</div>
+
+<div class="barra">
+  <div class="barraIn">
+    <button id="btnCopiar" disabled>Copiar mis respuestas</button>
+    <button class="fantasma" id="btnVer">Ver el texto</button>
+    <span class="aviso" id="aviso"><span class="larga">completos: </span><b id="cuentaNotas">0</b>/17</span>
+  </div>
+  <textarea class="volcado" id="volcado" readonly aria-label="Texto de las respuestas para copiar"></textarea>
+</div>
+
+<script>
+const CASOS = [{"ref":"T01","grupo":"suya","dia":"2026-08-14","hm":"09:40","ent":1.15476,"stop":1.15438,"tp":1.15552,"res":"TP","velas":[{"t":"08:45","o":1.15423,"h":1.15434,"l":1.15414,"c":1.15429},{"t":"08:50","o":1.15431,"h":1.15435,"l":1.15408,"c":1.15416},{"t":"08:55","o":1.1542,"h":1.15444,"l":1.15413,"c":1.15443},{"t":"09:00","o":1.15444,"h":1.15464,"l":1.15441,"c":1.15449},{"t":"09:05","o":1.15447,"h":1.15448,"l":1.15429,"c":1.15448},{"t":"09:10","o":1.15448,"h":1.15471,"l":1.15444,"c":1.15451},{"t":"09:15","o":1.1545,"h":1.15468,"l":1.15444,"c":1.15465},{"t":"09:20","o":1.15465,"h":1.15473,"l":1.15441,"c":1.15446},{"t":"09:25","o":1.15446,"h":1.15469,"l":1.15443,"c":1.15458},{"t":"09:30","o":1.15459,"h":1.15465,"l":1.1545,"c":1.15452},{"t":"09:35","o":1.1545,"h":1.15476,"l":1.15447,"c":1.15476},{"t":"09:40","o":1.15475,"h":1.1549,"l":1.1547,"c":1.15483}],"k":11,"ahi":1.15429,"alo":1.15277,"rgo":3.8,"lo":1.15277,"hi":1.15552,"dijo":"Rompe con cuerpo envolviendo a la vela anterior bajista."},{"ref":"T02","grupo":"suya","dia":"2026-08-17","hm":"08:30","ent":1.15919,"stop":1.15822,"tp":1.16114,"res":"TP","velas":[{"t":"07:35","o":1.1586,"h":1.15873,"l":1.15849,"c":1.15873},{"t":"07:40","o":1.15869,"h":1.15876,"l":1.15861,"c":1.1587},{"t":"07:45","o":1.1587,"h":1.15883,"l":1.15866,"c":1.15881},{"t":"07:50","o":1.15882,"h":1.15892,"l":1.15863,"c":1.15863},{"t":"07:55","o":1.15864,"h":1.15882,"l":1.15864,"c":1.1587},{"t":"08:00","o":1.15871,"h":1.15893,"l":1.15871,"c":1.15877},{"t":"08:05","o":1.15876,"h":1.15892,"l":1.15857,"c":1.15857},{"t":"08:10","o":1.15859,"h":1.1586,"l":1.15835,"c":1.15847},{"t":"08:15","o":1.1585,"h":1.15868,"l":1.15846,"c":1.15867},{"t":"08:20","o":1.15866,"h":1.15872,"l":1.1585,"c":1.15852},{"t":"08:25","o":1.15852,"h":1.15921,"l":1.15851,"c":1.1592},{"t":"08:30","o":1.15919,"h":1.15921,"l":1.1589,"c":1.15894}],"k":11,"ahi":1.15892,"alo":1.15633,"rgo":9.7,"lo":1.15822,"hi":1.16114,"dijo":"Vela con fuerza que rompe el último alto y cierra por encima del high de Asia."},{"ref":"T03","grupo":"suya","dia":"2026-08-18","hm":"10:30","ent":1.15714,"stop":1.15678,"tp":1.15786,"res":"TP","velas":[{"t":"09:35","o":1.15737,"h":1.15765,"l":1.15737,"c":1.15756},{"t":"09:40","o":1.15756,"h":1.1577,"l":1.15748,"c":1.15754},{"t":"09:45","o":1.15754,"h":1.1577,"l":1.15751,"c":1.15766},{"t":"09:50","o":1.15766,"h":1.15774,"l":1.15747,"c":1.15752},{"t":"09:55","o":1.15753,"h":1.15757,"l":1.15735,"c":1.15738},{"t":"10:00","o":1.1574,"h":1.1574,"l":1.15709,"c":1.15728},{"t":"10:05","o":1.15728,"h":1.15731,"l":1.157,"c":1.15712},{"t":"10:10","o":1.15711,"h":1.15722,"l":1.15705,"c":1.15715},{"t":"10:15","o":1.15715,"h":1.15719,"l":1.15701,"c":1.15709},{"t":"10:20","o":1.15708,"h":1.15708,"l":1.15689,"c":1.15697},{"t":"10:25","o":1.15696,"h":1.15714,"l":1.15694,"c":1.15714},{"t":"10:30","o":1.15712,"h":1.15731,"l":1.15712,"c":1.15725}],"k":11,"ahi":1.15857,"alo":1.15691,"rgo":3.6,"lo":1.15678,"hi":1.15857,"dijo":"Rechazo del mínimo al tocarlo, siguiente vela alcista envuelve a la bajista y entiendo rechazo."},{"ref":"T04","grupo":"suya","dia":"2026-08-18","hm":"08:20","ent":1.15705,"stop":1.15677,"tp":1.15762,"res":"SL","velas":[{"t":"07:25","o":1.15712,"h":1.15728,"l":1.15709,"c":1.15725},{"t":"07:30","o":1.15725,"h":1.15728,"l":1.15714,"c":1.15716},{"t":"07:35","o":1.15715,"h":1.15723,"l":1.15711,"c":1.15715},{"t":"07:40","o":1.15716,"h":1.15725,"l":1.15703,"c":1.15721},{"t":"07:45","o":1.15721,"h":1.15739,"l":1.15721,"c":1.15739},{"t":"07:50","o":1.15741,"h":1.15741,"l":1.15725,"c":1.1573},{"t":"07:55","o":1.15731,"h":1.15737,"l":1.15726,"c":1.1573},{"t":"08:00","o":1.15731,"h":1.15747,"l":1.15677,"c":1.15682},{"t":"08:05","o":1.15679,"h":1.15692,"l":1.15669,"c":1.15691},{"t":"08:10","o":1.15691,"h":1.15713,"l":1.15688,"c":1.15696},{"t":"08:15","o":1.15694,"h":1.15713,"l":1.15687,"c":1.15697},{"t":"08:20","o":1.15695,"h":1.15707,"l":1.15688,"c":1.15704}],"k":11,"ahi":1.15857,"alo":1.15691,"rgo":2.8,"lo":1.15669,"hi":1.15857,"dijo":"Veo que la vela bajista rompe el mínimo de Asia y también rompe el último bajo, y hago la entrada."},{"ref":"T05","grupo":"suya","dia":"2026-08-19","hm":"09:25","ent":1.15948,"stop":1.15883,"tp":1.16078,"res":"TP","velas":[{"t":"08:30","o":1.15976,"h":1.15981,"l":1.15945,"c":1.15949},{"t":"08:35","o":1.15951,"h":1.15959,"l":1.15944,"c":1.15954},{"t":"08:40","o":1.15953,"h":1.15971,"l":1.1595,"c":1.15958},{"t":"08:45","o":1.15958,"h":1.15967,"l":1.15945,"c":1.15967},{"t":"08:50","o":1.15969,"h":1.15972,"l":1.1595,"c":1.15961},{"t":"08:55","o":1.1596,"h":1.15961,"l":1.1594,"c":1.15944},{"t":"09:00","o":1.15946,"h":1.15963,"l":1.1594,"c":1.15941},{"t":"09:05","o":1.15941,"h":1.15956,"l":1.1593,"c":1.15936},{"t":"09:10","o":1.15937,"h":1.15941,"l":1.15917,"c":1.15932},{"t":"09:15","o":1.1593,"h":1.15941,"l":1.15915,"c":1.15933},{"t":"09:20","o":1.15934,"h":1.15949,"l":1.15928,"c":1.15936},{"t":"09:25","o":1.15934,"h":1.15947,"l":1.15932,"c":1.15946}],"k":11,"ahi":1.15893,"alo":1.157,"rgo":6.5,"lo":1.15883,"hi":1.16078,"dijo":"La última vela alcista tiene cuerpo que cierra por encima de la última vela bajista, y me faltaría el contexto, pero podría ser que la parte bajista forme parte de un pequeño retroceso dentro de un movimiento alcista; eso también hay que tenerlo en cuenta."},{"ref":"T06","grupo":"suya","dia":"2026-08-20","hm":"09:55","ent":1.16928,"stop":1.16853,"tp":1.17078,"res":"TP","velas":[{"t":"09:00","o":1.16877,"h":1.16882,"l":1.16817,"c":1.16829},{"t":"09:05","o":1.1683,"h":1.16836,"l":1.1681,"c":1.16815},{"t":"09:10","o":1.16815,"h":1.16834,"l":1.16809,"c":1.16816},{"t":"09:15","o":1.16817,"h":1.16832,"l":1.168,"c":1.16818},{"t":"09:20","o":1.16818,"h":1.16821,"l":1.16787,"c":1.16799},{"t":"09:25","o":1.16799,"h":1.16802,"l":1.16782,"c":1.16796},{"t":"09:30","o":1.16798,"h":1.1686,"l":1.16798,"c":1.16857},{"t":"09:35","o":1.16858,"h":1.16879,"l":1.16853,"c":1.16879},{"t":"09:40","o":1.16878,"h":1.16933,"l":1.16874,"c":1.16904},{"t":"09:45","o":1.16904,"h":1.16911,"l":1.16864,"c":1.16872},{"t":"09:50","o":1.16873,"h":1.16893,"l":1.16857,"c":1.16892},{"t":"09:55","o":1.16893,"h":1.16934,"l":1.16888,"c":1.16925}],"k":11,"ahi":1.16837,"alo":1.16698,"rgo":7.5,"lo":1.16698,"hi":1.17078,"dijo":"Vela grande que envuelve a la bajista y rompe el alto sin apenas mecha. El momento óptimo hubiese sido al cierre de esa vela que rompe el alto, y lo que hice fue esperar un pequeño retroceso para hacer la entrada, y cuando otra vela alcista envuelve la bajista, entonces ya tomar la entrada."},{"ref":"T19","grupo":"suya","dia":"2026-08-05","hm":"11:10","ent":1.15373,"stop":1.15339,"tp":1.15442,"res":"TP","velas":[{"t":"10:15","o":1.15365,"h":1.15411,"l":1.15365,"c":1.15405},{"t":"10:20","o":1.15405,"h":1.15423,"l":1.15404,"c":1.15414},{"t":"10:25","o":1.15414,"h":1.15433,"l":1.15405,"c":1.15432},{"t":"10:30","o":1.15433,"h":1.15444,"l":1.15415,"c":1.15419},{"t":"10:35","o":1.15418,"h":1.15428,"l":1.15381,"c":1.15382},{"t":"10:40","o":1.15382,"h":1.15382,"l":1.15331,"c":1.15347},{"t":"10:45","o":1.15347,"h":1.15347,"l":1.1531,"c":1.15332},{"t":"10:50","o":1.15333,"h":1.15344,"l":1.15326,"c":1.15339},{"t":"10:55","o":1.15338,"h":1.1537,"l":1.15333,"c":1.15355},{"t":"11:00","o":1.15354,"h":1.15378,"l":1.15334,"c":1.15342},{"t":"11:05","o":1.15342,"h":1.15383,"l":1.15342,"c":1.15376},{"t":"11:10","o":1.15374,"h":1.15382,"l":1.15359,"c":1.15371}],"k":11,"ahi":1.15404,"alo":1.15266,"rgo":3.4,"lo":1.15266,"hi":1.15444,"dijo":"Una vez el precio rompe el alto de Asia pierde fuerza y las velas alcistas son pequeñas, por lo que veo que pierde fuerza el mercado. Espero a una reversión y el precio rompe el alto con cuerpo."},{"ref":"T22","grupo":"suya","dia":"2026-08-07","hm":"11:20","ent":1.15287,"stop":1.15249,"tp":1.15375,"res":"TP","velas":[{"t":"10:25","o":1.15201,"h":1.15204,"l":1.15191,"c":1.15191},{"t":"10:30","o":1.15189,"h":1.15223,"l":1.15189,"c":1.15214},{"t":"10:35","o":1.15214,"h":1.15227,"l":1.15204,"c":1.15222},{"t":"10:40","o":1.15223,"h":1.15242,"l":1.15223,"c":1.15241},{"t":"10:45","o":1.15242,"h":1.15252,"l":1.15224,"c":1.15229},{"t":"10:50","o":1.15228,"h":1.15245,"l":1.15227,"c":1.15233},{"t":"10:55","o":1.15234,"h":1.1525,"l":1.15233,"c":1.15236},{"t":"11:00","o":1.15234,"h":1.15255,"l":1.15229,"c":1.15235},{"t":"11:05","o":1.15237,"h":1.1525,"l":1.15234,"c":1.15248},{"t":"11:10","o":1.15245,"h":1.15287,"l":1.15245,"c":1.15284},{"t":"11:15","o":1.15286,"h":1.15292,"l":1.15282,"c":1.15285},{"t":"11:20","o":1.15287,"h":1.15294,"l":1.15284,"c":1.15288}],"k":11,"ahi":1.15255,"alo":1.15179,"rgo":3.8,"lo":1.15179,"hi":1.15375,"dijo":"Movimiento alcista, rompe con fuerza el alto rompiendo el último máximo."},{"ref":"N01","grupo":"no tomada","dia":"2026-08-04","hm":"09:20","ent":1.15167,"stop":1.15085,"tp":1.15331,"res":"SL","velas":[{"t":"08:25","o":1.15093,"h":1.15104,"l":1.1506,"c":1.15061},{"t":"08:30","o":1.15059,"h":1.15079,"l":1.15054,"c":1.15073},{"t":"08:35","o":1.15076,"h":1.15081,"l":1.15052,"c":1.15052},{"t":"08:40","o":1.15053,"h":1.15057,"l":1.15037,"c":1.15046},{"t":"08:45","o":1.15046,"h":1.15069,"l":1.15037,"c":1.15063},{"t":"08:50","o":1.15062,"h":1.15064,"l":1.1504,"c":1.15041},{"t":"08:55","o":1.15038,"h":1.15074,"l":1.15038,"c":1.15073},{"t":"09:00","o":1.15075,"h":1.15098,"l":1.15063,"c":1.15097},{"t":"09:05","o":1.15095,"h":1.15105,"l":1.15062,"c":1.15089},{"t":"09:10","o":1.1509,"h":1.15098,"l":1.15084,"c":1.1509},{"t":"09:15","o":1.15088,"h":1.15128,"l":1.15085,"c":1.15125},{"t":"09:20","o":1.15123,"h":1.1517,"l":1.15123,"c":1.15167}],"k":11,"ahi":1.15149,"alo":1.15022,"rgo":8.2,"lo":1.15022,"hi":1.15331,"dijo":"Hay varias velas alcistas que envuelven a la anterior bajista con cuerpo, y rompe el último máximo y rompe con cuerpo el alto de Asia."},{"ref":"N02","grupo":"no tomada","dia":"2026-08-05","hm":"08:40","ent":1.15418,"stop":1.15347,"tp":1.1556,"res":"SL","velas":[{"t":"07:45","o":1.15359,"h":1.1538,"l":1.15356,"c":1.15363},{"t":"07:50","o":1.15365,"h":1.15368,"l":1.15342,"c":1.15353},{"t":"07:55","o":1.15355,"h":1.1537,"l":1.15352,"c":1.15356},{"t":"08:00","o":1.15356,"h":1.15371,"l":1.15348,"c":1.15369},{"t":"08:05","o":1.1537,"h":1.15374,"l":1.15359,"c":1.15364},{"t":"08:10","o":1.15364,"h":1.15375,"l":1.1536,"c":1.15363},{"t":"08:15","o":1.15362,"h":1.15363,"l":1.15323,"c":1.1534},{"t":"08:20","o":1.15339,"h":1.15355,"l":1.15332,"c":1.15345},{"t":"08:25","o":1.15342,"h":1.15353,"l":1.15336,"c":1.15353},{"t":"08:30","o":1.15349,"h":1.15351,"l":1.15325,"c":1.15349},{"t":"08:35","o":1.15351,"h":1.15401,"l":1.15347,"c":1.15399},{"t":"08:40","o":1.15397,"h":1.15422,"l":1.15395,"c":1.15418}],"k":11,"ahi":1.15404,"alo":1.15266,"rgo":7.1,"lo":1.15266,"hi":1.1556},{"ref":"N03","grupo":"no tomada","dia":"2026-08-10","hm":"09:40","ent":1.15629,"stop":1.15567,"tp":1.1575300000000002,"res":"SL","velas":[{"t":"08:45","o":1.15545,"h":1.1555,"l":1.15538,"c":1.15541},{"t":"08:50","o":1.15538,"h":1.15538,"l":1.15522,"c":1.15529},{"t":"08:55","o":1.15529,"h":1.15552,"l":1.15526,"c":1.15547},{"t":"09:00","o":1.15548,"h":1.15548,"l":1.15519,"c":1.15525},{"t":"09:05","o":1.15524,"h":1.15557,"l":1.15522,"c":1.15545},{"t":"09:10","o":1.15544,"h":1.15557,"l":1.15535,"c":1.15535},{"t":"09:15","o":1.15536,"h":1.15559,"l":1.15532,"c":1.15553},{"t":"09:20","o":1.15553,"h":1.15572,"l":1.15538,"c":1.15568},{"t":"09:25","o":1.15568,"h":1.15577,"l":1.15551,"c":1.15559},{"t":"09:30","o":1.15559,"h":1.15571,"l":1.15555,"c":1.15566},{"t":"09:35","o":1.15567,"h":1.15609,"l":1.15567,"c":1.15595},{"t":"09:40","o":1.15594,"h":1.15629,"l":1.15594,"c":1.15629}],"k":11,"ahi":1.15617,"alo":1.15478,"rgo":6.2,"lo":1.15478,"hi":1.1575300000000002,"dijo":"Movimiento alcista donde cierra con cuerpo por encima del alto de Asia."},{"ref":"N04","grupo":"no tomada","dia":"2026-08-12","hm":"11:20","ent":1.15469,"stop":1.15401,"tp":1.15605,"res":"SL","velas":[{"t":"10:25","o":1.15375,"h":1.1538,"l":1.1537,"c":1.15377},{"t":"10:30","o":1.15376,"h":1.15382,"l":1.15363,"c":1.15368},{"t":"10:35","o":1.1537,"h":1.15385,"l":1.15366,"c":1.15383},{"t":"10:40","o":1.15384,"h":1.154,"l":1.15378,"c":1.154},{"t":"10:45","o":1.15399,"h":1.15399,"l":1.15371,"c":1.15387},{"t":"10:50","o":1.15389,"h":1.15395,"l":1.1538,"c":1.1538},{"t":"10:55","o":1.15381,"h":1.15381,"l":1.15365,"c":1.15372},{"t":"11:00","o":1.15371,"h":1.15393,"l":1.15369,"c":1.15391},{"t":"11:05","o":1.15393,"h":1.15393,"l":1.15368,"c":1.15379},{"t":"11:10","o":1.15378,"h":1.15411,"l":1.15378,"c":1.1541},{"t":"11:15","o":1.1541,"h":1.15419,"l":1.15401,"c":1.15412},{"t":"11:20","o":1.15414,"h":1.15497,"l":1.15401,"c":1.15469}],"k":11,"ahi":1.15446,"alo":1.1532,"rgo":6.8,"lo":1.1532,"hi":1.15605,"dijo":"Veo que hay un posible cambio de tendencia, velas alcistas con más cuerpo que las bajistas, finalmente rompe el alto. Pero aquí la mecha que deja el movimiento puede indicar rechazo del alto y esperaría a la siguiente vela."},{"ref":"N05","grupo":"no tomada","dia":"2026-08-13","hm":"11:25","ent":1.15309,"stop":1.15292,"tp":1.15343,"res":"TP","velas":[{"t":"10:30","o":1.15248,"h":1.15263,"l":1.15247,"c":1.15256},{"t":"10:35","o":1.15257,"h":1.15261,"l":1.15245,"c":1.15261},{"t":"10:40","o":1.15258,"h":1.15274,"l":1.15257,"c":1.15267},{"t":"10:45","o":1.15267,"h":1.15284,"l":1.15265,"c":1.15278},{"t":"10:50","o":1.15277,"h":1.15279,"l":1.15253,"c":1.15255},{"t":"10:55","o":1.15255,"h":1.15255,"l":1.15239,"c":1.1524},{"t":"11:00","o":1.1524,"h":1.15243,"l":1.15232,"c":1.15238},{"t":"11:05","o":1.15237,"h":1.15262,"l":1.1523,"c":1.15256},{"t":"11:10","o":1.15254,"h":1.1528,"l":1.15252,"c":1.15279},{"t":"11:15","o":1.15279,"h":1.15297,"l":1.15274,"c":1.15289},{"t":"11:20","o":1.15292,"h":1.15305,"l":1.15292,"c":1.15304},{"t":"11:25","o":1.15307,"h":1.15321,"l":1.15303,"c":1.15309}],"k":11,"ahi":1.15311,"alo":1.15197,"rgo":1.7,"lo":1.15197,"hi":1.15343,"dijo":"Cambio de tendencia, viene de un movimiento alcista ya con envolvente, y hubiese esperado a la rotura del high para tomar la entrada; no hubiese entrado en esa vela, sino que hubiese esperado al cierre de la que rompe el alto."},{"ref":"N06","grupo":"no tomada","dia":"2026-08-14","hm":"08:00","ent":1.1543,"stop":1.15402,"tp":1.1548600000000002,"res":"SL","velas":[{"t":"07:05","o":1.15393,"h":1.15397,"l":1.15389,"c":1.15394},{"t":"07:10","o":1.15395,"h":1.15399,"l":1.15393,"c":1.15396},{"t":"07:15","o":1.15399,"h":1.15404,"l":1.15397,"c":1.15402},{"t":"07:20","o":1.15403,"h":1.15403,"l":1.15393,"c":1.15397},{"t":"07:25","o":1.15396,"h":1.15412,"l":1.15394,"c":1.15408},{"t":"07:30","o":1.15409,"h":1.15414,"l":1.154,"c":1.1541},{"t":"07:35","o":1.15411,"h":1.15412,"l":1.15404,"c":1.15408},{"t":"07:40","o":1.15411,"h":1.15429,"l":1.15407,"c":1.15409},{"t":"07:45","o":1.15408,"h":1.15414,"l":1.15406,"c":1.15407},{"t":"07:50","o":1.15408,"h":1.15413,"l":1.15403,"c":1.1541},{"t":"07:55","o":1.1541,"h":1.15417,"l":1.15402,"c":1.15417},{"t":"08:00","o":1.15416,"h":1.15435,"l":1.15416,"c":1.1543}],"k":11,"ahi":1.15429,"alo":1.15277,"rgo":2.8,"lo":1.15277,"hi":1.1548600000000002},{"ref":"N07","grupo":"no tomada","dia":"2026-08-19","hm":"08:00","ent":1.15897,"stop":1.15872,"tp":1.1594700000000002,"res":"TP","velas":[{"t":"07:05","o":1.15859,"h":1.15859,"l":1.15845,"c":1.15848},{"t":"07:10","o":1.15849,"h":1.15863,"l":1.15845,"c":1.15861},{"t":"07:15","o":1.15862,"h":1.15875,"l":1.15858,"c":1.15868},{"t":"07:20","o":1.15866,"h":1.15873,"l":1.15862,"c":1.15866},{"t":"07:25","o":1.15868,"h":1.15869,"l":1.15854,"c":1.15863},{"t":"07:30","o":1.15864,"h":1.15872,"l":1.15853,"c":1.1587},{"t":"07:35","o":1.15872,"h":1.15873,"l":1.15856,"c":1.15869},{"t":"07:40","o":1.15871,"h":1.15877,"l":1.1586,"c":1.15874},{"t":"07:45","o":1.15873,"h":1.15884,"l":1.15862,"c":1.15879},{"t":"07:50","o":1.15881,"h":1.15888,"l":1.1587,"c":1.15874},{"t":"07:55","o":1.15875,"h":1.15893,"l":1.15872,"c":1.15885},{"t":"08:00","o":1.15884,"h":1.15901,"l":1.15876,"c":1.15897}],"k":11,"ahi":1.15893,"alo":1.157,"rgo":2.5,"lo":1.157,"hi":1.1594700000000002},{"ref":"N08","grupo":"no tomada","dia":"2026-08-20","hm":"08:45","ent":1.16849,"stop":1.16796,"tp":1.16955,"res":"SL","velas":[{"t":"07:50","o":1.16721,"h":1.16726,"l":1.16705,"c":1.1671},{"t":"07:55","o":1.16711,"h":1.16772,"l":1.16708,"c":1.1676},{"t":"08:00","o":1.16761,"h":1.16778,"l":1.16737,"c":1.16742},{"t":"08:05","o":1.16742,"h":1.16763,"l":1.16733,"c":1.16759},{"t":"08:10","o":1.1676,"h":1.16802,"l":1.16756,"c":1.16793},{"t":"08:15","o":1.16793,"h":1.16798,"l":1.16782,"c":1.16788},{"t":"08:20","o":1.16787,"h":1.16789,"l":1.16767,"c":1.16775},{"t":"08:25","o":1.16775,"h":1.16787,"l":1.16763,"c":1.16768},{"t":"08:30","o":1.16769,"h":1.16778,"l":1.1676,"c":1.1677},{"t":"08:35","o":1.16773,"h":1.16799,"l":1.1677,"c":1.16798},{"t":"08:40","o":1.16798,"h":1.16801,"l":1.16796,"c":1.16797},{"t":"08:45","o":1.16799,"h":1.16874,"l":1.16798,"c":1.16849}],"k":11,"ahi":1.16837,"alo":1.16698,"rgo":5.3,"lo":1.16698,"hi":1.16955},{"ref":"N09","grupo":"no tomada","dia":"2026-08-21","hm":"10:40","ent":1.17039,"stop":1.1696,"tp":1.1719700000000002,"res":"SL","velas":[{"t":"09:45","o":1.16897,"h":1.16899,"l":1.16866,"c":1.16895},{"t":"09:50","o":1.16896,"h":1.16908,"l":1.16873,"c":1.16884},{"t":"09:55","o":1.16882,"h":1.16908,"l":1.16875,"c":1.16906},{"t":"10:00","o":1.16906,"h":1.1693,"l":1.16897,"c":1.16916},{"t":"10:05","o":1.16915,"h":1.16924,"l":1.16891,"c":1.16919},{"t":"10:10","o":1.16922,"h":1.16953,"l":1.16915,"c":1.16944},{"t":"10:15","o":1.1694,"h":1.16952,"l":1.16923,"c":1.16931},{"t":"10:20","o":1.16931,"h":1.16931,"l":1.16914,"c":1.16927},{"t":"10:25","o":1.16926,"h":1.16965,"l":1.16926,"c":1.16957},{"t":"10:30","o":1.16956,"h":1.16977,"l":1.16949,"c":1.16965},{"t":"10:35","o":1.16965,"h":1.16984,"l":1.1696,"c":1.16981},{"t":"10:40","o":1.1698,"h":1.17048,"l":1.16974,"c":1.17039}],"k":11,"ahi":1.17007,"alo":1.16756,"rgo":7.9,"lo":1.16756,"hi":1.1719700000000002,"dijo":"Venimos de un movimiento alcista donde cierra con fuerza por fuera del alto de Asia. Tengo que decir que me falta contexto en tus imágenes, porque algo que no habíamos comentado era que también hay que ver un poco del contexto hacia dónde va y hacia dónde está yendo el precio, y no entrar simplemente con eso, sino mirar de acompañar al precio por el contexto y temporalidades mayores, ya sea M15 o H1."}];
+const PX = 6;                       // pixeles por pip, igual en los 17
+const U = 0.0001, ANCHO = 420, MI = 6, MD = 46, MV = 12, PIE = 15;
+
+function suNivel(c){ return Math.abs(c.ent - c.ahi) <= Math.abs(c.ent - c.alo) ? "alto" : "mínimo"; }
+function rango(c){
+  let lo = Math.min(c.stop, ...c.velas.map(v => v.l));
+  let hi = Math.max(c.ent,  ...c.velas.map(v => v.h));
+  const nv = suNivel(c) === "alto" ? c.ahi : c.alo;
+  if (nv > lo - 12*U && nv < hi + 12*U){ lo = Math.min(lo, nv); hi = Math.max(hi, nv); }
+  const m = 1.5*U;
+  return [lo - m, hi + m];
+}
+function svg(c, rg){
+  const n = c.velas.length;
+  const [lo, hi] = rg || rango(c);
+  const alto = Math.round((hi - lo) / U * PX) + MV + PIE;
+  const y = p => MV + (hi - p) / U * PX;
+  const paso = (ANCHO - MI - MD) / n;
+  const cuerpo = Math.max(3, paso * 0.6);
+  let s = `<svg class="grafo" viewBox="0 0 ${ANCHO} ${alto}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Velas de 5 minutos previas a la entrada ${c.ref}">`;
+
+  // regla de pips relativa a la entrada
+  const desde = Math.ceil((lo - c.ent)/U/5)*5, hasta = Math.floor((hi - c.ent)/U/5)*5;
+  for (let p = desde; p <= hasta; p += 5){
+    const yy = y(c.ent + p*U);
+    s += `<line x1="${MI}" y1="${yy}" x2="${ANCHO-MD+2}" y2="${yy}" stroke="var(--linea)" stroke-width="1"/>`;
+    s += `<text x="${ANCHO-MD+8}" y="${yy+3.6}" fill="var(--tenue)" font-family="JetBrains Mono, monospace" font-size="10">${p>0?"+":""}${p}</text>`;
+  }
+  // columna de la vela de entrada
+  const xe = MI + (n-1)*paso;
+  s += `<rect x="${xe}" y="0" width="${paso}" height="${alto}" fill="var(--hueco)"/>`;
+
+  // niveles: la raya va debajo de las velas, la etiqueta encima de todo
+  const suyo = suNivel(c);
+  const NIV = [[c.stop, "var(--baja)", "STOP", "5 3"],
+               [c.ahi,  "var(--asia)", suyo === "alto"   ? "ALTO ASIA"   : "alto Asia",   "2 3"],
+               [c.alo,  "var(--asia)", suyo === "mínimo" ? "MÍNIMO ASIA" : "mínimo Asia", "2 3"]].filter(x => x[0] >= lo && x[0] <= hi);
+  for (const [p, col, , guion] of NIV)
+    s += `<line x1="${MI}" y1="${y(p)}" x2="${ANCHO-MD}" y2="${y(p)}" stroke="${col}" stroke-width="1.4" stroke-dasharray="${guion}"/>`;
+
+  // velas
+  for (let i = 0; i < n; i++){
+    const v = c.velas[i], x = MI + i*paso + paso/2;
+    const sube = v.c >= v.o, col = sube ? "var(--alza)" : "var(--baja)";
+    s += `<line x1="${x}" y1="${y(v.h)}" x2="${x}" y2="${y(v.l)}" stroke="${col}" stroke-width="1.2"/>`;
+    const a = y(Math.max(v.o,v.c)), b = y(Math.min(v.o,v.c));
+    s += `<rect x="${x-cuerpo/2}" y="${a}" width="${cuerpo}" height="${Math.max(1.4, b-a)}" `
+      + (sube ? `fill="var(--tarjeta)" stroke="${col}" stroke-width="1.2"` : `fill="${col}"`) + `/>`;
+  }
+  // etiquetas de nivel, por encima de las velas y sin pisarse entre ellas
+  let ant = -99;
+  for (const [p, col, txt] of [...NIV].sort((a,b) => a[0] > b[0] ? -1 : 1)){
+    const yy = Math.max(11, y(p) - 4, ant + 11); ant = yy;
+    s += `<text x="${MI+3}" y="${yy}" fill="${col}" stroke="var(--tarjeta)" stroke-width="3.4" paint-order="stroke" font-family="Archivo, sans-serif" font-size="9.5" font-weight="700" letter-spacing=".07em">${txt}</text>`;
+  }
+  // entrada
+  const ye = y(c.ent);
+  s += `<line x1="${MI}" y1="${ye}" x2="${ANCHO-MD}" y2="${ye}" stroke="var(--tinta)" stroke-width="1.3"/>`;
+  s += `<path d="M ${ANCHO-MD} ${ye} l 7 -4.5 l 0 9 z" fill="var(--tinta)"/>`;
+  // hora de la primera y de la ultima vela
+  s += `<text x="${MI+1}" y="${alto-3}" fill="var(--tenue)" stroke="var(--tarjeta)" stroke-width="3" paint-order="stroke" font-family="JetBrains Mono, monospace" font-size="9.5">${c.velas[0].t}</text>`;
+  s += `<text x="${xe+paso}" y="${alto-3}" text-anchor="end" fill="var(--tinta)" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="600">${c.velas[n-1].t}</text>`;
+  return s + "</svg>";
+}
+
+function tarjeta(c, rg){
+  const mia = c.grupo === "suya";
+  const d = new Date(c.dia + "T12:00:00");
+  const dia = d.toLocaleDateString("es-ES", {weekday:"short", day:"numeric", month:"short"});
+  const el = document.createElement("article");
+  el.className = "caso " + (mia ? "suya" : "otra");
+  el.dataset.ref = c.ref;
+  el.innerHTML =
+    `<div class="cab">
+       <span class="ref">${c.ref}</span>
+       <span class="chip ${mia?"mia":"no"}">${mia?"la tomaste":"no la tomaste"}</span>
+       <span class="res ${c.res==="TP"?"tp":"sl"}">${c.res}</span>
+       <span class="cuando">${dia} · ${c.hm}</span>
+     </div>
+     ${svg(c, rg)}
+     <div class="pie">
+       <span>riesgo <b>${c.rgo.toFixed(1)} p</b></span>
+       <span>${suNivel(c) === "alto" ? "sobre el alto" : "sobre el mínimo"} <b>${((c.ent - (suNivel(c)==="alto" ? c.ahi : c.alo))/U).toFixed(1)} p</b></span>
+       <span>entrada <b>${c.ent.toFixed(5)}</b></span>
+     </div>
+     ${c.dijo ? `<p class="dijo"><b>lo que me dijiste</b>${c.dijo}</p>` : ""}
+     <div class="preguntas"></div>
+     <textarea data-ref="${c.ref}" placeholder="si ninguna encaja del todo, cuéntamelo aquí"></textarea>`;
+  const cont = el.querySelector(".preguntas");
+  PREGUNTAS.forEach(([clave, titulo, ops]) => {
+    const b = document.createElement("div");
+    b.className = "preg";
+    b.innerHTML = `<p>${titulo}</p><div class="ops"></div>`;
+    const fila = b.querySelector(".ops");
+    ops.forEach((txt, i) => {
+      const bt = document.createElement("button");
+      bt.type = "button"; bt.className = "op"; bt.textContent = txt;
+      bt.setAttribute("aria-pressed", "false");
+      if (R[c.ref] && R[c.ref][clave] === i) bt.setAttribute("aria-pressed", "true");
+      bt.addEventListener("click", () => elegir(c.ref, clave, i, fila, bt));
+      fila.appendChild(bt);
+    });
+    cont.appendChild(b);
+  });
+  return el;
+}
+
+const PREGUNTAS = [
+  ["momento", "¿En qué momento del nivel estás?", [
+    "Primera vez que el precio llega al nivel hoy",
+    "Ya lo rompió antes, perdió fuerza y ha vuelto",
+    "Lleva rato pegado al nivel, entrando y saliendo",
+    "No lo distingo"]],
+  ["vela", "¿Qué hace la vela de la entrada?", [
+    "Rompe el nivel con cuerpo, sin apenas mecha",
+    "Envuelve a la última contraria y cierra por fuera",
+    "Cierra por fuera pero deja mecha de rechazo",
+    "Todavía no rompe nada"]],
+  ["estructura", "¿Y el último máximo o mínimo anterior?", [
+    "También lo rompe", "No lo rompe", "No lo veo"]],
+  ["antes", "¿Qué venía haciendo el precio antes?", [
+    "Movimiento fuerte a favor, sin descanso",
+    "A favor, hizo un retroceso y ahora se reanuda",
+    "Venía en contra, esto sería un giro",
+    "Lateral, sin dirección clara",
+    "No lo distingo"]],
+  ["entras", "¿Entras aquí?", [
+    "Sí, tal cual",
+    "Sí, pero esperaría una vela más",
+    "No",
+    "Me falta ver M15 o H1 para decidirlo"]],
+];
+const CLAVE = "compras-nivel-asia-v2";
+let R = {};
+try { R = JSON.parse(localStorage.getItem(CLAVE) || "{}"); } catch(e) { R = {}; }
+const guarda = () => { try { localStorage.setItem(CLAVE, JSON.stringify(R)); } catch(e) {} };
+const completo = ref => PREGUNTAS.every(([k]) => R[ref] && R[ref][k] != null);
+
+function pinta(ref){
+  const el = document.querySelector(`.caso[data-ref="${ref}"]`);
+  if (el) el.classList.toggle("hecha", completo(ref));
+  const n = CASOS.filter(c => completo(c.ref)).length;
+  document.getElementById("cuentaNotas").textContent = n;
+  const b = document.getElementById("btnCopiar");
+  if (b) b.disabled = n === 0;
+}
+function elegir(ref, clave, i, fila, bt){
+  R[ref] = R[ref] || {};
+  const quita = R[ref][clave] === i;
+  R[ref][clave] = quita ? null : i;
+  if (quita) delete R[ref][clave];
+  [...fila.children].forEach(x => x.setAttribute("aria-pressed", "false"));
+  if (!quita) bt.setAttribute("aria-pressed", "true");
+  guarda(); pinta(ref);
+}
+
+const byRef = Object.fromEntries(CASOS.map(c => [c.ref, c]));
+const PARES = [["N02","T19"], ["N06","T01"], ["N07","T05"], ["N08","T06"]];
+const PROPIO = ["T04","T03"];
+const SUELTOS = ["T02","T22","N01","N03","N04","N05","N09"];
+
+function fecha(iso){
+  const d = new Date(iso + "T12:00:00");
+  return d.toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long"});
+}
+function par(refs, destino, titulo){
+  const cs = refs.map(x => byRef[x]);
+  const rs = cs.map(rango);
+  const rg = [Math.min(...rs.map(r => r[0])), Math.max(...rs.map(r => r[1]))];
+  const caja = document.createElement("div");
+  caja.className = "par";
+  caja.innerHTML = `<div class="parCab">${titulo || fecha(cs[0].dia)}</div>`;
+  const r = document.createElement("div");
+  r.className = "rejilla";
+  cs.forEach(c => r.appendChild(tarjeta(c, rg)));
+  caja.appendChild(r);
+  destino.appendChild(caja);
+}
+PARES.forEach(refs => par(refs, document.getElementById("paresMixtos")));
+par(PROPIO, document.getElementById("parPropio"), fecha(byRef.T04.dia) + " · las dos son tuyas");
+SUELTOS.forEach(x => document.getElementById("sueltos").appendChild(tarjeta(byRef[x])));
+
+/* ---- texto libre, guardado y copia ---- */
+document.querySelectorAll("textarea[data-ref]").forEach(a => {
+  const r = a.dataset.ref;
+  if (R[r] && R[r].otra) a.value = R[r].otra;
+  a.addEventListener("input", () => {
+    R[r] = R[r] || {};
+    if (a.value.trim()) R[r].otra = a.value.trim(); else delete R[r].otra;
+    guarda();
+  });
+});
+CASOS.forEach(c => pinta(c.ref));
+
+function texto(){
+  const orden = [...PARES.flat(), ...PROPIO, ...SUELTOS];
+  return orden.filter(r => R[r] && Object.keys(R[r]).length).map(r => {
+    const c = byRef[r];
+    const partes = PREGUNTAS.filter(([k]) => R[r][k] != null)
+      .map(([k, , ops]) => `${k}: ${ops[R[r][k]]}`);
+    if (R[r].otra) partes.push(`nota: ${R[r].otra}`);
+    return `${r} (${c.grupo === "suya" ? "tuya" : "no tomada"}, ${c.res}) · ${partes.join(" · ")}`;
+  }).join("\n");
+}
+const volcado = document.getElementById("volcado");
+document.getElementById("btnVer").addEventListener("click", () => {
+  volcado.value = texto() || "todavía no has contestado nada";
+  volcado.classList.toggle("ver");
+});
+document.getElementById("btnCopiar").addEventListener("click", async e => {
+  const t = texto();
+  if (!t) return;
+  try {
+    await navigator.clipboard.writeText(t);
+    e.target.textContent = "copiado";
+    setTimeout(() => e.target.textContent = "Copiar mis respuestas", 1600);
+  } catch(err) {
+    volcado.value = t; volcado.classList.add("ver");
+    volcado.removeAttribute("readonly"); volcado.select();
+    e.target.textContent = "selecciónalo y copia";
+    setTimeout(() => e.target.textContent = "Copiar mis respuestas", 2600);
+  }
+});
+</script>

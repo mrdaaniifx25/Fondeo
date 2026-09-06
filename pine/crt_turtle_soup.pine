@@ -1,0 +1,202 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// at https://mozilla.org/MPL/2.0/
+//
+//  CRT · barrido y vuelta (Turtle Soup)
+//
+//  Version para TradingView del CONCEPTO, no del .ex4. Aquel es un binario
+//  comprimido -entropia 7,99 bits por byte- del que no se puede leer la logica,
+//  asi que esto no es una traduccion de su codigo: es el patron implementado
+//  desde su definicion.
+//
+//  EL PATRON
+//    El precio se sale del extremo de una referencia -la vela anterior de una
+//    temporalidad mayor, el maximo/minimo de N velas, o el rango de Asia- y
+//    CIERRA de vuelta dentro. La mecha queda fuera y el cuerpo dentro: eso es
+//    el barrido. La direccion va contra el barrido.
+//
+//  LO QUE ESTA MEDIDO EN ESTE PROYECTO, ANTES DE QUE LO USES
+//    barrido del nivel de Asia en M5, 1.473 operaciones fuera de muestra
+//    2020-2026:                                    34,7 % de acierto a 1:2
+//                                                  R neta -0,459, z -12,31
+//    barrido diario, 7 instrumentos, 1.444 ops:    -2,5 puntos por DEBAJO de
+//                                                  la geometria, z -3,17
+//    CRT en H4 con el stop en la mecha:            +2,9 puntos, y aun asi neta
+//                                                  negativa por el coste
+//    el CRT como contexto de sus 150 operaciones:  ninguno de ocho contrastes
+//                                                  llega al umbral
+//
+//  O sea: el dibujo es correcto y el patron existe, pero operado a ciegas no
+//  paga el coste. Usalo como contexto, no como señal.
+//  Detalle en docs/RESULTADOS_ingenieria_inversa.md y RESULTADOS_escala_diaria.md
+//@version=6
+indicator("CRT · barrido y vuelta", overlay = true, max_lines_count = 500,
+     max_labels_count = 500, max_boxes_count = 200)
+
+// ─── de que se barre ──────────────────────────────────────────────────────
+gR = "La referencia"
+modo = input.string("Vela anterior de otra temporalidad", "De qué se barre el extremo",
+     options = ["Vela anterior de otra temporalidad", "Máximo y mínimo de N velas",
+                "Alto y bajo de Asia"], group = gR)
+tfRef = input.timeframe("60", "Temporalidad de la referencia", group = gR,
+     tooltip = "La vela ANTERIOR ya cerrada de esta temporalidad. Con la que se " +
+     "esta formando no se puede operar sin mirar al futuro.")
+nVelas = input.int(20, "N velas, si eliges esa referencia", 3, 500, group = gR)
+aIni = input.int(0, "Asia empieza a las", 0, 23, group = gR, inline = "a")
+aFin = input.int(8, "y acaba a las",      1, 23, group = gR, inline = "a")
+tz   = input.string("Europe/Madrid", "Huso horario", group = gR,
+     options = ["Europe/Madrid", "Europe/London", "America/New_York", "UTC"])
+
+// ─── que cuenta como barrido ──────────────────────────────────────────────
+gB = "El barrido"
+estricto = input.bool(true, "El cierre tiene que volver dentro del CUERPO", group = gB,
+     tooltip = "Definicion estricta, la que usa este proyecto: la vela barre el " +
+     "extremo y cierra dentro del cuerpo de la referencia. Si lo desmarcas basta " +
+     "con que cierre dentro del rango, que es mas laxo y da mas señales.")
+minMecha = input.float(0.0, "Mínimo que tiene que sobresalir la mecha (pips)", 0, 100,
+     step = 0.5, group = gB)
+soloVent = input.bool(false, "Solo dentro de una ventana horaria", group = gB, inline = "v")
+vIni = input.int(8,  "de", 0, 23, group = gB, inline = "v")
+vFin = input.int(12, "a",  1, 24, group = gB, inline = "v")
+
+// ─── que dibuja ───────────────────────────────────────────────────────────
+gD = "Dibujo"
+verNiv  = input.bool(true,  "Líneas de la referencia", group = gD)
+verMarca= input.bool(true,  "Marcar los barridos", group = gD)
+verObj  = input.bool(true,  "Stop y objetivo del último barrido", group = gD)
+ratio   = input.float(2.0, "Objetivo (R)", 0.5, 10, step = 0.5, group = gD)
+objEstr = input.bool(false, "Objetivo estructural (extremo contrario) en vez de 1:R",
+     group = gD, tooltip = "Lo canonico del CRT: el objetivo es el otro extremo de " +
+     "la vela de referencia. En este proyecto salio peor que el 1:2 fijo.")
+cAlza = input.color(#23735A, "Barrido del mínimo (compra)", group = gD)
+cBaja = input.color(#A8382C, "Barrido del máximo (venta)",  group = gD)
+cNiv  = input.color(#8F6410, "Referencia", group = gD)
+verTab= input.bool(true, "Tabla", group = gD)
+
+// ─── pip ──────────────────────────────────────────────────────────────────
+dig = math.round(-math.log10(syminfo.mintick))
+pip = (dig == 5 or dig == 3) ? syminfo.mintick * 10 : syminfo.mintick
+
+// ─── la referencia ────────────────────────────────────────────────────────
+[so, sh, sl, sc] = request.security(syminfo.tickerid, tfRef,
+     [open[1], high[1], low[1], close[1]], lookahead = barmerge.lookahead_off)
+
+h     = hour(time, tz)
+mDia  = h * 60 + minute(time, tz)
+aIniM = aIni * 60
+aFinM = aFin * 60
+enAsia = aIniM < aFinM ? (mDia >= aIniM and mDia < aFinM) : (mDia >= aIniM or mDia < aFinM)
+var float acH = na
+var float acL = na
+var float asH = na
+var float asL = na
+if enAsia and not enAsia[1]
+    acH := high
+    acL := low
+    asH := na
+    asL := na
+else if enAsia
+    acH := math.max(nz(acH, high), high)
+    acL := math.min(nz(acL, low),  low)
+if not enAsia and enAsia[1]
+    asH := acH
+    asL := acL
+
+float refH = na
+float refL = na
+float refO = na
+float refC = na
+if modo == "Vela anterior de otra temporalidad"
+    refH := sh
+    refL := sl
+    refO := so
+    refC := sc
+else if modo == "Máximo y mínimo de N velas"
+    refH := ta.highest(high, nVelas)[1]
+    refL := ta.lowest(low,  nVelas)[1]
+    refO := refL                      // sin cuerpo: el "cuerpo" es el rango entero
+    refC := refH
+else
+    refH := asH
+    refL := asL
+    refO := asL
+    refC := asH
+
+hayRef = not na(refH) and not na(refL) and refH > refL
+cA = math.min(nz(refO, refL), nz(refC, refH))
+cB = math.max(nz(refO, refL), nz(refC, refH))
+dentroAlto = estricto ? (close >= cA and close <= cB) : (close < refH and close > refL)
+dentroBajo = dentroAlto
+
+enVent = not soloVent or (vIni < vFin ? (h >= vIni and h < vFin) : (h >= vIni or h < vFin))
+
+barreAlto = hayRef and enVent and high > refH + minMecha*pip and dentroAlto
+barreBajo = hayRef and enVent and low  < refL - minMecha*pip and dentroBajo
+// si la vela barre los dos extremos a la vez no se sabe de que lado va: se descarta
+dos = barreAlto and barreBajo
+barreAlto := barreAlto and not dos
+barreBajo := barreBajo and not dos
+
+// ─── stop y objetivo del ultimo barrido ───────────────────────────────────
+var int   ladoU = 0
+var float entU  = na
+var float stopU = na
+var float objU  = na
+var int   barU  = na
+if barreAlto or barreBajo
+    ladoU := barreAlto ? -1 : 1
+    entU  := close
+    stopU := barreAlto ? high : low
+    rgo    = math.abs(entU - stopU)
+    objU  := objEstr ? (barreAlto ? refL : refH) : entU + ladoU * ratio * rgo
+    barU  := bar_index
+
+// ─── dibujo ───────────────────────────────────────────────────────────────
+plot(verNiv and hayRef ? refH : na, "Máximo de la referencia", color = cNiv,
+     linewidth = 1, style = plot.style_linebr)
+plot(verNiv and hayRef ? refL : na, "Mínimo de la referencia", color = cNiv,
+     linewidth = 1, style = plot.style_linebr)
+
+plotshape(verMarca and barreAlto, "Barrido del máximo", shape.triangledown,
+     location.abovebar, cBaja, size = size.small, text = "barrido")
+plotshape(verMarca and barreBajo, "Barrido del mínimo", shape.triangleup,
+     location.belowbar, cAlza, size = size.small, text = "barrido")
+
+plot(verObj and not na(stopU) and bar_index - barU < 60 ? stopU : na, "Stop",
+     color = color.new(cBaja, 35), style = plot.style_circles, linewidth = 1)
+plot(verObj and not na(objU) and bar_index - barU < 60 ? objU : na, "Objetivo",
+     color = color.new(cAlza, 35), style = plot.style_circles, linewidth = 1)
+
+// ─── tabla ────────────────────────────────────────────────────────────────
+var table T = table.new(position.bottom_right, 2, 7, border_width = 1,
+     frame_width = 1, frame_color = color.new(color.gray, 60))
+fila(int r, string a, string b, color k) =>
+    table.cell(T, 0, r, a, text_size = size.small, text_halign = text.align_left,
+         text_color = k)
+    table.cell(T, 1, r, b, text_size = size.small, text_halign = text.align_right,
+         text_color = k)
+
+f5(float x) => str.tostring(x, format.mintick)
+p1(float x) => str.tostring(x / pip, "#.0") + " p"
+
+if verTab and barstate.islast
+    gris  = color.new(color.gray, 20)
+    tinta = chart.fg_color
+    fila(0, "CRT · barrido y vuelta",
+         modo == "Vela anterior de otra temporalidad" ? tfRef
+         : modo == "Máximo y mínimo de N velas" ? str.tostring(nVelas) + " velas" : "Asia", tinta)
+    fila(1, "máximo de la referencia", hayRef ? f5(refH) : "—", cNiv)
+    fila(2, "mínimo de la referencia", hayRef ? f5(refL) : "—", cNiv)
+    fila(3, "último barrido",
+         na(ladoU) or ladoU == 0 ? "—"
+         : (ladoU > 0 ? "del mínimo · compra" : "del máximo · venta")
+           + " · hace " + str.tostring(bar_index - barU) + " velas",
+         ladoU > 0 ? cAlza : cBaja)
+    fila(4, "stop", na(stopU) ? "—" : f5(stopU) + "  (" + p1(math.abs(entU - stopU)) + ")", cBaja)
+    fila(5, "objetivo", na(objU) ? "—" : f5(objU), cAlza)
+    fila(6, "medido: 34,7 % a 1:2 · no paga el coste", "contexto, no señal", gris)
+
+// ─── alertas ──────────────────────────────────────────────────────────────
+alertcondition(barreAlto, "Barrido del máximo",
+     "CRT: mecha por encima del máximo de la referencia y cierre de vuelta dentro")
+alertcondition(barreBajo, "Barrido del mínimo",
+     "CRT: mecha por debajo del mínimo de la referencia y cierre de vuelta dentro")

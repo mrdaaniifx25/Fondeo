@@ -1,0 +1,262 @@
+//@version=6
+// ─────────────────────────────────────────────────────────────────────────────
+//  CRT · PANEL DE 3 VELAS CON RANGOS INTERNOS
+//
+//  Panel a la derecha con la estructura de tres velas de CRT en H4 y H1:
+//     Vela 1  el rango        Vela 2  el barrido        Vela 3  donde se opera
+//
+//  RANGOS INTERNOS. La guía admite velas internas adicionales en la
+//  acumulación: si la Vela 1 está contenida dentro de la anterior, esa no es el
+//  rango de verdad — la acumulación viene de más atrás. El indicador retrocede
+//  mientras cada vela sea interna a la previa y marca el RANGO EFECTIVO, que es
+//  el que de verdad guarda la liquidez. Te dice además cuántas internas absorbió.
+//
+//  Rejilla H4 configurable, por defecto anclada a la 01:00 de Nueva York, que es
+//  la de la guía. En hora española: 03, 07, 11, 15, 19 y 23.
+// ─────────────────────────────────────────────────────────────────────────────
+indicator("CRT · Panel 3 velas + rangos internos", "CRT 3v", overlay = true,
+     max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500)
+
+HIST = 14      // cuántas velas guardo por dentro para poder retroceder
+
+// ── entradas ────────────────────────────────────────────────────────────────
+gP = "Panel"
+verH4   = input.bool(true, "H4", group = gP, inline = "tf")
+verH1   = input.bool(true, "H1", group = gP, inline = "tf")
+sepIni  = input.int(6,  "Separación del precio (barras)", minval = 1, maxval = 60, group = gP)
+anchoV  = input.int(5,  "Ancho de cada vela (barras)", minval = 1, maxval = 14, group = gP)
+huecoV  = input.int(3,  "Hueco entre velas (barras)", minval = 0, maxval = 10, group = gP)
+huecoG  = input.int(10, "Hueco entre H4 y H1 (barras)", minval = 2, maxval = 40, group = gP)
+
+gR = "Rangos internos"
+verRango = input.bool(true, "Dibujar el rango efectivo en el panel", group = gR)
+enGrafico = input.bool(true, "Llevar el rango efectivo de H4 al gráfico", group = gR)
+maxInt   = input.int(6, "Máximo de velas internas que absorbe", minval = 0, maxval = 12, group = gR,
+     tooltip = "0 desactiva los rangos internos: la Vela 1 es siempre la anterior a la del barrido, como en el backtest.")
+
+gA = "Rejilla H4"
+anclaH = input.int(1, "El bloque H4 empieza a las", minval = 0, maxval = 23, group = gA,
+     tooltip = "1 con huso de Nueva York = la rejilla de la guía CRT. En hora española: 03,07,11,15,19,23.")
+tzRef  = input.string("America/New_York", "Huso de referencia", group = gA,
+     options = ["America/New_York", "Europe/Madrid", "UTC"])
+
+gD = "Día anterior"
+verDia   = input.bool(true,  "Máximo y mínimo sobre el gráfico", group = gD)
+diaAncla = input.bool(false, "Cortar el día con el anclaje de la rejilla", group = gD)
+
+gC = "Colores"
+cAl  = input.color(#2E9E85, "Alcista", group = gC, inline = "c1")
+cBa  = input.color(#C0563A, "Bajista", group = gC, inline = "c1")
+cViv = input.color(#3D7FD6, "Vela en curso", group = gC)
+cRng = input.color(#8E6BC4, "Rango efectivo", group = gC)
+cDia = input.color(#C9821B, "Día anterior", group = gC)
+
+// ── troceado por husos ──────────────────────────────────────────────────────
+tLocal = timestamp("UTC", year(time, tzRef), month(time, tzRef), dayofmonth(time, tzRef),
+     hour(time, tzRef), minute(time, tzRef), 0)
+MS_H1 = 3600000
+MS_H4 = 14400000
+MS_D  = 86400000
+idH1 = math.floor(tLocal / MS_H1)
+idH4 = math.floor((tLocal - anclaH * MS_H1) / MS_H4)
+idD  = math.floor((tLocal - (diaAncla ? anclaH : 0) * MS_H1) / MS_D)
+
+// ═══ H4 ════════════════════════════════════════════════════════════════════
+var array<float> aO4 = array.new<float>()
+var array<float> aH4 = array.new<float>()
+var array<float> aL4 = array.new<float>()
+var array<float> aC4 = array.new<float>()
+var array<int>   aT4 = array.new<int>()
+var float o4 = na
+var float h4 = na
+var float l4 = na
+var float c4 = na
+var int   t4 = na
+
+if na(idH4[1]) or idH4 != idH4[1]
+    if not na(o4)
+        array.push(aO4, o4)
+        array.push(aH4, h4)
+        array.push(aL4, l4)
+        array.push(aC4, c4)
+        array.push(aT4, t4)
+        if array.size(aO4) > HIST
+            array.shift(aO4)
+            array.shift(aH4)
+            array.shift(aL4)
+            array.shift(aC4)
+            array.shift(aT4)
+    o4 := open
+    h4 := high
+    l4 := low
+    t4 := int((idH4 * MS_H4) + anclaH * MS_H1)
+else
+    h4 := math.max(h4, high)
+    l4 := math.min(l4, low)
+c4 := close
+
+// ═══ H1 ════════════════════════════════════════════════════════════════════
+var array<float> aO1 = array.new<float>()
+var array<float> aH1 = array.new<float>()
+var array<float> aL1 = array.new<float>()
+var array<float> aC1 = array.new<float>()
+var array<int>   aT1 = array.new<int>()
+var float o1 = na
+var float h1 = na
+var float l1 = na
+var float c1 = na
+var int   t1 = na
+
+if na(idH1[1]) or idH1 != idH1[1]
+    if not na(o1)
+        array.push(aO1, o1)
+        array.push(aH1, h1)
+        array.push(aL1, l1)
+        array.push(aC1, c1)
+        array.push(aT1, t1)
+        if array.size(aO1) > HIST
+            array.shift(aO1)
+            array.shift(aH1)
+            array.shift(aL1)
+            array.shift(aC1)
+            array.shift(aT1)
+    o1 := open
+    h1 := high
+    l1 := low
+    t1 := int(idH1 * MS_H1)
+else
+    h1 := math.max(h1, high)
+    l1 := math.min(l1, low)
+c1 := close
+
+// ═══ RANGO EFECTIVO: retrocede mientras la vela sea interna a la anterior ══
+// Devuelve [indice del rango, cuantas internas absorbio]. Empieza en la Vela 1,
+// que es la penultima cerrada, porque la ultima cerrada es la del barrido.
+f_rango(array<float> ah, array<float> al) =>
+    n = array.size(ah)
+    idx = n - 2                       // Vela 1
+    dentro = 0
+    if idx > 0
+        seguir = true
+        while seguir and dentro < maxInt and idx > 0
+            esInterna = array.get(ah, idx) <= array.get(ah, idx - 1) and
+                 array.get(al, idx) >= array.get(al, idx - 1)
+            if esInterna
+                idx -= 1
+                dentro += 1
+            else
+                seguir := false
+    [idx, dentro]
+
+// ═══ DIBUJO ════════════════════════════════════════════════════════════════
+f_hhmm(int t) =>
+    str.format("{0,number,00}:{1,number,00}", hour(t, "UTC"), minute(t, "UTC"))
+
+var array<box>   pBox = array.new<box>()
+var array<line>  pLin = array.new<line>()
+var array<label> pLab = array.new<label>()
+
+f_limpia() =>
+    while array.size(pBox) > 0
+        box.delete(array.pop(pBox))
+    while array.size(pLin) > 0
+        line.delete(array.pop(pLin))
+    while array.size(pLab) > 0
+        label.delete(array.pop(pLab))
+
+f_vela(int xi, float vo, float vh, float vl, float vc, int vt, bool viva, string tag) =>
+    col = viva ? cViv : (vc >= vo ? cAl : cBa)
+    xc  = xi + int(anchoV / 2)
+    b = box.new(xi, math.max(vo, vc), xi + anchoV, math.min(vo, vc),
+         border_color = col, border_width = 1, bgcolor = color.new(col, viva ? 55 : 20))
+    m = line.new(xc, vh, xc, vl, color = col, width = 2)
+    array.push(pBox, b)
+    array.push(pLin, m)
+    e = label.new(xc, vl, tag + "\n" + f_hhmm(vt), style = label.style_label_up,
+         color = color.new(color.gray, 100), textcolor = color.new(col, 10),
+         size = size.tiny, textalign = text.align_center)
+    array.push(pLab, e)
+
+f_texto(int xi, float y, string txt, color c, string est) =>
+    e = label.new(xi, y, txt, style = est, color = color.new(color.gray, 100),
+         textcolor = c, size = size.small)
+    array.push(pLab, e)
+
+f_nivel(int xi, int xf, float y, string txt) =>
+    l = line.new(xi, y, xf, y, color = color.new(cRng, 25), width = 1,
+         style = line.style_dashed)
+    array.push(pLin, l)
+    e = label.new(xf, y, txt, style = label.style_label_left,
+         color = color.new(color.gray, 100), textcolor = cRng, size = size.tiny)
+    array.push(pLab, e)
+
+// grupo de tres velas + su rango efectivo. Devuelve la x siguiente.
+f_grupo(int x0, string nom, array<float> ao, array<float> ah, array<float> al,
+     array<float> ac, array<int> at, float vo, float vh, float vl, float vc, int vt) =>
+    n = array.size(ah)
+    paso = anchoV + huecoV
+    x = x0
+    [idx, dentro] = f_rango(ah, al)
+    rAlto = n >= 2 ? array.get(ah, idx) : na
+    rBajo = n >= 2 ? array.get(al, idx) : na
+    techo = math.max(vh, nz(rAlto, vh))
+    f_texto(x, techo, nom + (dentro > 0 ? "  ·  " + str.tostring(dentro) + " internas" : ""),
+         color.new(color.gray, 10), label.style_label_down)
+    // Vela 1: la del rango efectivo
+    if n >= 2
+        f_vela(x, array.get(ao, idx), rAlto, rBajo, array.get(ac, idx),
+             array.get(at, idx), false, "1")
+        x += paso
+    // Vela 2: la última cerrada, la del barrido
+    if n >= 1
+        f_vela(x, array.get(ao, n - 1), array.get(ah, n - 1), array.get(al, n - 1),
+             array.get(ac, n - 1), array.get(at, n - 1), false, "2")
+        x += paso
+    // Vela 3: la que está viva
+    f_vela(x, vo, vh, vl, vc, vt, true, "3")
+    xFin = x + anchoV
+    if verRango and not na(rAlto)
+        f_nivel(x0, xFin, rAlto, str.tostring(rAlto, format.mintick))
+        f_nivel(x0, xFin, rBajo, str.tostring(rBajo, format.mintick))
+    xFin + huecoG
+
+// rango efectivo de H4, para llevarlo al gráfico
+var float r4Alto = na
+var float r4Bajo = na
+if array.size(aH4) >= 2
+    [i4x, d4x] = f_rango(aH4, aL4)
+    r4Alto := array.get(aH4, i4x)
+    r4Bajo := array.get(aL4, i4x)
+
+if barstate.islast
+    f_limpia()
+    x = bar_index + sepIni
+    if verH4 and not na(o4)
+        x := f_grupo(x, "H4", aO4, aH4, aL4, aC4, aT4, o4, h4, l4, c4, t4)
+    if verH1 and not na(o1)
+        x := f_grupo(x, "H1", aO1, aH1, aL1, aC1, aT1, o1, h1, l1, c1, t1)
+
+// ═══ NIVELES SOBRE EL GRÁFICO ══════════════════════════════════════════════
+var float dh  = na
+var float dl  = na
+var float pdh = na
+var float pdl = na
+if na(idD[1]) or idD != idD[1]
+    pdh := dh
+    pdl := dl
+    dh  := high
+    dl  := low
+else
+    dh := math.max(dh, high)
+    dl := math.min(dl, low)
+
+plot(verDia ? pdh : na, "Máximo del día anterior", cDia, 1, plot.style_linebr)
+plot(verDia ? pdl : na, "Mínimo del día anterior", cDia, 1, plot.style_linebr)
+plot(enGrafico ? r4Alto : na, "Rango H4 · techo", cRng, 1, plot.style_linebr)
+plot(enGrafico ? r4Bajo : na, "Rango H4 · suelo",  cRng, 1, plot.style_linebr)
+
+// ── alertas ─────────────────────────────────────────────────────────────────
+alertcondition(not na(r4Alto) and ta.crossover(high, r4Alto), "Barrido del techo del rango H4")
+alertcondition(not na(r4Bajo) and ta.crossunder(low, r4Bajo), "Barrido del suelo del rango H4")
+alertcondition(not na(pdh) and ta.crossover(high, pdh), "Barrido del máximo del día anterior")
+alertcondition(not na(pdl) and ta.crossunder(low, pdl), "Barrido del mínimo del día anterior")

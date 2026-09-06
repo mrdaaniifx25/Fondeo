@@ -1,0 +1,433 @@
+<title>Cuatro Confirmaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F5F6F7; --panel:#FFFFFF; --panel-2:#EDEFF2;
+  --ink:#171A1F; --ink-2:#4B535F; --ink-3:#79828F;
+  --rule:#DDE1E6; --rule-2:#C8CED6;
+  --s1:#2E5EAA; --s2:#A66A18;
+  --s1-soft:rgba(46,94,170,.10); --s2-soft:rgba(166,106,24,.10);
+  --flag:#9C2F2F; --flag-soft:rgba(156,47,47,.09);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --panel:#1B1E24; --panel-2:#22262E;
+    --ink:#E7E9ED; --ink-2:#A8B0BC; --ink-3:#79828F;
+    --rule:#2C313A; --rule-2:#3B424D;
+    --s1:#4E8BE0; --s2:#BE8630;
+    --s1-soft:rgba(78,139,224,.14); --s2-soft:rgba(190,134,48,.14);
+    --flag:#D97A7A; --flag-soft:rgba(217,122,122,.12);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --panel:#1B1E24; --panel-2:#22262E;
+  --ink:#E7E9ED; --ink-2:#A8B0BC; --ink-3:#79828F;
+  --rule:#2C313A; --rule-2:#3B424D;
+  --s1:#4E8BE0; --s2:#BE8630;
+  --s1-soft:rgba(78,139,224,.14); --s2-soft:rgba(190,134,48,.14);
+  --flag:#D97A7A; --flag-soft:rgba(217,122,122,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16.5px; line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px}
+.col{max-width:64ch}
+h1,h2,h3{font-family:Newsreader,Georgia,serif; font-weight:600; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.4rem,6vw,3.6rem); line-height:1.06; letter-spacing:-.015em}
+h2{font-size:clamp(1.45rem,3.2vw,1.9rem); line-height:1.2; margin-bottom:.5rem}
+h3{font-size:1.08rem; font-weight:600; margin-bottom:.3rem}
+p{margin:0 0 1.05em}
+a{color:var(--s1)}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:.7rem;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); margin:0 0 1.1rem;
+}
+header{padding:76px 0 8px; border-bottom:1px solid var(--rule)}
+.lede{font-size:1.16rem; color:var(--ink-2); margin-top:1.4rem}
+.meta{
+  display:flex; flex-wrap:wrap; gap:8px 26px; margin:26px 0 30px;
+  font-family:"IBM Plex Mono",monospace; font-size:.74rem; color:var(--ink-3);
+  letter-spacing:.03em;
+}
+section{padding-top:56px}
+.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+
+/* veredicto */
+.verdict{
+  margin:38px 0 0; padding:30px 32px; background:var(--panel);
+  border:1px solid var(--rule); border-left:3px solid var(--flag); border-radius:3px;
+}
+.vgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:26px 30px; margin-top:22px}
+.stat .k{font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3); display:block; margin-bottom:5px}
+.stat .v{font-family:Newsreader,Georgia,serif; font-size:2.1rem; line-height:1;
+  font-variant-numeric:tabular-nums}
+.stat .n{font-size:.8rem; color:var(--ink-3); display:block; margin-top:5px}
+.bad{color:var(--flag)}
+
+/* figuras */
+figure{margin:30px 0 0; padding:24px 22px 18px; background:var(--panel);
+  border:1px solid var(--rule); border-radius:3px}
+figcaption{font-size:.84rem; color:var(--ink-2); margin-top:16px; padding-top:14px;
+  border-top:1px solid var(--rule)}
+.legend{display:flex; flex-wrap:wrap; gap:18px; margin-bottom:14px;
+  font-size:.82rem; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.sw{width:15px; height:2.5px; border-radius:2px; display:inline-block}
+.chart{width:100%; height:auto; display:block; overflow:visible}
+.grid line{stroke:var(--rule)}
+.axis text{fill:var(--ink-3); font-family:"IBM Plex Mono",monospace; font-size:10.5px}
+.endlab{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:500}
+
+/* tablas */
+.scroll{overflow-x:auto; margin-top:26px}
+table{border-collapse:collapse; width:100%; font-size:.9rem; min-width:460px}
+th,td{text-align:right; padding:9px 12px; border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:400;
+  border-bottom:1px solid var(--rule-2)}
+td.num{font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--panel-2)}
+tr.hi td{background:var(--flag-soft)}
+caption{caption-side:top; text-align:left; font-size:.84rem; color:var(--ink-2);
+  padding-bottom:12px}
+
+/* pasos del embudo */
+.steps{list-style:none; margin:26px 0 0; padding:0; counter-reset:s}
+.steps li{display:grid; grid-template-columns:auto 1fr auto; gap:16px; align-items:baseline;
+  padding:13px 0; border-bottom:1px solid var(--rule)}
+.steps .tag{font-family:"IBM Plex Mono",monospace; font-size:.7rem; color:var(--ink-3);
+  letter-spacing:.08em}
+.steps .cnt{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:.95rem}
+
+.note{background:var(--panel-2); border:1px solid var(--rule); border-radius:3px;
+  padding:20px 22px; margin-top:28px; font-size:.93rem; color:var(--ink-2)}
+.note strong{color:var(--ink)}
+.tip{position:fixed; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--panel); border:1px solid var(--rule-2); border-radius:3px;
+  padding:7px 10px; font-family:"IBM Plex Mono",monospace; font-size:11.5px;
+  color:var(--ink); box-shadow:0 4px 16px rgba(0,0,0,.14); z-index:9;
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+footer{margin-top:70px; padding-top:22px; border-top:1px solid var(--rule);
+  font-size:.82rem; color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Backtest · EURUSD · 2020-2026</p>
+  <h1>Las cuatro confirmaciones no confirman nada</h1>
+  <p class="lede col">La estrategia de barrido de liquidez con doble Liquidity Sweep en H4 y H1
+  y vela envolvente en M5, probada sobre 2,4 millones de velas de un minuto. Las entradas
+  resultan estadísticamente indistinguibles de entradas al azar tomadas en la misma franja horaria.</p>
+  <div class="meta">
+    <span>2.397.463 velas M1</span><span>HistData · EURUSD</span>
+    <span>ene 2020 — jul 2026</span><span>SL/TP resueltos a granularidad M1</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <h3>Veredicto</h3>
+  <p style="margin:0; color:var(--ink-2)">Con un coste realista de 1,2 pips por operación, el sistema
+  pierde el 84 % del capital. Sin costes queda en equilibrio exacto: la ventaja bruta es cero.</p>
+  <div class="vgrid">
+    <div class="stat"><span class="k">Operaciones</span><span class="v" id="v-ops"></span><span class="n">en 6 años y medio</span></div>
+    <div class="stat"><span class="k">Win rate</span><span class="v" id="v-wr"></span><span class="n">equilibrio a 1R: 50,00 %</span></div>
+    <div class="stat"><span class="k">Resultado</span><span class="v bad" id="v-r"></span><span class="n">R acumulados</span></div>
+    <div class="stat"><span class="k">Sin coste</span><span class="v" id="v-rs"></span><span class="n">R acumulados</span></div>
+  </div>
+</div>
+
+<section>
+  <h2>La curva es el coste</h2>
+  <div class="col">
+  <p>Las dos curvas parten del mismo capital y de las mismas 1.237 operaciones. Lo único que
+  las separa es el spread. La azul descuenta 1,2 pips por operación; la ocre no descuenta nada.</p>
+  <p>La ocre termina prácticamente donde empezó. Eso es lo que significa no tener ventaja:
+  el sistema no pierde por estar mal calibrado, pierde porque no gana nada con lo que pagar
+  el coste de operar.</p>
+  </div>
+  <figure>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--s1)"></i>Con coste de 1,2 pips</span>
+      <span><i class="sw" style="background:var(--s2)"></i>Sin coste (ventaja bruta)</span>
+    </div>
+    <svg id="eq" class="chart" viewBox="0 0 780 330" role="img"
+         aria-label="Curvas de capital con y sin coste de operación"></svg>
+    <figcaption>Capital desde 10.000 € arriesgando el 1 % por operación. El riesgo mediano
+    por operación es de 9,2 pips, así que 1,2 pips de coste equivalen al 13 % del riesgo.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Cada objetivo cae en su punto de equilibrio</h2>
+  <div class="col">
+  <p>Ésta es la prueba más elocuente. En un paseo aleatorio sin deriva, la probabilidad de
+  tocar <span class="num">+nR</span> antes que <span class="num">−1R</span> es exactamente
+  <span class="num">1/(1+n)</span>. Si una estrategia tiene ventaja, sus win rates deberían
+  superar ese umbral. Aquí lo clavan.</p>
+  </div>
+  <div class="scroll">
+    <table>
+      <caption>Win rate observado frente al umbral teórico de una entrada sin información. Calculado sobre las operaciones decididas por stop o por objetivo; excluye las cerradas por tiempo, que en la tabla de variantes sí cuentan y desplazan la cifra unas décimas.</caption>
+      <thead><tr><th>Objetivo</th><th>Observado</th><th>Equilibrio</th><th>Diferencia</th><th>p</th></tr></thead>
+      <tbody id="t-eq"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Tres controles, la misma respuesta</h2>
+  <div class="col">
+  <p>Un mal resultado puede venir de una estrategia mala o de una implementación mala.
+  Para separar las dos cosas hay que comparar contra referencias que compartan implementación.</p>
+  <p><strong>El espejo</strong> toma las mismas señales e invierte la dirección. Si las
+  confirmaciones acertaran la dirección, su reflejo tendría que ser simétricamente peor.
+  No lo es: los dos pierden lo mismo.</p>
+  <p><strong>Las entradas aleatorias</strong> se toman en la misma ventana horaria y con la
+  misma distribución de distancias de stop, pero en velas elegidas al azar y con la dirección
+  echada a suerte. Treinta corridas independientes.</p>
+  </div>
+  <figure>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--ink-3);height:9px;width:9px;border-radius:50%"></i>30 corridas aleatorias</span>
+      <span><i class="sw" style="background:var(--s1);height:11px;width:11px;border-radius:50%"></i>Estrategia real</span>
+      <span><i class="sw" style="background:var(--s2);height:11px;width:11px;border-radius:50%"></i>Espejo</span>
+    </div>
+    <svg id="ctl" class="chart" viewBox="0 0 780 150" role="img"
+         aria-label="Distribución de resultados aleatorios frente al resultado real"></svg>
+    <figcaption id="ctl-cap"></figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Los filtros sí funcionan. Simplemente no sirven.</h2>
+  <div class="col">
+  <p>Conviene descartar la explicación cómoda: que el backtest no encuentre nada porque las
+  condiciones nunca se cumplen. No es el caso. Cada confirmación descarta un volumen enorme
+  de velas y las cuatro juntas dejan 1.569 señales en seis años y medio, un ritmo perfectamente
+  compatible con el que describe el vídeo.</p>
+  </div>
+  <ul class="steps" id="embudo"></ul>
+</section>
+
+<section>
+  <h2>Catorce variantes, ninguna rentable</h2>
+  <div class="col">
+  <p>Traducir un vídeo a reglas mecánicas obliga a decidir cosas que el vídeo no precisa.
+  Cada decisión discutible se ha probado en las dos direcciones.</p>
+  </div>
+  <div class="scroll">
+    <table>
+      <caption>Profit factor por variante. Ninguna alcanza 1,0.</caption>
+      <thead><tr><th>Variante</th><th>Ops</th><th>Win rate</th><th>R total</th><th>Profit factor</th></tr></thead>
+      <tbody id="t-sens"></tbody>
+    </table>
+  </div>
+  <div class="note col">
+    <strong>Las variantes que menos pierden lo hacen por una razón mecánica, no por acertar más.</strong>
+    Exigir un cuerpo del 70 % en la envolvente sube el profit factor de 0,749 a 0,816, pero también
+    sube el riesgo medio de 11,7 a 12,5 pips. Con un coste fijo de 1,2 pips, un stop más ancho
+    diluye el peaje. El win rate apenas se mueve.
+  </div>
+</section>
+
+<section>
+  <h2>Resultado por año</h2>
+  <div class="scroll">
+    <table>
+      <caption>Sin un solo año rentable. La pérdida no depende del régimen de mercado.</caption>
+      <thead><tr><th>Año</th><th>Operaciones</th><th>Win rate</th><th>R total</th></tr></thead>
+      <tbody id="t-ano"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Lo que este informe no dice</h2>
+  <div class="col">
+  <p><strong>No dice que la estrategia no funcione en índices.</strong> El vídeo la demuestra
+  sobre el NASDAQ y aquí se ha probado sobre EURUSD. Los índices tienen otra microestructura:
+  huecos de apertura, arranques direccionales, sesión concentrada. El resultado podría ser
+  distinto y no está comprobado.</p>
+  <p><strong>No dice que los ocho trades del vídeo estén amañados.</strong> Con una moneda,
+  siete aciertos de ocho salen el 3,5 % de las veces. Lanzando monedas cada semana del año,
+  eso ocurre en 1,8 semanas. Enseñar la semana buena no requiere mala fe, solo elegir qué semana
+  enseñar.</p>
+  <p><strong>No dice que mi lectura de las reglas sea la única.</strong> Las definiciones de
+  sesión, de envolvente y de Liquidity Sweep son interpretaciones. Por eso están todas
+  parametrizadas y sometidas a sensibilidad: para que discrepar de una no obligue a rehacer
+  el trabajo.</p>
+  </div>
+</section>
+
+<footer>
+  Datos de HistData.com. Corregido un desfase de una hora en el 65 % de la muestra:
+  los sellos de tiempo siguen el reloj de Nueva York con horario de verano, no EST fijo
+  como documenta el proveedor. Verificado por el desplazamiento estacional del perfil de
+  volatilidad. Código y operaciones en el repositorio.
+</footer>
+</div>
+
+<div class="tip" id="tip"></div>
+<script>
+const D = {"embudo":{"velas M5":481987,"en ventana horaria":160794,"C1 nivel barrido":281069,"C2/C3 LS en H1":41802,"C2/C3 LS en H1+H4":36934,"C4 envolvente M5":72364,"senales (4 de 4)":1569},"ops":1237,"wr":50.04,"Rtot":-176.84,"Rtot_sin":1.21,"eq_con":1601.0,"eq_sin":9518.0,"serie":[{"f":"2020-01","n":1,"con":9870.7,"sin":9900.0},{"f":"2020-01","n":6,"con":9682.6,"sin":9799.0},{"f":"2020-01","n":11,"con":9528.2,"sin":9699.1},{"f":"2020-01","n":16,"con":9374.8,"sin":9600.2},{"f":"2020-01","n":21,"con":9402.7,"sin":9694.3},{"f":"2020-02","n":26,"con":9229.4,"sin":9595.4},{"f":"2020-02","n":31,"con":8829.5,"sin":9309.5},{"f":"2020-02","n":36,"con":9212.1,"sin":9784.4},{"f":"2020-03","n":41,"con":9069.8,"sin":9684.6},{"f":"2020-03","n":46,"con":8756.6,"sin":9396.0},{"f":"2020-04","n":51,"con":8456.7,"sin":9116.0},{"f":"2020-04","n":56,"con":8321.9,"sin":9023.0},{"f":"2020-04","n":61,"con":8526.6,"sin":9295.5},{"f":"2020-05","n":66,"con":8402.2,"sin":9200.7},{"f":"2020-05","n":71,"con":8278.4,"sin":9106.9},{"f":"2020-05","n":76,"con":8475.5,"sin":9381.9},{"f":"2020-05","n":81,"con":8182.4,"sin":9102.3},{"f":"2020-05","n":86,"con":7907.1,"sin":8831.1},{"f":"2020-06","n":91,"con":7929.5,"sin":8917.6},{"f":"2020-06","n":96,"con":7975.4,"sin":9005.0},{"f":"2020-06","n":101,"con":8020.0,"sin":9093.2},{"f":"2020-07","n":106,"con":7729.0,"sin":8822.3},{"f":"2020-07","n":111,"con":7897.5,"sin":9088.7},{"f":"2020-07","n":116,"con":7626.2,"sin":8817.9},{"f":"2020-08","n":121,"con":7661.4,"sin":8904.3},{"f":"2020-08","n":126,"con":7851.0,"sin":9173.2},{"f":"2020-08","n":131,"con":8035.8,"sin":9450.2},{"f":"2020-08","n":136,"con":7750.1,"sin":9168.6},{"f":"2020-08","n":141,"con":7928.1,"sin":9445.4},{"f":"2020-09","n":146,"con":7881.4,"sin":9432.7},{"f":"2020-09","n":151,"con":8064.6,"sin":9717.6},{"f":"2020-09","n":156,"con":7936.5,"sin":9618.5},{"f":"2020-10","n":161,"con":7817.5,"sin":9520.4},{"f":"2020-10","n":166,"con":7686.4,"sin":9423.3},{"f":"2020-10","n":171,"con":7387.7,"sin":9142.5},{"f":"2020-11","n":176,"con":7568.4,"sin":9418.6},{"f":"2020-11","n":181,"con":7458.2,"sin":9322.5},{"f":"2020-11","n":186,"con":7042.3,"sin":8865.6},{"f":"2020-11","n":191,"con":7058.2,"sin":8952.5},{"f":"2020-12","n":196,"con":7040.9,"sin":8974.0},{"f":"2020-12","n":201,"con":6922.0,"sin":8882.5},{"f":"2020-12","n":206,"con":6936.4,"sin":8969.5},{"f":"2020-12","n":211,"con":6958.7,"sin":9057.4},{"f":"2021-01","n":216,"con":6836.7,"sin":8965.0},{"f":"2021-01","n":221,"con":7010.4,"sin":9235.7},{"f":"2021-01","n":226,"con":6880.7,"sin":9141.6},{"f":"2021-02","n":231,"con":6502.5,"sin":8693.5},{"f":"2021-02","n":236,"con":6518.0,"sin":8778.7},{"f":"2021-02","n":241,"con":6379.7,"sin":8689.2},{"f":"2021-03","n":246,"con":6150.8,"sin":8430.3},{"f":"2021-03","n":251,"con":6163.9,"sin":8512.9},{"f":"2021-04","n":256,"con":6024.2,"sin":8426.0},{"f":"2021-04","n":261,"con":6010.3,"sin":8508.6},{"f":"2021-04","n":266,"con":5902.5,"sin":8421.8},{"f":"2021-04","n":271,"con":5914.1,"sin":8504.4},{"f":"2021-04","n":276,"con":6168.5,"sin":8938.2},{"f":"2021-05","n":281,"con":6301.8,"sin":9208.1},{"f":"2021-05","n":286,"con":6195.8,"sin":9114.2},{"f":"2021-05","n":291,"con":6087.7,"sin":9021.2},{"f":"2021-06","n":296,"con":6108.3,"sin":9109.6},{"f":"2021-06","n":301,"con":5877.5,"sin":8838.2},{"f":"2021-07","n":306,"con":5754.2,"sin":8748.0},{"f":"2021-07","n":311,"con":5888.8,"sin":9012.2},{"f":"2021-07","n":316,"con":5772.3,"sin":8920.3},{"f":"2021-07","n":321,"con":5666.0,"sin":8829.3},{"f":"2021-08","n":326,"con":5570.0,"sin":8739.3},{"f":"2021-08","n":331,"con":5532.4,"sin":8746.5},{"f":"2021-08","n":336,"con":5412.4,"sin":8657.3},{"f":"2021-09","n":341,"con":5624.1,"sin":9043.7},{"f":"2021-09","n":346,"con":5521.5,"sin":8951.5},{"f":"2021-10","n":351,"con":5524.9,"sin":9039.2},{"f":"2021-10","n":356,"con":5427.8,"sin":8947.0},{"f":"2021-10","n":361,"con":5320.4,"sin":8855.8},{"f":"2021-10","n":366,"con":5237.7,"sin":8765.4},{"f":"2021-11","n":371,"con":5130.2,"sin":8676.1},{"f":"2021-11","n":376,"con":5140.2,"sin":8761.1},{"f":"2021-11","n":381,"con":5256.3,"sin":9025.6},{"f":"2021-12","n":386,"con":5274.3,"sin":9114.1},{"f":"2021-12","n":391,"con":5272.9,"sin":9203.4},{"f":"2021-12","n":396,"con":5287.6,"sin":9293.5},{"f":"2022-01","n":401,"con":5194.2,"sin":9198.8},{"f":"2022-01","n":406,"con":5204.1,"sin":9288.9},{"f":"2022-02","n":411,"con":5017.4,"sin":9012.1},{"f":"2022-02","n":416,"con":4926.7,"sin":8920.2},{"f":"2022-02","n":421,"con":4947.8,"sin":9007.6},{"f":"2022-03","n":426,"con":4780.4,"sin":8739.2},{"f":"2022-03","n":431,"con":4992.1,"sin":9185.0},{"f":"2022-03","n":436,"con":4809.8,"sin":8911.3},{"f":"2022-03","n":441,"con":4828.4,"sin":8998.6},{"f":"2022-04","n":446,"con":4847.2,"sin":9086.8},{"f":"2022-04","n":451,"con":4968.5,"sin":9361.2},{"f":"2022-05","n":456,"con":4897.2,"sin":9265.7},{"f":"2022-05","n":461,"con":4726.1,"sin":8989.6},{"f":"2022-06","n":466,"con":4724.7,"sin":9077.7},{"f":"2022-06","n":471,"con":4752.6,"sin":9166.6},{"f":"2022-06","n":476,"con":4772.5,"sin":9256.4},{"f":"2022-07","n":481,"con":4888.6,"sin":9536.0},{"f":"2022-07","n":486,"con":4914.4,"sin":9629.4},{"f":"2022-07","n":491,"con":4936.6,"sin":9723.7},{"f":"2022-07","n":496,"con":4898.9,"sin":9683.0},{"f":"2022-08","n":501,"con":4925.8,"sin":9777.8},{"f":"2022-08","n":506,"con":4952.8,"sin":9873.6},{"f":"2022-08","n":511,"con":4787.3,"sin":9579.4},{"f":"2022-09","n":516,"con":4896.8,"sin":9868.7},{"f":"2022-09","n":521,"con":4911.8,"sin":9965.4},{"f":"2022-09","n":526,"con":4938.4,"sin":10063.0},{"f":"2022-09","n":531,"con":4863.9,"sin":9960.4},{"f":"2022-09","n":536,"con":4609.1,"sin":9472.3},{"f":"2022-10","n":541,"con":4545.8,"sin":9375.7},{"f":"2022-10","n":546,"con":4670.6,"sin":9658.8},{"f":"2022-10","n":551,"con":4605.7,"sin":9560.3},{"f":"2022-11","n":556,"con":4717.4,"sin":9849.0},{"f":"2022-11","n":561,"con":4558.0,"sin":9555.5},{"f":"2022-11","n":566,"con":4585.0,"sin":9649.1},{"f":"2022-12","n":571,"con":4613.1,"sin":9743.7},{"f":"2022-12","n":576,"con":4640.2,"sin":9839.1},{"f":"2022-12","n":581,"con":4574.7,"sin":9738.8},{"f":"2022-12","n":586,"con":4497.9,"sin":9639.5},{"f":"2023-01","n":591,"con":4248.3,"sin":9167.1},{"f":"2023-01","n":596,"con":4299.6,"sin":9334.2},{"f":"2023-01","n":601,"con":4147.9,"sin":9056.1},{"f":"2023-01","n":606,"con":4240.6,"sin":9329.6},{"f":"2023-02","n":611,"con":4256.4,"sin":9421.0},{"f":"2023-02","n":616,"con":4030.5,"sin":8959.3},{"f":"2023-03","n":621,"con":4052.1,"sin":9047.1},{"f":"2023-03","n":626,"con":3908.0,"sin":8777.5},{"f":"2023-04","n":631,"con":3996.0,"sin":9042.5},{"f":"2023-04","n":636,"con":3920.9,"sin":8950.3},{"f":"2023-05","n":641,"con":4092.3,"sin":9406.9},{"f":"2023-05","n":646,"con":4011.7,"sin":9310.9},{"f":"2023-05","n":651,"con":4027.7,"sin":9402.2},{"f":"2023-05","n":656,"con":3879.4,"sin":9122.0},{"f":"2023-06","n":661,"con":3949.8,"sin":9397.5},{"f":"2023-07","n":666,"con":3805.2,"sin":9117.4},{"f":"2023-07","n":671,"con":3977.5,"sin":9582.5},{"f":"2023-07","n":676,"con":3915.5,"sin":9484.8},{"f":"2023-08","n":681,"con":3849.2,"sin":9388.1},{"f":"2023-08","n":686,"con":3712.3,"sin":9108.3},{"f":"2023-08","n":691,"con":3751.6,"sin":9246.9},{"f":"2023-09","n":696,"con":3681.8,"sin":9152.6},{"f":"2023-09","n":701,"con":3621.7,"sin":9059.3},{"f":"2023-10","n":706,"con":3554.1,"sin":8966.9},{"f":"2023-10","n":711,"con":3424.5,"sin":8699.7},{"f":"2023-11","n":716,"con":3347.7,"sin":8611.0},{"f":"2023-11","n":721,"con":3404.5,"sin":8871.0},{"f":"2023-11","n":726,"con":3406.5,"sin":8957.9},{"f":"2023-11","n":731,"con":3413.9,"sin":9045.7},{"f":"2023-11","n":736,"con":3421.8,"sin":9134.3},{"f":"2023-12","n":741,"con":3296.7,"sin":8862.1},{"f":"2023-12","n":746,"con":3246.8,"sin":8771.8},{"f":"2023-12","n":751,"con":3313.6,"sin":9036.7},{"f":"2024-01","n":756,"con":3256.7,"sin":8944.5},{"f":"2024-01","n":761,"con":3335.2,"sin":9214.6},{"f":"2024-01","n":766,"con":3211.1,"sin":8940.0},{"f":"2024-02","n":771,"con":3157.5,"sin":8848.9},{"f":"2024-02","n":776,"con":3227.9,"sin":9116.1},{"f":"2024-02","n":781,"con":3143.0,"sin":8936.6},{"f":"2024-02","n":786,"con":3065.6,"sin":8845.5},{"f":"2024-03","n":791,"con":3070.1,"sin":8932.1},{"f":"2024-03","n":796,"con":2946.4,"sin":8666.0},{"f":"2024-04","n":801,"con":3008.1,"sin":8927.7},{"f":"2024-04","n":806,"con":2958.2,"sin":8836.6},{"f":"2024-04","n":811,"con":3081.2,"sin":9287.4},{"f":"2024-05","n":816,"con":3132.1,"sin":9567.8},{"f":"2024-05","n":821,"con":3077.2,"sin":9470.3},{"f":"2024-05","n":826,"con":2957.9,"sin":9188.1},{"f":"2024-06","n":831,"con":2948.2,"sin":9278.1},{"f":"2024-06","n":836,"con":2950.9,"sin":9369.0},{"f":"2024-07","n":841,"con":3014.7,"sin":9651.9},{"f":"2024-07","n":846,"con":3133.2,"sin":10144.3},{"f":"2024-07","n":851,"con":3185.9,"sin":10450.6},{"f":"2024-08","n":856,"con":3125.2,"sin":10344.0},{"f":"2024-08","n":861,"con":3116.1,"sin":10445.4},{"f":"2024-08","n":866,"con":3189.3,"sin":10760.8},{"f":"2024-09","n":871,"con":3135.5,"sin":10651.1},{"f":"2024-09","n":876,"con":3019.3,"sin":10333.7},{"f":"2024-10","n":881,"con":2971.6,"sin":10228.3},{"f":"2024-10","n":886,"con":2975.5,"sin":10328.5},{"f":"2024-10","n":891,"con":2851.0,"sin":10020.8},{"f":"2024-10","n":896,"con":2686.9,"sin":9529.6},{"f":"2024-11","n":901,"con":2748.2,"sin":9817.4},{"f":"2024-11","n":906,"con":2702.8,"sin":9717.3},{"f":"2024-11","n":911,"con":2718.1,"sin":9812.5},{"f":"2024-12","n":916,"con":2730.4,"sin":9908.7},{"f":"2024-12","n":921,"con":2800.0,"sin":10207.9},{"f":"2024-12","n":926,"con":2803.0,"sin":10307.9},{"f":"2025-01","n":931,"con":2804.5,"sin":10408.9},{"f":"2025-01","n":936,"con":2762.0,"sin":10302.7},{"f":"2025-01","n":941,"con":2780.6,"sin":10403.7},{"f":"2025-01","n":946,"con":2782.6,"sin":10505.6},{"f":"2025-02","n":951,"con":2738.3,"sin":10398.5},{"f":"2025-02","n":956,"con":2860.4,"sin":10928.9},{"f":"2025-02","n":961,"con":2862.1,"sin":11036.0},{"f":"2025-02","n":966,"con":2860.3,"sin":11144.1},{"f":"2025-03","n":971,"con":2930.9,"sin":11480.7},{"f":"2025-03","n":976,"con":2942.6,"sin":11593.1},{"f":"2025-04","n":981,"con":2898.5,"sin":11474.9},{"f":"2025-04","n":986,"con":2861.5,"sin":11357.9},{"f":"2025-04","n":991,"con":2935.7,"sin":11700.9},{"f":"2025-05","n":996,"con":2883.9,"sin":11581.6},{"f":"2025-05","n":1001,"con":2780.0,"sin":11236.5},{"f":"2025-05","n":1006,"con":2733.2,"sin":11121.9},{"f":"2025-05","n":1011,"con":2683.0,"sin":11008.4},{"f":"2025-06","n":1016,"con":2685.5,"sin":11116.3},{"f":"2025-06","n":1021,"con":2638.1,"sin":11002.9},{"f":"2025-07","n":1026,"con":2542.1,"sin":10675.1},{"f":"2025-07","n":1031,"con":2450.0,"sin":10357.0},{"f":"2025-07","n":1036,"con":2453.6,"sin":10458.5},{"f":"2025-07","n":1041,"con":2460.4,"sin":10560.9},{"f":"2025-08","n":1046,"con":2499.9,"sin":10843.4},{"f":"2025-08","n":1051,"con":2461.4,"sin":10732.8},{"f":"2025-08","n":1056,"con":2417.9,"sin":10623.3},{"f":"2025-09","n":1061,"con":2478.5,"sin":10944.1},{"f":"2025-09","n":1066,"con":2388.7,"sin":10618.0},{"f":"2025-09","n":1071,"con":2345.1,"sin":10509.7},{"f":"2025-09","n":1076,"con":2261.1,"sin":10196.6},{"f":"2025-10","n":1081,"con":2177.1,"sin":9892.7},{"f":"2025-10","n":1086,"con":2144.8,"sin":9791.8},{"f":"2025-10","n":1091,"con":2145.0,"sin":9887.8},{"f":"2025-11","n":1096,"con":2148.3,"sin":9984.7},{"f":"2025-11","n":1101,"con":2147.0,"sin":10082.5},{"f":"2025-11","n":1106,"con":2149.8,"sin":10181.3},{"f":"2025-12","n":1111,"con":2150.6,"sin":10281.0},{"f":"2025-12","n":1116,"con":2071.1,"sin":9974.7},{"f":"2025-12","n":1121,"con":2120.3,"sin":10275.9},{"f":"2025-12","n":1126,"con":2115.1,"sin":10376.6},{"f":"2026-01","n":1131,"con":2068.4,"sin":10270.8},{"f":"2026-01","n":1136,"con":2029.0,"sin":10166.0},{"f":"2026-01","n":1141,"con":1948.2,"sin":9863.1},{"f":"2026-01","n":1146,"con":1914.3,"sin":9762.5},{"f":"2026-02","n":1151,"con":1956.8,"sin":10057.3},{"f":"2026-02","n":1156,"con":1866.2,"sin":9653.2},{"f":"2026-02","n":1161,"con":1869.4,"sin":9747.7},{"f":"2026-03","n":1166,"con":1955.4,"sin":10245.0},{"f":"2026-03","n":1171,"con":1916.5,"sin":10140.5},{"f":"2026-03","n":1176,"con":1887.4,"sin":10037.1},{"f":"2026-04","n":1181,"con":1897.8,"sin":10135.4},{"f":"2026-04","n":1186,"con":1863.5,"sin":10032.1},{"f":"2026-05","n":1191,"con":1828.8,"sin":9929.8},{"f":"2026-05","n":1196,"con":1789.2,"sin":9828.5},{"f":"2026-05","n":1201,"con":1821.1,"sin":10125.3},{"f":"2026-05","n":1206,"con":1787.1,"sin":10022.0},{"f":"2026-06","n":1211,"con":1751.5,"sin":9919.8},{"f":"2026-06","n":1216,"con":1747.2,"sin":10017.0},{"f":"2026-06","n":1221,"con":1718.0,"sin":9914.9},{"f":"2026-07","n":1226,"con":1725.0,"sin":10012.0},{"f":"2026-07","n":1231,"con":1656.4,"sin":9713.7},{"f":"2026-07","n":1236,"con":1619.8,"sin":9614.6},{"f":"2026-07","n":1237,"con":1601.5,"sin":9518.5}],"azar":[-163.5,-105.6,-198.1,-163.8,-162.7,-168.6,-261.7,-126.3,-177.5,-173.6,-217.1,-216.5,-161.6,-217.5,-185.7,-203.3,-141.2,-147.8,-201.0,-175.4,-191.9,-190.4,-180.0,-187.4,-231.3,-212.7,-204.9,-181.8,-229.6,-218.3],"azar_media":-186.6,"azar_sd":33.1,"espejo":-181.3,"riesgo_med":9.2,"por_ano":[{"a":2020,"n":214,"wr":47.7,"R":-36.6},{"a":2021,"n":183,"wr":51.4,"R":-26.3},{"a":2022,"n":192,"wr":50.5,"R":-17.5},{"a":2023,"n":166,"wr":48.8,"R":-26.7},{"a":2024,"n":175,"wr":54.3,"R":-16.2},{"a":2025,"n":198,"wr":50.0,"R":-28.9},{"a":2026,"n":109,"wr":46.8,"R":-24.6}]};
+const $ = s => document.querySelector(s);
+const fmt = (n,d=0) => n.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});
+const tip = $('#tip');
+function showTip(e, html){ tip.innerHTML = html; tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - r.width - 10) + 'px';
+  tip.style.top  = Math.max(e.clientY - r.height - 12, 8) + 'px'; }
+function hideTip(){ tip.style.opacity = 0; }
+
+/* cifras del veredicto */
+$('#v-ops').textContent = fmt(D.ops);
+$('#v-wr').textContent  = fmt(D.wr,2) + ' %';
+$('#v-r').textContent   = fmt(D.Rtot,1);
+$('#v-rs').textContent  = '+' + fmt(D.Rtot_sin,2);
+
+/* ---------- curva de capital ---------- */
+(function(){
+  const W=780,H=330,L=52,R=112,T=14,B=32;
+  const s=D.serie, n=s.length;
+  const ys=s.flatMap(p=>[p.con,p.sin]);
+  const ymax=Math.ceil(Math.max(...ys)/2000)*2000, ymin=0;
+  const X=i=>L+i*(W-L-R)/(n-1);
+  const Y=v=>T+(1-(v-ymin)/(ymax-ymin))*(H-T-B);
+  let g='';
+  for(let v=ymin; v<=ymax; v+=2000){
+    g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+  }
+  let ax='';
+  for(let v=ymin; v<=ymax; v+=2000){
+    ax+=`<text x="${L-9}" y="${Y(v)+3.5}" text-anchor="end">${fmt(v/1000)}k</text>`;
+  }
+  const years=[...new Set(s.map(p=>p.f.slice(0,4)))];
+  years.forEach(y=>{ const i=s.findIndex(p=>p.f.slice(0,4)===y);
+    ax+=`<text x="${X(i)}" y="${H-10}" text-anchor="middle">${y}</text>`; });
+  const path=k=>s.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(p[k]).toFixed(1)).join(' ');
+  const last=s[n-1];
+  $('#eq').innerHTML=`
+    <g class="grid">${g}</g><g class="axis">${ax}</g>
+    <line x1="${L}" x2="${W-R}" y1="${Y(10000)}" y2="${Y(10000)}"
+          stroke="var(--rule-2)" stroke-dasharray="3 3"/>
+    <text class="axis" x="${W-R+6}" y="${Y(10000)-6}" fill="var(--ink-3)"
+          font-family="IBM Plex Mono" font-size="10">capital inicial</text>
+    <path d="${path('sin')}" fill="none" stroke="var(--s2)" stroke-width="2"
+          stroke-linejoin="round"/>
+    <path d="${path('con')}" fill="none" stroke="var(--s1)" stroke-width="2"
+          stroke-linejoin="round"/>
+    <circle cx="${X(n-1)}" cy="${Y(last.sin)}" r="3.5" fill="var(--s2)"
+            stroke="var(--panel)" stroke-width="2"/>
+    <circle cx="${X(n-1)}" cy="${Y(last.con)}" r="3.5" fill="var(--s1)"
+            stroke="var(--panel)" stroke-width="2"/>
+    <text class="endlab" x="${X(n-1)+9}" y="${Y(last.sin)+4}" fill="var(--s2)">${fmt(last.sin)} €</text>
+    <text class="endlab" x="${X(n-1)+9}" y="${Y(last.con)+4}" fill="var(--s1)">${fmt(last.con)} €</text>
+    <line id="cross" x1="0" x2="0" y1="${T}" y2="${H-B}" stroke="var(--rule-2)" opacity="0"/>
+    <rect id="hit" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/>`;
+  const svg=$('#eq'), cross=svg.querySelector('#cross');
+  svg.querySelector('#hit').addEventListener('mousemove',e=>{
+    const bb=svg.getBoundingClientRect();
+    const px=(e.clientX-bb.left)/bb.width*W;
+    let i=Math.round((px-L)/((W-L-R)/(n-1))); i=Math.max(0,Math.min(n-1,i));
+    cross.setAttribute('x1',X(i)); cross.setAttribute('x2',X(i)); cross.setAttribute('opacity','1');
+    showTip(e,`<b>${s[i].f}</b> · op. ${fmt(s[i].n)}<br>
+      <span style="color:var(--s1)">■</span> con coste ${fmt(s[i].con)} €<br>
+      <span style="color:var(--s2)">■</span> sin coste ${fmt(s[i].sin)} €`);
+  });
+  svg.querySelector('#hit').addEventListener('mouseleave',()=>{
+    cross.setAttribute('opacity','0'); hideTip(); });
+})();
+
+/* ---------- control ---------- */
+(function(){
+  const W=780,H=150,L=24,R=24,T=26,B=34;
+  const all=[...D.azar,D.Rtot,D.espejo];
+  const lo=Math.floor(Math.min(...all)/20)*20-10, hi=Math.ceil(Math.max(...all)/20)*20+10;
+  const X=v=>L+(v-lo)/(hi-lo)*(W-L-R);
+  const base=T+42;
+  let ax='', g='';
+  for(let v=Math.ceil(lo/40)*40; v<=hi; v+=40){
+    g+=`<line x1="${X(v)}" x2="${X(v)}" y1="${T}" y2="${base+30}"/>`;
+    ax+=`<text x="${X(v)}" y="${base+48}" text-anchor="middle">${v>0?'+':''}${v}R</text>`;
+  }
+  let dots='';
+  D.azar.forEach((v,i)=>{
+    const y=base+((i%6)-2.5)*7.4;
+    dots+=`<circle class="rnd" data-v="${v}" cx="${X(v)}" cy="${y.toFixed(1)}" r="4"
+            fill="var(--ink-3)" fill-opacity=".55" stroke="var(--panel)" stroke-width="1.5"/>`;
+  });
+  const mark=(v,c,lab,anchor,dx)=>`
+    <line x1="${X(v)}" x2="${X(v)}" y1="${T-4}" y2="${base+30}" stroke="${c}" stroke-width="1.5"/>
+    <circle cx="${X(v)}" cy="${base}" r="5.5" fill="${c}" stroke="var(--panel)" stroke-width="2"/>
+    <text class="endlab" x="${X(v)+dx}" y="${T-6}" text-anchor="${anchor}" fill="${c}">${lab}</text>`;
+  $('#ctl').innerHTML=`<g class="grid">${g}</g><g class="axis">${ax}</g>${dots}
+    ${mark(D.espejo,'var(--s2)','espejo '+fmt(D.espejo,1),'end',-7)}
+    ${mark(D.Rtot,'var(--s1)','real '+fmt(D.Rtot,1),'start',7)}`;
+  $('#ctl').querySelectorAll('.rnd').forEach(c=>{
+    c.addEventListener('mouseenter',e=>showTip(e,`corrida aleatoria<br><b>${c.dataset.v} R</b>`));
+    c.addEventListener('mouseleave',hideTip);
+  });
+  const z=((D.Rtot-D.azar_media)/D.azar_sd).toFixed(2);
+  $('#ctl-cap').innerHTML=`Las 30 corridas aleatorias promedian
+    <span class="num">${fmt(D.azar_media,1)} R</span> con una desviación típica de
+    <span class="num">${fmt(D.azar_sd,1)}</span>. La estrategia real cae a
+    <span class="num">${z>0?'+':''}${z}</span> desviaciones de esa media: dentro del ruido.
+    El espejo, que debería ser su opuesto, cae junto a ella.`;
+})();
+
+/* ---------- tablas ---------- */
+const eq=[['0,5R',66.93,66.67,'0,701'],['1R',50.04,50.00,'0,977'],
+          ['2R',32.79,33.33,'0,701'],['3R',24.64,25.00,'0,788']];
+$('#t-eq').innerHTML=eq.map(r=>`<tr><td>TP ${r[0]}</td>
+  <td class="num">${fmt(r[1],2)} %</td><td class="num">${fmt(r[2],2)} %</td>
+  <td class="num">${r[1]-r[2]>0?'+':''}${fmt(r[1]-r[2],2)}</td>
+  <td class="num">${r[3]}</td></tr>`).join('');
+
+const sens=[['Base (ventana horaria, H4, 1R)',1237,50.04,-176.84,0.749,1],
+ ['Sin coste de operación',1237,50.04,1.21,1.002,0],
+ ['Coste de 0,6 pips',1237,50.04,-87.82,0.867,0],
+ ['Sin filtro horario',2595,49.63,-508.57,0.671,0],
+ ['Sin confirmación de H4',1430,50.35,-196.65,0.757,0],
+ ['Solo niveles del día',560,49.64,-82.84,0.742,0],
+ ['Solo niveles de sesión',955,49.42,-148.06,0.730,0],
+ ['Envolvente con cuerpo ≥ 50 %',998,50.10,-136.38,0.758,0],
+ ['Envolvente con cuerpo ≥ 70 %',660,51.52,-66.08,0.816,0],
+ ['Objetivo 2R',1129,33.75,-169.26,0.801,0],
+ ['Objetivo 3R',1088,27.02,-134.58,0.851,0],
+ ['Objetivo 0,5R',1367,66.93,-188.05,0.633,0],
+ ['SL con 3 pips de colchón',1158,49.57,-138.13,0.786,0],
+ ['H4 anclado a las 17:00 de NY',1239,50.69,-159.94,0.770,0]];
+$('#t-sens').innerHTML=sens.map(r=>`<tr class="${r[5]?'hi':''}"><td>${r[0]}</td>
+  <td class="num">${fmt(r[1])}</td><td class="num">${fmt(r[2],2)} %</td>
+  <td class="num">${fmt(r[3],2)}</td><td class="num">${fmt(r[4],3)}</td></tr>`).join('');
+
+$('#t-ano').innerHTML=D.por_ano.map(r=>`<tr><td>${r.a}</td>
+  <td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.wr,1)} %</td>
+  <td class="num">${fmt(r.R,1)}</td></tr>`).join('');
+
+const pasos=[['C1','Un nivel de sesión o de día es barrido','C1 nivel barrido'],
+ ['C2','El barrido es un Liquidity Sweep en H1','C2/C3 LS en H1'],
+ ['C3','…y también en H4','C2/C3 LS en H1+H4'],
+ ['C4','Vela envolvente en M5','C4 envolvente M5']];
+const tot=D.embudo['velas M5'];
+$('#embudo').innerHTML=
+ `<li><span class="tag">—</span><span>Velas M5 en la muestra</span>
+   <span class="cnt">${fmt(tot)}</span></li>
+  <li><span class="tag">HORA</span><span>Dentro de la apertura de Londres o de Nueva York</span>
+   <span class="cnt">${fmt(D.embudo['en ventana horaria'])}</span></li>`
+ + pasos.map(p=>`<li><span class="tag">${p[0]}</span><span>${p[1]}</span>
+   <span class="cnt">${fmt(D.embudo[p[2]])}</span></li>`).join('')
+ + `<li><span class="tag">4/4</span><span><b>Las cuatro a la vez — señal</b></span>
+   <span class="cnt"><b>${fmt(D.embudo['senales (4 de 4)'])}</b></span></li>
+    <li><span class="tag">EJEC</span><span>Operaciones tras aplicar «una a la vez»</span>
+   <span class="cnt">${fmt(D.ops)}</span></li>`;
+</script>
