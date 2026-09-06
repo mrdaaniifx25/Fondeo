@@ -67,8 +67,11 @@ def dia_estr(g, gp, apert, buf, rr, usa_bias, sesgo):
         ia = int(aa[0])+1 if len(aa) else 10**9
         ib = int(bb[0])   if len(bb) else 10**9
         if ia == ib == 10**9: return None
-        return (rr if ia < ib else -1.0) - COSTE*U/(rgo/U)*1.0/ (rgo/U) * (rgo/U) - 0 \
-               if False else (rr if ia < ib else -1.0) - COSTE/(rgo/U)
+        # FALLO CORREGIDO: con objetivo "extremo opuesto" (rr=0) las ganadoras
+        # se puntuaban como 0,0 R en vez de su R real. Se calcula siempre a
+        # partir de la distancia real al objetivo.
+        gan = abs(tp-px)/rgo
+        return (gan if ia < ib else -1.0) - COSTE/(rgo/U)
     return None
 
 def rejilla(MM, et=""):
