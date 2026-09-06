@@ -106,3 +106,37 @@ for _, r in D.sort_values("z", ascending=False).head(10).iterrows():
           f"{str(bool(r.bias)):>6} {int(r.n):>6} {r.n/1700:>8.2f} {r.R:>+9.4f} {r.z:>+7.2f}")
 print(f"\n  mejor z {D.z.max():+.2f}  ·  celdas z>2 {int((D.z>2).sum())}/{len(D)}  ·  "
       f"celdas R>0 {int((D.R>0).sum())}/{len(D)}")
+
+# --------------------------------------------------------------------------
+# EL NULO · la MISMA rejilla sobre EURUSD con los bloques permutados.
+# Sin esto, un z de +4,72 sobre 36 celdas no significa nada: hoy mismo una
+# rejilla de 225 celdas sobre datos barajados dio +3,64.
+# --------------------------------------------------------------------------
+def baraja(x, bl=1440):
+    lr = np.diff(np.log(x.close.to_numpy()))
+    amp = ((x.high-x.low)/x.close).to_numpy()[1:]
+    nb = len(lr)//bl; o = rng.permutation(nb)
+    idx = (o[:,None]*bl + np.arange(bl)[None,:]).ravel()
+    px = x.close.iloc[0]*np.exp(np.cumsum(lr[idx])); m = len(px)
+    op = np.r_[x.close.iloc[0], px[:-1]]; a = amp[idx]*px
+    y = x.iloc[:m].copy()
+    y["open"], y["close"] = op, px
+    y["high"] = np.maximum(op, px) + a*rng.random(m)*0.5
+    y["low"]  = np.minimum(op, px) - a*rng.random(m)*0.5
+    return y
+
+print(f"\n=== {NULOS} NULOS ===")
+mx = []
+for k in range(NULOS):
+    N = rejilla(baraja(M))
+    if not len(N): continue
+    mx.append(N.z.max())
+    print(f"  nulo {k+1}: mejor z {N.z.max():+.2f}  ·  celdas z>2 "
+          f"{int((N.z>2).sum())}/{len(N)}  ·  celdas R>0 {int((N.R>0).sum())}/{len(N)}",
+          flush=True)
+if mx:
+    mx = np.array(mx)
+    print(f"\n  mejor z de un nulo: media {mx.mean():+.2f}  "
+          f"rango {mx.min():+.2f} a {mx.max():+.2f}")
+    print(f"  mejor z REAL: {D.z.max():+.2f}  ->  "
+          f"{'SUPERA a todos los nulos' if D.z.max() > mx.max() else 'NO supera'}")
