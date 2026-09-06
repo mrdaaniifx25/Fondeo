@@ -1,1 +1,14 @@
 EURUSD · 1717 dias · sesgo del dia k = signo(cierre[k-1]-cierre[k-2])
+
+=== EURUSD · 24 celdas · SESGO CORREGIDO ===
+    apert   buf   rr   bias      n    R neta       z
+    09:00   3.0    3   True    549   -0.2298   -3.13
+    09:00   3.0    2   True    566   -0.1948   -3.26
+    08:00   3.0    2   True    596   -0.1957   -3.36
+    08:00   3.0    2  False   1126   -0.1481   -3.46
+    08:00   3.0    3   True    570   -0.2502   -3.51
+    08:00   3.0    3  False   1083   -0.1903   -3.61
+    09:00   3.0    3  False   1106   -0.1967   -3.77
+    09:00   1.0    3   True    535   -0.2876   -3.87
+
+  mejor z -3.13 · celdas z>2 0/24 · celdas R>0 0/24
