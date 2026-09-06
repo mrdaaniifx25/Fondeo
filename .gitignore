@@ -4,3 +4,4 @@ data/raw2/
 data/raw3/
 __pycache__/
 data/simulador_casos.json
+data/ctrl_apertura.log
