@@ -215,3 +215,38 @@ Esto convierte la pregunta abierta de todo el proyecto en una pregunta con
 respuesta concreta y comprobable: **¿cuál es el spread medio real del XAUUSD
 en su cuenta, incluyendo las horas malas?** Si está por debajo de 0,35, la
 estrategia tiene sentido. Si ronda 0,50, no.
+
+## Control 7 · ¿solo gana si el oro sube?
+
+Pregunta del usuario, y era la que faltaba. 42 meses:
+
+                     meses    n   oro medio   estrategia   % meses +
+               el oro SUBE    28      +4,55 %      +2,80 %       71 %
+               el oro BAJA    14      -3,37 %      -0,17 %       43 %
+                     TODOS    42      +1,91 %      +1,81 %       62 %
+
+    correlación mensual con el oro   +0,361
+    beta al oro                      +0,393
+    alfa mensual                     +1,064 %
+
+**Casi todo el beneficio viene de los meses alcistas.** En los 14 meses de oro
+bajista la estrategia suma **-2,3 %**: nada.
+
+Pero no es simplemente estar comprado:
+
+    · beta 0,39: captura el 40 % del movimiento. Cuando el oro cae un 3,4 %
+      de media, ella pierde un 0,17 %. Casi plana en las caídas -por eso su
+      drawdown es -13,5 % contra el -28,8 % de comprar y esperar.
+    · alfa +1,06 % mensual, aunque estimada sobre solo 42 meses.
+
+Y en meses sueltos sí gana contra el oro:
+
+    2024-11   oro  -3,46 %   estrategia  +9,11 %
+    2026-03   oro -11,04 %   estrategia  +3,63 %
+
+**Lectura operativa:** necesita que el oro suba para ganar, pero no le hace
+daño que baje. Si el oro se queda lateral o bajista dos años, no pierde mucho
+pero no gana nada, y sigue pagando comisiones.
+
+Los 3,55 años que la miden fueron el mayor mercado alcista del oro de la
+década. **No hay dato de qué hace en un régimen que no está en la muestra.**
