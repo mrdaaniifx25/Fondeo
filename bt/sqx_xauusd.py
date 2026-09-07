@@ -29,8 +29,12 @@ COM_LOTE, SPREAD, SWAP = 6.0, float(os.environ.get("SPREAD", 0.2)), 35.0
 SUF = os.environ.get("SUF", "")
 ONZAS             = 100.0            # 1 lote de XAUUSD = 100 onzas -> 100 $/punto
 
-M = pd.concat([pd.read_parquet("data/xauusd_m1.parquet"),
-               pd.read_parquet("data/xauusd_m1_2026.parquet")], ignore_index=True)
+# DATOS=fuera -> 2020-2022, tres anos que ni yo ni la optimizacion de
+# StrategyQuant hemos visto. Es la prueba de verdad de esta estrategia.
+FUENTES = {"": ["data/xauusd_m1.parquet", "data/xauusd_m1_2026.parquet"],
+           "fuera": ["data/xauusd_m1_2020_2022.parquet"]}
+M = pd.concat([pd.read_parquet(f) for f in FUENTES[os.environ.get("DATOS", "")]],
+              ignore_index=True)
 M["ts"] = pd.to_datetime(M["ts"]); M = M.sort_values("ts").drop_duplicates("ts")
 M = M.reset_index(drop=True)
 print(f"CSV M1 · {len(M)} minutos · {M.ts.min()} -> {M.ts.max()}")

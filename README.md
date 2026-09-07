@@ -33,11 +33,16 @@ palanca contra el coste, el stop ancho, está medida y no funciona.
 
 ---
 
-## LO ÚNICO QUE SIGUE EN PIE
+## NO QUEDA NADA EN PIE
+
+La estrategia del oro era lo último. Con el XAUUSD de 2020-2022 delante
+—tres años que la optimización no vio— hace **−55,4 %**, negativa los tres
+años, y **−35,7 % incluso sin ningún coste**. Era una rotura al alza montada
+sobre la subida histórica del oro de 2023-2026. `RESULTADOS_sqx_fuera_muestra.md`
 
 | qué | dónde | estado |
 |---|---|---|
-| **Estrategia del oro** (rotura de 51 velas H1, XAUUSD) | `RESULTADOS_sqx_xauusd.md` · `RESULTADOS_sqx_coste_real.md` | spread real medido 0,08-0,20 $ contra un umbral de 0,52 $: **el coste deja de ser objeción**. CAGR 23,2 %, DD −12,7 %, t +2,08. Pendiente la prueba que la decide: XAUUSD 2020-2022 |
+| ~~**Estrategia del oro**~~ | `RESULTADOS_sqx_fuera_muestra.md` | **muerta**: +87,8 % dentro de muestra, −55,4 % fuera |
 | **Geometría de barreras** para pasar un reto | `RESULTADOS_cfd_fondeo.md` | 36,9 % fuera de muestra = el techo de azar. No es una señal |
 | **Prima de riesgo de los índices** | `RESULTADOS_anomalias.md` | +0,070 % diario, z +2,93. Real, y no alcanza para nada operable |
 
