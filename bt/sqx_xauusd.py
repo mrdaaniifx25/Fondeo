@@ -24,7 +24,9 @@ CAP0, RIESGO      = 100_000.0, 0.01
 GANN, NBAR, ATRN  = 5, 51, 95
 VALIDEZ, NSAL     = 10, 5
 H_INI, H_FIN      = 1*60+30, 23*60+30
-COM_LOTE, SPREAD, SWAP = 6.0, 0.2, 35.0
+import os
+COM_LOTE, SPREAD, SWAP = 6.0, float(os.environ.get("SPREAD", 0.2)), 35.0
+SUF = os.environ.get("SUF", "")
 ONZAS             = 100.0            # 1 lote de XAUUSD = 100 onzas -> 100 $/punto
 
 M = pd.concat([pd.read_parquet("data/xauusd_m1.parquet"),
@@ -112,15 +114,19 @@ while k < n - NSAL - 1:
                                pd.Timestamp(mt[mfin]), freq="D"))
     bruto = (sale - px)*ONZAS*lotes
     coste = COM_LOTE*lotes + SWAP*lotes*noches
+    # excursion adversa maxima: el peor punto FLOTANTE mientras estuvo abierta.
+    # Hace falta porque el limite diario de una prop firm mira el equity, no
+    # las operaciones cerradas.
+    peor = (float(ml[ment:mfin+1].min()) - px)*ONZAS*lotes - coste
     cap  += bruto - coste
     ops.append(dict(entrada=pd.Timestamp(mt[ment]), salida=pd.Timestamp(mt[mfin]),
                     px_ent=px, px_sal=sale, lotes=lotes, atr=atr, motivo=motivo,
                     noches=noches, bruto=bruto, coste=coste, neto=bruto-coste,
-                    capital=cap))
+                    peor=peor, capital=cap))
     # con posicion abierta no se generan senales: se reanuda tras la salida
     k = max(k+1, jsal)
 
-O = pd.DataFrame(ops); O.to_csv("data/sqx_xauusd_operaciones.csv", index=False)
+O = pd.DataFrame(ops); O.to_csv(f"data/sqx_xauusd_operaciones{SUF}.csv", index=False)
 print(f"\n{'='*70}\nRESULTADO\n{'='*70}")
 if not len(O): raise SystemExit("sin operaciones")
 ret = cap/CAP0 - 1

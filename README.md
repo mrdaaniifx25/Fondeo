@@ -27,7 +27,7 @@ palanca contra el coste, el stop ancho, está medida y no funciona.
 
 | qué | dónde | estado |
 |---|---|---|
-| **Estrategia del oro** (rotura de 51 velas H1, XAUUSD) | `RESULTADOS_sqx_xauusd.md` · `OPERATIVA_oro.md` | pasa sus 4 controles internos. **Depende de un dato que falta: el spread real del XAUUSD. Umbral 0,52 $** |
+| **Estrategia del oro** (rotura de 51 velas H1, XAUUSD) | `RESULTADOS_sqx_xauusd.md` · `RESULTADOS_sqx_coste_real.md` | spread real medido 0,08-0,20 $ contra un umbral de 0,52 $: **el coste deja de ser objeción**. CAGR 23,2 %, DD −12,7 %, t +2,08. Pendiente la prueba que la decide: XAUUSD 2020-2022 |
 | **Geometría de barreras** para pasar un reto | `RESULTADOS_cfd_fondeo.md` | 36,9 % fuera de muestra = el techo de azar. No es una señal |
 | **Prima de riesgo de los índices** | `RESULTADOS_anomalias.md` | +0,070 % diario, z +2,93. Real, y no alcanza para nada operable |
 

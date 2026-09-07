@@ -13,9 +13,11 @@ H, IDX = prepara(M)
 print(f"  {'spread':>8} {'comision':>9} {'swap':>7} | {'n':>5} {'ret':>9} "
       f"{'CAGR':>8} {'PF':>6} {'DD':>7} {'t':>6}")
 base = None
-for spr, com, swp in [(0.20,6,35), (0.30,6,35), (0.35,6,35), (0.50,6,35),
-                      (0.65,6,35), (0.80,6,35), (1.00,6,35),
-                      (0.35,10,50), (0.50,12,60), (0.20,0,0)]:
+# 2026-09: spread REAL medido por el usuario en FundingPips MT5 = 0,08-0,20 $
+for spr, com, swp in [(0.08,6,35), (0.14,6,35), (0.20,6,35),
+                      (0.08,10,35), (0.14,10,35), (0.20,10,35),
+                      (0.20,15,50), (0.20,6,70), (0.30,6,35), (0.50,6,35),
+                      (0.65,6,35), (1.00,6,35), (0.20,0,0)]:
     SPREAD, COM_LOTE, SWAP = spr, com, swp
     g = dict(globals()); g.update(SPREAD=spr, COM_LOTE=com, SWAP=swp)
     exec(compile(open("bt/sqx_controles.py").read().split("H, IDX = prepara(M)")[0]
