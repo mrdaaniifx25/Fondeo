@@ -6,3 +6,4 @@ __pycache__/
 data/simulador_casos.json
 data/ctrl_apertura.log
 data/crt_9am.csv
+data/ema_fibo_esto_ops.csv
