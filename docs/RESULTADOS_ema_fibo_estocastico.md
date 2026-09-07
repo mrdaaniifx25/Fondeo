@@ -127,3 +127,69 @@ estadística fina sino sentido común:
 
 1. **aplicarla a instrumentos que no habían opinado**, y
 2. **contar los grados de libertad de verdad** — 7 años, no 26.525 operaciones.
+
+
+---
+
+# Ampliación · ¿en algún par? ¿y si era un RSI?
+
+Dos preguntas del usuario: si funcionaba en algún par, y si el oscilador de la
+captura podía ser un RSI en vez de un estocástico. Código en
+`bt/ema_fibo_osciladores.py`. Todo con **z agrupado por año desde el
+principio**, que es la lección de arriba.
+
+Criterio declarado antes de mirar: para contar, algo tiene que dar z agrupado
+> 2 en un par **y** no ser negativo en los otros. Un efecto que cambia de signo
+entre pares no es un efecto.
+
+## Los tres pares de divisas
+
+    filtro                    EURUSD    GBPUSD    USDJPY   LOS TRES
+    sin filtro                 -3,75     -5,03     -4,08      -8,04
+    estocastico <=20/>=80      -0,08     -0,96     +0,22      -0,37
+    RSI <=30/>=70              +1,97     +0,84     +1,43      +2,21
+    RSI <=40/>=60              +0,92     -0,72     +0,44      +0,39
+
+**El estocástico está muerto en los tres.** El usuario tenía razón en dudar de
+la identificación.
+
+**El RSI 30/70 sale positivo en los tres a la vez**, dentro y fuera de muestra
+(+1,28 / +1,99) y en 6 de 7 años. Es lo único del proyecto que no cambia de
+signo entre pares. Pero son **127 entradas distintas en total** —unas 6,5 al
+año por par— y es 1 de 4 filtros probados, así que +2,21 no pasa una corrección
+por comparaciones múltiples.
+
+## La prueba que lo cierra
+
+Los mismos filtros, sin tocar nada, en **cuatro instrumentos que no han
+intervenido en ninguna elección**:
+
+    filtro                    NAS100    SPX500     GER40    XAUUSD   LOS CUATRO
+    sin filtro                 -4,92     -4,41     -1,73     -6,96       -11,21
+    estocastico <=20/>=80      +0,64     -0,50     +1,24     -3,75        -1,78
+    RSI <=30/>=70              -0,47     +1,15     +1,86     -0,89        +0,55
+    RSI <=40/>=60              -0,13     -0,15     +4,36     -4,26        -0,50
+
+    RSI 30/70 donde se encontro (3 pares FX)   +0,3086   z +2,21
+    RSI 30/70 en los 4 que NO participaron     +0,0861   z +0,55
+
+**No replica.** Dos positivos y dos negativos, y el conjunto en +0,55.
+
+## Los siete instrumentos juntos
+
+    filtro                         n    R neta       z   instrumentos +
+    RSI <=30/>=70              16324   +0,1840   +1,50          5/7
+    RSI <=40/>=60             116968   -0,0021   -0,03          3/7
+    estocastico <=20/>=80     162167   -0,0571   -1,14          3/7
+    sin filtro                998367   -0,1577  -10,29          0/7
+
+## Veredicto de la ampliación
+
+- **EMA + Fibonacci sin oscilador: negativo en los siete instrumentos**, z
+  −10,29. La entrada en el retroceso es una mala operación, punto.
+- **Estocástico: muerto**, −1,14 sobre los siete.
+- **RSI 30/70**: lo mejor que ha aparecido, +1,50 sobre los siete y positivo en
+  5 de 7 — pero **el número honesto es el de los instrumentos que no lo
+  eligieron, y ahí es +0,55.**
+
+Ninguna mezcla de EMA, Fibonacci y oscilador supera a su propio control.
