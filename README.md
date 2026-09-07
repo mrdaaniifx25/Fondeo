@@ -68,6 +68,8 @@ Por eso cada resultado de este repositorio lleva su nulo al lado.
 | Rango asiático (Tradinverso) | `RESULTADOS_rango_asiatico.md` | ventaja bruta real, solo a 3-4 pips de stop, donde el coste la come |
 | CRT en cascada hacia el objetivo semanal | `RESULTADOS_crt_cascada.md` | el objetivo semanal se alcanza 1,92 % contra un 3,19 % de azar. 80 % del bruto en 5 operaciones de 6.422 |
 | Modelo "9 a.m. CR" (ancla horaria fija) | `RESULTADOS_crt_9am.md` | +0,0146 bruto, z +0,61. Su propio control de detección señala Londres, no Nueva York |
+| Rango CRT dinámico por sesión (SmartRisk) | `RESULTADOS_crt_sesion.md` | celda primaria +0,0003, z +0,02. **El control de detección puntúa más alto que el modelo** |
+| "Londres forma el extremo del día" | `RESULTADOS_crt_sesion.md` | falso: Londres 14-20 % de los días, Nueva York 44-59 % |
 
 ---
 
