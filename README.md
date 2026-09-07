@@ -23,6 +23,16 @@ palanca contra el coste, el stop ancho, está medida y no funciona.
 
 ---
 
+## PARA MIRARLO TÚ MISMO
+
+| qué | dónde |
+|---|---|
+| **Simulador con las 4.454 señales reales** · velas H12, 2020-2026, cada operación con el azar geométrico al lado | `docs/simulador_crt.html` · [artefacto publicado](https://claude.ai/code/artifact/20ab4194-0116-4708-b946-891673a2b065) |
+| Indicador para TradingView con la misma estadística dentro | `pine/CRT_operativo.pine` |
+| Examen de 392 señales sin filtrar, preguntas y respuestas | `EXAMEN_crt.md` |
+
+---
+
 ## LO ÚNICO QUE SIGUE EN PIE
 
 | qué | dónde | estado |
