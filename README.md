@@ -10,6 +10,19 @@ tal cual salga — incluidos los fallos propios, que están todos documentados.
 
 ---
 
+## EL CIERRE DEL CRT
+`RESULTADOS_crt_final.md`
+
+La estrategia CRT ensamblada —todo lo que sobrevivió a las mediciones, elegida
+sin mirar el futuro— pierde dinero en **las 24 celdas** fuera de muestra. La
+ventaja bruta se apaga (21 de 24 celdas a la baja, p ≈ 0,0002) y la última
+palanca contra el coste, el stop ancho, está medida y no funciona.
+
+    2020-2023   +1,92 € por operacion    +2.091 €/año
+    2024-2026   -5,69 € por operacion    -6.424 €/año
+
+---
+
 ## LO ÚNICO QUE SIGUE EN PIE
 
 | qué | dónde | estado |
