@@ -5,3 +5,4 @@ data/raw3/
 __pycache__/
 data/simulador_casos.json
 data/ctrl_apertura.log
+data/crt_9am.csv
