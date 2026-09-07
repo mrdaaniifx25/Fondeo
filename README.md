@@ -66,6 +66,8 @@ Por eso cada resultado de este repositorio lleva su nulo al lado.
 | Barrido asiático (2 versiones) | `RESULTADOS_barrido_asiatico.md` · `RESULTADOS_lsweep_v1.md` | **bruta negativa**. Aciertan por debajo del azar geométrico |
 | Estrategia del grupo de NASDAQ | `RESULTADOS_grupo_nasdaq_2.md` | −0,044 bruto a su ritmo real de operativa |
 | Rango asiático (Tradinverso) | `RESULTADOS_rango_asiatico.md` | ventaja bruta real, solo a 3-4 pips de stop, donde el coste la come |
+| CRT en cascada hacia el objetivo semanal | `RESULTADOS_crt_cascada.md` | el objetivo semanal se alcanza 1,92 % contra un 3,19 % de azar. 80 % del bruto en 5 operaciones de 6.422 |
+| Modelo "9 a.m. CR" (ancla horaria fija) | `RESULTADOS_crt_9am.md` | +0,0146 bruto, z +0,61. Su propio control de detección señala Londres, no Nueva York |
 
 ---
 
@@ -90,6 +92,7 @@ Exige bankroll y repetición, no señal. Con una sola cuota, 83 % de perderla.
 | Control positivo (deriva inyectada) | `bt/control_positivo.py` |
 | Curva de detección (qué tamaño de ventaja vería el montaje) | `bt/ema_fibo_deteccion.py` |
 | Simulador de retos de fondeo | `bt/cfd_fondeo.py`, `bt/reto_montecarlo.py` |
+| Control de detección por ancla horaria | `bt/crt_9am.py` |
 
 ---
 
