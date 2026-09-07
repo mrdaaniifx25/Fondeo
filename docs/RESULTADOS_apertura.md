@@ -107,3 +107,60 @@ muestra antes de convertirlo en regla operativa.
     · la R fuera de muestra es +0,25 con z +1,85: consistente, no demostrado
     · sin datos de spread reales del usuario para GBPUSD y USDJPY
     · nunca se ha operado hacia delante: cero evidencia en tiempo real
+
+---
+
+# RETRACTADO · el resultado era una mirada al futuro
+
+**Todo lo de arriba queda anulado.** El filtro de sesgo usaba el cierre diario
+del PROPIO día:
+
+    b1 = np.sign(D1.c.diff())        # velas diarias
+    sg = int(b1[k])                  # sesgo del dia k
+
+`b1[k]` es el signo del cierre de hoy contra el de ayer. Operando a las 08:00,
+ese cierre ocurre **16 horas despues**. Comprobado con fechas reales:
+
+    k= 500   el cierre usado termina  2021-12-03 00:00
+             pero se opera a las      2021-12-02 08:00
+
+5 de 5 comprobaciones miran al futuro. Y era la pieza central: **las seis
+mejores celdas de los tres instrumentos llevaban el sesgo activado.**
+
+## El resultado con el sesgo corregido
+
+Sesgo = signo(cierre[k-1] − cierre[k-2]), los dos cerrados antes de que
+empiece el dia k. Codigo en `bt/apertura_v2.py`.
+
+     apert   buf   rr   bias      n    R neta       z
+     09:00   3.0    3   True    549   -0.2298   -3.13
+     09:00   3.0    2   True    566   -0.1948   -3.26
+     08:00   3.0    2   True    596   -0.1957   -3.36
+     08:00   3.0    2  False   1126   -0.1481   -3.46
+     08:00   3.0    3   True    570   -0.2502   -3.51
+
+     mejor z -3.13  ·  celdas z>2: 0/24  ·  celdas R>0: 0/24
+
+**Las 24 negativas.** Y las celdas SIN filtro de sesgo tambien pierden, asi
+que el barrido de la vela de apertura no tiene nada por si solo.
+
+## Queda anulado
+
+    el z +4,72 de EURUSD
+    la replica en GBPUSD (+4,70) y USDJPY (+4,11)
+    la correlacion ajuste/fuera de muestra de +0,935
+    los cuatro nulos superados
+    el analisis por regimen de volatilidad
+    la cartera de siete instrumentos
+
+Todo eso validaba una estrategia que incluia el fallo. El metodo era correcto;
+lo que validaba, no.
+
+## Por que se encontro tarde
+
+Se reviso por adelantado la mirada al futuro en la vela de entrada y en el
+momento de la confirmacion. **No se reviso la causalidad del filtro de
+sesgo**, que es donde estaba. Aparecio al repasar el codigo para contestar a
+la pregunta "¿que porcentaje de validacion lleva?".
+
+Cuatro horas presentado como el hallazgo del proyecto.
