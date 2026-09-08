@@ -15,6 +15,19 @@ repositorio, no del material de los cursos.
 | 7 | **La criba de los 10 segundos** — calculadora de viabilidad | [artefacto](docs/leccion7_la_criba.html) | `docs/RESULTADOS_crt_temporalidad.md` |
 | 8 | El registro: cómo medir si su propio criterio añade algo | pendiente | simulador, modo ciego |
 
+## Un aviso sobre el marco
+
+Las lecciones 4, 5 y 6 están dadas sobre **EURUSD en H4**. Esa elección fue
+didáctica, no empírica: en H4 hay 348 operaciones al año, se ven muchos patrones
+en poco tiempo, y es la rejilla que él tiene en pantalla.
+
+**H4 es además el marco donde la aritmética dice que no.** Neta media −0,030 R,
+sólo 2 de 5 instrumentos por encima de cero y los dos en +0,009 y +0,002, o sea
+cero. El desglose y la comprobación de que su rejilla de TradingView da lo mismo
+que la del estudio están en `RESULTADOS_rejilla_y_marco.md`.
+
+Así que: H4 para aprender el mecanismo, sí. H4 para operarlo, no.
+
 ## La lección 7 en una línea
 
 ```
