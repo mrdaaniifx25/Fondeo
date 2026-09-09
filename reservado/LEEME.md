@@ -11,3 +11,15 @@ independiente después de haber publicado la primera. Si se mezcla, se pierde:
 no hay forma de volver a hacer ciegos unos datos que ya se han visto.
 
 `bt/load_nuevos.py` solo lee `material/`. Esta carpeta no la toca.
+
+---
+
+# ABIERTO · 2026-09-09
+
+Estos ficheros **ya se han usado**, en la pasada única de
+`docs/PREREGISTRO_londres_sesion.md`. El resultado está en
+`docs/RESULTADOS_londres_ciego.md`.
+
+**Dejan de ser ciegos.** No pueden servir para ninguna prueba futura. Si hace
+falta otra, hay que conseguir instrumentos o periodos que no hayan participado
+en nada.
