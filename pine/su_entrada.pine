@@ -1,0 +1,330 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// at https://mozilla.org/MPL/2.0/
+//
+//  SU ENTRADA · la regla tal y como la opera, con el lotaje dentro
+//
+//  Pensado para convivir con el indicador "Sesiones": mismo huso, mismas
+//  killzones, mismos colores, y NO vuelve a dibujar cajas ni niveles de sesión
+//  — de eso se encarga el otro. Éste sólo marca la entrada.
+//
+//  LA REGLA, la suya, medida en bt/su_regla_instrumentos.py:
+//      cuerpo de la ÚLTIMA vela de M5 cerrada
+//      cierre de una M1 por encima  -> compra
+//      cierre de una M1 por debajo  -> venta
+//      stop      = extremo de los últimos 10 minutos (incluida la de entrada)
+//      objetivo  = 1:2
+//      no repite señal del mismo lado antes de 4 minutos
+//
+//  LO QUE SE LE HA AÑADIDO, y es lo único nuevo de esta semana:
+//      · stop mínimo de 7 pips. Por debajo, el coste se lleva más del 20 % del
+//        riesgo y el 1:2 deja de serlo. Esas señales salen en gris y no cuentan.
+//      · el LOTAJE, calculado para arriesgar siempre lo mismo:
+//            lotes = riesgo € / (pips de stop x valor del pip por lote)
+//      · el objetivo en precio, para copiarlo a MT5.
+//
+//  QUÉ HAY MEDIDO Y QUÉ NO, para que no se lea esto como una promesa:
+//
+//    · la regla a ciegas, EURUSD 2020-2026, 1.725 días, 85.453 señales
+//      (49,5 al día). Con cada nivel de stop mínimo:
+//
+//        mínimo   quedan   al día   acierto   R:R real   necesita
+//           0 p    100 %     49,5     31,3 %      1,30     43,5 %
+//           6 p     33 %     16,1     29,9 %      1,55     39,1 %
+//        >> 7 p     24 %     11,8     29,6 %      1,60     38,5 %
+//          10 p      9 %      4,6     28,2 %      1,69     37,2 %
+//          15 p      2 %      1,2     26,8 %      1,78     36,0 %
+//
+//      Dos cosas hay que leer ahí y las dos importan:
+//
+//      1. El mínimo de 7 pips NO deja el gráfico vacío: quedan casi 12 señales
+//         al día. Los 15 pips que se probaron antes sí lo dejaban (1,2 al día).
+//
+//      2. El acierto BAJA al filtrar, de 31,3 % a 29,6 %. El filtro estrecha la
+//         distancia —de 12,2 puntos a 8,9— porque baja lo que hace falta, no
+//         porque la regla mejore. A ciegas sigue perdiendo en todos los niveles.
+//
+//      O sea: la regla SOLA pierde, y ensanchar el stop no la arregla. Lo que
+//      no está medido es su criterio al elegir cuál de esas 12 señales diarias
+//      toma. Ésos son los 8,9 puntos que tiene que poner usted, y es lo único
+//      que el registro puede contestar.
+//
+//    · el filtro de "barrido de nivel de sesión" NO está medido. Está aquí
+//      porque es lo que hacen sus operaciones reales del 8 y el 10 de
+//      septiembre, no porque haya pasado ninguna prueba. Trátelo como una
+//      hipótesis suya, no como un hallazgo.
+//
+//  Ponlo en un gráfico de M1. En otra temporalidad no significa nada.
+//
+//  Detalle: la ventana de Pine excluye el minuto final (0800-1130 llega hasta
+//  las 11:29), un minuto menos que el backtest. Son 3 señales de 85.453.
+//
+//  AVISO: escrito sin poder compilarlo aquí. Si TradingView se queja, pega el
+//  error tal cual.
+//@version=6
+indicator("Su entrada", overlay = true, max_labels_count = 500,
+     max_lines_count = 500, max_boxes_count = 500)
+
+// ─── horario · mismas opciones que el indicador Sesiones ───────────────────
+gT = "Horario"
+tz = input.string("Europe/Madrid", "Huso horario", group = gT,
+     options = ["Europe/Madrid", "America/New_York", "UTC"])
+hIni = input.string("0800", "Empieza a operar", group = gT)
+hFin = input.string("1130", "Deja de operar",   group = gT,
+     tooltip = "Formato HHMM. Fuera de esta ventana no se marca nada.")
+dias = input.string("23456", "Días", group = gT,
+     tooltip = "1 domingo, 2 lunes … 7 sábado. 23456 = de lunes a viernes.")
+
+// ─── la regla ──────────────────────────────────────────────────────────────
+gR = "La regla"
+sep   = input.int(4,  "Minutos sin repetir el mismo lado", 0, 60, group = gR)
+retro = input.int(10, "Minutos hacia atrás para el stop",  1, 60, group = gR)
+rr    = input.float(2.0, "Objetivo (múltiplos del riesgo)", 0.1, 10, 0.1, group = gR)
+
+// ─── tamaño ────────────────────────────────────────────────────────────────
+gL = "Riesgo y lotaje"
+riesgo  = input.float(150, "Riesgo por operación (€)", 1, 100000, 5, group = gL)
+valPip  = input.float(8.60, "Valor del pip por lote (€)", 0.01, 1000, 0.01,
+     group = gL, tooltip = "EURUSD y GBPUSD: 8,60 € por lote y pip, con la " +
+     "cuenta en euros y el par cerca de 1,16. Compruébalo en tu bróker.")
+minPips = input.float(7.0, "Stop mínimo (pips)", 0, 100, 0.5, group = gL,
+     tooltip = "Por debajo de 7 pips el coste se lleva más del 20 % del riesgo " +
+     "y su 1:2 se convierte en poco más de un 1:1. Esas señales salen en gris.")
+coste   = input.float(1.43, "Coste ida y vuelta (pips)", 0, 50, 0.01, group = gL,
+     tooltip = "Medido en su cuenta el 28-08-2026: 0,85 de spread más 5 €/lote " +
+     "de comisión.")
+
+// ─── filtro opcional de barrido ────────────────────────────────────────────
+gB = "Barrido de nivel de sesión · NO está medido"
+usarBar = input.bool(false, "Sólo tras barrer un nivel de sesión", group = gB,
+     tooltip = "Es lo que hacen sus operaciones reales, pero no ha pasado " +
+     "ninguna prueba. Apagado por defecto a propósito.")
+minBar  = input.int(30, "Minutos que vale el barrido", 1, 240, group = gB)
+
+// ─── dibujo ────────────────────────────────────────────────────────────────
+gD = "Dibujo"
+verCajas = input.bool(true, "Riesgo y objetivo de cada entrada", group = gD)
+verEtq   = input.bool(true, "Etiqueta con el lotaje", group = gD)
+verGris  = input.bool(true, "Mostrar también las descartadas", group = gD)
+verTabla = input.bool(true, "Tabla de recuento", group = gD)
+cCompra  = input.color(#2F6FD0, "Compra", group = gD, inline = "c")
+cVenta   = input.color(#E08A2B, "Venta",  group = gD, inline = "c")
+cGris    = input.color(color.new(#8E8E93, 35), "Descartada", group = gD)
+
+// ─── ventana ───────────────────────────────────────────────────────────────
+enSesion(string sp) => not na(time(timeframe.period, sp + ":" + dias, tz))
+bool dentro = enSesion(hIni + "-" + hFin)
+int  mDia   = hour(time, tz) * 60 + minute(time, tz)
+bool nuevoDia = na(time[1]) or dayofmonth(time, tz) != dayofmonth(time[1], tz)
+
+float pip = syminfo.type == "forex" ? syminfo.mintick * 10 : syminfo.mintick
+
+// ─── barrido de un extremo reciente (filtro opcional) ──────────────────────
+// El nivel es el extremo de la sesión previa que el indicador Sesiones dibuja.
+// Aquí se recalcula en corto: el máximo y el mínimo de las 08:00 hacia atrás.
+var float preHi = na
+var float preLo = na
+var float diaHi = na
+var float diaLo = na
+if nuevoDia
+    preHi := diaHi
+    preLo := diaLo
+    diaHi := high
+    diaLo := low
+else
+    diaHi := na(diaHi) ? high : math.max(diaHi, high)
+    diaLo := na(diaLo) ? low  : math.min(diaLo, low)
+
+var int ultBarAlto = -9999
+var int ultBarBajo = -9999
+if not na(preHi) and high > preHi
+    ultBarAlto := mDia
+if not na(preLo) and low < preLo
+    ultBarBajo := mDia
+
+// ─── cuerpo de la última M5 CERRADA, construido desde el propio M1 ─────────
+var int   cuboAct = na
+var float aOpen   = na
+var float aClose  = na
+var int   cuboPre = na
+var float pOpen   = na
+var float pClose  = na
+
+if nuevoDia
+    cuboAct := na
+    aOpen   := na
+    aClose  := na
+    cuboPre := na
+    pOpen   := na
+    pClose  := na
+
+if dentro
+    int c = math.floor(mDia / 5)
+    if na(cuboAct)
+        cuboAct := c
+        aOpen   := open
+        aClose  := close
+    else if c != cuboAct
+        cuboPre := cuboAct                    // el cubo anterior acaba de cerrar
+        pOpen   := aOpen
+        pClose  := aClose
+        cuboAct := c
+        aOpen   := open
+        aClose  := close
+    else
+        aClose  := close
+
+bool hayCuerpo = dentro and not na(cuboPre) and cuboPre == math.floor(mDia / 5) - 1
+float cLo = hayCuerpo ? math.min(pOpen, pClose) : na
+float cHi = hayCuerpo ? math.max(pOpen, pClose) : na
+
+// ─── el disparo ────────────────────────────────────────────────────────────
+var int ultMin  = -999
+var int ultLado = 0
+if nuevoDia
+    ultMin  := -999
+    ultLado := 0
+
+int lado = hayCuerpo ? (close > cHi ? 1 : close < cLo ? -1 : 0) : 0
+bool repetida = lado != 0 and mDia - ultMin < sep and lado == ultLado
+bool dispara  = lado != 0 and not repetida
+
+// el barrido tiene que ser del lado contrario: para vender, haber barrido arriba
+bool barrido = not usarBar or (lado > 0 ? mDia - ultBarBajo <= minBar
+                                        : mDia - ultBarAlto <= minBar)
+
+float stop = lado > 0 ? ta.lowest(low, retro) : ta.highest(high, retro)
+float ent  = close
+float rgo  = math.abs(ent - stop)
+float obj  = ent + lado * rr * rgo
+float rgoP = rgo / pip
+float lotes = rgoP > 0 ? riesgo / (rgoP * valPip) : na
+
+bool vale  = dispara and barrido and rgo > 0
+bool pasa  = vale and rgoP >= minPips
+bool pinta = vale and (pasa or verGris)
+
+if vale
+    ultMin  := mDia
+    ultLado := lado
+
+// ─── operaciones vivas ─────────────────────────────────────────────────────
+var array<int>   opLado = array.new<int>()
+var array<float> opStop = array.new<float>()
+var array<float> opObj  = array.new<float>()
+var array<box>   opCaja = array.new<box>()
+var array<line>  opLin  = array.new<line>()
+var array<bool>  opPasa = array.new<bool>()
+
+var int nTot  = 0
+var int nPasa = 0
+var int nTP   = 0
+var int nSL   = 0
+var int nFin  = 0
+
+// Se resuelve ANTES de crear: si no, una señal podría cerrarse contra su propia
+// vela de entrada, que es mirar al futuro.
+if array.size(opLado) > 0
+    for i = array.size(opLado) - 1 to 0
+        int   L = array.get(opLado, i)
+        float S = array.get(opStop, i)
+        float O = array.get(opObj,  i)
+        bool  P = array.get(opPasa, i)
+        bool  tocaS = L > 0 ? low  <= S : high >= S
+        bool  tocaO = L > 0 ? high >= O : low  <= O
+        bool  fin = not dentro or barstate.islast
+        if tocaS or tocaO or fin
+            string res = tocaS ? "SL" : tocaO ? "TP" : "fuera"
+            if P and res == "TP"
+                nTP := nTP + 1
+            if P and res == "SL"
+                nSL := nSL + 1
+            if P and res == "fuera"
+                nFin := nFin + 1
+            box b = array.get(opCaja, i)
+            line l = array.get(opLin,  i)
+            if not na(b)
+                box.set_right(b, bar_index)
+                if res != "TP"
+                    box.set_bgcolor(b, color.new(#d03b3b, 88))
+                    box.set_border_color(b, color.new(#d03b3b, 40))
+            if not na(l)
+                line.set_x2(l, bar_index)
+                if res == "TP"
+                    line.set_color(l, #0ca30c)
+                    line.set_style(l, line.style_solid)
+            array.remove(opLado, i)
+            array.remove(opStop, i)
+            array.remove(opObj,  i)
+            array.remove(opCaja, i)
+            array.remove(opLin,  i)
+            array.remove(opPasa, i)
+        else if not na(array.get(opCaja, i))
+            box.set_right(array.get(opCaja, i), bar_index)
+            line.set_x2(array.get(opLin, i),  bar_index)
+
+if pinta
+    nTot := nTot + 1
+    if pasa
+        nPasa := nPasa + 1
+    color cc = pasa ? (lado > 0 ? cCompra : cVenta) : cGris
+    box caja = na
+    line lin = na
+    if verCajas and pasa
+        caja := box.new(bar_index, ent, bar_index, stop, border_color = cc,
+             border_width = 1, bgcolor = color.new(cc, 90))
+        lin  := line.new(bar_index, obj, bar_index, obj, color = cc, width = 1,
+             style = line.style_dotted)
+    if verEtq
+        string txt = pasa
+             ? str.tostring(lotes, "#.##") + " lotes\n" + str.tostring(rgoP, "#.#")
+               + " p · obj " + str.tostring(obj, format.mintick)
+             : str.tostring(rgoP, "#.#") + " p"
+        label.new(bar_index, lado > 0 ? low : high, txt,
+             style = lado > 0 ? label.style_label_up : label.style_label_down,
+             color = color.new(cc, pasa ? 15 : 60), textcolor = color.white,
+             size = pasa ? size.small : size.tiny)
+    array.push(opLado, lado)
+    array.push(opStop, stop)
+    array.push(opObj,  obj)
+    array.push(opCaja, caja)
+    array.push(opLin,  lin)
+    array.push(opPasa, pasa)
+
+// ─── las flechas ───────────────────────────────────────────────────────────
+plotshape(pinta and pasa and lado > 0, "Compra", shape.triangleup,
+     location.belowbar, cCompra, size = size.tiny)
+plotshape(pinta and pasa and lado < 0, "Venta",  shape.triangledown,
+     location.abovebar, cVenta,  size = size.tiny)
+plotshape(pinta and not pasa and lado > 0, "Compra descartada", shape.circle,
+     location.belowbar, cGris, size = size.tiny)
+plotshape(pinta and not pasa and lado < 0, "Venta descartada",  shape.circle,
+     location.abovebar, cGris, size = size.tiny)
+
+// ─── la tabla ──────────────────────────────────────────────────────────────
+var table T = table.new(position.top_right, 2, 6, border_width = 1)
+if verTabla and barstate.islast
+    int res = nTP + nSL
+    float ac = res > 0 ? nTP / res : na
+    float geo = 1.0 / (1.0 + rr)
+    // acierto que hace falta con el coste puesto, al stop mínimo declarado
+    float x = minPips > 0 ? coste / minPips : 0
+    float rreal = (rr - x) / (1 + x)
+    float nec = 1.0 / (1.0 + rreal)
+    table.cell(T, 0, 0, "en el gráfico", text_size = size.small,
+         bgcolor = color.new(#8E8E93, 80))
+    table.cell(T, 1, 0, "", text_size = size.small, bgcolor = color.new(#8E8E93, 80))
+    table.cell(T, 0, 1, "señales", text_size = size.small)
+    table.cell(T, 1, 1, str.tostring(nTot), text_size = size.small)
+    table.cell(T, 0, 2, "pasan el mínimo", text_size = size.small)
+    table.cell(T, 1, 2, str.tostring(nPasa) + (nTot > 0 ? "  ("
+         + str.tostring(100.0 * nPasa / nTot, "#.#") + " %)" : ""), text_size = size.small)
+    table.cell(T, 0, 3, "TP / SL", text_size = size.small)
+    table.cell(T, 1, 3, str.tostring(nTP) + " / " + str.tostring(nSL),
+         text_size = size.small)
+    table.cell(T, 0, 4, "acierto", text_size = size.small)
+    table.cell(T, 1, 4, na(ac) ? "-" : str.tostring(ac * 100, "#.#") + " %",
+         text_size = size.small,
+         text_color = na(ac) ? color.gray : ac > nec ? #0ca30c : #d03b3b)
+    table.cell(T, 0, 5, "necesitas (con coste)", text_size = size.small)
+    table.cell(T, 1, 5, str.tostring(nec * 100, "#.#") + " %  ·  azar "
+         + str.tostring(geo * 100, "#.#") + " %", text_size = size.small)
