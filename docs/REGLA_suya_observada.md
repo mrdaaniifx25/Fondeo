@@ -69,6 +69,55 @@ real produce stops pequeños, igual que la anterior, así que la aritmética del
 coste va a volver a aparecer. Se reportarán por separado la ventaja bruta del
 patrón y lo que se lleva el coste.
 
+## Primer intento de codificarla, y lo que enseñó
+
+`bt/regla_suya_v1.py`. Máximo/mínimo de Asia, origen del impulso que lo rompe
+(se anda hacia atrás desde la vela de rotura mientras aparezcan mínimos más
+bajos, parando tras K velas sin uno nuevo), y entrada cuando una vela cierra con
+cuerpo al otro lado. K = 3, pivote del stop P = 2.
+
+Contrastado contra sus 12 días de agosto con datos:
+
+| día | él | la regla codificada |
+|---|---|---|
+| 04 ago | venta | 10:25 venta ✓ |
+| 05 ago | venta + compra | 10:45 venta ✓ |
+| 07 ago | compra | 10:46 compra ✓ |
+| 18 ago | compra + compra | 09:26 compra ✓ |
+| **14 ago** | **compra** | **08:22 venta ✗** |
+| **17 ago** | **compra** | **08:09 venta ✗** |
+| 03, 06, 10, 11, 19, 20 | operó | no dispara |
+
+**Acierta el lado en 4 de 6 y no dispara en la mitad de los días.** No es su
+regla todavía.
+
+Tres fallos identificados:
+
+1. **El 14 y el 17 él compra donde el código vende.** Esos dos días el máximo de
+   Asia se rompe a las 08:00 y el precio **continúa** subiendo. Él se sube al
+   movimiento en vez de esperar el giro. Es exactamente lo que él mismo avisó:
+   *«lo peligroso es que puede ser o rotura y continuación o rotura y rebote»*.
+   Si opera las dos, la regla no es «barrido y giro»: es «se rompe un nivel y
+   luego la estructura dice hacia dónde».
+2. **Sólo coge la primera rotura del día por lado.** Él toma de una a tres
+   operaciones diarias; probablemente hay segundos impulsos que rompen niveles
+   nuevos más tarde.
+3. **Las horas no cuadran.** El 4 de agosto él entra a las 09:30 y el código a
+   las 10:25. Mismo lado, distinta operación.
+
+En el 14 de agosto se ve además una figura que no estaba en la conversación:
+el precio rompe el máximo de Asia a las 08:00, **vuelve a caer por debajo**
+hasta las 08:55, lo **recupera**, y él compra a las 09:40. Rotura fallida y
+reconquista. Pendiente de que él confirme si es eso lo que miraba.
+
+## Herramientas hechas para esto
+
+- `docs/agosto_m1.html` — los quince días con datos, en M1, con los niveles de
+  Asia y sus entradas. Se toca una vela y da su precio exacto; se pueden marcar
+  niveles para señalar en el gráfico lo que se quiere explicar. Nace de que su
+  TradingView gratuito no llega en M1 a agosto.
+- `bt/grafico_dia.py` — genera el PNG de un día suelto.
+
 ## Diferencia con lo medido hasta ahora
 
 `bt/su_regla_instrumentos.py` mide otra cosa: el cuerpo de la última M5 cerrada
