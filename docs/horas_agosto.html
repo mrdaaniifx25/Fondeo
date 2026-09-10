@@ -1,0 +1,182 @@
+<title>Las horas de agosto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --papel:#EDEFF3; --carta:#FBFCFD; --hueco:#E3E6EC;
+  --tinta:#18202C; --tenue:#69748A; --linea:#D3D8E1; --linea2:#E6E9EF;
+  --alza:#2A7A70; --baja:#B0523C; --marca:#B5811F; --marcaSuave:#EFE2C4; --foco:#2A5C9A;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --papel:#11151B; --carta:#181D25; --hueco:#141920;
+  --tinta:#E3E8F0; --tenue:#8894A6; --linea:#2A323E; --linea2:#212831;
+  --alza:#4FA294; --baja:#D0755A; --marca:#D7A441; --marcaSuave:#3A3122; --foco:#6E9FD8;}}
+:root[data-theme="dark"]{
+  --papel:#11151B; --carta:#181D25; --hueco:#141920;
+  --tinta:#E3E8F0; --tenue:#8894A6; --linea:#2A323E; --linea2:#212831;
+  --alza:#4FA294; --baja:#D0755A; --marca:#D7A441; --marcaSuave:#3A3122; --foco:#6E9FD8;}
+*{box-sizing:border-box}
+body{background:var(--papel); color:var(--tinta); margin:0; padding:0 0 6rem;
+     font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+.env{max-width:760px; margin:0 auto; padding:0 1rem}
+:focus-visible{outline:2px solid var(--foco); outline-offset:2px}
+.barra{position:sticky; top:0; z-index:20; background:var(--papel); border-bottom:1px solid var(--linea)}
+.barra .env{display:flex; align-items:center; gap:.8rem; height:58px}
+.marcaTxt{font-weight:700; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap}
+.marcaTxt span{color:var(--marca)}
+.riel{flex:1; height:5px; background:var(--hueco); border-radius:99px; overflow:hidden; min-width:40px}
+.riel i{display:block; height:100%; width:0; background:var(--marca); transition:width .2s}
+.cuenta{font-family:"IBM Plex Mono",monospace; font-size:.76rem; color:var(--tenue); white-space:nowrap; font-variant-numeric:tabular-nums}
+.btn{font-family:inherit; font-weight:600; font-size:.78rem; padding:.5rem .85rem; border-radius:6px;
+     border:1px solid var(--tinta); background:var(--tinta); color:var(--papel); cursor:pointer; white-space:nowrap}
+.btn:hover{opacity:.88}
+header{padding:2.25rem 0 1.5rem}
+h1{font-size:clamp(1.7rem,5vw,2.4rem); line-height:1.06; margin:0 0 .8rem; letter-spacing:-.02em; font-weight:700; text-wrap:balance}
+p.sub{font-family:"Source Serif 4",Georgia,serif; font-size:1rem; line-height:1.6; color:var(--tenue); max-width:60ch; margin:0}
+p.sub b{color:var(--tinta); font-weight:600}
+.aviso{margin-top:1.1rem; padding:.85rem 1rem; border-left:3px solid var(--marca); background:var(--marcaSuave); border-radius:0 6px 6px 0}
+.aviso p{margin:0; font-family:"Source Serif 4",Georgia,serif; font-size:.9rem; line-height:1.5; color:var(--tinta)}
+.dia{margin-top:1.6rem}
+.diaT{display:flex; align-items:baseline; gap:.6rem; padding:0 .2rem .5rem; }
+.diaT b{font-size:.95rem; letter-spacing:-.01em}
+.diaT span{font-family:"IBM Plex Mono",monospace; font-size:.72rem; color:var(--tenue)}
+.filas{display:flex; flex-direction:column; gap:1px; background:var(--linea); border:1px solid var(--linea); border-radius:9px; overflow:hidden}
+.fila{background:var(--carta); padding:.7rem .85rem; display:flex; align-items:center; gap:.7rem; flex-wrap:wrap}
+.fila.ok{background:linear-gradient(90deg,var(--marcaSuave) 0 3px,var(--carta) 3px)}
+.id{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:.8rem; color:var(--tenue); width:2.2rem}
+.dir{font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; font-weight:700; padding:.2rem .45rem; border-radius:4px; white-space:nowrap}
+.dir.c{background:var(--alza); color:#fff} .dir.v{background:var(--baja); color:#fff}
+.precios{font-family:"IBM Plex Mono",monospace; font-size:.78rem; color:var(--tenue); font-variant-numeric:tabular-nums; white-space:nowrap}
+.precios b{color:var(--tinta); font-weight:600}
+.res{font-size:.66rem; letter-spacing:.07em; text-transform:uppercase; font-weight:700; color:var(--tenue)}
+.res.tp{color:var(--alza)} .res.sl{color:var(--baja)}
+.hueco{flex:1; min-width:.5rem}
+input.h{font-family:"IBM Plex Mono",monospace; font-size:1rem; font-weight:600; width:5.2rem; text-align:center;
+  padding:.5rem .3rem; border-radius:7px; border:1.5px solid var(--linea); background:var(--papel); color:var(--tinta);
+  font-variant-numeric:tabular-nums}
+input.h::placeholder{color:var(--tenue); opacity:.4; font-weight:400; letter-spacing:.02em}
+input.h:focus{border-color:var(--marca)}
+input.h:disabled{opacity:.5}
+input.h.lleno{border-color:var(--alza); background:var(--carta)}
+.nose{font-family:inherit; font-size:.68rem; font-weight:600; padding:.42rem .5rem; border-radius:6px;
+  border:1px solid var(--linea); background:var(--carta); color:var(--tenue); cursor:pointer}
+.nose[aria-pressed="true"]{background:var(--tenue); color:var(--papel); border-color:var(--tenue)}
+.cierre{margin-top:2.5rem; padding:1.5rem; border:1px solid var(--linea); border-radius:10px; background:var(--carta)}
+.cierre h2{font-size:1.15rem; margin:0 0 .5rem}
+.cierre p{font-family:"Source Serif 4",Georgia,serif; font-size:.93rem; line-height:1.55; color:var(--tenue); margin:0 0 1rem}
+textarea{width:100%; min-height:130px; font-family:"IBM Plex Mono",monospace; font-size:.75rem; padding:.7rem;
+  border-radius:7px; border:1px solid var(--linea); background:var(--papel); color:var(--tinta); resize:vertical; line-height:1.5}
+@media (max-width:520px){.precios{width:100%; order:5} .hueco{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="barra"><div class="env">
+  <div class="marcaTxt">Horas <span>·</span> agosto</div>
+  <div class="riel"><i id="riel"></i></div>
+  <div class="cuenta" id="cuenta">0 / 25</div>
+  <button class="btn" id="cop1">Copiar</button>
+</div></div>
+
+<div class="env">
+<header>
+  <h1>Sólo la hora de entrada.</h1>
+  <p class="sub">Las 25 de agosto, por día. En cada una escribe <b>la hora en que entraste</b>, la que marca el borde izquierdo de tu caja de posición. Formato libre: <b>930</b>, <b>9:30</b> o <b>09:30</b>, me da igual. Si no la recuerdas, dale a <b>no sé</b> y sigue.</p>
+  <div class="aviso"><p>Los días con dos o tres operaciones son los que más me importan: con la hora sabré <b>cuál fue la entrada y cuál la reentrada</b>, que no son lo mismo. Se guarda solo mientras escribes.</p></div>
+</header>
+<div id="lista"></div>
+<div class="cierre">
+  <h2>Cuando acabes</h2>
+  <p>Pulsa copiar y pega el texto en el chat. Con eso resuelvo las 16 que caen en mis datos sin suponer nada, y te digo dónde estaba mi error.</p>
+  <button class="btn" id="cop2" style="margin-bottom:1rem">Copiar las horas</button>
+  <textarea id="salida" readonly placeholder="Aquí saldrán al pulsar copiar."></textarea>
+</div>
+</div>
+
+<script>
+const D = [{"id":"T17","iso":"2026-08-03","dia":"lunes 3 ago","lado":-1,"entrada":"1.15257","stop":"1.15282","tp":"1.15207","rgo":2.5,"res":"SL"},{"id":"T18","iso":"2026-08-04","dia":"martes 4 ago","lado":-1,"entrada":"1.15127","stop":"1.15161","tp":"1.15059","rgo":3.4,"res":"TP"},{"id":"T19","iso":"2026-08-05","dia":"mi\u00e9rcoles 5 ago","lado":1,"entrada":"1.15373","stop":"1.15339","tp":"1.15442","rgo":3.4,"res":"TP"},{"id":"T20","iso":"2026-08-05","dia":"mi\u00e9rcoles 5 ago","lado":-1,"entrada":"1.15388","stop":"1.15426","tp":"1.15312","rgo":3.8,"res":"SL"},{"id":"T21","iso":"2026-08-06","dia":"jueves 6 ago","lado":-1,"entrada":"1.15424","stop":"1.15476","tp":"1.15320","rgo":5.2,"res":"abierta"},{"id":"T22","iso":"2026-08-07","dia":"viernes 7 ago","lado":1,"entrada":"1.15287","stop":"1.15249","tp":"1.15375","rgo":3.8,"res":"TP"},{"id":"T23","iso":"2026-08-10","dia":"lunes 10 ago","lado":-1,"entrada":"1.15617","stop":"1.15651","tp":"1.15549","rgo":3.4,"res":"TP"},{"id":"T24","iso":"2026-08-10","dia":"lunes 10 ago","lado":-1,"entrada":"1.15590","stop":"1.15637","tp":"1.15496","rgo":4.7,"res":"SL"},{"id":"T25","iso":"2026-08-11","dia":"martes 11 ago","lado":-1,"entrada":"1.15370","stop":"1.15394","tp":"1.15322","rgo":2.4,"res":"SL"},{"id":"T01","iso":"2026-08-14","dia":"viernes 14 ago","lado":1,"entrada":"1.15476","stop":"1.15438","tp":"1.15552","rgo":3.8,"res":"TP"},{"id":"T02","iso":"2026-08-17","dia":"lunes 17 ago","lado":1,"entrada":"1.15919","stop":"1.15822","tp":"1.16114","rgo":9.7,"res":"TP"},{"id":"T03","iso":"2026-08-18","dia":"martes 18 ago","lado":1,"entrada":"1.15714","stop":"1.15678","tp":"1.15786","rgo":3.6,"res":"TP"},{"id":"T04","iso":"2026-08-18","dia":"martes 18 ago","lado":1,"entrada":"1.15705","stop":"1.15677","tp":"1.15762","rgo":2.8,"res":"SL"},{"id":"T05","iso":"2026-08-19","dia":"mi\u00e9rcoles 19 ago","lado":1,"entrada":"1.15948","stop":"1.15883","tp":"1.16078","rgo":6.5,"res":"TP"},{"id":"T06","iso":"2026-08-20","dia":"jueves 20 ago","lado":1,"entrada":"1.16928","stop":"1.16853","tp":"1.17078","rgo":7.5,"res":"TP"},{"id":"T07","iso":"2026-08-20","dia":"jueves 20 ago","lado":-1,"entrada":"1.16831","stop":"1.16899","tp":"1.16704","rgo":6.8,"res":"SL"},{"id":"T08","iso":"2026-08-24","dia":"lunes 24 ago","lado":-1,"entrada":"1.16721","stop":"1.16776","tp":"1.16611","rgo":5.5,"res":"TP"},{"id":"T09","iso":"2026-08-25","dia":"martes 25 ago","lado":1,"entrada":"1.16579","stop":"1.16525","tp":"1.16687","rgo":5.4,"res":"TP"},{"id":"T10","iso":"2026-08-25","dia":"martes 25 ago","lado":-1,"entrada":"1.16699","stop":"1.16740","tp":"1.16617","rgo":4.1,"res":"TP"},{"id":"T11","iso":"2026-08-26","dia":"mi\u00e9rcoles 26 ago","lado":1,"entrada":"1.16639","stop":"1.16611","tp":"1.16695","rgo":2.8,"res":"TP"},{"id":"T12","iso":"2026-08-26","dia":"mi\u00e9rcoles 26 ago","lado":-1,"entrada":"1.16743","stop":"1.16774","tp":"1.16681","rgo":3.1,"res":"TP"},{"id":"T13","iso":"2026-08-27","dia":"jueves 27 ago","lado":-1,"entrada":"1.16512","stop":"1.16543","tp":"1.16450","rgo":3.1,"res":"TP"},{"id":"T14","iso":"2026-08-28","dia":"viernes 28 ago","lado":1,"entrada":"1.16432","stop":"1.16419","tp":"1.16458","rgo":1.3,"res":"SL"},{"id":"T15","iso":"2026-08-28","dia":"viernes 28 ago","lado":1,"entrada":"1.16450","stop":"1.16429","tp":"1.16490","rgo":2.1,"res":"TP"},{"id":"T16","iso":"2026-08-28","dia":"viernes 28 ago","lado":-1,"entrada":"1.16468","stop":"1.16488","tp":"1.16428","rgo":2.0,"res":"TP"}];
+const LLAVE = "horas_agosto_v1";
+let est = {};
+try{ est = JSON.parse(localStorage.getItem(LLAVE)) || {}; }catch(e){ est = {}; }
+const guarda = () => { try{ localStorage.setItem(LLAVE, JSON.stringify(est)); }catch(e){} };
+
+const norm = s => {
+  const d = (s||"").replace(/\D/g,"").slice(0,4);
+  if(d.length < 3) return null;
+  const h = d.length === 3 ? d.slice(0,1) : d.slice(0,2);
+  const m = d.slice(-2);
+  if(+h > 23 || +m > 59) return null;
+  return String(+h).padStart(2,"0") + ":" + m;
+};
+
+const lista = document.getElementById("lista");
+let dia = null, cont = null;
+for(const o of D){
+  if(o.iso !== dia){
+    dia = o.iso;
+    const n = D.filter(x => x.iso === dia).length;
+    const w = document.createElement("div"); w.className = "dia";
+    w.innerHTML = `<div class="diaT"><b>${o.dia}</b><span>${n} operación${n>1?"es":""}</span></div>`;
+    cont = document.createElement("div"); cont.className = "filas";
+    w.appendChild(cont); lista.appendChild(w);
+  }
+  const f = document.createElement("div"); f.className = "fila";
+  f.innerHTML = `
+    <span class="id">${o.id}</span>
+    <span class="dir ${o.lado>0?"c":"v"}">${o.lado>0?"compra":"venta"}</span>
+    <span class="precios">entrada <b>${o.entrada}</b> · stop ${o.stop} · <b>${o.rgo}p</b></span>
+    <span class="res ${o.res.toLowerCase()}">${o.res}</span>
+    <span class="hueco"></span>
+    <input class="h" inputmode="numeric" placeholder="09:30" aria-label="hora de entrada de ${o.id}">
+    <button class="nose" type="button" aria-pressed="false">no sé</button>`;
+  cont.appendChild(f);
+
+  const inp = f.querySelector("input"), ns = f.querySelector(".nose");
+  const pinta = () => {
+    const v = est[o.id];
+    inp.value = (v && v !== "?") ? v : (v === "?" ? "" : inp.value);
+    inp.classList.toggle("lleno", !!v && v !== "?");
+    inp.disabled = v === "?";
+    ns.setAttribute("aria-pressed", String(v === "?"));
+    f.classList.toggle("ok", !!v);
+    cuenta();
+  };
+  inp.addEventListener("input", () => {
+    const n = norm(inp.value);
+    if(n) est[o.id] = n; else delete est[o.id];
+    inp.classList.toggle("lleno", !!n);
+    f.classList.toggle("ok", !!n);
+    guarda(); cuenta();
+  });
+  inp.addEventListener("blur", () => { const n = norm(inp.value); if(n) inp.value = n; });
+  ns.onclick = () => {
+    if(est[o.id] === "?"){ delete est[o.id]; inp.value = ""; }
+    else { est[o.id] = "?"; inp.value = ""; }
+    guarda(); pinta();
+  };
+  if(est[o.id] && est[o.id] !== "?") inp.value = est[o.id];
+  pinta();
+}
+
+function cuenta(){
+  const n = D.filter(o => est[o.id]).length;
+  document.getElementById("cuenta").textContent = n + " / " + D.length;
+  document.getElementById("riel").style.width = (100*n/D.length) + "%";
+}
+function texto(){
+  const l = ["# horas de entrada · agosto 2026"];
+  for(const o of D) l.push(`${o.id} | ${o.iso} | ${o.lado>0?"compra":"venta"} | ${est[o.id] || "sin poner"}`);
+  return l.join("\n");
+}
+function copiar(b){
+  const t = texto();
+  const c = document.getElementById("salida"); c.value = t;
+  const ok = () => { const v = b.textContent; b.textContent = "Copiado"; setTimeout(()=>b.textContent=v,1500); };
+  if(navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(t).then(ok, () => { c.select(); b.textContent = "Cópialo del cuadro"; });
+  else { c.select(); b.textContent = "Cópialo del cuadro"; }
+}
+document.getElementById("cop1").onclick = e => copiar(e.currentTarget);
+document.getElementById("cop2").onclick = e => copiar(e.currentTarget);
+cuenta();
+</script>

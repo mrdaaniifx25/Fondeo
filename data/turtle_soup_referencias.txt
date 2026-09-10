@@ -1,0 +1,12 @@
+485,999 velas de M5
+
+   referencia      n  stop med  c/riesgo  ventaja que   acierto  la tiene?   R neta       z
+                                           hace falta
+  ----------------------------------------------------------------------------------------
+          M15  22105      3.1p     46.1%        15.4pt     33.4%      +0.1pt   -0.488  -50.69
+           H1  11854      3.6p     39.7%        13.2pt     33.4%      +0.0pt   -0.433  -33.03
+           H4   4297      4.3p     33.3%        11.1pt     32.6%      -0.7pt   -0.397  -18.32
+           D1    555      6.2p     23.1%         7.7pt     33.3%      +0.0pt   -0.279   -4.63
+
+  «ventaja que hace falta» = (coste/stop)/(1+k), los puntos que hay que sacarle
+  al 33,3 % geometrico solo para empatar. «la tiene?» es lo que saca de verdad.

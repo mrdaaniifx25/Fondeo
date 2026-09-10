@@ -1,0 +1,251 @@
+S01 · 08:00 COMPRA (1.9p) no entro  -> TP +2 R
+S01 · 08:00 COMPRA (1.9p) ENTRO     -> TP +2 R
+S01 · 08:12 COMPRA (8.8p) no entro  -> TP +2 R
+S01 · 08:38 COMPRA (10.7p) ENTRO     -> SL -1 R
+S01 · 08:40 VENTA  (4.8p) ENTRO     -> SL -1 R
+S01 · 08:42 COMPRA (7.7p) no entro  -> SL -1 R
+S01 · 08:46 COMPRA (12.7p) ENTRO     -> SL -1 R
+S01 · 08:50 COMPRA (10.1p) ENTRO     -> SL -1 R
+S01 · 09:09 COMPRA (6.1p) ENTRO     -> SL -1 R
+S01 · 09:31 VENTA  (5.5p) ENTRO     -> TP +2 R
+S01 · 09:48 VENTA  (4.4p) ENTRO     -> TP +2 R
+S01 · 09:52 VENTA  (9.7p) ENTRO     -> TP +2 R
+S01 · 10:01 COMPRA (2.9p) no entro  -> TP +2 R
+S01 · 10:02 VENTA  (3.2p) ENTRO     -> SL -1 R
+S01 · 10:03 COMPRA (4.6p) no entro  -> SL -1 R
+S01 · 10:07 COMPRA (4.9p) ENTRO     -> SL -1 R
+S01 · 10:11 COMPRA (7.6p) ENTRO     -> SL -1 R
+S01 · 10:15 COMPRA (2.7p) ENTRO     -> SL -1 R
+S01 · 10:19 COMPRA (1.7p) no entro  -> SL -1 R
+S01 · 10:24 VENTA  (7.7p) ENTRO     -> TP +2 R
+S01 · 10:39 VENTA  (3.7p) ENTRO     -> TP +2 R
+S01 · 10:47 VENTA  (19.3p) ENTRO     -> cierre -0.33 R
+S01 · 11:01 COMPRA (11.9p) ENTRO     -> cierre +0.55 R
+S01 · 11:07 COMPRA (11.5p) ENTRO     -> cierre +0.25 R
+S01 · 11:11 COMPRA (3.1p) no entro  -> cierre +1.35 R
+S01 · 11:15 VENTA  (3.9p) no entro  -> SL -1 R
+S02 · 08:25 VENTA  (2.7p) ENTRO     -> SL -1 R
+S02 · 08:36 COMPRA (2.4p) ENTRO     -> SL -1 R
+S02 · 08:40 COMPRA (1.7p) no entro  -> SL -1 R
+S02 · 08:53 VENTA  (2.2p) ENTRO     -> SL -1 R
+S02 · 09:09 VENTA  (3.8p) ENTRO     -> SL -1 R
+S02 · 09:14 COMPRA (1.8p) no entro  -> SL -1 R
+S02 · 09:22 COMPRA (2.1p) ENTRO     -> SL -1 R
+S02 · 09:26 COMPRA (1.5p) no entro  -> SL -1 R
+S02 · 09:34 VENTA  (1.9p) ENTRO     -> TP +2 R
+S02 · 09:38 VENTA  (3.1p) ENTRO     -> TP +2 R
+S02 · 09:44 VENTA  (1.9p) ENTRO     -> TP +2 R
+S02 · 09:48 VENTA  (5.3p) ENTRO     -> cierre +0.34 R
+S02 · 09:52 VENTA  (7.5p) ENTRO     -> cierre -0.05 R
+S02 · 09:57 VENTA  (5.3p) ENTRO     -> cierre -0.55 R
+S02 · 10:01 VENTA  (6p) no entro  -> SL -1 R
+S02 · 10:08 VENTA  (3.1p) ENTRO     -> SL -1 R
+S02 · 10:13 VENTA  (2.1p) ENTRO     -> SL -1 R
+S02 · 10:17 VENTA  (2.8p) no entro  -> SL -1 R
+S02 · 10:24 COMPRA (2p) ENTRO     -> TP +2 R
+S02 · 10:33 VENTA  (1.9p) no entro  -> SL -1 R
+S02 · 10:57 COMPRA (4.5p) ENTRO     -> cierre +0.67 R
+S02 · 11:01 COMPRA (3.3p) ENTRO     -> cierre +0.7 R
+S02 · 11:05 COMPRA (3.3p) no entro  -> cierre +0.39 R
+S02 · 11:09 COMPRA (5.5p) ENTRO     -> cierre -0.29 R
+S02 · 11:15 VENTA  (1.6p) no entro  -> cierre +0.06 R
+S03 · 08:15 VENTA  (2.3p) no entro  -> SL -1 R
+S03 · 08:20 VENTA  (2.7p) no entro  -> SL -1 R
+S03 · 08:39 VENTA  (2.6p) no entro  -> SL -1 R
+S03 · 08:55 COMPRA (3.2p) ENTRO     -> SL -1 R
+S03 · 08:59 COMPRA (2.7p) no entro  -> SL -1 R
+S03 · 09:00 VENTA  (2.5p) no entro  -> SL -1 R
+S03 · 09:03 COMPRA (4.8p) ENTRO     -> SL -1 R
+S03 · 09:09 COMPRA (6.3p) ENTRO     -> SL -1 R
+S03 · 09:14 COMPRA (3.1p) no entro  -> SL -1 R
+S03 · 09:17 VENTA  (2.3p) ENTRO     -> TP +2 R
+S03 · 09:27 VENTA  (1.8p) no entro  -> SL -1 R
+S03 · 09:31 VENTA  (3.6p) ENTRO     -> SL -1 R
+S03 · 09:40 VENTA  (1.7p) ENTRO     -> SL -1 R
+S03 · 10:01 COMPRA (5.4p) no entro  -> TP +2 R
+S03 · 10:05 COMPRA (7.7p) ENTRO     -> cierre +1.19 R
+S03 · 10:18 COMPRA (3.3p) ENTRO     -> TP +2 R
+S03 · 10:34 COMPRA (4.8p) ENTRO     -> SL -1 R
+S03 · 10:38 COMPRA (3.5p) ENTRO     -> SL -1 R
+S03 · 10:45 VENTA  (2.4p) ENTRO     -> TP +2 R
+S03 · 10:49 VENTA  (2.5p) no entro  -> TP +2 R
+S03 · 10:53 VENTA  (3p) no entro  -> SL -1 R
+S03 · 10:57 VENTA  (5.6p) ENTRO     -> SL -1 R
+S03 · 11:00 COMPRA (2.6p) no entro  -> cierre +1.54 R
+S03 · 11:08 COMPRA (4.3p) ENTRO     -> cierre +0.37 R
+S03 · 11:14 COMPRA (3.4p) no entro  -> cierre +0.12 R
+S04 · 08:12 VENTA  (2.5p) ENTRO     -> SL -1 R
+S04 · 08:23 COMPRA (3.4p) ENTRO     -> TP +2 R
+S04 · 08:27 COMPRA (4.2p) ENTRO     -> SL -1 R
+S04 · 08:31 COMPRA (3.9p) no entro  -> SL -1 R
+S04 · 08:35 COMPRA (1.7p) no entro  -> SL -1 R
+S04 · 08:44 COMPRA (4.1p) ENTRO     -> SL -1 R
+S04 · 08:54 VENTA  (3.1p) ENTRO     -> SL -1 R
+S04 · 08:59 VENTA  (2.4p) no entro  -> SL -1 R
+S04 · 09:00 COMPRA (4.3p) no entro  -> SL -1 R
+S04 · 09:04 COMPRA (4.5p) ENTRO     -> SL -1 R
+S04 · 09:21 VENTA  (3.1p) no entro  -> TP +2 R
+S04 · 09:33 VENTA  (7.7p) ENTRO     -> TP +2 R
+S04 · 09:39 COMPRA (4.5p) no entro  -> SL -1 R
+S04 · 09:43 COMPRA (4.9p) ENTRO     -> SL -1 R
+S04 · 09:45 VENTA  (1.5p) no entro  -> SL -1 R
+S04 · 09:55 VENTA  (13p) ENTRO     -> cierre -0.72 R
+S04 · 09:59 VENTA  (16.6p) no entro  -> SL -1 R
+S04 · 10:03 VENTA  (18.2p) no entro  -> SL -1 R
+S04 · 10:40 VENTA  (4.5p) ENTRO     -> SL -1 R
+S04 · 10:52 VENTA  (3.2p) no entro  -> SL -1 R
+S04 · 10:54 COMPRA (5p) ENTRO     -> TP +2 R
+S04 · 11:02 COMPRA (8.9p) ENTRO     -> cierre +0.45 R
+S04 · 11:10 COMPRA (3.5p) no entro  -> cierre +0.4 R
+S04 · 11:16 VENTA  (3.2p) no entro  -> SL -1 R
+S04 · 11:24 COMPRA (4.2p) ENTRO     -> cierre +0.1 R
+S05 · 08:01 VENTA  (3.7p) no entro  -> TP +2 R
+S05 · 08:05 VENTA  (10p) ENTRO     -> TP +2 R
+S05 · 08:09 VENTA  (13.7p) no entro  -> TP +2 R
+S05 · 08:20 COMPRA (4.6p) ENTRO     -> SL -1 R
+S05 · 08:34 COMPRA (7.2p) no entro  -> SL -1 R
+S05 · 08:39 COMPRA (9.1p) no entro  -> SL -1 R
+S05 · 08:43 COMPRA (9.7p) ENTRO     -> SL -1 R
+S05 · 08:55 VENTA  (4.3p) no entro  -> SL -1 R
+S05 · 08:59 VENTA  (8.8p) ENTRO     -> SL -1 R
+S05 · 09:12 COMPRA (5.3p) no entro  -> SL -1 R
+S05 · 09:16 COMPRA (3.1p) ENTRO     -> SL -1 R
+S05 · 09:26 VENTA  (3.5p) no entro  -> TP +2 R
+S05 · 09:30 VENTA  (5.6p) ENTRO     -> TP +2 R
+S05 · 09:45 COMPRA (11p) no entro  -> SL -1 R
+S05 · 09:50 VENTA  (7.9p) ENTRO     -> SL -1 R
+S05 · 09:54 VENTA  (7.8p) no entro  -> SL -1 R
+S05 · 09:59 COMPRA (5.8p) no entro  -> SL -1 R
+S05 · 10:10 VENTA  (4.9p) ENTRO     -> TP +2 R
+S05 · 10:22 VENTA  (39.2p) no entro  -> cierre -0.61 R
+S05 · 10:27 VENTA  (24.2p) ENTRO     -> SL -1 R
+S05 · 10:56 COMPRA (11.6p) ENTRO     -> cierre +0.89 R
+S05 · 11:01 VENTA  (7p) no entro  -> SL -1 R
+S05 · 11:13 COMPRA (7.3p) ENTRO     -> cierre +0.7 R
+S05 · 11:24 COMPRA (3.8p) ENTRO     -> cierre +0.45 R
+S05 · 11:28 COMPRA (6.3p) ENTRO     -> cierre -0.13 R
+S06 · 08:01 COMPRA (6.1p) no entro  -> TP +2 R
+S06 · 08:09 COMPRA (7.9p) ENTRO     -> SL -1 R
+S06 · 08:12 VENTA  (3.7p) ENTRO     -> SL -1 R
+S06 · 08:13 COMPRA (4.4p) ENTRO     -> SL -1 R
+S06 · 08:20 VENTA  (4.7p) no entro  -> SL -1 R
+S06 · 08:24 VENTA  (2.8p) no entro  -> SL -1 R
+S06 · 08:43 COMPRA (6.9p) no entro  -> SL -1 R
+S06 · 08:55 VENTA  (2.8p) ENTRO     -> TP +2 R
+S06 · 08:59 VENTA  (5.7p) ENTRO     -> TP +2 R
+S06 · 09:07 VENTA  (10.9p) ENTRO     -> SL -1 R
+S06 · 09:23 COMPRA (7.8p) ENTRO     -> TP +2 R
+S06 · 09:30 COMPRA (7.9p) ENTRO     -> TP +2 R
+S06 · 09:56 COMPRA (6.2p) ENTRO     -> TP +2 R
+S06 · 10:00 COMPRA (10.6p) ENTRO     -> cierre +0.75 R
+S06 · 10:04 COMPRA (16.4p) ENTRO     -> cierre +0.13 R
+S06 · 10:08 COMPRA (11.2p) no entro  -> cierre +0.18 R
+S06 · 10:12 COMPRA (7.9p) ENTRO     -> cierre -0.06 R
+S06 · 10:20 COMPRA (10.2p) ENTRO     -> SL -1 R
+S06 · 10:25 VENTA  (4p) no entro  -> SL -1 R
+S06 · 10:33 VENTA  (3.7p) no entro  -> SL -1 R
+S06 · 10:50 COMPRA (2.4p) no entro  -> SL -1 R
+S06 · 10:54 COMPRA (4.7p) ENTRO     -> SL -1 R
+S06 · 10:57 VENTA  (6.5p) no entro  -> cierre +0.11 R
+S06 · 11:10 VENTA  (4.1p) ENTRO     -> SL -1 R
+S06 · 11:14 VENTA  (7.8p) no entro  -> SL -1 R
+S07 · 08:01 COMPRA (5.4p) no entro  -> SL -1 R
+S07 · 08:09 VENTA  (3p) no entro  -> TP +2 R
+S07 · 08:17 VENTA  (6.6p) ENTRO     -> SL -1 R
+S07 · 08:22 VENTA  (3.1p) ENTRO     -> SL -1 R
+S07 · 08:44 VENTA  (4.3p) no entro  -> SL -1 R
+S07 · 08:51 VENTA  (4.6p) ENTRO     -> SL -1 R
+S07 · 08:53 COMPRA (2.3p) no entro  -> SL -1 R
+S07 · 09:03 VENTA  (4.6p) ENTRO     -> SL -1 R
+S07 · 09:07 COMPRA (3.5p) no entro  -> TP +2 R
+S07 · 09:20 VENTA  (3.9p) ENTRO     -> SL -1 R
+S07 · 09:25 VENTA  (2.3p) no entro  -> SL -1 R
+S07 · 09:42 COMPRA (2.3p) ENTRO     -> TP +2 R
+S07 · 09:46 COMPRA (3p) no entro  -> TP +2 R
+S07 · 09:58 COMPRA (4.2p) ENTRO     -> TP +2 R
+S07 · 10:00 VENTA  (2.5p) ENTRO     -> SL -1 R
+S07 · 10:04 VENTA  (1.9p) no entro  -> SL -1 R
+S07 · 10:10 COMPRA (2.7p) no entro  -> TP +2 R
+S07 · 10:18 COMPRA (8.9p) ENTRO     -> cierre +0.66 R
+S07 · 10:25 VENTA  (2.8p) ENTRO     -> TP +2 R
+S07 · 10:33 VENTA  (5.8p) ENTRO     -> SL -1 R
+S07 · 10:37 VENTA  (5.9p) no entro  -> SL -1 R
+S07 · 10:40 COMPRA (2.9p) ENTRO     -> TP +2 R
+S07 · 11:16 COMPRA (6.8p) ENTRO     -> cierre +0 R
+S07 · 11:23 COMPRA (3.6p) no entro  -> cierre -0.5 R
+S07 · 11:27 VENTA  (2.1p) ENTRO     -> cierre +0.24 R
+S08 · 08:04 COMPRA (8p) ENTRO     -> TP +2 R
+S08 · 08:15 VENTA  (4.3p) ENTRO     -> SL -1 R
+S08 · 08:23 VENTA  (3.1p) no entro  -> SL -1 R
+S08 · 08:35 COMPRA (3.7p) ENTRO     -> SL -1 R
+S08 · 08:39 COMPRA (3.9p) ENTRO     -> SL -1 R
+S08 · 08:44 VENTA  (7.5p) no entro  -> SL -1 R
+S08 · 09:10 VENTA  (6.2p) ENTRO     -> SL -1 R
+S08 · 09:14 COMPRA (6p) no entro  -> SL -1 R
+S08 · 09:18 COMPRA (8p) ENTRO     -> SL -1 R
+S08 · 09:20 VENTA  (4.4p) ENTRO     -> SL -1 R
+S08 · 09:24 VENTA  (5.5p) no entro  -> SL -1 R
+S08 · 09:34 COMPRA (2.4p) no entro  -> TP +2 R
+S08 · 09:38 COMPRA (3.6p) ENTRO     -> SL -1 R
+S08 · 09:42 COMPRA (3.9p) no entro  -> SL -1 R
+S08 · 10:10 VENTA  (4.6p) ENTRO     -> SL -1 R
+S08 · 10:14 VENTA  (2.3p) no entro  -> SL -1 R
+S08 · 10:29 COMPRA (4.2p) ENTRO     -> SL -1 R
+S08 · 10:41 VENTA  (9.2p) no entro  -> SL -1 R
+S08 · 10:48 COMPRA (6.9p) ENTRO     -> cierre +0.51 R
+S08 · 10:53 COMPRA (6.3p) ENTRO     -> cierre +0.22 R
+S08 · 11:00 VENTA  (3.3p) ENTRO     -> SL -1 R
+S08 · 11:13 COMPRA (4.7p) ENTRO     -> cierre -0.04 R
+S08 · 11:17 COMPRA (5.9p) no entro  -> cierre -0.31 R
+S08 · 11:21 VENTA  (2p) ENTRO     -> cierre +0.4 R
+S08 · 11:25 COMPRA (1.7p) ENTRO     -> SL -1 R
+S09 · 08:07 COMPRA (5.9p) ENTRO     -> TP +2 R
+S09 · 08:11 COMPRA (7.4p) ENTRO     -> TP +2 R
+S09 · 08:15 COMPRA (10.3p) no entro  -> cierre +0.18 R
+S09 · 08:22 COMPRA (3.2p) ENTRO     -> SL -1 R
+S09 · 08:24 VENTA  (5.1p) no entro  -> SL -1 R
+S09 · 08:32 VENTA  (6.3p) no entro  -> SL -1 R
+S09 · 08:36 VENTA  (2p) ENTRO     -> SL -1 R
+S09 · 08:39 COMPRA (3p) no entro  -> TP +2 R
+S09 · 08:52 COMPRA (7.3p) ENTRO     -> cierre -0.34 R
+S09 · 08:57 VENTA  (6p) no entro  -> SL -1 R
+S09 · 09:09 COMPRA (7.4p) ENTRO     -> SL -1 R
+S09 · 09:19 VENTA  (5.2p) no entro  -> SL -1 R
+S09 · 09:23 VENTA  (7.9p) ENTRO     -> SL -1 R
+S09 · 09:27 VENTA  (5.6p) no entro  -> SL -1 R
+S09 · 09:32 COMPRA (4.5p) ENTRO     -> TP +2 R
+S09 · 09:40 VENTA  (2.9p) no entro  -> SL -1 R
+S09 · 09:47 COMPRA (5.1p) ENTRO     -> SL -1 R
+S09 · 09:57 VENTA  (3.7p) no entro  -> SL -1 R
+S09 · 10:02 COMPRA (3.9p) no entro  -> SL -1 R
+S09 · 10:20 VENTA  (2.2p) no entro  -> SL -1 R
+S09 · 10:25 VENTA  (3.5p) ENTRO     -> SL -1 R
+S09 · 10:35 VENTA  (2.3p) no entro  -> SL -1 R
+S09 · 10:37 COMPRA (3.6p) ENTRO     -> TP +2 R
+S09 · 11:03 VENTA  (5.7p) ENTRO     -> cierre -0.14 R
+S09 · 11:25 COMPRA (2.2p) no entro  -> cierre +0.77 R
+S10 · 08:00 COMPRA (3.7p) no entro  -> TP +2 R
+S10 · 08:16 VENTA  (3p) ENTRO     -> SL -1 R
+S10 · 08:40 COMPRA (4.5p) no entro  -> SL -1 R
+S10 · 08:46 VENTA  (7.3p) ENTRO     -> TP +2 R
+S10 · 08:50 VENTA  (5.9p) no entro  -> TP +2 R
+S10 · 08:54 VENTA  (3.3p) ENTRO     -> TP +2 R
+S10 · 08:58 VENTA  (4.6p) ENTRO     -> TP +2 R
+S10 · 09:06 VENTA  (1.8p) ENTRO     -> TP +2 R
+S10 · 09:24 COMPRA (3.7p) no entro  -> SL -1 R
+S10 · 09:28 COMPRA (3.7p) no entro  -> SL -1 R
+S10 · 09:31 VENTA  (2.9p) ENTRO     -> TP +2 R
+S10 · 09:48 VENTA  (3.8p) ENTRO     -> TP +2 R
+S10 · 09:52 VENTA  (7p) ENTRO     -> cierre +0.43 R
+S10 · 10:02 COMPRA (2p) no entro  -> SL -1 R
+S10 · 10:05 VENTA  (3.5p) ENTRO     -> SL -1 R
+S10 · 10:09 VENTA  (4p) ENTRO     -> SL -1 R
+S10 · 10:27 VENTA  (5.8p) no entro  -> SL -1 R
+S10 · 10:31 COMPRA (2.9p) ENTRO     -> SL -1 R
+S10 · 10:41 COMPRA (1.6p) no entro  -> SL -1 R
+S10 · 10:43 VENTA  (2.2p) ENTRO     -> SL -1 R
+S10 · 10:54 COMPRA (4.3p) no entro  -> cierre -0.63 R
+S10 · 10:58 COMPRA (4.7p) ENTRO     -> cierre -0.89 R
+S10 · 11:07 COMPRA (2.7p) no entro  -> SL -1 R
+S10 · 11:18 VENTA  (3.3p) ENTRO     -> cierre +0.76 R
+S10 · 11:23 COMPRA (1.8p) no entro  -> SL -1 R

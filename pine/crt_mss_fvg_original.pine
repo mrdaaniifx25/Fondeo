@@ -1,0 +1,190 @@
+//@version=6
+// ═════════════════════════════════════════════════════════════════════════════
+//  CRT MSS+FVG · STRATEGY (backtest automático de TradingView)
+// ═════════════════════════════════════════════════════════════════════════════
+strategy(title = "CRT MSS+FVG [Backtest]",
+     shorttitle = "CRT MSSFVG BT",
+     overlay = true,
+     initial_capital = 10000,
+     default_qty_type = strategy.fixed,
+     default_qty_value = 1,
+     slippage = 6,
+     commission_type = strategy.commission.percent,
+     commission_value = 0.0,
+     calc_on_every_tick = false,
+     process_orders_on_close = true,
+     max_boxes_count = 200, max_labels_count = 200, max_lines_count = 200)
+
+G1 = "Rango / Sweep"
+G2 = "MSS + FVG"
+G3 = "Ventana de trading"
+G4 = "Gestión de riesgo"
+
+htf         = input.timeframe("240", "Temporalidad del rango (HTF)", group = G1)
+slBufferATR = input.float(0.50, "Colchón del SL (× ATR HTF)", minval = 0.0, step = 0.05, group = G1)
+minRangeATR = input.float(0.50, "Tamaño mínimo del rango (× ATR HTF)", minval = 0.0, step = 0.05, group = G1)
+reArm       = input.bool(true,  "Rearmar tras un barrido más profundo", group = G1)
+
+mssLookback = input.int(20, "Velas del gráfico atrás para el swing de referencia (MSS)", minval = 10, maxval = 100, group = G2)
+minRR       = input.float(1.0, "R:R mínimo para confirmar", minval = 0.0, step = 0.1, group = G2)
+rMultiple   = input.float(3.0, "Múltiplo R del objetivo", minval = 1.0, maxval = 6.0, step = 0.5, group = G2)
+minRiskPips = input.float(3.0, "Riesgo mínimo aceptable (pips)", minval = 0.5, maxval = 20.0, group = G2)
+
+onlyKZ      = input.bool(true, "Confirmar solo dentro de kill zone (hora del gráfico)", group = G3)
+oneTrade    = input.bool(true, "Una operación a la vez", group = G3)
+oneDir      = input.bool(true, "Una sola dirección por rango", group = G3)
+
+riskPercent = input.float(1.0, "Riesgo por operación (% del equity)", minval = 0.1, maxval = 5.0, step = 0.1, group = G4)
+
+f_htf(_exp) => request.security(syminfo.tickerid, htf, _exp, lookahead = barmerge.lookahead_on)
+
+htfHigh = f_htf(high[1])
+htfLow  = f_htf(low[1])
+htfATR  = f_htf(ta.atr(14)[1])
+htfTime = f_htf(time)
+newHTF  = ta.change(htfTime) != 0
+
+rangeHigh = htfHigh
+rangeLow  = htfLow
+rangeSize = rangeHigh - rangeLow
+rangeOK   = rangeSize >= minRangeATR * htfATR
+
+m15High1 = request.security(syminfo.tickerid, "15", high[1], barmerge.gaps_off, barmerge.lookahead_off)
+m15Low1  = request.security(syminfo.tickerid, "15", low[1],  barmerge.gaps_off, barmerge.lookahead_off)
+m15High3 = request.security(syminfo.tickerid, "15", high[3], barmerge.gaps_off, barmerge.lookahead_off)
+m15Low3  = request.security(syminfo.tickerid, "15", low[3],  barmerge.gaps_off, barmerge.lookahead_off)
+newM15   = ta.change(request.security(syminfo.tickerid, "15", time, barmerge.gaps_off, barmerge.lookahead_off)) != 0
+
+inLDN = not na(time(timeframe.period, "0700-1000"))
+inNY  = not na(time(timeframe.period, "1230-1500"))
+kzOK  = not onlyKZ or inLDN or inNY
+
+var bool  sweptHi   = false
+var bool  sweptLo   = false
+var float sweepHiPx = na
+var float sweepLoPx = na
+var bool  dirDone   = false
+
+if newHTF
+    sweptHi   := false
+    sweptLo   := false
+    sweepHiPx := na
+    sweepLoPx := na
+    dirDone   := false
+
+sweepUp   = high > rangeHigh
+sweepDown = low  < rangeLow
+
+if sweepUp
+    if not sweptHi
+        sweptHi := true
+        sweepHiPx := high
+    else if reArm and high > sweepHiPx
+        sweepHiPx := high
+if sweepDown
+    if not sweptLo
+        sweptLo := true
+        sweepLoPx := low
+    else if reArm and low < sweepLoPx
+        sweepLoPx := low
+
+var bool   mPend      = false
+var int    mDir       = 0
+var float  mCounterLv = na
+var bool   mMssDone   = false
+var float  mFvgNear   = na
+var float  mFvgFar    = na
+var int    mBarCount  = 0
+
+mssLow  = ta.lowest(low, mssLookback)
+mssHigh = ta.highest(high, mssLookback)
+
+inPosition = strategy.position_size != 0
+baseGate = rangeOK and kzOK and (not dirDone or not oneDir) and (not inPosition or not oneTrade)
+
+if not mPend and baseGate
+    if sweepUp and not sweptHi[1]
+        mPend := true
+        mDir  := -1
+        mCounterLv := mssLow[1]
+        mMssDone := false
+        mFvgNear := na
+        mFvgFar  := na
+        mBarCount := 0
+    else if sweepDown and not sweptLo[1]
+        mPend := true
+        mDir  := 1
+        mCounterLv := mssHigh[1]
+        mMssDone := false
+        mFvgNear := na
+        mFvgFar  := na
+        mBarCount := 0
+
+if mPend
+    mBarCount := mBarCount + 1
+    if mBarCount > 300
+        mPend := false
+    else if not mMssDone
+        if mDir == 1 and close > mCounterLv
+            mMssDone := true
+            label.new(bar_index, close, "MSS", style = label.style_label_down, color = color.new(color.aqua, 20), textcolor = color.black, size = size.tiny)
+        else if mDir == -1 and close < mCounterLv
+            mMssDone := true
+            label.new(bar_index, close, "MSS", style = label.style_label_up, color = color.new(color.aqua, 20), textcolor = color.black, size = size.tiny)
+
+if mPend and mMssDone and na(mFvgNear) and newM15
+    if mDir == 1 and m15Low1 > m15High3
+        mFvgNear := m15Low1
+        mFvgFar  := m15High3
+    else if mDir == -1 and m15High1 < m15Low3
+        mFvgNear := m15High1
+        mFvgFar  := m15Low3
+    if not na(mFvgNear)
+        box.new(bar_index - 3, mFvgNear, bar_index + 40, mFvgFar,
+             bgcolor = mDir == 1 ? color.new(color.lime, 80) : color.new(color.red, 80),
+             border_color = mDir == 1 ? color.lime : color.red, border_width = 1)
+        label.new(bar_index, mDir == 1 ? mFvgNear : mFvgFar, "FVG",
+             style = label.style_label_down, color = color.new(color.black, 100),
+             textcolor = mDir == 1 ? color.lime : color.red, size = size.tiny)
+
+var float pendingSL = na
+var float pendingTP = na
+
+if mPend and not na(mFvgNear) and barstate.isconfirmed
+    touched     = mDir == 1 ? (low <= mFvgNear) : (high >= mFvgNear)
+    invalidated = mDir == 1 ? (close < mFvgFar)  : (close > mFvgFar)
+    if touched
+        entryPx = mFvgNear
+        slPx    = mDir == 1 ? math.min(sweepLoPx, mFvgFar) - slBufferATR * htfATR : math.max(sweepHiPx, mFvgFar) + slBufferATR * htfATR
+        riskPx  = math.abs(entryPx - slPx)
+        riskPips = riskPx / 0.0001
+        if riskPx > 0 and riskPips >= minRiskPips
+            tpPx = entryPx + mDir * rMultiple * riskPx
+            rr   = math.abs(tpPx - entryPx) / riskPx
+            if rr >= minRR
+                qty = (strategy.equity * riskPercent / 100.0) / riskPx
+                if mDir == 1
+                    strategy.entry("Long", strategy.long, qty = qty)
+                else
+                    strategy.entry("Short", strategy.short, qty = qty)
+                pendingSL := slPx
+                pendingTP := tpPx
+                dirDone := true
+        mPend := false
+    else if invalidated
+        mPend := false
+
+if strategy.position_size != 0 and not na(pendingSL)
+    if strategy.position_size > 0
+        strategy.exit("SalidaLong", "Long", stop = pendingSL, limit = pendingTP)
+    else
+        strategy.exit("SalidaShort", "Short", stop = pendingSL, limit = pendingTP)
+    pendingSL := na
+    pendingTP := na
+
+var box liveBox = na
+box.delete(liveBox)
+liveBox := box.new(bar_index - 20, rangeHigh, bar_index, rangeLow, border_color = color.new(color.gray, 60), bgcolor = color.new(color.gray, 92))
+
+plotshape(sweepUp and not sweptHi[1], title = "Sweep alto", style = shape.diamond, location = location.abovebar, color = color.orange, size = size.tiny)
+plotshape(sweepDown and not sweptLo[1], title = "Sweep bajo", style = shape.diamond, location = location.belowbar, color = color.orange, size = size.tiny)

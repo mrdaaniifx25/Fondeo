@@ -1,0 +1,15 @@
+=== LA MISMA CELDA (08:00 · buffer 3 · 3R · con sesgo) EN TODO ===
+
+     instr      n   op/dia    R neta       z   acierto
+    EURUSD    532     1.00   +0.4024   +4.72     39.7%
+    GBPUSD    536     1.00   +0.3803   +4.47     39.0%
+    USDJPY    553     1.00   +0.3419   +4.11     38.2%
+    XAUUSD     16  muestra corta
+     US100    515     1.00   +0.1943   +2.32     32.8%
+     US500    400     1.00   +0.4950   +5.04     39.8%
+     GER40    192     1.00   +0.6131   +4.24     43.2%
+
+  AGREGADO   2728            +0.3749  +10.01     38.2%
+
+  instrumentos positivos: 6/6
+  operaciones al dia con la cartera entera: 1.99

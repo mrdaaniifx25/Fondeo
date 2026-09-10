@@ -1,0 +1,47 @@
+==========================================================================
+EL MODELO CONGELADO, OPERANDO
+==========================================================================
+
+K=1 mejores por día · 114 días del examen
+  106 operaciones en 106 días de 114  ·  0.93 por sesión
+  acierto 47.6 %   z contra 33,3 % = +3.07
+  stop mediano 4.4 p  ·  coste/riesgo 37.8 %
+  R bruta +0.450  ·  R NETA +0.072  z = +0.49  (p=0.62063)  ·  suma +7.6 R
+
+K=1 mejores por día · 1.032 días NUEVOS
+  1449 operaciones en 1449 días de 1608  ·  0.90 por sesión
+  acierto 37.4 %   z contra 33,3 % = +3.26
+  stop mediano 4.1 p  ·  coste/riesgo 39.1 %
+  R bruta +0.135  ·  R NETA -0.256  z = -6.71  (p=0.00000)  ·  suma -371.0 R
+
+K=2 mejores por día · 114 días del examen
+  210 operaciones en 114 días de 114  ·  1.84 por sesión
+  acierto 46.3 %   z contra 33,3 % = +3.92
+  stop mediano 4.3 p  ·  coste/riesgo 38.3 %
+  R bruta +0.401  ·  R NETA +0.017  z = +0.17  (p=0.86597)  ·  suma +3.6 R
+
+K=2 mejores por día · 1.032 días NUEVOS
+  2844 operaciones en 1580 días de 1608  ·  1.77 por sesión
+  acierto 37.3 %   z contra 33,3 % = +4.48
+  stop mediano 4.0 p  ·  coste/riesgo 39.6 %
+  R bruta +0.131  ·  R NETA -0.265  z = -9.75  (p=0.00000)  ·  suma -754.4 R
+
+K=3 mejores por día · 114 días del examen
+  310 operaciones en 114 días de 114  ·  2.72 por sesión
+  acierto 43.2 %   z contra 33,3 % = +3.63
+  stop mediano 4.2 p  ·  coste/riesgo 39.6 %
+  R bruta +0.303  ·  R NETA -0.093  z = -1.10  (p=0.26973)  ·  suma -28.8 R
+
+K=3 mejores por día · 1.032 días NUEVOS
+  4219 operaciones en 1603 días de 1608  ·  2.62 por sesión
+  acierto 36.5 %   z contra 33,3 % = +4.27
+  stop mediano 4.0 p  ·  coste/riesgo 39.8 %
+  R bruta +0.106  ·  R NETA -0.292  z = -13.13  (p=0.00000)  ·  suma -1232.5 R
+
+==========================================================================
+Y SI SOLO SE OPERA CUANDO EL MODELO ESTÁ MUY SEGURO (umbral de probabilidad)
+==========================================================================
+  p >= 0.05   n=14027  acierto  33.2 %  stop  3.8p  R neta -0.408  z -34.11
+  p >= 0.10   n= 3857  acierto  32.4 %  stop  3.7p  R neta -0.434  z -19.14
+  p >= 0.20   n=  767  acierto  32.3 %  stop  3.9p  R neta -0.422  z  -8.31
+  p >= 0.30   n=  137  acierto  27.7 %  stop  3.4p  R neta -0.630  z  -5.47

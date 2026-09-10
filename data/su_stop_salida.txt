@@ -1,0 +1,12 @@
+su stop: mediana 6.0 p   ·   media 6.5
+
+  referencia                          mediana  error medio  |error| med  correlación
+  ----------------------------------------------------------------------------------
+  extremo de la vela de M5 del disparo     5.3p       +0.68p        1.55p         0.43
+  extremo de las 2 últimas de M5         6.2p       -0.40p        1.30p         0.58
+  extremo de las 3 últimas de M5         6.7p       -1.10p        1.30p         0.57
+  extremo de los últimos 5 min de M1     4.6p       +1.42p        1.50p         0.35
+  extremo de los últimos 10 min de M1     5.9p       +0.04p        1.30p         0.54
+  extremo de los últimos 15 min de M1     6.5p       -0.89p        1.10p         0.59
+
+  su stop menos el extremo de la vela del disparo: mediana +0.70 p  ·  lo pone por FUERA en 67 % de los casos

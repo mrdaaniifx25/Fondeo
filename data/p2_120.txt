@@ -1,0 +1,16 @@
+TF=M120 · rango H4 de 20 velas · entrada al 71% · FVG=sí · filtro H4=sí
+azar geométrico con R:R 2.45 = 29.0 %
+
+  instr      n   acierto   R bruta       z    R NETA     stop  coste/R
+----------------------------------------------------------------------------
+ EURUSD     30     23.3 %    -0.273   -1.07    -0.363    21.7     6.6 %
+ GBPUSD  29 operaciones
+ USDJPY  27 operaciones
+ XAUUSD  18 operaciones
+ GRXEUR  11 operaciones
+ NSXUSD  23 operaciones
+ SPXUSD  27 operaciones
+----------------------------------------------------------------------------
+  acierto medio 23.3 %  contra el azar de 29.0 %
+  R bruta media -0.273  ·  positiva en 0/1
+  R NETA  media -0.363  ·  positiva en 0/1

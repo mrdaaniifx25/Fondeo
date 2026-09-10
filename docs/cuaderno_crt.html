@@ -1,0 +1,533 @@
+<title>Cuaderno de campo CRT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+
+<style>
+:root{
+  --fondo:#F5F5F2; --sup:#FFFFFF; --sup2:#EBEBE6; --papel:#FAFAF7;
+  --tinta:#16181A; --tinta2:#3E4448; --gris:#6A7075; --linea:#DBDBD4;
+  --azul:#26437E; --azulS:rgba(38,67,126,.09);
+  --alc:#0E7F72; --baj:#BE3B33; --oro:#9A6B10;
+  --alcS:rgba(14,127,114,.10); --bajS:rgba(190,59,51,.10); --oroS:rgba(154,107,16,.10);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --fondo:#0D0F11; --sup:#16191C; --sup2:#1E2226; --papel:#131619;
+  --tinta:#E6E7E4; --tinta2:#B6BBBE; --gris:#888E93; --linea:#2A2F34;
+  --azul:#93AAE4; --azulS:rgba(147,170,228,.13);
+  --alc:#35C6B1; --baj:#F1766D; --oro:#DFA53E;
+  --alcS:rgba(53,198,177,.13); --bajS:rgba(241,118,109,.13); --oroS:rgba(223,165,62,.13);
+}}
+:root[data-theme="dark"]{
+  --fondo:#0D0F11; --sup:#16191C; --sup2:#1E2226; --papel:#131619;
+  --tinta:#E6E7E4; --tinta2:#B6BBBE; --gris:#888E93; --linea:#2A2F34;
+  --azul:#93AAE4; --azulS:rgba(147,170,228,.13);
+  --alc:#35C6B1; --baj:#F1766D; --oro:#DFA53E;
+  --alcS:rgba(53,198,177,.13); --bajS:rgba(241,118,109,.13); --oroS:rgba(223,165,62,.13);
+}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);margin:0;padding:0 20px 110px;
+  font-family:Newsreader,Georgia,serif;font-size:18px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.env{max-width:1120px;margin:0 auto}
+.col{max-width:640px}
+h1,h2,h3,h4,.disp{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;text-wrap:balance}
+h1{font-size:clamp(2rem,5.4vw,3.2rem);font-weight:700;letter-spacing:-.026em;line-height:1.03;margin:0}
+h2{font-size:clamp(1.35rem,3vw,1.75rem);font-weight:600;letter-spacing:-.018em;margin:0}
+h3{font-size:1.08rem;font-weight:600;margin:2.2em 0 .45em;letter-spacing:-.005em}
+h4{font-size:.92rem;font-weight:600;margin:1.6em 0 .3em}
+p{margin:0 0 1em}
+strong{font-weight:600}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.85em}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.69rem;font-weight:500;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--gris)}
+
+header{padding:76px 0 34px;border-bottom:1px solid var(--linea);margin-bottom:14px}
+.sub{font-size:1.16rem;color:var(--tinta2);max-width:54ch;margin:1.1em 0 0}
+
+nav.idx{margin:34px 0 62px}
+nav.idx ol{list-style:none;margin:0;padding:0;display:grid;gap:1px;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));background:var(--linea);
+  border:1px solid var(--linea);border-radius:2px;overflow:hidden}
+nav.idx li{background:var(--sup)}
+nav.idx a{display:flex;gap:10px;padding:12px 14px;text-decoration:none;color:var(--tinta);
+  font-family:Archivo,sans-serif;font-size:.85rem;font-weight:500;line-height:1.3}
+nav.idx a:hover{background:var(--sup2)}
+nav.idx a:focus-visible{outline:2px solid var(--azul);outline-offset:-2px}
+nav.idx .n{font-family:"IBM Plex Mono",monospace;color:var(--azul);font-size:.76rem;flex:none}
+
+section{margin:0 0 80px;scroll-margin-top:18px}
+.shead{display:flex;gap:18px;align-items:baseline;border-top:2px solid var(--tinta);
+  padding-top:14px;margin-bottom:1.5em}
+.snum{font-family:"IBM Plex Mono",monospace;font-size:.76rem;font-weight:500;
+  color:var(--azul);padding-top:.35em;flex:none}
+
+figure{margin:2em 0}
+figure svg{width:100%;height:auto;display:block;color:var(--tinta)}
+figcaption{font-family:"IBM Plex Mono",monospace;font-size:.71rem;color:var(--gris);
+  margin-top:12px;text-align:center;letter-spacing:.02em}
+
+blockquote{margin:1.5em 0;padding:2px 0 2px 20px;border-left:3px solid var(--azul);
+  font-size:1rem;color:var(--tinta2);font-style:italic;max-width:600px}
+blockquote cite{display:block;font-style:normal;font-family:"IBM Plex Mono",monospace;
+  font-size:.68rem;color:var(--gris);margin-top:.6em;letter-spacing:.04em}
+
+.tw{overflow-x:auto;margin:1.6em 0;border:1px solid var(--linea);border-radius:2px;background:var(--sup)}
+table{border-collapse:collapse;width:100%;font-family:Archivo,sans-serif;font-size:.87rem;min-width:480px}
+th{text-align:left;font-weight:600;font-size:.68rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--gris);padding:11px 16px;border-bottom:1px solid var(--linea);white-space:nowrap;background:var(--sup2)}
+td{padding:11px 16px;border-bottom:1px solid var(--linea);vertical-align:top;color:var(--tinta2);line-height:1.5}
+tr:last-child td{border-bottom:0}
+td:first-child{color:var(--tinta);font-weight:500}
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.7rem;
+  padding:1px 7px;border-radius:2px;white-space:nowrap}
+.p-a{background:var(--alcS);color:var(--alc)}
+.p-b{background:var(--bajS);color:var(--baj)}
+.p-o{background:var(--oroS);color:var(--oro)}
+.p-n{background:var(--sup2);color:var(--gris)}
+
+.pasos{list-style:none;counter-reset:p;margin:1.8em 0 0;padding:0}
+.pasos li{counter-increment:p;display:grid;grid-template-columns:40px 1fr;gap:18px;
+  padding:18px 0;border-top:1px solid var(--linea)}
+.pasos li:last-child{border-bottom:1px solid var(--linea)}
+.pasos li::before{content:counter(p,decimal-leading-zero);font-family:"IBM Plex Mono",monospace;
+  font-size:.76rem;font-weight:500;color:var(--azul);padding-top:.4em}
+.pasos b{font-family:Archivo,sans-serif;font-size:.98rem;display:block;margin-bottom:.2em}
+.pasos span{font-size:.96rem;color:var(--tinta2)}
+
+.check{list-style:none;margin:1.5em 0;padding:0;border:1px solid var(--linea);
+  border-radius:2px;background:var(--papel);overflow:hidden}
+.check li{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:13px 18px;
+  border-bottom:1px solid var(--linea);font-size:.96rem;align-items:start}
+.check li:last-child{border-bottom:0}
+.check li::before{content:"";width:15px;height:15px;border:1.5px solid var(--gris);
+  border-radius:2px;margin-top:.28em}
+.check b{font-family:Archivo,sans-serif;font-weight:600}
+
+.nota{border-left:3px solid var(--linea);padding:2px 0 2px 18px;margin:1.7em 0;
+  color:var(--tinta2);font-size:.97rem;max-width:610px}
+.dec{border:1px solid var(--oro);border-left-width:4px;background:var(--oroS);
+  padding:17px 21px;border-radius:2px;margin:1.6em 0;max-width:640px;font-size:.97rem}
+.dec p:last-child{margin:0}
+.dec .eyebrow{color:var(--oro);margin-bottom:.5em}
+
+footer{border-top:1px solid var(--linea);padding-top:26px;font-family:"IBM Plex Mono",monospace;
+  font-size:.72rem;color:var(--gris);line-height:1.85}
+</style>
+
+<div class="env">
+
+<header>
+  <div class="eyebrow">Candle Range Theory · EURUSD · un mes en demo</div>
+  <h1>Cuaderno de campo</h1>
+  <p class="sub">El método completo, tal y como lo enseñan sus autores, ordenado para poder seguirlo cada mañana. Con los huecos que ellos no publican rellenados y marcados como tales.</p>
+</header>
+
+<div class="col">
+<p class="nota" style="margin-top:26px">Esto no es una promesa de que funcione. Es una <strong>regla cerrada</strong>: todo decidido de antemano, para que operar no consista en decidir bajo presión. Lo que diga si funciona será tu libro de operaciones dentro de un mes, y esa es la prueba que te falta.</p>
+</div>
+
+<nav class="idx" aria-label="Índice">
+  <ol>
+    <li><a href="#s1"><span class="n">I</span>De qué va, en un párrafo</a></li>
+    <li><a href="#s2"><span class="n">II</span>El PO3 y la vela base</a></li>
+    <li><a href="#s3"><span class="n">III</span>El rango: nacer, vivir, morir</a></li>
+    <li><a href="#s4"><span class="n">IV</span>La cadena de lectura</a></li>
+    <li><a href="#s5"><span class="n">V</span>Las reiniciadas</a></li>
+    <li><a href="#s6"><span class="n">VI</span>Las tres zonas de R:R</a></li>
+    <li><a href="#s7"><span class="n">VII</span>Las dos formas de entrar</a></li>
+    <li><a href="#s8"><span class="n">VIII</span>Stop, objetivo y salida</a></li>
+    <li><a href="#s9"><span class="n">IX</span>La rutina de cada día</a></li>
+    <li><a href="#s10"><span class="n">X</span>El libro de operaciones</a></li>
+  </ol>
+</nav>
+
+<!-- I ─────────────────────────────────────────── -->
+<section id="s1">
+  <div class="shead"><span class="snum">I</span><h2>De qué va, en un párrafo</h2></div>
+  <div class="col">
+    <p>Una vela deja un rango entre su máximo y su mínimo. La siguiente sale de ese rango, se lleva la liquidez que había justo detrás del extremo, y vuelve a meterse dentro. Ese movimiento no es un fallo: <strong>es una trampa deliberada</strong>, y al fallar deja al precio empujado hacia el otro lado. Eso «activa» el rango y crea un objetivo en el extremo opuesto.</p>
+    <p>Cuando varias temporalidades tienen a la vez un objetivo pendiente en la misma dirección, se baja a una temporalidad menor, se espera un cierre que confirme, y se entra buscando esos objetivos.</p>
+    <p>Todo lo demás son detalles de esa frase.</p>
+  </div>
+</section>
+
+<!-- II ─────────────────────────────────────────── -->
+<section id="s2">
+  <div class="shead"><span class="snum">II</span><h2>El PO3 y la vela base</h2></div>
+  <div class="col">
+    <p><strong>PO3</strong> es <em>power of three</em>: toda vela grande, mirada por dentro en una temporalidad menor, se descompone en tres fases.</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 660 300" role="img" aria-label="Las tres fases del PO3: una vela base donde se acumula, una vela que barre su extremo y cierra dentro (manipulación), y el desplazamiento hacia el objetivo (distribución).">
+      <!-- bandas de fase -->
+      <rect x="30" y="238" width="150" height="30" style="fill:var(--sup2)"/>
+      <rect x="182" y="238" width="106" height="30" style="fill:var(--bajS)"/>
+      <rect x="290" y="238" width="200" height="30" style="fill:var(--alcS)"/>
+      <text x="105" y="258" text-anchor="middle" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--gris)">ACUMULACIÓN</text>
+      <text x="235" y="258" text-anchor="middle" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--baj)">MANIPULACIÓN</text>
+      <text x="390" y="258" text-anchor="middle" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--alc)">DISTRIBUCIÓN</text>
+      <text x="105" y="284" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">la vela base</text>
+      <text x="235" y="284" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">barre y cierra dentro</text>
+      <text x="390" y="284" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">va al objetivo</text>
+
+      <!-- niveles del rango -->
+      <line x1="30" y1="60" x2="560" y2="60" style="stroke:var(--linea)" stroke-width="1"/>
+      <line x1="30" y1="200" x2="560" y2="200" style="stroke:var(--alc)" stroke-width="2" stroke-dasharray="7 5"/>
+      <text x="568" y="64" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">máximo base</text>
+      <text x="568" y="197" font-family="IBM Plex Mono, monospace" font-size="11" style="fill:var(--alc)">OBJETIVO</text>
+      <text x="568" y="210" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">mínimo base</text>
+
+      <!-- vela base (bajista, se va a activar rango ALCISTA... no: barre el maximo -> bajista) -->
+      <g style="stroke:var(--alc);fill:var(--alc)">
+        <line x1="70" y1="60" x2="70" y2="200" stroke-width="1.4"/><rect x="62" y="82" width="16" height="96" stroke="none"/>
+      </g>
+      <g style="stroke:var(--gris);fill:var(--gris)">
+        <line x1="120" y1="96" x2="120" y2="164" stroke-width="1.2"/><rect x="112" y="110" width="16" height="40" stroke="none"/>
+      </g>
+
+      <!-- vela de manipulacion: barre el maximo y cierra dentro del cuerpo -->
+      <g style="stroke:var(--baj);fill:var(--baj)">
+        <line x1="205" y1="34" x2="205" y2="130" stroke-width="1.7"/><rect x="197" y="70" width="16" height="48" stroke="none"/>
+      </g>
+      <line x1="250" y1="26" x2="212" y2="36" style="stroke:var(--tinta)" stroke-width="1" opacity=".45"/>
+      <text x="256" y="24" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--baj)">saca el máximo…</text>
+      <text x="256" y="38" font-family="Archivo, sans-serif" font-size="11" style="fill:var(--tinta2)">…y cierra dentro del CUERPO</text>
+
+      <!-- distribucion -->
+      <g style="stroke:var(--baj);fill:var(--baj)">
+        <line x1="310" y1="106" x2="310" y2="164" stroke-width="1.2"/><rect x="302" y="118" width="16" height="36" stroke="none"/>
+        <line x1="355" y1="140" x2="355" y2="192" stroke-width="1.2"/><rect x="347" y="150" width="16" height="34" stroke="none"/>
+        <line x1="400" y1="170" x2="400" y2="212" stroke-width="1.2"/><rect x="392" y="178" width="16" height="26" stroke="none"/>
+      </g>
+      <line x1="440" y1="118" x2="470" y2="196" style="stroke:var(--alc)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="476" y="160" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--alc)">completa</text>
+    </svg>
+    <figcaption>el PO3 sobre una activación bajista · la vela base es la primera, la trampa es la tercera</figcaption>
+  </figure>
+
+  <div class="col">
+    <blockquote>«El precio crea una <strong>vela base</strong> donde comienza la acumulación de liquidez y, posteriormente, <strong>manipula esa zona para construir el rango</strong>.»<cite>bctrades · 1 de junio</cite></blockquote>
+
+    <h3>PO3 de dos velas y de tres velas</h3>
+    <p>La misma lógica presentada de dos maneras. En el <strong>de tres velas</strong>, la segunda hace solo la manipulación y la tercera desarrolla el movimiento. En el <strong>de dos velas</strong>, la segunda hace las dos cosas a la vez: barre y ya se va, dejando un movimiento más directo.</p>
+    <p>No cambia nada de lo que haces. Cambia lo que ves: si el PO3 es de dos velas, el movimiento arranca inmediatamente y no hay tiempo de dudar.</p>
+
+    <h3>La vela base define dos cosas distintas</h3>
+    <div class="tw"><table>
+      <thead><tr><th></th><th>qué es</th><th>para qué sirve</th></tr></thead>
+      <tbody>
+        <tr><td>Sus <strong>extremos</strong></td><td>máximo y mínimo</td><td>el nivel que hay que barrer, y el objetivo en el lado contrario</td></tr>
+        <tr><td>Su <strong>cuerpo</strong></td><td>entre apertura y cierre</td><td>la zona donde tiene que cerrar la vela que barre</td></tr>
+      </tbody>
+    </table></div>
+    <p>Es cuerpo, no rango. Está dicho literalmente: <em>«liquida esa vela base y cierra dentro del cuerpo»</em>. Es más exigente y deja fuera bastantes barridos que a ojo parecen válidos.</p>
+  </div>
+</section>
+
+<!-- III ─────────────────────────────────────────── -->
+<section id="s3">
+  <div class="shead"><span class="snum">III</span><h2>El rango: nacer, vivir, morir</h2></div>
+  <div class="col">
+    <p>Un rango no está vivo o muerto: tiene historia, y cada estado te dice algo distinto sobre qué hacer.</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Estado</th><th>Qué ha pasado</th><th>Qué haces</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill p-a">CREADO</span></td><td>La vela barrió el extremo de la anterior y cerró dentro de su cuerpo. Nace el objetivo en el extremo opuesto.</td><td>Es el momento de mirar si el resto encaja.</td></tr>
+      <tr><td><span class="pill p-a">CONTINUACIÓN</span></td><td>El precio respeta la estructura y avanza hacia el objetivo, apoyándose en rangos menores.</td><td>Dejarlo correr.</td></tr>
+      <tr><td><span class="pill p-o">DOBLE / TRIPLE TOMA</span></td><td>Vuelve a llevarse el mismo extremo y vuelve a cerrar dentro. Ocurre cuando le falta una activación en otra temporalidad.</td><td>Nada. Refuerza, no invalida.</td></tr>
+      <tr><td><span class="pill p-o">REINICIADO</span></td><td>Se lleva el extremo otra vez y esta vez no cierra dentro. Está en el aire.</td><td>Atención: sección <a href="#s5">V</a>.</td></tr>
+      <tr><td><span class="pill p-b">DESCARTADO</span></td><td>Tras el reinicio, una vela <strong>cierra fuera</strong> de la estructura.</td><td>Fuera. El rango se cancela.</td></tr>
+      <tr><td><span class="pill p-n">COMPLETADO</span></td><td>El precio alcanza el objetivo.</td><td>Hecho. Ese rango ya no da contexto.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="col">
+    <blockquote>«Tras un reinicio, el rango <strong>solo se descarta si el precio confirma con un cierre fuera</strong> del rango principal.»<cite>bctrades</cite></blockquote>
+    <p>Esa frase es la que más gente se salta. <strong>Que el precio se lleve el extremo otra vez no mata el setup.</strong> Hace falta un cierre fuera para cancelarlo. Si cierra dentro, es una segunda toma de liquidez y el rango sigue vivo — de hecho lo refuerza.</p>
+
+    <h3>Liquidez simple, doble y triple</h3>
+    <blockquote>«El precio puede tomar la liquidez las veces que quiera mientras siga cerrando dentro de la vela base. La doble y la triple ocurren cuando <strong>al precio le falta una activación de rango en otra temporalidad</strong>.»<cite>bctrades</cite></blockquote>
+    <p>La explicación del porqué es la parte útil: si el precio vuelve dos y tres veces al mismo sitio, no es que dude — es que está esperando a que otra temporalidad cierre su vela y active su rango. Cuando esa activación llega, el movimiento arranca.</p>
+    <div class="nota"><strong>Un rango completado o descartado deja de contar.</strong> Un objetivo alcanzado ayer no es contexto de hoy. Solo cuentan los rangos que siguen vivos.</div>
+  </div>
+</section>
+
+<!-- IV ─────────────────────────────────────────── -->
+<section id="s4">
+  <div class="shead"><span class="snum">IV</span><h2>La cadena de lectura</h2></div>
+  <div class="col">
+    <p>Siempre de arriba abajo. Cada temporalidad te da una cosa y solo una, y no se baja al siguiente escalón hasta tener la de arriba.</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 660 470" role="img" aria-label="La cadena de lectura de arriba abajo: el diario da la dirección, 12 horas el objetivo principal, 4 horas el rango a operar, 1 hora la confirmación y 15 minutos el gatillo.">
+      <defs>
+        <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <polygon points="0,0 10,5 0,10" style="fill:var(--azul)"/>
+        </marker>
+      </defs>
+      <line x1="46" y1="46" x2="46" y2="408" style="stroke:var(--azul)" stroke-width="1.5" opacity=".35"/>
+      <line x1="46" y1="72" x2="46" y2="104" style="stroke:var(--azul)" stroke-width="1.5" marker-end="url(#ab)"/>
+      <line x1="46" y1="158" x2="46" y2="190" style="stroke:var(--azul)" stroke-width="1.5" marker-end="url(#ab)"/>
+      <line x1="46" y1="244" x2="46" y2="276" style="stroke:var(--azul)" stroke-width="1.5" marker-end="url(#ab)"/>
+      <line x1="46" y1="330" x2="46" y2="362" style="stroke:var(--azul)" stroke-width="1.5" marker-end="url(#ab)"/>
+
+      <circle cx="46" cy="46" r="7" style="fill:var(--azul)"/>
+      <text x="74" y="42" font-family="Archivo, sans-serif" font-size="15" font-weight="700" style="fill:var(--tinta)">Diario</text>
+      <text x="74" y="60" font-family="Newsreader, serif" font-size="13" style="fill:var(--tinta2)">¿hay rango vivo? ¿hacia dónde?</text>
+      <text x="420" y="46" font-family="IBM Plex Mono, monospace" font-size="11" style="fill:var(--azul)">te da LA DIRECCIÓN</text>
+
+      <circle cx="46" cy="132" r="7" style="fill:var(--azul)"/>
+      <text x="74" y="128" font-family="Archivo, sans-serif" font-size="15" font-weight="700" style="fill:var(--tinta)">12 horas</text>
+      <text x="74" y="146" font-family="Newsreader, serif" font-size="13" style="fill:var(--tinta2)">bloques de 00:00 y 12:00</text>
+      <text x="420" y="132" font-family="IBM Plex Mono, monospace" font-size="11" style="fill:var(--azul)">te da EL OBJETIVO PRINCIPAL</text>
+
+      <circle cx="46" cy="218" r="7" style="fill:var(--azul)"/>
+      <text x="74" y="214" font-family="Archivo, sans-serif" font-size="15" font-weight="700" style="fill:var(--tinta)">4 horas</text>
+      <text x="74" y="232" font-family="Newsreader, serif" font-size="13" style="fill:var(--tinta2)">aquí es donde tú lees mejor</text>
+      <text x="420" y="218" font-family="IBM Plex Mono, monospace" font-size="11" style="fill:var(--azul)">te da EL RANGO A OPERAR</text>
+
+      <circle cx="46" cy="304" r="7" style="fill:var(--azul)"/>
+      <text x="74" y="300" font-family="Archivo, sans-serif" font-size="15" font-weight="700" style="fill:var(--tinta)">1 hora</text>
+      <text x="74" y="318" font-family="Newsreader, serif" font-size="13" style="fill:var(--tinta2)">el cierre que confirma · el order block</text>
+      <text x="420" y="304" font-family="IBM Plex Mono, monospace" font-size="11" style="fill:var(--azul)">te da LA CONFIRMACIÓN</text>
+
+      <circle cx="46" cy="390" r="7" style="fill:var(--azul)"/>
+      <text x="74" y="386" font-family="Archivo, sans-serif" font-size="15" font-weight="700" style="fill:var(--tinta)">15 minutos</text>
+      <text x="74" y="404" font-family="Newsreader, serif" font-size="13" style="fill:var(--tinta2)">opcional · solo si quieres afinar</text>
+      <text x="420" y="390" font-family="IBM Plex Mono, monospace" font-size="11" style="fill:var(--azul)">te da EL GATILLO</text>
+
+      <line x1="20" y1="436" x2="640" y2="436" style="stroke:var(--linea)" stroke-width="1"/>
+      <text x="20" y="458" font-family="Newsreader, serif" font-size="13" font-style="italic" style="fill:var(--gris)">cuantas más temporalidades tengan objetivo pendiente en la misma dirección, más fuerte es el setup</text>
+    </svg>
+    <figcaption>de arriba abajo, y no se baja de escalón sin tener el anterior</figcaption>
+  </figure>
+
+  <div class="col">
+    <blockquote>«Vamos <strong>acumulando objetivos</strong> y reforzando la dirección del movimiento, dejando ya las temporalidades alineadas hacia esa dirección. Ahora lo único que falta es encontrar un cierre para poder ejecutar la operación con confirmación.»<cite>bctrades</cite></blockquote>
+    <p>Y la frase que dice dónde entrar, que es más precisa de lo que parece:</p>
+    <blockquote>«Ahí es donde realmente buscamos ejecutar: <strong>en la zona donde nace el desplazamiento de temporalidad mayor</strong>, y donde el contexto ya nos permite buscar continuidad hacia los objetivos principales.»<cite>bctrades</cite></blockquote>
+    <p>No se entra en cualquier sitio del recorrido: se entra <strong>donde empieza</strong>. Si el movimiento ya lleva medio camino andado, ese tren ya ha salido — y eso es exactamente lo que mide la sección <a href="#s6">VI</a>.</p>
+
+    <div class="dec">
+      <div class="eyebrow">Decisión, no dato</div>
+      <p><strong>El huso horario y el anclaje de los bloques.</strong> El material nunca dice a qué hora empieza el bloque de 12H ni el diario. Aquí se fija: <strong>hora de España, bloques a las 00:00 y 12:00</strong>, diario a las 00:00.</p>
+      <p>Elígelo una vez y no lo toques nunca. Cambiar el huso cambia qué velas existen, y por tanto todos los rangos y todos los objetivos. Si algún día lo cambias «a ver qué tal», ya no es el mismo método y tu libro de operaciones deja de valer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- V ─────────────────────────────────────────── -->
+<section id="s5">
+  <div class="shead"><span class="snum">V</span><h2>Las reiniciadas</h2></div>
+  <div class="col">
+    <p>Esta es la pieza que ellos no publicaban y que te mandaron por privado. Es la más útil de todo el material y hace <strong>dos trabajos distintos</strong>.</p>
+
+    <h3>Trabajo 1 · te protegen</h3>
+    <blockquote>«Si en esa temporalidad que tenemos cerrada al alza, por la cual estamos buscando compras, se nos crea una <strong>reiniciada bajista, debemos protegernos</strong>. ¿Por qué? Porque las demás temporalidades todavía no han cerrado y el precio nos está mostrando que todavía tiene posibilidad de desplazarse en ambas direcciones.»<cite>bctrades · mensaje privado</cite></blockquote>
+    <p>Traducido a regla: <strong>si aparece una reiniciada en contra mientras las temporalidades mayores aún no han cerrado su vela, no se opera.</strong> Es lo más parecido a un «cuándo no operar» que hay en todo el material, y hasta que te lo mandaron no existía.</p>
+
+    <h3>Trabajo 2 · alinean temporalidades</h3>
+    <blockquote>«Tenemos: 1D para subir, 4H para subir, <strong>1H para bajar</strong>. Nosotros queremos buscar compras… En este caso, <strong>buscamos una reiniciada alcista en 1H</strong>. Cuando aparece, esa temporalidad vuelve a alinearse con el contexto de 4H y 1D, y ya tenemos una estructura mucho más limpia.»<cite>bctrades · mensaje privado</cite></blockquote>
+
+    <div class="tw"><table>
+      <thead><tr><th>Situación</th><th>1D</th><th>4H</th><th>1H</th><th>Qué haces</th></tr></thead>
+      <tbody>
+        <tr><td>Todo alineado</td><td>▲</td><td>▲</td><td>▲</td><td>Entrada normal al confirmar 1H.</td></tr>
+        <tr><td><strong>La de ejecución en contra</strong></td><td>▲</td><td>▲</td><td>▼</td><td><strong>Esperas la reiniciada alcista de 1H.</strong> Cuando aparece, entras. Es el mejor momento del método.</td></tr>
+        <tr><td>Reiniciada en contra y arriba sin cerrar</td><td>▲ sin cerrar</td><td>▲</td><td>reiniciada ▼</td><td><strong>No operas.</strong> Te proteges y esperas.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p>La diferencia entre las dos primeras filas es sutil y es lo que más valor tiene: <strong>no entras cuando 1H ya coincide, entras cuando pasa de estar en contra a coincidir.</strong> Eso es un momento concreto, no un estado difuso, y por eso se puede esperar sin ansiedad: o llega o no llega.</p>
+  </div>
+</section>
+
+<!-- VI ─────────────────────────────────────────── -->
+<section id="s6">
+  <div class="shead"><span class="snum">VI</span><h2>Las tres zonas de R:R</h2></div>
+  <div class="col">
+    <p>Aquí está la respuesta a «cómo sé que el setup se ve bien», y no es una sensación: <strong>es una división.</strong></p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 660 250" role="img" aria-label="Tres zonas dentro del recorrido: al principio queda tres veces el riesgo por delante (zona óptima), a mitad de camino dos veces (continuación), y cerca del objetivo solo una (últimas oportunidades).">
+      <line x1="40" y1="200" x2="600" y2="200" style="stroke:var(--linea)" stroke-width="1.5"/>
+      <text x="40" y="222" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">donde nace el movimiento</text>
+      <text x="600" y="222" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" style="fill:var(--gris)">objetivo</text>
+
+      <rect x="40" y="60" width="187" height="120" style="fill:var(--alcS)"/>
+      <rect x="227" y="60" width="187" height="120" style="fill:var(--oroS)"/>
+      <rect x="414" y="60" width="186" height="120" style="fill:var(--bajS)"/>
+      <line x1="227" y1="60" x2="227" y2="200" style="stroke:var(--linea)" stroke-width="1"/>
+      <line x1="414" y1="60" x2="414" y2="200" style="stroke:var(--linea)" stroke-width="1"/>
+
+      <text x="133" y="94" text-anchor="middle" font-family="Archivo, sans-serif" font-size="13" font-weight="700" style="fill:var(--alc)">ZONA ÓPTIMA</text>
+      <text x="133" y="120" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="18" style="fill:var(--alc)">1:3</text>
+      <text x="133" y="146" text-anchor="middle" font-family="Newsreader, serif" font-size="12" style="fill:var(--tinta2)">queda todo el recorrido</text>
+      <text x="133" y="164" text-anchor="middle" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--alc)">aquí se entra</text>
+
+      <text x="320" y="94" text-anchor="middle" font-family="Archivo, sans-serif" font-size="13" font-weight="700" style="fill:var(--oro)">CONTINUACIÓN</text>
+      <text x="320" y="120" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="18" style="fill:var(--oro)">1:2</text>
+      <text x="320" y="146" text-anchor="middle" font-family="Newsreader, serif" font-size="12" style="fill:var(--tinta2)">media carrera hecha</text>
+      <text x="320" y="164" text-anchor="middle" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--oro)">solo si acompaña todo</text>
+
+      <text x="507" y="94" text-anchor="middle" font-family="Archivo, sans-serif" font-size="13" font-weight="700" style="fill:var(--baj)">ÚLTIMAS OPORTUNIDADES</text>
+      <text x="507" y="120" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="18" style="fill:var(--baj)">1:1</text>
+      <text x="507" y="146" text-anchor="middle" font-family="Newsreader, serif" font-size="12" style="fill:var(--tinta2)">el tren ya ha salido</text>
+      <text x="507" y="164" text-anchor="middle" font-family="Archivo, sans-serif" font-size="11" font-weight="600" style="fill:var(--baj)">no se entra</text>
+
+      <text x="40" y="38" font-family="Newsreader, serif" font-size="13" font-style="italic" style="fill:var(--gris)">lo que queda hasta el objetivo, dividido entre lo que arriesgas</text>
+    </svg>
+    <figcaption>la misma estructura vale tres cosas distintas según dónde esté el precio dentro de ella</figcaption>
+  </figure>
+
+  <div class="col">
+    <blockquote>«No solo importa identificar el PO3, sino también <strong>saber dónde está el precio dentro de él y qué RR nos ofrece esa fase</strong>. Esto nos permite decidir si la entrada tiene sentido.»<cite>bctrades · 13 de agosto</cite></blockquote>
+    <p>Se mide antes de entrar, siempre, y se apunta en el libro. <strong>La regla es entrar solo con 1:3 o más.</strong> Con 1:2 solo si todo lo demás acompaña —diario, 12H y 4H en la misma dirección— y se anota que era zona de continuación. Con 1:1 no se entra, y punto: su única operación perdedora publicada entró justo ahí.</p>
+    <p>Esto también resuelve la ansiedad de «llego tarde». No llegas tarde ni pronto: <strong>llegas con un número</strong>. Si es menor de 3, no era tu operación, y no pasa nada.</p>
+  </div>
+</section>
+
+<!-- VII ─────────────────────────────────────────── -->
+<section id="s7">
+  <div class="shead"><span class="snum">VII</span><h2>Las dos formas de entrar</h2></div>
+  <div class="col">
+    <p>Están escritas literalmente, y las dos valen. Lo importante es que <strong>elijas una y la uses todo el mes</strong>, para que el libro compare cosas comparables.</p>
+  </div>
+
+  <ol class="pasos">
+    <li><b>Segunda ejecución — la que te recomiendo para empezar</b><span>Esperas directamente al <strong>cierre de 1H</strong>. Una vez confirmado, buscas la creación del rango de 1H y ejecutas. Más lenta, menos entradas, cero ambigüedad sobre el momento.</span></li>
+    <li><b>Primera ejecución — para cuando lleves el mes</b><span>Entras en el <strong>primer rango de 15M</strong>, buscando después la confirmación con el cierre de 1H. Entrada más fina, pero exige decidir en caliente y es justo lo que te bloquea ahora.</span></li>
+  </ol>
+
+  <div class="col">
+    <blockquote>«Dos formas de ejecución, mismo contexto: <strong>PO3 activado → creación de rango → confirmación → ejecución.</strong>»<cite>bctrades · 17 de agosto</cite></blockquote>
+
+    <h3>El order block, como confirmación extra</h3>
+    <p>Hay una combinación que ellos usan para validar continuidad: <strong>en 15M se completa un rango y en 1H se genera un order block</strong> en la misma dirección. No es una entrada distinta: es una señal de que el movimiento tiene intención de seguir buscando los objetivos de arriba. Si la ves, anótala en el libro. Al final del mes sabrás si tus operaciones con order block salieron mejor que las demás.</p>
+
+    <div class="dec">
+      <div class="eyebrow">Decisión, no dato</div>
+      <p><strong>El momento exacto de la orden.</strong> Al <strong>cierre de la vela de 1H que confirma</strong>, a mercado. Sin esperar retroceso, sin buscar mejor precio, sin bajar a M5 a afinar.</p>
+      <p>No porque sea mejor precio, sino porque <strong>elimina la decisión</strong>. Buscar el punto óptimo es lo que te ha dejado fuera de operaciones que sí eran válidas, y una regla abierta se paga con ansiedad todos los días. Al cierre de la vela no se puede llegar tarde.</p>
+    </div>
+  </div>
+</section>
+
+<!-- VIII ─────────────────────────────────────────── -->
+<section id="s8">
+  <div class="shead"><span class="snum">VIII</span><h2>Stop, objetivo y salida</h2></div>
+  <div class="col">
+    <h3>El stop</h3>
+    <p>Va <strong>al otro lado de la mecha que hizo el barrido</strong>, más un par de pips de colchón. En una compra, debajo del mínimo que acaba de barrer. En una venta, encima del máximo.</p>
+    <p>Y va ahí por una razón que es el corazón del método: <strong>el setup afirma que ese mínimo era el mínimo.</strong> Si el precio vuelve a pasarlo, la lectura ya era falsa. Un stop más ancho no te protege más — te mantiene dentro de una operación que ya se había demostrado equivocada, y esa es la peor situación que hay.</p>
+    <div class="nota">Si el stop te sale tan pegado que la operación no se puede ejecutar de verdad —dos o tres pips— <strong>esa operación no existe</strong>. Se anota como «descartada por stop demasiado pequeño» y se pasa a otra cosa.</div>
+
+    <h3>El objetivo</h3>
+    <p><strong>El extremo opuesto de la vela base</strong>, si operas la estructura de una sola temporalidad. Si tienes objetivos acumulados arriba —12H y diario apuntando al mismo sitio—, el objetivo es <strong>el más cercano de ellos</strong>. Es la lectura conservadora y hace que el R:R que midas sea el peor de los posibles, que es como hay que medirlo.</p>
+
+    <h3>La salida</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Sale por</th><th>Cuándo</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Objetivo</strong></td><td>El precio llega. Se cierra entera. No se mueve el objetivo a mitad de camino.</td></tr>
+        <tr><td><strong>Stop</strong></td><td>El precio vuelve a pasar la mecha del barrido. No se mueve, no se aparta, no se «le da un poco más».</td></tr>
+        <tr><td><strong>Descarte</strong></td><td>Una vela cierra fuera de la estructura tras un reinicio. Se cierra a mercado aunque no haya tocado el stop.</td></tr>
+        <tr><td><strong>Tiempo</strong></td><td>Han pasado más de dos días y sigue sin resolverse. Se cierra a mercado y se anota como «salida por tiempo».</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Tu horario</h3>
+    <p>Londres <strong>09:00 a 11:30</strong> y Nueva York <strong>14:00 a 16:00</strong>, hora de España. Fuera de ahí, ni entradas ni gestión.</p>
+    <p>Pero <strong>sí revisión</strong>: por la tarde repasas lo que pasó mientras no estabas y lo anotas como «setup fuera de horario». Esas anotaciones te dirán al final del mes cuánto te está costando el horario, que es un dato que ahora mismo no tienes.</p>
+  </div>
+</section>
+
+<!-- IX ─────────────────────────────────────────── -->
+<section id="s9">
+  <div class="shead"><span class="snum">IX</span><h2>La rutina de cada día</h2></div>
+  <div class="col"><p>Quince minutos por la mañana y cinco por la tarde. Siempre en el mismo orden, aunque parezca que no hay nada.</p></div>
+
+  <h3>08:45 · antes de que abra Londres</h3>
+  <ul class="check">
+    <li><span><b>Diaria.</b> ¿Hay rango vivo? ¿Alcista o bajista? ¿Dónde está su objetivo? Lo apuntas.</span></li>
+    <li><span><b>12 horas.</b> Lo mismo. ¿Coincide con la diaria o la contradice?</span></li>
+    <li><span><b>4 horas.</b> ¿Hay rango vivo y en qué dirección? Este es el que vas a operar.</span></li>
+    <li><span><b>Cuentas cuántas coinciden.</b> Tres es fuerte, dos es normal, una es flojo. Lo apuntas antes de que pase nada.</span></li>
+    <li><span><b>Escribes tu sesgo del día en una frase.</b> «Busco compras hacia 1,0940 porque diario y 12H apuntan arriba.» Si no puedes escribirla, es que no hay sesgo, y eso también se apunta.</span></li>
+  </ul>
+
+  <h3>09:00 a 11:30 · Londres</h3>
+  <ul class="check">
+    <li><span><b>Miras solo el cierre de cada vela de 1H.</b> Entre cierre y cierre no hay nada que hacer. Si te descubres mirando M5, cierras el gráfico.</span></li>
+    <li><span><b>¿Ha creado rango de 1H en la dirección de tu sesgo?</b> Si no, no hay operación y ya está.</span></li>
+    <li><span><b>Si 1H iba en contra: ¿ha aparecido la reiniciada?</b> Ese es tu mejor momento.</span></li>
+    <li><span><b>Mides el R:R antes de tocar nada.</b> Menos de 1:3 y no entras salvo que todo acompañe.</span></li>
+    <li><span><b>Entras al cierre, a mercado, con el stop y el objetivo puestos en el mismo momento.</b> Y te apartas.</span></li>
+  </ul>
+
+  <h3>14:00 a 16:00 · Nueva York</h3>
+  <ul class="check">
+    <li><span><b>Lo mismo, sin volver a leer el contexto.</b> El sesgo es el de la mañana; si lo cambias a media tarde, estás improvisando.</span></li>
+    <li><span><b>Máximo dos operaciones al día.</b> Si ya has hecho dos, se acabó, hayan salido bien o mal.</span></li>
+  </ul>
+
+  <h3>Por la tarde · cinco minutos</h3>
+  <ul class="check">
+    <li><span><b>Rellenas el libro</b> de lo que hayas hecho, incluidas las operaciones que viste y no tomaste.</span></li>
+    <li><span><b>Una captura del gráfico por operación.</b> Dentro de un mes, la captura vale más que lo que escribas.</span></li>
+    <li><span><b>Una frase sobre cómo te sentiste.</b> Es la columna que más te va a servir, y la que más gente se salta.</span></li>
+  </ul>
+</section>
+
+<!-- X ─────────────────────────────────────────── -->
+<section id="s10">
+  <div class="shead"><span class="snum">X</span><h2>El libro de operaciones</h2></div>
+  <div class="col">
+    <p>Estas son las columnas. Ni una más, para que lo llenes de verdad todos los días.</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Columna</th><th>Qué pones</th><th>Para qué la vas a usar</th></tr></thead>
+    <tbody>
+      <tr><td>Fecha y hora</td><td>Del cierre de la vela de entrada</td><td>Ver si tus buenas operaciones se agrupan en una franja</td></tr>
+      <tr><td>Dirección</td><td>Compra / venta</td><td>Ver si se te dan mejor unas que otras</td></tr>
+      <tr><td>Marcos alineados</td><td>1, 2 o 3</td><td><strong>Comprobar si más alineación es realmente mejor</strong></td></tr>
+      <tr><td>¿Reiniciada?</td><td>Sí / no</td><td>Comprobar si el mejor momento del método lo es de verdad para ti</td></tr>
+      <tr><td>Zona de R:R</td><td>Óptima / continuación / últimas</td><td>Comprobar el gradiente 1:3 → 1:2 → 1:1 con tus propias operaciones</td></tr>
+      <tr><td>Entrada · Stop · Objetivo</td><td>Los tres precios</td><td>Poder recalcular todo después</td></tr>
+      <tr><td>R:R</td><td>El número que mediste antes de entrar</td><td>Ver si de verdad respetaste tu propia regla</td></tr>
+      <tr><td>Resultado</td><td>Objetivo / stop / descarte / tiempo</td><td>La cuenta, y algo más importante: cuántas salen por tiempo</td></tr>
+      <tr><td>¿Seguí la regla?</td><td><strong>Sí / no</strong></td><td>La columna más valiosa del libro</td></tr>
+      <tr><td>Cómo me sentí</td><td>Una frase</td><td>Encontrar el patrón en las veces que te la saltaste</td></tr>
+      <tr><td>Captura</td><td>Imagen del gráfico</td><td>Al final del mes, revisarlas todas seguidas</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="col">
+    <h3>Y una hoja aparte: las que NO tomaste</h3>
+    <p>Fecha, por qué no entraste, y qué habría pasado si hubieras entrado. <strong>Esta hoja es la que va a contestar tu pregunta de verdad</strong> — si tu criterio al descartar te está salvando o te está costando. Sin ella, dentro de un mes tendrás treinta operaciones y ninguna forma de saber qué te dejaste por el camino.</p>
+
+    <h3>Qué miras al acabar el mes</h3>
+    <ul class="check">
+      <li><span><b>¿Cuántas veces seguiste la regla?</b> Antes que ningún resultado. Si es menos del 80 %, no has probado el método: has probado otra cosa.</span></li>
+      <li><span><b>¿Las de 3 marcos alineados salieron mejor que las de 1?</b> Su afirmación central, contra tus propios datos.</span></li>
+      <li><span><b>¿Las de zona óptima salieron mejor que las de continuación?</b></span></li>
+      <li><span><b>¿Las que descartaste habrían ganado?</b> La hoja de las no tomadas.</span></li>
+      <li><span><b>¿En qué franja horaria están tus mejores operaciones?</b></span></li>
+    </ul>
+
+    <div class="nota" style="margin-top:2em">Treinta operaciones no van a decirte si el método gana dinero — hace falta mucho más para eso. <strong>Sí van a decirte si tú puedes ejecutarlo</strong>, que es la pregunta que tienes delante ahora mismo y que ningún backtest puede contestar por ti.</div>
+  </div>
+</section>
+
+<footer>
+  <div>Método CRT · reconstruido de todo el material aportado: bctrades, los vídeos, las guías y el mensaje privado sobre reiniciadas.</div>
+  <div>Los conceptos, los estados, las tres zonas de R:R, las dos formas de entrar y las reiniciadas salen de sus publicaciones. El huso, el anclaje, el momento exacto de la orden, el límite de dos operaciones y la salida por tiempo son decisiones, y están marcadas como tales.</div>
+</footer>
+
+</div>

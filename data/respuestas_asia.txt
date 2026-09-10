@@ -1,0 +1,62 @@
+# barrido de asia · baraja v1 · 60 cortes
+S01 | paso
+S02 | opero | venta | 1.17985 | 1.18024 | 1.17904
+S03 | opero | venta | 1.07091 | 1.07136 | 1.06917
+S04 | opero | compra | 1.18747 | 1.18700 | 1.18836
+S05 | paso
+S06 | paso
+S07 | opero | venta | 1.22299 | 1.22356 | 1.22145
+S08 | opero | compra | 1.15984 | 1.15886 | 1.16354
+S09 | paso
+S10 | paso
+S11 | opero | compra | 1.08528 | 1.08482 | 1.08626
+S12 | paso
+S13 | opero | compra | 1.06786 | 1.06547 | 1.07016
+S14 | opero | venta | 1.07375 | 1.07466 | 1.07225
+S15 | opero | venta | 1.13800 | 1.13998 | 1.12981
+S16 | paso
+S17 | paso
+S18 | opero | venta | 1.17728 | 1.17787 | 1.17535
+S19 | paso
+S20 | paso
+S21 | opero | compra | 1.08689 | 1.08507 | 1.09084
+S22 | paso
+S23 | opero | venta | 1.05353 | 1.05438 | 1.05046
+S24 | paso
+S25 | paso
+S26 | paso
+S27 | paso
+S28 | opero | compra | 1.08531 | 1.08466 | 1.08720
+S29 | paso
+S30 | paso
+S31 | paso
+S32 | paso
+S33 | opero | venta | 1.07109 | 1.07217 | 1.06854
+S34 | paso
+S35 | opero | compra | 1.08130 | 1.08035 | 1.08271
+S36 | paso
+S37 | opero | venta | 1.05460 | 1.05572 | 1.05311
+S38 | paso
+S39 | paso
+S40 | opero | venta | 1.18378 | 1.18541 | 1.17969
+S41 | paso
+S42 | opero | compra | 1.12335 | 1.12199 | 1.12500
+S43 | paso
+S44 | opero | compra | 1.09900 | 1.09849 | 1.09978
+S45 | opero | compra | 1.18416 | 1.18365 | 1.18498
+S46 | paso
+S47 | paso
+S48 | paso
+S49 | opero | compra | 1.17883 | 1.17732 | 1.18274
+S50 | opero | compra | 0.99838 | 0.99726 | 1.00099
+S51 | paso
+S52 | opero | venta | 1.08614 | 1.08639 | 1.08511
+S53 | opero | compra | 1.21596 | 1.21533 | 1.21719
+S54 | paso
+S55 | paso
+S56 | opero | compra | 1.00114 | 0.99998 | 1.00522
+S57 | paso
+S58 | paso
+S59 | paso
+S60 | opero | venta | 1.17161 | 1.17254 | 1.17036
+# respondidas 60 de 60
