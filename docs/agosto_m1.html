@@ -59,7 +59,8 @@ svg{display:block; width:100%; min-width:860px; height:auto; touch-action:pan-x}
 .mandos button:hover{background:var(--linea2)}
 .mandos button:disabled{opacity:.4; cursor:default}
 .mandos .sep{flex:1}
-.mandos .ayuda{font-size:12.5px; color:var(--tinta3)}
+.mandos .ayuda{font-size:12.5px; color:var(--tinta3); max-width:46ch}
+.mandos .ayuda b{color:var(--tinta2)}
 
 .lee{display:grid; grid-template-columns:repeat(auto-fit,minmax(118px,1fr)); gap:1px;
   background:var(--linea2)}
@@ -73,6 +74,15 @@ svg{display:block; width:100%; min-width:860px; height:auto; touch-action:pan-x}
 .ficha{padding:13px 16px; font-size:14px; color:var(--tinta2); line-height:1.6}
 .ficha b{color:var(--tinta)}
 .ficha .mono{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.chips{display:flex; flex-wrap:wrap; gap:7px; margin:8px 0 10px}
+.chip{display:inline-flex; align-items:center; gap:7px; padding:5px 5px 5px 11px;
+  border:1px solid var(--linea); border-radius:20px; background:var(--panel2);
+  font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--tinta2)}
+.chip b{color:var(--tinta); font-weight:600}
+.chip button{font:inherit; font-size:17px; line-height:1; width:24px; height:24px;
+  border:0; border-radius:50%; background:var(--linea2); color:var(--tinta2);
+  cursor:pointer; padding:0}
+.chip button:hover{background:var(--mal); color:#fff}
 :focus-visible{outline:2px solid var(--s1); outline-offset:2px}
 </style>
 
@@ -89,12 +99,11 @@ svg{display:block; width:100%; min-width:860px; height:auto; touch-action:pan-x}
            role="img" aria-label="Velas de un minuto del día seleccionado"></svg>
     </div>
     <div class="mandos">
-      <button type="button" id="b-min">Marcar el mínimo</button>
-      <button type="button" id="b-max">Marcar el máximo</button>
-      <button type="button" id="b-borra">Borrar marcas</button>
+      <span class="ayuda"><b>Toca el gráfico y sale una línea</b> en el máximo o el mínimo
+        de esa vela, el que te pille más cerca. Para quitar una, la × de la lista de abajo.</span>
       <span class="sep"></span>
+      <button type="button" id="b-borra">Borrar todas</button>
       <button type="button" id="b-zoom" aria-pressed="true">Ver 07:00-12:00</button>
-      <span class="ayuda">toca cualquier vela del gráfico</span>
     </div>
     <div class="lee" id="lee"></div>
   </div>
@@ -111,7 +120,17 @@ var es = function(v,d){ return v.toLocaleString("es-ES",
     {minimumFractionDigits:d, maximumFractionDigits:d}); };
 var pr = function(v){ return v.toFixed(5).replace(".", ","); };
 
-var iDia = DIAS.length - 1, sel = -1, marcas = [], zoom = true;
+var iDia = DIAS.length - 1, sel = -1, zoom = true;
+var porDia = {};
+try { porDia = JSON.parse(localStorage.getItem("agosto_marcas") || "{}"); } catch (e) {}
+function marcasHoy(){
+  var k = DIAS[iDia].d;
+  if (!porDia[k]) porDia[k] = [];
+  return porDia[k];
+}
+function guarda(){
+  try { localStorage.setItem("agosto_marcas", JSON.stringify(porDia)); } catch (e) {}
+}
 var W = 1120, H = 560, ML = 14, MR = 104, MT = 26, MB = 30;
 
 function hm(min){
@@ -200,14 +219,16 @@ function pinta(){
       + ' fill="var(--s1)" font-weight="600">' + z[1] + " " + pr(z[0]) + '</text>');
   });
   // marcas suyas
-  marcas.forEach(function(mk){
-    if (mk.v < lo || mk.v > hi) return;
-    var y = Y(mk.v);
+  marcasHoy().forEach(function(mk){
+    var v = mk.v;
+    if (v < lo || v > hi) return;
+    var y = Y(v);
     s.push('<line x1="' + ML + '" y1="' + y.toFixed(1) + '" x2="' + (W-MR)
       + '" y2="' + y.toFixed(1) + '" stroke="var(--tinta)" stroke-width="1.4"'
       + ' stroke-dasharray="6 4"/>');
     s.push('<text x="' + (W-MR-6) + '" y="' + (y-6).toFixed(1) + '" font-size="12.5"'
-      + ' fill="var(--tinta)" text-anchor="end" font-weight="600">' + pr(mk.v) + '</text>');
+      + ' fill="var(--tinta)" text-anchor="end" font-weight="600">'
+      + pr(v) + "  " + mk.h + '</text>');
   });
   // sus entradas
   D.ops.forEach(function(op){
@@ -289,13 +310,19 @@ function pintaFicha(){
   } else {
     txt += "Ese día no tengo ninguna operación tuya apuntada.";
   }
-  if (marcas.length){
-    txt += "<br>Marcas: " + marcas.map(function(m){
-      return "<span class='mono'>" + pr(m.v) + "</span>"; }).join(" · ");
-    if (marcas.length >= 2){
-      var a = marcas[marcas.length-2].v, b = marcas[marcas.length-1].v;
-      txt += " — entre las dos últimas hay <b>" + es(Math.abs(a-b)*10000,1) + " pips</b>.";
+  var mk = marcasHoy();
+  if (mk.length){
+    txt += "<br><b>Tus líneas</b> — toca la × para quitar una:<div class='chips'>"
+        + mk.map(function(m, k){
+            return "<span class='chip'><b>" + pr(m.v) + "</b> " + m.h
+              + "<button type='button' data-k='" + k + "' aria-label='quitar'>×</button></span>";
+          }).join("") + "</div>";
+    if (mk.length >= 2){
+      txt += "Entre las dos últimas hay <b>"
+          + es(Math.abs(mk[mk.length-2].v - mk[mk.length-1].v)*10000,1) + " pips</b>. ";
     }
+    txt += "<span style='color:var(--tinta3)'>Se guardan aunque cambies de día "
+        + "o cierres la página.</span>";
   }
   $("#ficha").innerHTML = txt;
 }
@@ -303,37 +330,54 @@ function pintaFicha(){
 function toca(e){
   var D = DIAS[iDia], r = rango(D), i0 = r[0], i1 = r[1], n = i1 - i0;
   var box = $("#g").getBoundingClientRect();
-  var cx = e.clientX;
-  if (cx === undefined && e.touches && e.touches.length) cx = e.touches[0].clientX;
-  if (cx === undefined) return;
-  var px = (cx - box.left) / box.width * W;
-  var i = i0 + Math.round((px - ML) / ((W - ML - MR) / n) - 0.5);
-  sel = Math.max(i0, Math.min(i1 - 1, i));       // se pega al borde, nunca ignora
-  pinta();
+  if (e.clientX === undefined) return;
+  var px = (e.clientX - box.left) / box.width * W;
+  var py = (e.clientY - box.top)  / box.height * H;
+  var i = Math.max(i0, Math.min(i1 - 1,
+          i0 + Math.round((px - ML) / ((W - ML - MR) / n) - 0.5)));
+  sel = i;
+
+  // rehacer la escala igual que en pinta(), para traducir el toque a precio
+  var lo = Infinity, hi = -Infinity, k;
+  for (k = i0; k < i1; k++){
+    if (D.l[k] < lo) lo = D.l[k];
+    if (D.h[k] > hi) hi = D.h[k];
+  }
+  if (D.aHi <= hi + 0.0012 && D.aHi >= lo - 0.0012) hi = Math.max(hi, D.aHi);
+  if (D.aLo >= lo - 0.0012 && D.aLo <= hi + 0.0012) lo = Math.min(lo, D.aLo);
+  var pad = (hi - lo) * 0.06 || 0.0005;
+  lo -= pad; hi += pad;
+  var precio = hi - (py - MT) / (H - MT - MB) * (hi - lo);
+
+  // tocar SIEMPRE pone una línea. Se quita desde la lista de abajo, nunca
+  // tocando el gráfico: antes un toque cerca de una línea la borraba sin
+  // avisar y parecía que no se guardaba nada.
+  var v = Math.abs(D.h[i] - precio) < Math.abs(D.l[i] - precio) ? D.h[i] : D.l[i];
+  marcasHoy().push({v: v, h: hm(D.m0 + i)});
+  guarda(); pinta();
 }
-var x0toque = null;
-$("#g").addEventListener("pointerdown", function(e){ x0toque = e.clientX; });
-$("#g").addEventListener("pointerup", function(e){
-  if (x0toque !== null && Math.abs(e.clientX - x0toque) > 8) return;  // estaba arrastrando
-  toca(e);
-  x0toque = null;
-});
-$("#g").addEventListener("click", function(e){ if (sel < 0) toca(e); });
+// UN solo camino. Antes había pointerup y click a la vez, así que cada toque
+// ponía la línea y acto seguido se la quitaba: parecía que no se guardaba.
+if (window.PointerEvent){
+  var x0toque = null;
+  $("#g").addEventListener("pointerdown", function(e){ x0toque = e.clientX; });
+  $("#g").addEventListener("pointerup", function(e){
+    var arrastre = x0toque !== null && Math.abs(e.clientX - x0toque) > 8;
+    x0toque = null;
+    if (!arrastre) toca(e);
+  });
+} else {
+  $("#g").addEventListener("click", toca);
+}
 $("#dias").addEventListener("click", function(e){
   var b = e.target.closest("button[data-i]"); if (!b) return;
-  iDia = +b.dataset.i; sel = -1; marcas = []; pintaDias(); pinta();
+  iDia = +b.dataset.i; sel = -1; pintaDias(); pinta();   // las marcas se quedan
 });
-function marca(alto){
-  if (sel < 0){
-    $("#ficha").innerHTML = "<b>Toca antes una vela</b> en el gráfico y luego dale a marcar.";
-    return;
-  }
-  marcas.push({v: alto ? DIAS[iDia].h[sel] : DIAS[iDia].l[sel]});
-  pinta();
-}
-$("#b-min").onclick = function(){ marca(false); };
-$("#b-max").onclick = function(){ marca(true); };
-$("#b-borra").onclick = function(){ marcas = []; pinta(); };
+$("#b-borra").onclick = function(){ porDia[DIAS[iDia].d] = []; guarda(); pinta(); };
+$("#ficha").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-k]"); if (!b) return;
+  marcasHoy().splice(+b.dataset.k, 1); guarda(); pinta();
+});
 $("#b-zoom").onclick = function(){
   zoom = !zoom;
   this.setAttribute("aria-pressed", String(zoom));
