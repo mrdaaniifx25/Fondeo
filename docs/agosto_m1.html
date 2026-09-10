@@ -48,7 +48,8 @@ h1{font-family:Archivo,system-ui,sans-serif; font-size:26px; font-weight:700;
 
 .caja{background:var(--panel); border:1px solid var(--linea); border-radius:11px;
   box-shadow:var(--sombra); overflow:hidden; margin-bottom:14px}
-svg{display:block; width:100%; height:auto; touch-action:manipulation}
+.lienzo{overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch}
+svg{display:block; width:100%; min-width:860px; height:auto; touch-action:pan-x}
 
 .mandos{display:flex; gap:8px; flex-wrap:wrap; align-items:center;
   padding:11px 14px; border-top:1px solid var(--linea2); background:var(--panel2)}
@@ -83,15 +84,17 @@ svg{display:block; width:100%; height:auto; touch-action:manipulation}
   <div class="barra" id="dias"></div>
 
   <div class="caja">
-    <svg id="g" viewBox="0 0 1120 560" preserveAspectRatio="xMidYMid meet"
-         role="img" aria-label="Velas de un minuto del día seleccionado"></svg>
+    <div class="lienzo">
+      <svg id="g" viewBox="0 0 1120 560" preserveAspectRatio="xMidYMid meet"
+           role="img" aria-label="Velas de un minuto del día seleccionado"></svg>
+    </div>
     <div class="mandos">
       <button type="button" id="b-min">Marcar el mínimo</button>
       <button type="button" id="b-max">Marcar el máximo</button>
       <button type="button" id="b-borra">Borrar marcas</button>
       <span class="sep"></span>
-      <button type="button" id="b-zoom" aria-pressed="false">Ver sólo 08:00-11:30</button>
-      <span class="ayuda">toca una vela</span>
+      <button type="button" id="b-zoom" aria-pressed="true">Ver 07:00-12:00</button>
+      <span class="ayuda">toca cualquier vela del gráfico</span>
     </div>
     <div class="lee" id="lee"></div>
   </div>
@@ -108,7 +111,7 @@ var es = function(v,d){ return v.toLocaleString("es-ES",
     {minimumFractionDigits:d, maximumFractionDigits:d}); };
 var pr = function(v){ return v.toFixed(5).replace(".", ","); };
 
-var iDia = DIAS.length - 1, sel = -1, marcas = [], zoom = false;
+var iDia = DIAS.length - 1, sel = -1, marcas = [], zoom = true;
 var W = 1120, H = 560, ML = 14, MR = 104, MT = 26, MB = 30;
 
 function hm(min){
@@ -219,10 +222,27 @@ function pinta(){
       + '" font-size="13" fill="var(--s2)" font-weight="700">'
       + (op.lado > 0 ? "COMPRA" : "VENTA") + " " + op.h + '</text>');
   });
-  // vela seleccionada
+  // vela seleccionada · tiene que verse a la primera en una tablet
   if (sel >= i0 && sel < i1){
-    s.push('<line x1="' + X(sel).toFixed(1) + '" y1="' + MT + '" x2="' + X(sel).toFixed(1)
-      + '" y2="' + (H-MB) + '" stroke="var(--tinta2)" stroke-width="1" stroke-dasharray="3 3"/>');
+    var xs = X(sel), yh = Y(D.h[sel]), yl = Y(D.l[sel]);
+    s.push('<line x1="' + xs.toFixed(1) + '" y1="' + MT + '" x2="' + xs.toFixed(1)
+      + '" y2="' + (H-MB) + '" stroke="var(--tinta)" stroke-width="1.4"'
+      + ' stroke-dasharray="5 4" opacity=".55"/>');
+    s.push('<rect x="' + (xs - Math.max(5, w*0.9)).toFixed(1) + '" y="' + (yh-5).toFixed(1)
+      + '" width="' + (Math.max(10, w*1.8)).toFixed(1) + '" height="' + (yl-yh+10).toFixed(1)
+      + '" fill="none" stroke="var(--tinta)" stroke-width="2" rx="3"/>');
+    var ancho = 128, alto = 46;
+    var bx = Math.min(W - MR - ancho - 4, Math.max(ML + 2, xs - ancho/2));
+    var by = Math.max(MT + 2, yh - alto - 12);
+    s.push('<rect x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + ancho
+      + '" height="' + alto + '" rx="7" fill="var(--panel)" stroke="var(--tinta)"'
+      + ' stroke-width="1.5"/>');
+    s.push('<text x="' + (bx+11) + '" y="' + (by+19) + '" font-size="14" font-weight="700"'
+      + ' fill="var(--tinta)" font-family="IBM Plex Mono, monospace">'
+      + hm(D.m0 + sel) + '</text>');
+    s.push('<text x="' + (bx+11) + '" y="' + (by+37) + '" font-size="13"'
+      + ' fill="var(--tinta2)" font-family="IBM Plex Mono, monospace">'
+      + pr(D.l[sel]) + " / " + pr(D.h[sel]) + '</text>');
   }
   $("#g").innerHTML = s.join("");
   $("#g").dataset.i0 = i0; $("#g").dataset.n = n;
@@ -280,21 +300,39 @@ function pintaFicha(){
   $("#ficha").innerHTML = txt;
 }
 
-$("#g").addEventListener("click", function(e){
+function toca(e){
   var D = DIAS[iDia], r = rango(D), i0 = r[0], i1 = r[1], n = i1 - i0;
-  var box = this.getBoundingClientRect();
-  var px = (e.clientX - box.left) / box.width * W;
-  var i = i0 + Math.floor((px - ML) / ((W - ML - MR) / n));
-  if (i >= i0 && i < i1){ sel = i; pinta(); }
+  var box = $("#g").getBoundingClientRect();
+  var cx = e.clientX;
+  if (cx === undefined && e.touches && e.touches.length) cx = e.touches[0].clientX;
+  if (cx === undefined) return;
+  var px = (cx - box.left) / box.width * W;
+  var i = i0 + Math.round((px - ML) / ((W - ML - MR) / n) - 0.5);
+  sel = Math.max(i0, Math.min(i1 - 1, i));       // se pega al borde, nunca ignora
+  pinta();
+}
+var x0toque = null;
+$("#g").addEventListener("pointerdown", function(e){ x0toque = e.clientX; });
+$("#g").addEventListener("pointerup", function(e){
+  if (x0toque !== null && Math.abs(e.clientX - x0toque) > 8) return;  // estaba arrastrando
+  toca(e);
+  x0toque = null;
 });
+$("#g").addEventListener("click", function(e){ if (sel < 0) toca(e); });
 $("#dias").addEventListener("click", function(e){
   var b = e.target.closest("button[data-i]"); if (!b) return;
   iDia = +b.dataset.i; sel = -1; marcas = []; pintaDias(); pinta();
 });
-$("#b-min").onclick = function(){
-  if (sel < 0) return; marcas.push({v: DIAS[iDia].l[sel]}); pinta(); };
-$("#b-max").onclick = function(){
-  if (sel < 0) return; marcas.push({v: DIAS[iDia].h[sel]}); pinta(); };
+function marca(alto){
+  if (sel < 0){
+    $("#ficha").innerHTML = "<b>Toca antes una vela</b> en el gráfico y luego dale a marcar.";
+    return;
+  }
+  marcas.push({v: alto ? DIAS[iDia].h[sel] : DIAS[iDia].l[sel]});
+  pinta();
+}
+$("#b-min").onclick = function(){ marca(false); };
+$("#b-max").onclick = function(){ marca(true); };
 $("#b-borra").onclick = function(){ marcas = []; pinta(); };
 $("#b-zoom").onclick = function(){
   zoom = !zoom;
