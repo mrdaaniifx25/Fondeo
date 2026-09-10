@@ -53,6 +53,15 @@
 //      septiembre, no porque haya pasado ninguna prueba. Trátelo como una
 //      hipótesis suya, no como un hallazgo.
 //
+//  MODO REVISIÓN
+//  El selector "Qué marcar" tiene cuatro posiciones. "En vivo" marca cada señal
+//  cuando ocurre, que es como se opera de verdad. Las otras tres esperan a que
+//  la operación se resuelva y usan el resultado para decidir si la pintan:
+//  sirven para mirar hacia atrás y comparar ganadoras contra perdedoras, y NO
+//  se pueden usar operando, porque en vivo no hay forma de saber cuál va a
+//  ganar. Están puestas a propósito para lo que él quiere hacer: buscar en qué
+//  se diferencian.
+//
 //  Ponlo en un gráfico de M1. En otra temporalidad no significa nada.
 //
 //  Detalle: la ventana de Pine excluye el minuto final (0800-1130 llega hasta
@@ -100,11 +109,22 @@ usarBar = input.bool(false, "Sólo tras barrer un nivel de sesión", group = gB,
      "ninguna prueba. Apagado por defecto a propósito.")
 minBar  = input.int(30, "Minutos que vale el barrido", 1, 240, group = gB)
 
+// ─── revisión del histórico ────────────────────────────────────────────────
+gV = "Revisión del histórico"
+modo = input.string("En vivo", "Qué marcar", group = gV,
+     options = ["En vivo", "Sólo las que ganaron", "Sólo las que perdieron",
+                "Todas, ya resueltas"],
+     tooltip = "En vivo marca cada señal cuando ocurre, que es como se opera. " +
+     "Los otros tres esperan a que la operación se resuelva y usan el " +
+     "resultado, así que SÓLO valen para mirar hacia atrás: en vivo no puede " +
+     "saberse cuál va a ganar. Úsalos para comparar ganadoras contra " +
+     "perdedoras y buscar en qué se diferencian.")
+
 // ─── dibujo ────────────────────────────────────────────────────────────────
 gD = "Dibujo"
 verCajas = input.bool(true, "Riesgo y objetivo de cada entrada", group = gD)
 verEtq   = input.bool(true, "Etiqueta con el lotaje", group = gD)
-verGris  = input.bool(true, "Mostrar también las descartadas", group = gD)
+verGris  = input.bool(false, "Mostrar también las descartadas", group = gD)
 verTabla = input.bool(true, "Tabla de recuento", group = gD)
 cCompra  = input.color(#2F6FD0, "Compra", group = gD, inline = "c")
 cVenta   = input.color(#E08A2B, "Venta",  group = gD, inline = "c")
@@ -214,6 +234,11 @@ var array<float> opObj  = array.new<float>()
 var array<box>   opCaja = array.new<box>()
 var array<line>  opLin  = array.new<line>()
 var array<bool>  opPasa = array.new<bool>()
+var array<int>   opX0   = array.new<int>()
+var array<string> opTxt = array.new<string>()
+var array<float> opEnt  = array.new<float>()
+
+bool enVivo = modo == "En vivo"
 
 var int nTot  = 0
 var int nPasa = 0
@@ -240,6 +265,25 @@ if array.size(opLado) > 0
                 nSL := nSL + 1
             if P and res == "fuera"
                 nFin := nFin + 1
+            // modo revisión: se dibuja AHORA, en su vela de entrada
+            if not enVivo and P
+                bool quiero = (modo == "Todas, ya resueltas")
+                     or ((modo == "Sólo las que ganaron")   and res == "TP")
+                     or ((modo == "Sólo las que perdieron") and res == "SL")
+                if quiero
+                    int   x0 = array.get(opX0,  i)
+                    float e0 = array.get(opEnt, i)
+                    color cv = res == "TP" ? #0ca30c : res == "SL" ? #d03b3b : #8E8E93
+                    if verCajas
+                        box.new(x0, e0, bar_index, S, border_color = cv,
+                             border_width = 1, bgcolor = color.new(cv, 90))
+                        line.new(x0, O, bar_index, O, color = cv, width = 1,
+                             style = res == "TP" ? line.style_solid : line.style_dotted)
+                    if verEtq
+                        label.new(x0, e0, array.get(opTxt, i),
+                             style = L > 0 ? label.style_label_up : label.style_label_down,
+                             color = color.new(cv, 15), textcolor = color.white,
+                             size = size.small)
             box b = array.get(opCaja, i)
             line l = array.get(opLin,  i)
             if not na(b)
@@ -258,6 +302,9 @@ if array.size(opLado) > 0
             array.remove(opCaja, i)
             array.remove(opLin,  i)
             array.remove(opPasa, i)
+            array.remove(opX0,   i)
+            array.remove(opTxt,  i)
+            array.remove(opEnt,  i)
         else if not na(array.get(opCaja, i))
             box.set_right(array.get(opCaja, i), bar_index)
             line.set_x2(array.get(opLin, i),  bar_index)
@@ -269,16 +316,16 @@ if pinta
     color cc = pasa ? (lado > 0 ? cCompra : cVenta) : cGris
     box caja = na
     line lin = na
-    if verCajas and pasa
+    if verCajas and pasa and enVivo
         caja := box.new(bar_index, ent, bar_index, stop, border_color = cc,
              border_width = 1, bgcolor = color.new(cc, 90))
         lin  := line.new(bar_index, obj, bar_index, obj, color = cc, width = 1,
              style = line.style_dotted)
-    if verEtq
-        string txt = pasa
-             ? str.tostring(lotes, "#.##") + " lotes\n" + str.tostring(rgoP, "#.#")
-               + " p · obj " + str.tostring(obj, format.mintick)
-             : str.tostring(rgoP, "#.#") + " p"
+    string txt = pasa
+         ? str.tostring(lotes, "#.##") + " lotes\n" + str.tostring(rgoP, "#.#")
+           + " p · obj " + str.tostring(obj, format.mintick)
+         : str.tostring(rgoP, "#.#") + " p"
+    if verEtq and enVivo
         label.new(bar_index, lado > 0 ? low : high, txt,
              style = lado > 0 ? label.style_label_up : label.style_label_down,
              color = color.new(cc, pasa ? 15 : 60), textcolor = color.white,
@@ -289,15 +336,18 @@ if pinta
     array.push(opCaja, caja)
     array.push(opLin,  lin)
     array.push(opPasa, pasa)
+    array.push(opX0,   bar_index)
+    array.push(opTxt,  txt)
+    array.push(opEnt,  ent)
 
 // ─── las flechas ───────────────────────────────────────────────────────────
-plotshape(pinta and pasa and lado > 0, "Compra", shape.triangleup,
+plotshape(enVivo and pinta and pasa and lado > 0, "Compra", shape.triangleup,
      location.belowbar, cCompra, size = size.tiny)
-plotshape(pinta and pasa and lado < 0, "Venta",  shape.triangledown,
+plotshape(enVivo and pinta and pasa and lado < 0, "Venta",  shape.triangledown,
      location.abovebar, cVenta,  size = size.tiny)
-plotshape(pinta and not pasa and lado > 0, "Compra descartada", shape.circle,
+plotshape(enVivo and pinta and not pasa and lado > 0, "Compra descartada", shape.circle,
      location.belowbar, cGris, size = size.tiny)
-plotshape(pinta and not pasa and lado < 0, "Venta descartada",  shape.circle,
+plotshape(enVivo and pinta and not pasa and lado < 0, "Venta descartada",  shape.circle,
      location.abovebar, cGris, size = size.tiny)
 
 // ─── la tabla ──────────────────────────────────────────────────────────────
