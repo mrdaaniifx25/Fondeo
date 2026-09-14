@@ -165,6 +165,75 @@ Los dos caminos que quedan, y los dos evitan que yo siga adivinando:
    `PREREGISTRO_criterio.md` (300 etiquetas a ciegas, escrito y nunca ejecutado)
    o el registro hacia delante.
 
+## Tercer intento: escrito desde sus propias palabras
+
+Se le pidió que narrara el 14 de agosto momento a momento, en un artefacto con
+una caja por cada hito. Lo que contestó, literal:
+
+| momento | lo que dijo |
+|---|---|
+| 08:00 · rompe Asia | «la vela que rompe deja mecha durante 2 velas consecutivas… la siguiente ya es bajista y espero a ver cómo reacciona el precio, **aquí no haría entrada**» |
+| 08:26 · 3,7 p por debajo | «aquí ya empezaría a pensar en **compras** en el momento que el movimiento alcista [rompa] el **último alto** que hay entre las 8 y las 8:30» |
+| 08:45 · recupera el nivel | «cierra por encima pero con **poco cuerpo**… esperaría a que el precio cerrase con alguna **vela alcista con cuerpo** por encima del nivel» |
+| 09:40 · compra | «rompe el **último alto del movimiento alcista** entre las 9 y 9:30» |
+
+Tres cosas que no estaban en ninguna versión anterior del código:
+
+1. **Distingue romper con mecha de romper con cuerpo**, y aun con cuerpo espera
+   si la vela siguiente va en contra.
+2. **En el momento 2, con el precio por debajo del nivel, ya está pensando en
+   COMPRAS.** Justo donde el código v2 vendía.
+3. **El nivel de Asia no dispara nada.** Sólo enciende la alarma. El disparo es
+   siempre una vela con cuerpo que rompe **el último pivote de la estructura
+   reciente**.
+
+`bt/regla_suya_v3.py` codifica exactamente eso: la rotura de Asia arma la
+vigilancia, se siguen los pivotes causales de 3 velas a cada lado, y entra la
+primera vela cuyo cuerpo (≥ 40 % del rango) cierra más allá del último pivote,
+en la dirección de esa rotura.
+
+Dispara los 12 días. **Coincide el lado en 6 de 12.**
+
+## El resultado de los cuatro intentos
+
+| intento | de dónde salía | acierta el lado |
+|---|---|---|
+| v1 · origen del impulso | de sus capturas | 4 de 6 (67 %) |
+| v2 · carrera origen/pico | de «también hago continuaciones» | 3 de 6 (50 %) |
+| dirección según el extremo de Asia roto | hipótesis propia | 7 de 13 (54 %) |
+| v3 · rotura con cuerpo del último pivote | **de sus propias palabras** | 6 de 12 (50 %) |
+
+Cuatro formulaciones independientes, una de ellas escrita directamente desde su
+narración paso a paso de una operación concreta, y **ninguna supera al azar en
+acertar su dirección**.
+
+## Lo que eso dice, y lo que no
+
+**No dice que opere mal.** Dice que la descripción **no determina la decisión**.
+Las palabras que usa —«rompe el último alto con cuerpo»— describen *cómo* entra,
+pero no *qué* pivote mira ni *cuándo* decide que ése es el bueno. En cualquier
+mañana hay varios pivotes y varias roturas con cuerpo; la regla, tal como se
+puede escribir, no elige entre ellas. Lo que elige es él, y eso no está en la
+descripción.
+
+Es lo normal en cualquier oficio: el criterio experto casi nunca es accesible a
+la introspección. Él cree que sigue esas reglas, y las sigue — pero las reglas
+dejan grados de libertad que rellena con algo que no sabe nombrar.
+
+**Y aquí está lo importante, que va justo al revés de como suena:** si su
+descripción fuera completa, se habría codificado, se habría medido sobre seis
+años y —visto todo lo demás de este repositorio— habría salido negativa. Que sus
+decisiones contengan algo que la descripción no captura es **el único sitio
+donde puede vivir una ventaja**.
+
+**Consecuencia operativa, y es firme:** esa ventaja no se puede medir
+codificando la regla. Cuatro intentos bastan para darlo por establecido. Sólo se
+puede medir midiéndole a él — `PREREGISTRO_criterio.md` (300 etiquetas a ciegas,
+escrito en agosto y nunca ejecutado) o el registro hacia delante.
+
+Aviso de tamaño: son 12-13 operaciones. Pequeño. Pero cuatro formulaciones
+distintas cayendo todas en el 50 % convence más que cualquiera de ellas sola.
+
 ## Herramientas hechas para esto
 
 - `docs/agosto_m1.html` — los quince días con datos, en M1, con los niveles de
