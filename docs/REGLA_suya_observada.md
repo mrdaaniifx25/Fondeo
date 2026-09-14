@@ -110,6 +110,61 @@ el precio rompe el máximo de Asia a las 08:00, **vuelve a caer por debajo**
 hasta las 08:55, lo **recupera**, y él compra a las 09:40. Rotura fallida y
 reconquista. Pendiente de que él confirme si es eso lo que miraba.
 
+## Segundo intento: la carrera entre el origen y el pico
+
+Él confirma que **opera también las continuaciones**, así que la regla se
+reescribe simétrica y sin adivinar nada (`bt/regla_suya_v2.py`):
+
+```
+se rompe el nivel de Asia -> el impulso deja un origen L y un pico P
+    cierre con cuerpo por debajo de L  ->  la rotura falló    ->  VENTA
+    cierre con cuerpo por encima de P  ->  la rotura aguantó  ->  COMPRA
+gana el primero que ocurra
+```
+
+989 entradas en 2020-2026, riesgo mediano 6,5 pips, 342 giros y 647
+continuaciones. Contra sus 12 días de agosto: **coincide el lado en 3 de 6 días
+en que dispara.** Peor que la v1, que daba 4 de 6.
+
+Y los tres desacuerdos tienen la misma forma: **el código vende y él compra**,
+los tres en días en que el máximo de Asia se rompe pronto y el precio sube toda
+la mañana (14, 17 y 18 de agosto).
+
+## Los atajos de tendencia tampoco lo explican
+
+Por si la estructura fina no era lo que mandaba, se comprueba si su dirección
+coincide simplemente con la del día:
+
+| proxy | coincide con su lado |
+|---|---|
+| dirección desde el cierre de Asia | 62 % (8 de 13) |
+| dirección de la vela de 4h previa | 69 % (9 de 13) |
+| por encima/debajo de la mitad del rango de Asia | 62 % (8 de 13) |
+| dirección de los 30 min antes de entrar | 62 % (8 de 13) |
+
+Con n = 13, el 69 % no se distingue del azar.
+
+## Dónde queda esto
+
+**Tres intentos de deducir su regla y ninguno converge.** Con 13 operaciones no
+se demuestra nada —puede ser ruido—, pero sí queda claro que no va a salir por
+deducción, y seguir probando variantes propias es el error de los dos meses
+anteriores repetido con otros datos.
+
+La lectura honesta, sin adornos: si sus entradas se reprodujeran con una regla
+sencilla, esa regla se habría medido sobre seis años y casi con seguridad habría
+salido negativa como todo lo demás. **Que no se reduzcan a una regla es
+compatible con que haya algo en su criterio** — no lo demuestra, porque sigue sin
+medirse, pero tampoco lo refuta.
+
+Los dos caminos que quedan, y los dos evitan que yo siga adivinando:
+
+1. Que narre **un día entero** paso a paso, en vez de describir la regla en
+   abstracto.
+2. Dejar de codificar y medir **al lector** directamente:
+   `PREREGISTRO_criterio.md` (300 etiquetas a ciegas, escrito y nunca ejecutado)
+   o el registro hacia delante.
+
 ## Herramientas hechas para esto
 
 - `docs/agosto_m1.html` — los quince días con datos, en M1, con los niveles de
