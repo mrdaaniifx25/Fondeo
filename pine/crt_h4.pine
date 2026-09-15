@@ -1,0 +1,520 @@
+//@version=6
+// ════════════════════════════════════════════════════════════════════════════
+//  CRT · estructura en 4H, gatillo en 1H
+//
+//  docs/marcas_grafico.html tiene el dibujo de cada elemento y sus reglas.
+//  docs/cuaderno_crt.html tiene el metodo entero.
+//
+//     CONTEXTO      1D y 12H  ->  solo sus lineas de objetivo
+//     ESTRUCTURA    4H        ->  la caja, el PO3 y el objetivo principal
+//     GATILLO       1H o M15  ->  crea rango en la misma direccion -> señal
+//
+//     ENTRADA   al cierre de la vela del gatillo
+//     STOP      en la mecha del barrido de esa vela, mas el colchon
+//     OBJETIVO  el del rango de 4H, o el mas cercano de los alineados
+//
+//  Las sesiones NO van aqui: van en un indicador aparte.
+//  No repinta: todo corre sobre velas cerradas y confirmadas.
+// ════════════════════════════════════════════════════════════════════════════
+indicator("CRT · 4H y gatillo", "CRT 4H", overlay = true,
+     max_lines_count = 500, max_boxes_count = 500, max_labels_count = 500)
+
+gR = "La regla"
+tz      = input.string("Europe/Madrid", "Huso horario", group = gR,
+     options = ["Europe/Madrid", "America/New_York", "UTC", "Etc/GMT-2"],
+     tooltip = "Elígelo una vez y no lo cambies. Cambia qué velas existen, y con " +
+     "ellas todos los rangos y todos los objetivos.")
+minEst  = input.int(240, "Estructura · minutos por vela", 60, 1440, step = 60, group = gR)
+minGat  = input.int(15,  "Gatillo · minutos por vela", 1, 240, step = 1, group = gR,
+     tooltip = "Dónde esperas el cierre que confirma. El barrido lo hace la vela " +
+     "de 4H; la confirmación la tomas en la escala que quieras. Cuanto más abajo, " +
+     "antes entras y más cerca del stop, a cambio de menos certeza. 5 y 15 son las " +
+     "que enseña el material; 60 es la variante lenta. Elige una y no la cambies " +
+     "dentro del mismo mes, o tu libro no compara nada.")
+pedirH1 = input.bool(true, "Exigir que H1 haya barrido en la misma dirección", group = gR,
+     tooltip = "Antes de bajar a M15, H1 tiene que tener rango vivo en la misma " +
+     "dirección que 4H: los dos apuntando al mismo sitio.")
+verCtx  = input.bool(true, "Líneas de objetivo de 12H y diario", group = gR)
+vidaMax = input.int(10, "Salir a mercado tras N velas de estructura", 0, 60, group = gR)
+dojiPct = input.float(10.0, "Vela base doji: cuerpo menor que este % del rango", 0, 50, group = gR)
+
+gD = "Lo que se dibuja"
+verPO3  = input.bool(true, "Corchetes del PO3 sobre el rango vivo", group = gD)
+histor  = input.bool(true, "Dejar el historial de rangos en gris", group = gD)
+verRitmo = input.bool(true, "Marcar el cierre de cada vela del gatillo", group = gD,
+     tooltip = "Solo aparece si el gráfico es más pequeño que el gatillo. Sirve " +
+     "para mirar en M5 sin perder de vista dónde cierran las velas de M15, que " +
+     "es el único instante en el que puede aparecer una señal.")
+verPanel = input.bool(true, "Panel", group = gD)
+
+gE = "Ejecución"
+pip     = input.float(0.0001, "Tamaño del pip", 0.000001, 100, group = gE)
+colchon = input.float(1.0, "Colchón del stop (ticks)", 0, 20, group = gE)
+bloqRe  = input.bool(true, "Bloquear si hay reiniciada en contra sin cerrar arriba", group = gE,
+     tooltip = "La regla de protección: si aparece una reiniciada en contra mientras " +
+     "una temporalidad mayor todavía no ha cerrado su rango, no se opera.")
+
+gV = "Tu ventana operativa"
+usarVent = input.bool(true, "Avisar solo dentro de la killzone", group = gV,
+     tooltip = "Dibuja siempre. Esto controla los avisos. Con el huso en " +
+     "Europe/Madrid las dos ventanas caen a la misma hora de tu reloj en " +
+     "invierno y en verano, porque España y Nueva York cambian de horario a la vez.")
+vent1 = input.session("0800-1100", "London killzone", group = gV)
+vent2 = input.session("1300-1600", "New York killzone", group = gV)
+
+ALC = #0E8C7D
+BAJ = #C4443C
+ORO = #B0790F
+GRI = color.gray
+MIN_MS = 60000
+
+// ── reloj local ─────────────────────────────────────────────────────────────
+epocaDe(int t) =>
+    timestamp("UTC", year(t, tz), month(t, tz), dayofmonth(t, tz), hour(t, tz), minute(t, tz))
+bloqueDe(int e, int per) => int(math.floor(e / (per * MIN_MS)))
+elFin = epocaDe(time_close - 1)
+elSig = epocaDe(time_close)
+enKZ1 = not na(time(timeframe.period, vent1 + ":23456", tz))
+enKZ2 = not na(time(timeframe.period, vent2 + ":23456", tz))
+enVentana = not usarVent or enKZ1 or enKZ2
+
+// ════════════════════════════════════════════════════════════════════════════
+type Marco
+    int    per
+    int    bid     = na
+    bool   cerrada = false
+    int    barIni  = na
+    int    barPrev = na
+    float  o = na
+    float  h = na
+    float  l = na
+    float  c = na
+    bool   hayPrev = false
+    float  po = na
+    float  ph = na
+    float  pl = na
+    float  pc = na
+    int    lado    = 0
+    int    ladoAnt = 0        // direccion del rango anterior, para la reiniciada
+    bool   vivo    = false
+    float  obj     = na
+    float  bhi     = na
+    float  blo     = na
+    float  mecha   = na       // el extremo del barrido: ahi va el stop
+    float  cierre  = na       // cierre de la vela que activo
+    int    edad    = 0
+    string estado  = "sin rango"
+    // la vela EN CURSO: un barrido es un instante, la confirmacion llega al
+    // cierre. Entre los dos hay horas de incertidumbre que ningun indicador
+    // enseña, y son exactamente las que hacen dudar.
+    int    barriendo = 0      // 0 nada · 1 se ha llevado el bajo · -1 el alto
+    bool   ahoraOK   = false  // si cerrase ahora, ¿cerraria dentro del cuerpo?
+    int    faltaMin  = 0
+
+var Marco d1  = Marco.new(1440)
+var Marco h12 = Marco.new(720)
+var Marco est = Marco.new(240)
+var Marco h1  = Marco.new(60)
+var Marco gat = Marco.new(15)
+
+procesa(Marco s) =>
+    float co = s.o
+    float ch = s.h
+    float cl = s.l
+    float cc = s.c
+    bool nace = false
+    if s.vivo
+        bool llega = s.lado > 0 ? ch >= s.obj : cl <= s.obj
+        bool salta = s.lado > 0 ? cl <= s.mecha : ch >= s.mecha
+        s.edad := s.edad + 1
+        if llega
+            s.vivo := false
+            s.estado := "COMPLETADO"
+        else if salta
+            s.vivo := false
+            s.estado := "INVALIDADO"
+        else if vidaMax > 0 and s.edad >= vidaMax
+            s.vivo := false
+            s.estado := "CADUCADO"
+        else
+            s.estado := "EN CURSO"
+    if s.hayPrev
+        float cuA = math.max(s.po, s.pc)
+        float cuB = math.min(s.po, s.pc)
+        float rgo = s.ph - s.pl
+        if rgo > 0 and (cuA - cuB) < rgo * dojiPct / 100.0
+            cuA := s.ph
+            cuB := s.pl
+        bool dentro = cc >= cuB and cc <= cuA
+        bool alc = cl < s.pl and dentro
+        bool baj = ch > s.ph and dentro
+        if alc and baj
+            alc := false
+            baj := false
+        if alc or baj
+            s.ladoAnt := s.lado
+            s.lado  := alc ? 1 : -1
+            s.obj   := alc ? s.ph : s.pl
+            s.bhi   := s.ph
+            s.blo   := s.pl
+            s.mecha := alc ? cl : ch
+            s.cierre := cc
+            s.edad  := 0
+            s.vivo  := true
+            s.estado := "CREADO"
+            nace := true
+    s.po := s.o
+    s.ph := s.h
+    s.pl := s.l
+    s.pc := s.c
+    s.hayPrev := true
+    nace
+
+abre(Marco s, int b) =>
+    s.bid := b
+    s.cerrada := false
+    s.barPrev := s.barIni
+    s.barIni := bar_index
+    s.o := open
+    s.h := high
+    s.l := low
+    s.c := close
+    true
+
+paso(Marco s) =>
+    int b  = bloqueDe(elFin, s.per)
+    int bn = bloqueDe(elSig, s.per)
+    bool nace = false
+    bool nueva = na(s.bid) or b != s.bid
+    if nueva and not na(s.bid) and not s.cerrada
+        nace := procesa(s)
+    if nueva
+        abre(s, b)
+    if not nueva
+        s.h := math.max(s.h, high)
+        s.l := math.min(s.l, low)
+        s.c := close
+        if bn != b and barstate.isconfirmed and not s.cerrada
+            nace := procesa(s)
+            s.cerrada := true
+    // estado de la vela en curso, para el panel
+    if s.hayPrev and not s.cerrada
+        bool bAlc = s.l < s.pl
+        bool bBaj = s.h > s.ph
+        s.barriendo := bAlc and not bBaj ? 1 : bBaj and not bAlc ? -1 : 0
+        float cuA = math.max(s.po, s.pc)
+        float cuB = math.min(s.po, s.pc)
+        float rg = s.ph - s.pl
+        if rg > 0 and (cuA - cuB) < rg * dojiPct / 100.0
+            cuA := s.ph
+            cuB := s.pl
+        s.ahoraOK := s.c >= cuB and s.c <= cuA
+        s.faltaMin := int(((b + 1) * s.per * MIN_MS - elFin) / MIN_MS)
+    else if s.cerrada
+        s.barriendo := 0
+    nace
+
+d1.per  := 1440
+h12.per := 720
+est.per := minEst
+h1.per  := 60
+gat.per := minGat
+
+paso(d1)
+paso(h12)
+naceEst = paso(est)
+paso(h1)
+naceGat = paso(gat)
+
+// ── objetivos de contexto ───────────────────────────────────────────────────
+lin(Marco s, line ln, float ancho, float transp) =>
+    line r = ln
+    if s.vivo
+        color cx = s.lado > 0 ? ALC : BAJ
+        if na(r)
+            r := line.new(bar_index, s.obj, bar_index + 1, s.obj,
+                 color = color.new(cx, int(transp)), width = int(ancho), style = line.style_dashed)
+        line.set_y1(r, s.obj)
+        line.set_y2(r, s.obj)
+        line.set_x2(r, bar_index + 24)
+        line.set_color(r, color.new(cx, int(transp)))
+    else if not na(r)
+        line.set_color(r, color.new(GRI, 55))
+        line.set_style(r, line.style_dotted)
+    r
+
+var line lnD1  = na
+var line lnH12 = na
+if verCtx
+    lnD1  := lin(d1,  lnD1,  1, 40)
+    lnH12 := lin(h12, lnH12, 2, 20)
+
+// ── la caja de 4H, el PO3 y las zonas ───────────────────────────────────────
+var box   cj  = na
+var line  lnE = na
+var label et  = na
+var line  b1  = na
+var line  b2  = na
+var line  b3  = na
+var label l1  = na
+var label l2  = na
+var label l3  = na
+borra() =>
+    line.delete(b1)
+    line.delete(b2)
+    line.delete(b3)
+    label.delete(l1)
+    label.delete(l2)
+    label.delete(l3)
+    true
+
+if naceEst
+    if not histor
+        box.delete(cj)
+        line.delete(lnE)
+        label.delete(et)
+    borra()
+    color cx = est.lado > 0 ? ALC : BAJ
+    cj := box.new(est.barPrev, est.bhi, bar_index + 1, est.blo,
+         border_color = color.new(cx, 30), bgcolor = na, border_width = 1)
+    lnE := line.new(est.barPrev, est.obj, bar_index + 24, est.obj,
+         color = cx, width = 3, style = line.style_dashed)
+    et := label.new(est.barPrev, est.lado > 0 ? est.blo : est.bhi, "4H · CREADO",
+         style = est.lado > 0 ? label.style_label_up : label.style_label_down,
+         color = color.new(cx, 88), textcolor = cx, size = size.small)
+    if verPO3
+        float y = est.lado > 0 ? est.blo : est.bhi
+        float d = (est.bhi - est.blo) * 0.10
+        float yb = est.lado > 0 ? y - d : y + d
+        b1 := line.new(est.barPrev, yb, est.barIni - 1, yb, color = GRI, width = 2)
+        b2 := line.new(est.barIni, yb, bar_index, yb, color = cx == ALC ? BAJ : ALC, width = 2)
+        b3 := line.new(bar_index + 1, yb, bar_index + 2, yb, color = cx, width = 2)
+        l1 := label.new(int(math.avg(est.barPrev, est.barIni)), yb, "acumulación",
+             style = label.style_none, textcolor = GRI, size = size.tiny)
+        l2 := label.new(int(math.avg(est.barIni, bar_index)), yb, "manipulación",
+             style = label.style_none, textcolor = cx == ALC ? BAJ : ALC, size = size.tiny)
+        l3 := label.new(bar_index + 2, yb, "distribución",
+             style = label.style_none, textcolor = cx, size = size.tiny)
+if est.vivo and not na(cj)
+    box.set_right(cj, bar_index + 1)
+    line.set_x2(lnE, bar_index + 24)
+    label.set_text(et, "4H · " + est.estado)
+    if verPO3 and not na(b3)
+        line.set_x2(b3, bar_index)
+        label.set_x(l3, int(math.avg(line.get_x1(b3), bar_index)))
+
+if not est.vivo and not na(cj)
+    box.set_border_color(cj, color.new(GRI, 55))
+    line.set_color(lnE, color.new(GRI, 60))
+    line.set_style(lnE, line.style_dotted)
+    label.set_textcolor(et, GRI)
+    label.set_text(et, "4H · " + est.estado)
+    borra()
+    b1 := na
+
+// ── el setup provisional, con la vela de 4H todavía abierta ─────────────────
+// Sin esto no se dibujaba NADA hasta que cerraba la vela de 4H, o sea hasta
+// cuatro horas despues del barrido. Y es justo cuando se opera: el gatillo
+// puede disparar con la de 4H abierta, y hasta ahora disparaba a ciegas.
+// Se dibuja discontinuo, para distinguirlo del rango ya confirmado.
+var box  cjP = na
+var line lnP = na
+var line lnS = na
+
+if est.barriendo != 0 and not est.vivo
+    color cp = est.barriendo > 0 ? ALC : BAJ
+    float oP = est.barriendo > 0 ? est.ph : est.pl
+    float mP = est.barriendo > 0 ? est.l : est.h
+    if na(cjP)
+        cjP := box.new(est.barPrev, est.ph, bar_index + 1, est.pl, bgcolor = na,
+             border_color = color.new(cp, 45), border_width = 1,
+             border_style = line.style_dashed)
+        lnP := line.new(est.barPrev, oP, bar_index + 12, oP, color = color.new(cp, 35),
+             width = 2, style = line.style_dashed)
+        lnS := line.new(est.barIni, mP, bar_index + 12, mP, color = color.new(BAJ, 35),
+             width = 1, style = line.style_dotted)
+    box.set_top(cjP, est.ph)
+    box.set_bottom(cjP, est.pl)
+    box.set_right(cjP, bar_index + 1)
+    box.set_border_color(cjP, color.new(cp, 45))
+    line.set_y1(lnP, oP)
+    line.set_y2(lnP, oP)
+    line.set_x2(lnP, bar_index + 12)
+    line.set_color(lnP, color.new(cp, 35))
+    line.set_y1(lnS, mP)
+    line.set_y2(lnS, mP)
+    line.set_x2(lnS, bar_index + 12)
+
+// en cuanto la de 4H cierra -confirmando o fallando- el provisional se va
+if est.barriendo == 0 or est.vivo
+    box.delete(cjP)
+    line.delete(lnP)
+    line.delete(lnS)
+    cjP := na
+    lnP := na
+    lnS := na
+
+// ── el gatillo ──────────────────────────────────────────────────────────────
+var string motivo = "esperando"
+var float  ultStop = na
+var bool   ultRein = false
+var bool   bloqueado = false
+
+// ── el setup ────────────────────────────────────────────────────────────────
+// Existe en dos momentos, y el codigo tenia solo el segundo:
+//   PROVISIONAL  la vela de 4H EN CURSO ya se ha llevado el extremo, pero
+//                todavia no ha cerrado. Aqui es donde se opera de verdad: si
+//                esperas al cierre de 4H entras cuatro horas tarde.
+//   CONFIRMADO   la vela de 4H cerro dentro del cuerpo y el rango esta vivo.
+// En los dos, el gatillo es el mismo: que un cierre de M15 devuelva el precio
+// dentro de la vela base.
+int   setL   = est.barriendo != 0 ? est.barriendo : (est.vivo ? est.lado : 0)
+bool  setProv = est.barriendo != 0
+float baseProv = setL > 0 ? est.pl : est.ph
+float baseFija = setL > 0 ? est.blo : est.bhi
+float setBase = setL == 0 ? na : setProv ? baseProv : baseFija
+float setMecha = setL == 0 ? na : setProv ? (setL > 0 ? est.l : est.h) : est.mecha
+float setObj  = setL == 0 ? na : setProv ? (setL > 0 ? est.ph : est.pl) : est.obj
+float setCie  = setProv ? est.pc : est.cierre
+
+// Pine no admite historial sobre campos de objeto -gat.cerrada[1] no compila-,
+// asi que el estado anterior se guarda a mano.
+var bool gatAntes = false
+bool acabaGat = barstate.isconfirmed and gat.cerrada and not gatAntes
+if barstate.isconfirmed
+    gatAntes := gat.cerrada
+
+// Sin if/else: cada caso es un `if` con su propia guarda. En Pine las ramas de
+// un if/else tienen que devolver el mismo tipo, y aqui unas acaban en una
+// asignacion y otras en una llamada que no devuelve nada. Con ifs sueltos no
+// hay nada que comparar.
+if acabaGat
+    bool resuelto = false
+    bool vuelve = setL == 0 ? false : setL > 0 ? gat.pc > setBase : gat.pc < setBase
+    bool h1ok   = not pedirH1 or (h1.vivo and h1.lado == setL)
+    bool arribaSinCerrar = not d1.vivo or not h12.vivo
+    // la reiniciada del mensaje privado es de H1, no del gatillo: "buscamos una
+    // reiniciada alcista en 1H". Estaba mirando el marco equivocado.
+    bool h1EnContra = setL != 0 and h1.vivo and h1.lado != 0 and h1.lado != setL
+    bool bloqueaRe = bloqRe and h1EnContra and arribaSinCerrar
+
+    if setL != 0
+        ultRein := h1.ladoAnt != 0 and h1.ladoAnt != setL and h1.vivo and h1.lado == setL
+
+    if setL == 0
+        motivo := "sin barrido en 4H"
+        ultStop := na
+        resuelto := true
+
+    if not resuelto and bloqueaRe
+        bloqueado := true
+        motivo := "⊘ reiniciada en contra y arriba sin cerrar · NO SE OPERA"
+        ultStop := na
+        resuelto := true
+
+    if not resuelto and not h1ok
+        motivo := "4H " + (setL > 0 ? "alcista" : "bajista") + " pero H1 no acompaña"
+        ultStop := na
+        resuelto := true
+
+    // un cierre del gatillo FUERA no descarta nada: el rango es de 4H y solo un
+    // cierre de 4H puede descartarlo. Se sigue esperando.
+    if not resuelto and not vuelve
+        motivo := "M15 cerró fuera · sigo esperando el que vuelva dentro"
+        ultStop := na
+        resuelto := true
+
+    if not resuelto
+        bloqueado := false
+        float ent = gat.pc
+        float colch = colchon * syminfo.mintick
+        float stp = setL > 0 ? setMecha - colch : setMecha + colch
+        float rgo = math.abs(ent - stp)
+        ultStop := rgo / pip
+        int nAl = 2 + (d1.vivo and d1.lado == setL ? 1 : 0) +
+             (h12.vivo and h12.lado == setL ? 1 : 0) + (h1.vivo and h1.lado == setL ? 1 : 0)
+        if rgo <= 0
+            motivo := "el barrido no deja stop"
+        if rgo > 0
+            color cs = setL > 0 ? ALC : BAJ
+            label.new(bar_index, setL > 0 ? low : high,
+                 (setL > 0 ? "▲ COMPRA" : "▼ VENTA") + (setProv ? "  · 4H sin cerrar" : "") +
+                 (ultRein ? "  · reiniciada" : "") +
+                 "\nentrada  " + str.tostring(ent, format.mintick) +
+                 "\nstop     " + str.tostring(stp, format.mintick) + "   · " +
+                 str.tostring(rgo / pip, "#.#") + " pips" +
+                 "\nobjetivo " + str.tostring(setObj, format.mintick) +
+                 "\n" + str.tostring(nAl) + " de 5 marcos" +
+                 (enVentana ? "" : "\n(fuera de tu ventana)"),
+                 style = setL > 0 ? label.style_label_up : label.style_label_down,
+                 color = color.new(cs, enVentana ? 12 : 58), textcolor = color.white,
+                 size = size.normal)
+            line.new(bar_index, stp, bar_index + 20, stp, color = BAJ, width = 2,
+                 style = line.style_dashed)
+            line.new(bar_index, ent, bar_index + 20, ent, color = color.new(color.gray, 20),
+                 width = 2)
+            if enVentana
+                alert((setL > 0 ? "CRT COMPRA " : "CRT VENTA ") + syminfo.ticker +
+                     (setProv ? " (4H sin cerrar)" : "") +
+                     " · entrada " + str.tostring(ent, format.mintick) +
+                     " · stop " + str.tostring(stp, format.mintick) +
+                     " · objetivo " + str.tostring(setObj, format.mintick),
+                     alert.freq_once_per_bar_close)
+            motivo := (enVentana ? "SEÑAL " : "SEÑAL fuera de tu ventana · ") +
+                 (setL > 0 ? "COMPRA" : "VENTA") + " · stop " +
+                 str.tostring(rgo / pip, "#.#") + " pips"
+
+// ── panel ───────────────────────────────────────────────────────────────────
+flecha(Marco s) => s.vivo ? (s.lado > 0 ? "▲" : "▼") : "—"
+colM(Marco s) => s.vivo ? (s.lado > 0 ? ALC : BAJ) : GRI
+
+fila(table t, int r, string a, string b, color cb) =>
+    table.cell(t, 0, r, a, text_size = size.small, text_color = color.gray, text_halign = text.align_left)
+    table.cell(t, 1, r, b, text_size = size.small, text_color = cb, text_halign = text.align_right)
+
+var table pan = table.new(position.bottom_right, 2, 5,
+     bgcolor = color.new(color.black, 12), border_width = 1,
+     border_color = color.new(color.gray, 78), frame_width = 1, frame_color = color.new(color.gray, 78))
+
+if verPanel and barstate.islast
+    bool hay = str.startswith(motivo, "SEÑAL")
+    bool blo = str.startswith(motivo, "⊘")
+    int nAl = (d1.vivo ? 1 : 0) + (h12.vivo ? 1 : 0) + (est.vivo ? 1 : 0) + (gat.vivo ? 1 : 0)
+    table.cell(pan, 0, 0, "CRT " + str.tostring(minEst / 60, "#") + "H", text_size = size.small,
+         text_color = color.white, text_halign = text.align_left)
+    table.cell(pan, 1, 0, "gatillo M" + str.tostring(minGat) + (enVentana ? "  ●" : "  ○"),
+         text_size = size.small, text_color = enVentana ? ALC : color.gray, text_halign = text.align_right)
+    fila(pan, 1, "1D · 12H · 4H · 1H",
+         flecha(d1) + " " + flecha(h12) + " " + flecha(est) + " " + flecha(h1) +
+         (ultRein ? "   reiniciada" : ""), ultRein ? ORO : color.white)
+    string txtEst = est.vivo ? est.estado + "  →  " + str.tostring(est.obj, format.mintick) : est.estado
+    color  colEst = colM(est)
+    if est.barriendo != 0
+        // el barrido ya ha ocurrido pero la vela no ha cerrado: ni valido ni
+        // invalido todavia. Es el hueco que hace dudar, y aqui se ve.
+        txtEst := "BARRIDO " + (est.barriendo > 0 ? "▲" : "▼") + "  " +
+             (est.ahoraOK ? "cierra dentro ✓" : "cierra FUERA ✗") + "  ·  faltan " +
+             (est.faltaMin >= 60 ? str.tostring(est.faltaMin / 60) + "h" +
+              str.tostring(est.faltaMin % 60, "00") : str.tostring(est.faltaMin) + "m")
+        colEst := est.ahoraOK ? ORO : GRI
+    fila(pan, 2, "estructura", txtEst, colEst)
+    fila(pan, 3, "stop", na(ultStop) ? "—" : str.tostring(ultStop, "#.#") + " pips",
+         na(ultStop) ? color.gray : color.white)
+    table.cell(pan, 0, 4, hay ? "▶" : blo ? "⊘" : "·", text_size = size.small,
+         text_color = hay ? ALC : blo ? BAJ : color.gray, text_halign = text.align_left)
+    table.cell(pan, 1, 4, motivo, text_size = size.small,
+         text_color = hay ? ALC : blo ? BAJ : color.gray, text_halign = text.align_right)
+
+// el ritmo del gatillo, para poder mirar en M5 sin perder la referencia
+bool finGat = bloqueDe(elSig, gat.per) != bloqueDe(elFin, gat.per)
+bool marcaRitmo = verRitmo and finGat and timeframe.in_seconds() < gat.per * 60
+bgcolor(marcaRitmo ? color.new(color.gray, 88) : na, title = "cierre del gatillo")
+
+var label avTF = na
+if barstate.islast
+    label.delete(avTF)
+    if timeframe.in_seconds() > minGat * 60
+        avTF := label.new(bar_index, high,
+             "El gráfico tiene velas más grandes que el gatillo.\nPonte en M15 o menos.",
+             style = label.style_label_down, color = color.new(color.orange, 15),
+             textcolor = color.white, size = size.normal)

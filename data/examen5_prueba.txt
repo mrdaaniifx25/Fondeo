@@ -1,0 +1,15 @@
+S01 · 08:45 COMPRA ent 1.18725 sl 1.18684 (4.1p) tp 1.18807 -> TP +2 R a las 08:57 [t+0m T1] {claro} [ind]
+S01 · 09:02 DESCARTA COMPRA en 1.1879 (5.2p) · no me convence [t+1m T1] [ind]
+S01 · 09:40 DESCARTA VENTA en 1.18812 (3p) · falta confirmación [t+2m T1] [ind]
+S02 · 08:35 VENTA ent 1.18962 sl 1.19013 (5.1p) tp 1.1886 -> SL -1 R a las 08:57 [t+3m T1] {dudando} | falló: nivel
+S02 · 10:15 COMPRA ent 1.18900 sl 1.18850 (5p) tp 1.19 -> cierre +1.72 R a las 11:30 [t+4m T1] {normal}
+S03 · SIN OPERACIONES
+S04 · 08:20 DESCARTA COMPRA en 1.20184 (5.8p) · voy tarde [t+6m T2] [ind]
+S05 · 08:08 COMPRA ent 1.2133 sl 1.21252 (7.8p) tp 1.21486 -> TP +2 R a las 10:53 {claro} · me ha costado decidirme
+S06 · 09:00 DESCARTA VENTA en 1.06 (4p) · me he equivocado
+
+TOTAL 4 operaciones · 3 en objetivo · 4.72 R brutos · 4 descartes
+
+CUENTAS
+    intento 1: PASA con 11000 $ en la sesión 3
+    intento 2: en curso con 9800 $
