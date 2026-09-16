@@ -1,5 +1,5 @@
 import json, io
-CASOS = open("data/etiquetas_casos.json").read()
+CASOS = open("data/etiquetas_casos_3tf.json").read()
 
 HTML = r'''<title>300 setups a ciegas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,7 +35,7 @@ body{
   font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
 }
-.envoltura{max-width:1180px; margin:0 auto; padding:18px 20px 28px; display:flex; flex-direction:column; gap:14px; min-height:100vh}
+.envoltura{max-width:1240px; margin:0 auto; padding:18px 20px 28px; display:flex; flex-direction:column; gap:14px; min-height:100vh}
 
 /* ── cabecera ───────────────────────────────────────── */
 .cab{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
@@ -53,11 +53,19 @@ body{
 
 /* ── tarjeta principal ──────────────────────────────── */
 .tarjeta{background:var(--panel); border:1px solid var(--linea); border-radius:12px;
-  box-shadow:var(--sombra); display:grid; grid-template-columns:1fr 232px; overflow:hidden; flex:1}
+  box-shadow:var(--sombra); display:grid; grid-template-columns:1fr 232px; overflow:hidden}
 @media (max-width:820px){ .tarjeta{grid-template-columns:1fr} }
 
-.lienzo{padding:6px 4px 0 10px; min-width:0; display:flex; flex-direction:column}
-svg.g{width:100%; height:100%; min-height:330px; display:block}
+.lienzo{padding:9px 6px 9px 11px; min-width:0; display:grid;
+  grid-template-columns:1fr 1fr; align-content:start; gap:7px 12px}
+@media (max-width:820px){ .lienzo{grid-template-columns:1fr} }
+.panel{min-width:0; display:flex; flex-direction:column; gap:2px}
+.panel.ancho{grid-column:1 / -1}
+@media (max-width:820px){ .panel.ancho{grid-column:auto} }
+.panel .tf{font-size:10.5px; text-transform:uppercase; letter-spacing:.085em;
+  color:var(--tenue); font-weight:600; padding-left:3px}
+.panel .tf b{color:var(--suave); font-weight:600}
+svg.g{width:100%; height:auto; display:block}
 
 .datos{border-left:1px solid var(--linea); padding:16px 16px 14px; display:flex; flex-direction:column; gap:14px; background:var(--hueco)}
 @media (max-width:820px){ .datos{border-left:none; border-top:1px solid var(--linea)} }
@@ -121,7 +129,14 @@ textarea{width:100%; height:110px; font-family:"IBM Plex Mono",monospace; font-s
   <div class="barra" id="barra"></div>
 
   <div class="tarjeta" id="tarjeta">
-    <div class="lienzo"><svg class="g" id="g" preserveAspectRatio="none"></svg></div>
+    <div class="lienzo">
+      <div class="panel"><span class="tf">H4 · <b>el rango y el barrido</b></span>
+        <svg class="g" id="g4" viewBox="0 0 520 304" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="panel"><span class="tf">H1 · <b>el mismo rango de cerca</b></span>
+        <svg class="g" id="g1" viewBox="0 0 520 304" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="panel ancho"><span class="tf">M5 · <b>la entrada</b></span>
+        <svg class="g" id="g5" viewBox="0 0 1064 262" preserveAspectRatio="xMidYMid meet"></svg></div>
+    </div>
     <div class="datos" id="datos"></div>
   </div>
 
@@ -212,82 +227,141 @@ function pintaProgreso(){
 
 function fmt(v, d){ return v.toFixed(d); }
 
-function dibuja(c){
-  const svg = document.getElementById("g");
-  const W = 1000, H = 460, mI = 8, mD = 74, mA = 16, mB = 26;
-  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
-  const vs = c.velas;
+const NS = "http://www.w3.org/2000/svg";
+function el(t, a, txt){
+  let s = "<" + t;
+  for (const k in a) s += " " + k + '="' + a[k] + '"';
+  return txt !== undefined ? s + ">" + txt + "</" + t + ">" : s + "/>";
+}
+
+/* Un panel. `vs` son las velas, `off` el desplazamiento del primer precio
+   dentro de cada fila (H4 lleva la marca de tiempo delante, H1 y M5 no).
+   Todos los paneles terminan en la vela de entrada: no hay ni una posterior. */
+function panel(id, vs, off, c, cfg){
+  const svg = document.getElementById(id);
+  const vb = svg.getAttribute("viewBox").split(" ");
+  const W = +vb[2], H = +vb[3], mI = 8, mD = 66, mA = 13, mB = 16;
   let lo = Infinity, hi = -Infinity;
-  vs.forEach(v => { hi = Math.max(hi, v[2]); lo = Math.min(lo, v[3]); });
-  [c.stop, c.objetivo, c.entrada, c.dia_hi, c.dia_lo].forEach(v => { hi = Math.max(hi,v); lo = Math.min(lo,v); });
-  const pad = (hi - lo) * 0.07; hi += pad; lo -= pad;
+  vs.forEach(v => { hi = Math.max(hi, v[off+1]); lo = Math.min(lo, v[off+2]); });
+  [c.stop, c.objetivo, c.entrada, c.rango_hi, c.rango_lo].forEach(v => {
+    hi = Math.max(hi, v); lo = Math.min(lo, v); });
+  if (cfg.dia) [c.dia_hi, c.dia_lo].forEach(v => { hi = Math.max(hi,v); lo = Math.min(lo,v); });
+  const pad = (hi - lo) * 0.08; hi += pad; lo -= pad;
   const Y = p => mA + (hi - p) / (hi - lo) * (H - mA - mB);
   const paso = (W - mI - mD) / vs.length;
   const X = k => mI + paso * (k + 0.5);
-  const anch = Math.max(3, paso * 0.6);
-
-  const NS = "http://www.w3.org/2000/svg";
+  const anch = Math.max(2, paso * 0.6);
   let out = "";
-  const el = (t, a, txt) => {
-    let s = "<" + t;
-    for (const k in a) s += " " + k + '="' + a[k] + '"';
-    return txt !== undefined ? s + ">" + txt + "</" + t + ">" : s + "/>";
-  };
 
-  // banda del rango de la vela base
-  const vb = vs[c.i_base];
-  out += el("rect", {x:X(c.i_base)-anch/2-2, y:Y(vb[2]), width:(W-mD)-(X(c.i_base)-anch/2-2),
-      height:Math.max(1,Y(vb[3])-Y(vb[2])), fill:"var(--acc)", "fill-opacity":".07"});
-  out += el("rect", {x:X(c.i_base)-anch/2-2, y:Y(vb[2]), width:(W-mD)-(X(c.i_base)-anch/2-2),
-      height:Math.max(1,Y(vb[3])-Y(vb[2])), fill:"none", stroke:"var(--acc)",
+  // el rango de la vela base, marcado igual en los tres marcos
+  const xr = cfg.iBase >= 0 ? X(cfg.iBase) - anch/2 - 2 : mI;
+  out += el("rect", {x:xr, y:Y(c.rango_hi), width:(W-mD)-xr,
+      height:Math.max(1, Y(c.rango_lo)-Y(c.rango_hi)), fill:"var(--acc)", "fill-opacity":".07"});
+  out += el("rect", {x:xr, y:Y(c.rango_hi), width:(W-mD)-xr,
+      height:Math.max(1, Y(c.rango_lo)-Y(c.rango_hi)), fill:"none", stroke:"var(--acc)",
       "stroke-opacity":".35", "stroke-dasharray":"3 4"});
+  out += el("text", {x:mI+3, y:Y(c.rango_hi)-5, fill:"var(--acc)", "font-size":10,
+      "font-family":"IBM Plex Mono, monospace", "fill-opacity":".85"}, "rango");
 
-  // niveles del día anterior
-  [[c.dia_hi,"PDH"],[c.dia_lo,"PDL"]].forEach(([p,et]) => {
+  // etiquetas del eje derecho: se recogen y se apartan al final, porque
+  // entrada, stop y objetivo se pisan cuando el stop es estrecho
+  const etq = [];
+  if (cfg.dia) [[c.dia_hi,"PDH"],[c.dia_lo,"PDL"]].forEach(([p,et]) => {
     out += el("line", {x1:mI, y1:Y(p), x2:W-mD, y2:Y(p), stroke:"var(--tenue)",
         "stroke-width":1, "stroke-dasharray":"2 5"});
-    out += el("text", {x:W-mD+5, y:Y(p)+3.5, fill:"var(--tenue)", "font-size":11,
-        "font-family":"IBM Plex Mono, monospace"}, et);
+    etq.push({y:Y(p), col:"var(--tenue)", txt:et, sub:""});
   });
 
-  // velas
   vs.forEach((v, k) => {
-    const [t,o,h,l,cl] = v;
-    const sube = cl >= o;
-    const col = sube ? "var(--alc)" : "var(--baj)";
-    const esBase = k === c.i_base, esEnt = k === c.i_ent;
-    const op = (esBase || esEnt) ? 1 : .55;
-    out += el("line", {x1:X(k), y1:Y(h), x2:X(k), y2:Y(l), stroke:col, "stroke-width":1.4, opacity:op});
+    const o = v[off], h = v[off+1], l = v[off+2], cl = v[off+3];
+    const sube = cl >= o, col = sube ? "var(--alc)" : "var(--baj)";
+    const esBase = k === cfg.iBase, esEnt = k >= cfg.iEnt;
+    const op = (esBase || esEnt) ? 1 : .5;
+    out += el("line", {x1:X(k), y1:Y(h), x2:X(k), y2:Y(l), stroke:col, "stroke-width":1.2, opacity:op});
     const y0 = Y(Math.max(o,cl)), y1 = Y(Math.min(o,cl));
-    out += el("rect", {x:X(k)-anch/2, y:y0, width:anch, height:Math.max(1.5, y1-y0),
-        fill:sube?"none":col, stroke:col, "stroke-width":1.4, opacity:op});
-    if (esEnt){
-      out += el("rect", {x:X(k)-anch/2-4, y:Y(h)-4, width:anch+8, height:Y(l)-Y(h)+8,
-          fill:"none", stroke:"var(--texto)", "stroke-width":1.2, "stroke-opacity":".45", rx:3});
-      out += el("text", {x:X(k), y:Y(l)+16, fill:"var(--texto)", "font-size":10.5,
-          "text-anchor":"middle", "font-family":"IBM Plex Mono, monospace", "fill-opacity":".65"}, "barrido");
-    }
-    if (esBase){
-      out += el("text", {x:X(k), y:Y(vb[2])-6, fill:"var(--acc)", "font-size":10.5,
-          "text-anchor":"middle", "font-family":"IBM Plex Mono, monospace"}, "base");
-    }
+    out += el("rect", {x:X(k)-anch/2, y:y0, width:anch, height:Math.max(1.3, y1-y0),
+        fill:sube?"none":col, stroke:col, "stroke-width":1.2, opacity:op});
   });
 
-  // entrada, stop, objetivo
-  const niv = [[c.entrada,"var(--acc)","entrada",2,""],
-               [c.stop,"var(--baj)","stop",1.4,"5 4"],
-               [c.objetivo,"var(--alc)","objetivo",1.4,"5 4"]];
-  niv.forEach(([p,col,et,w,dash]) => {
-    const a = {x1:X(c.i_ent)-anch, y1:Y(p), x2:W-mD, y2:Y(p), stroke:col, "stroke-width":w};
+  // el tramo que barre el rango, encuadrado
+  if (cfg.iEnt >= 0 && cfg.iEnt < vs.length){
+    let eh = -Infinity, elo = Infinity;
+    for (let k = cfg.iEnt; k < vs.length; k++){
+      eh = Math.max(eh, vs[k][off+1]); elo = Math.min(elo, vs[k][off+2]); }
+    const x0 = X(cfg.iEnt) - anch/2 - 3;
+    out += el("rect", {x:x0, y:Y(eh)-3, width:(W-mD)-x0-1, height:Y(elo)-Y(eh)+6,
+        fill:"none", stroke:"var(--texto)", "stroke-width":1.1, "stroke-opacity":".4", rx:3});
+    out += el("text", {x:Math.min(x0+3, W-mD-42), y:Y(elo)+13, fill:"var(--texto)",
+        "font-size":10, "font-family":"IBM Plex Mono, monospace", "fill-opacity":".6"}, "barrido");
+  }
+  if (cfg.iBase >= 0){
+    out += el("text", {x:Math.min(X(cfg.iBase), W-mD-18), y:Y(c.rango_lo)+13,
+        fill:"var(--acc)", "font-size":10, "text-anchor":"middle",
+        "font-family":"IBM Plex Mono, monospace"}, "base");
+  }
+
+  [[c.entrada,"var(--acc)","entrada",1.8,""],
+   [c.stop,"var(--baj)","stop",1.3,"5 4"],
+   [c.objetivo,"var(--alc)","objetivo",1.3,"5 4"]].forEach(([p,col,et,w,dash]) => {
+    const a = {x1:mI, y1:Y(p), x2:W-mD, y2:Y(p), stroke:col, "stroke-width":w};
     if (dash) a["stroke-dasharray"] = dash;
     out += el("line", a);
-    out += el("text", {x:W-mD+5, y:Y(p)+3.5, fill:col, "font-size":11,
-        "font-family":"IBM Plex Mono, monospace"}, fmt(p, c.dec));
-    out += el("text", {x:W-mD+5, y:Y(p)+15, fill:col, "font-size":9.5, "fill-opacity":".7",
-        "font-family":"IBM Plex Sans, sans-serif"}, et);
+    etq.push({y:Y(p), col:col, txt:fmt(p, c.dec), sub:et});
+  });
+
+  const HUE = 23;
+  etq.sort((a,b) => a.y - b.y);
+  etq.forEach(e => { e.ye = e.y; });
+  for (let k = 1; k < etq.length; k++)
+    if (etq[k].ye - etq[k-1].ye < HUE) etq[k].ye = etq[k-1].ye + HUE;
+  const sobra = etq.length ? etq[etq.length-1].ye - (H - 4) : 0;
+  if (sobra > 0) etq.forEach(e => { e.ye -= sobra; });
+  etq.forEach(e => {
+    if (Math.abs(e.ye - e.y) > 2)
+      out += el("line", {x1:W-mD, y1:e.y, x2:W-mD+4, y2:e.ye, stroke:e.col,
+          "stroke-width":1, opacity:.5});
+    out += el("text", {x:W-mD+6, y:e.ye+3.5, fill:e.col, "font-size":10,
+        "font-family":"IBM Plex Mono, monospace"}, e.txt);
+    if (e.sub) out += el("text", {x:W-mD+6, y:e.ye+13, fill:e.col, "font-size":9,
+        "fill-opacity":".7", "font-family":"IBM Plex Sans, sans-serif"}, e.sub);
   });
   svg.innerHTML = out;
 }
+
+/* En el movil no caben 60 velas de M5 legibles. Se recorta POR LA IZQUIERDA,
+   nunca por la derecha: la ultima vela sigue siendo la de entrada. */
+function recorta(vs, iBase, iEnt, max){
+  if (vs.length <= max) return [vs, iBase, iEnt];
+  const s = vs.length - max;
+  return [vs.slice(s), iBase - s >= 0 ? iBase - s : -1, Math.max(0, iEnt - s)];
+}
+
+function dibuja(c){
+  const movil = window.innerWidth < 820;
+  const caja = movil ? "0 0 384 300" : null;
+  if (movil){
+    ["g4","g1","g5"].forEach(k => document.getElementById(k).setAttribute("viewBox", caja));
+  } else {
+    document.getElementById("g4").setAttribute("viewBox", "0 0 520 304");
+    document.getElementById("g1").setAttribute("viewBox", "0 0 520 304");
+    document.getElementById("g5").setAttribute("viewBox", "0 0 1064 262");
+  }
+  const [w4, b4, e4] = recorta(c.velas, c.i_base, c.i_ent, movil ? 18 : 99);
+  const [w1, b1, e1] = recorta(c.v1,    c.i_base1, c.i_ent1, movil ? 26 : 99);
+  const [w5, b5, e5] = recorta(c.v5,    -1,        c.i_ent5, movil ? 36 : 99);
+  panel("g4", w4, 1, c, {iBase:b4, iEnt:e4, dia:true});
+  panel("g1", w1, 0, c, {iBase:b1, iEnt:e1, dia:false});
+  panel("g5", w5, 0, c, {iBase:b5, iEnt:e5, dia:false});
+}
+
+let anchoPrev = window.innerWidth < 820, temporizador = 0;
+window.addEventListener("resize", () => {
+  const ahora = window.innerWidth < 820;
+  if (ahora === anchoPrev) return;
+  anchoPrev = ahora;
+  clearTimeout(temporizador);
+  temporizador = setTimeout(() => { if (i < CASOS.length) dibuja(CASOS[i]); }, 120);
+});
 
 function pinta(){
   if (i >= CASOS.length){ acaba(); return; }
@@ -311,7 +385,7 @@ function pinta(){
     '<dt>Coste</dt><dd class="res">' + c.coste_pct + ' % del riesgo</dd>' +
     '<dt>CRT diario</dt><dd>' + bias + '</dd>' +
     '</dl>' +
-    '<div class="nota">El gráfico termina en la vela del barrido. No hay nada después.</div>';
+    '<div class="nota">Los tres marcos terminan en el mismo instante: el cierre de la vela del barrido. No hay nada después.</div>';
   ["bB","bM","bS"].forEach(id => document.getElementById(id).classList.remove("sel"));
   const y = marcas[c.id];
   if (y) document.getElementById(y==="b"?"bB":y==="m"?"bM":"bS").classList.add("sel");

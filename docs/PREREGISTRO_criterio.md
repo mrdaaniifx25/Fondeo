@@ -84,3 +84,30 @@ Página nueva: https://claude.ai/artifact/GjVK8EFGDXmfw2pvhoihEy
 
 La tasa base sigue oculta en `data/etiquetas_verdad.csv` y no se abre hasta que
 las etiquetas estén cerradas.
+
+### Lo que se ve en cada caso, ampliado el 16 de septiembre
+
+Petición suya: *"deberíamos ver H4 y H1, necesito que el rango esté bien marcado
+en ambas temporalidades y la entrada en M5"*. Tiene razón en que una prueba que
+le enseña menos de lo que él mira en real no podría concluir nada si sale nula:
+diría, con motivo, que no le enseñé el contexto con el que decide.
+
+Así que cada caso pasa de un gráfico a tres:
+
+| marco | velas | para qué |
+|---|---|---|
+| H4 | 18 | el rango, el barrido y los niveles del día anterior |
+| H1 | 44 | el mismo rango marcado de cerca |
+| M5 | 60 | la entrada |
+
+El rango de la vela base se pinta como banda en los tres, con el mismo color.
+
+**Esto cambia lo que se MUESTRA, no lo que se mide.** Los 300 casos son los
+mismos, con los mismos identificadores, el mismo orden barajado y la misma
+semilla 20260825. La muestra, el contraste único, el umbral z = 2,58 y la tasa
+base sellada no se tocan. `data/etiquetas_verdad.csv` no se ha abierto.
+
+Código en `bt/amplia_etiquetas.py`, que audita caso por caso lo único que podría
+invalidar la prueba: **que los tres marcos cierren exactamente en el precio de
+entrada**. Si alguno arrastrase una sola vela posterior, ese cierre no
+coincidiría. Los 300 pasan.
