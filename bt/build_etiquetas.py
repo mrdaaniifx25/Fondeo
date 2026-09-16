@@ -90,6 +90,8 @@ button.sel{box-shadow:inset 0 0 0 2px var(--acc)}
 .pie{display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:12.5px; color:var(--suave)}
 .pie button{padding:7px 13px; flex-direction:row; font-size:13px}
 .pie .esp{margin-left:auto}
+.pie .nube{color:var(--tenue);font-size:12.5px}
+.pie .nube.avisa{color:var(--avi)}
 
 kbd{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:var(--hueco);
   border:1px solid var(--linea); border-bottom-width:2px; border-radius:4px; padding:1px 5px; color:var(--suave)}
@@ -132,6 +134,7 @@ textarea{width:100%; height:110px; font-family:"IBM Plex Mono",monospace; font-s
   <div class="pie">
     <button id="atras">← Atrás</button>
     <span>Teclado: <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> para marcar, <kbd>←</kbd> para volver</span>
+    <span class="nube" id="nube">conectando…</span>
     <span class="esp" id="guardado"></span>
   </div>
 
@@ -158,8 +161,9 @@ textarea{width:100%; height:110px; font-family:"IBM Plex Mono",monospace; font-s
   <details id="expo">
     <summary>Guardar y enviarme los resultados</summary>
     <div class="cuerpo">
-      <p>Se guarda solo en este navegador según vas marcando. <strong>Copia esto y pégamelo en el
-      chat</strong> cada 50 o así, por si acaso.</p>
+      <p>Se guarda <strong>en la nube</strong> según vas marcando, así que puedes cerrar
+      esto y seguir otro día, o desde otro aparato. Yo puedo leerlo directamente: no hace falta
+      que me pegues nada. Esta caja es solo la red de seguridad por si la nube fallara.</p>
       <textarea id="salida" readonly></textarea>
       <div style="display:flex;gap:8px;margin-top:9px;align-items:center">
         <button id="copiar">Copiar</button>
@@ -329,6 +333,7 @@ function acaba(){
 function marca(v){
   if (i >= CASOS.length) return;
   marcas[CASOS[i].id] = v;
+  hayCambio = true;
   guarda(); i++; pinta();
 }
 document.getElementById("bB").onclick = () => marca("b");
@@ -351,15 +356,68 @@ document.getElementById("copiar").onclick = async () => {
   catch(e){ t.select(); a.textContent = "Selecciónalo y copia con Ctrl+C"; }
   setTimeout(() => a.textContent = "", 2600);
 };
-document.getElementById("borrar").onclick = () => {
+document.getElementById("borrar").onclick = async () => {
   if (!confirm("Se borran todas tus marcas. ¿Seguro?")) return;
   marcas = {}; i = 0;
   try { localStorage.removeItem(CLAVE); } catch(e) {}
+  if (DB) { try { await DB.doc("etiquetas/v1").delete(); } catch(e) {} }
   location.reload();
 };
 guarda(); pinta();
+
+/* Guardado en la nube. El navegador es la copia inmediata; la nube es la que
+   sobrevive a cerrar la pestaña, y la que yo puedo leer sin que pegues nada.
+   Nada se escribe hasta haber leído lo que ya había: si no, una pestaña recién
+   abierta borraría el trabajo de la anterior. */
+let DB = null, listoNube = false, hayCambio = false, escribiendo = false;
+
+function estadoNube(t, avisa){
+  const e = document.getElementById("nube");
+  if (!e) return;
+  e.textContent = t;
+  e.className = "nube" + (avisa ? " avisa" : "");
+}
+
+async function vuelcaNube(){
+  if (!DB || !listoNube || escribiendo || !hayCambio) return;
+  escribiendo = true; hayCambio = false;
+  const n = Object.keys(marcas).length;
+  try {
+    await DB.doc("etiquetas/v1").set({
+      marcas: marcas, n: n, version: 1, actualizado: new Date().toISOString() });
+    estadoNube(n + " guardadas en la nube");
+  } catch (err) {
+    hayCambio = true;
+    estadoNube("la nube falló — copia el texto de abajo", true);
+  }
+  escribiendo = false;
+}
+setInterval(vuelcaNube, 2500);
+
+(async function(){
+  try { DB = await claude.use("db"); } catch (e) { DB = null; }
+  if (!DB){
+    estadoNube("sin nube: solo en este navegador, copia el texto de abajo", true);
+    return;
+  }
+  try {
+    const s = await DB.doc("etiquetas/v1").get();
+    const guardadas = (s.exists && s.data() ? s.data().marcas : null) || {};
+    if (Object.keys(guardadas).length > Object.keys(marcas).length){
+      marcas = guardadas;
+      i = CASOS.findIndex(c => !marcas[c.id]);
+      if (i < 0) i = CASOS.length;
+      guarda(); pinta();
+    }
+  } catch (e) {
+    estadoNube("no he podido leer la nube — no marques aún, recarga", true);
+    return;
+  }
+  listoNube = true;
+  estadoNube(Object.keys(marcas).length + " guardadas en la nube");
+})();
 </script>'''
 
-open("/tmp/claude-0/-home-user-Fondeo/0d8c92b4-16e7-53a1-886b-22385a3d6383/scratchpad/etiquetas.html","w").write(
+open("docs/etiquetado_criterio.html","w").write(
     HTML.replace("__DATOS__", CASOS))
 print("escrito", len(HTML.replace("__DATOS__", CASOS))/1024, "KB")

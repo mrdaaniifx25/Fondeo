@@ -66,3 +66,21 @@ Si casi todo queda marcado igual —90 % que sí o 90 % que no— no hay contras
 que hacer y se dice así, sin buscarle otra lectura.
 
 Página: https://claude.ai/code/artifact/93a3ca6b-603e-4085-9792-73e005046555
+
+---
+
+## Reapertura · 16 de septiembre de 2026
+
+La prueba se selló el 25 de agosto y nunca se ejecutó. Se reabre **sin tocar
+una sola línea de lo anterior**: misma muestra, mismas 300, misma semilla, mismo
+contraste único y mismo umbral z = 2,58.
+
+Lo único que cambia es la mecánica de guardado. La página original guardaba en
+el navegador y obligaba a copiar y pegar el avance; ahora guarda en la nube, así
+que el etiquetado puede hacerse en varias sesiones y desde distintos aparatos sin
+riesgo de perderlo.
+
+Página nueva: https://claude.ai/artifact/GjVK8EFGDXmfw2pvhoihEy
+
+La tasa base sigue oculta en `data/etiquetas_verdad.csv` y no se abre hasta que
+las etiquetas estén cerradas.
