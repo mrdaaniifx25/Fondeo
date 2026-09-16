@@ -85,3 +85,48 @@ recuento sin la regla de un nivel una operación.
 Si salen menos de 100 operaciones en seis años, la regla no es lo que él opera
 —él entra una o dos veces al día— y habría que revisar la traducción antes de
 concluir nada del resultado.
+
+---
+
+## Corrección · 16 de septiembre, contestada por él
+
+Le pregunté por las siete decisiones que había tomado yo. Sus respuestas, antes
+de volver a medir nada:
+
+| | pregunta | respuesta | ¿cambia? |
+|---|---|---|---|
+| 1 | qué nivel se barre | **entre sesiones** (Londres barre Asia, NY barre Londres) | no |
+| 2 | sesión entera o killzone | **sesión entera** | no |
+| 3 | dónde entra exactamente | *"no sé cuándo entras, necesitaría verlo"* | **sin resolver** |
+| 4 | dónde va el stop | **en el mínimo de todo el movimiento**, no de la vela | **sí** |
+| 5 | un nivel una operación | **intenta todas** | **sí** |
+| 6 | distancia máxima | **no hay**, busca el 1:2 | no |
+| 7 | caducidad | **sigue valiendo** | **sí** |
+
+### Lo que cambia en el código
+
+**4 · El stop va al extremo de la excursión entera.** Se define excursión como el
+tramo que va desde que el precio cruza el nivel hasta que una vela cierra de
+vuelta dentro. El stop es el extremo alcanzado en todo ese tramo, no el de la
+vela que cierra. Con barridos de una sola vela coincide; con barridos de varias,
+el stop es más ancho.
+
+**5 · Se quita "un nivel, una operación".** Cada excursión completa es una señal.
+Cuando termina, el nivel vuelve a quedar armado.
+
+**7 · Se quita la caducidad de una hora.** La confirmación vale hasta el final de
+la sesión.
+
+### Lo que sigue sin resolverse, y es lo importante
+
+La 3. Él no sabe describir su entrada, y no pasa nada: es honesto y es
+exactamente lo que ya vimos en agosto cuando cuatro codificaciones de su regla
+salieron al azar. **La descripción no contiene la decisión.**
+
+Se mantienen las dos confirmaciones declaradas (C1 y C2) y se informa de las dos.
+Ninguna de las dos es "su entrada" mientras él no la señale sobre el gráfico.
+
+### El criterio no se toca
+
+Sigue siendo el mismo: celda principal C2, Londres y Nueva York juntas, y la
+regla funciona si el IC95 de la R neta queda entero por encima de cero.
