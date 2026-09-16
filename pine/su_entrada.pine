@@ -68,7 +68,13 @@
 //  las 11:29), un minuto menos que el backtest. Son 3 señales de 85.453.
 //
 //  AVISO: escrito sin poder compilarlo aquí. Si TradingView se queja, pega el
-//  error tal cual.
+//  error tal cual, con el número de línea.
+//
+//  Repasado el 16-09-2026 antes de la primera compilación. Corregido:
+//    · math.floor devuelve float y se asignaba a un int -> error de tipo
+//    · nTP / res eran dos enteros, y en Pine eso es división ENTERA: la casilla
+//      de "acierto" habría salido siempre 0 % o 100 %
+//    · dos expresiones partidas en dos líneas, reescritas en una
 //@version=6
 indicator("Su entrada", overlay = true, max_labels_count = 500,
      max_lines_count = 500, max_boxes_count = 500)
@@ -178,7 +184,7 @@ if nuevoDia
     pClose  := na
 
 if dentro
-    int c = math.floor(mDia / 5)
+    int c = int(math.floor(mDia / 5.0))
     if na(cuboAct)
         cuboAct := c
         aOpen   := open
@@ -193,7 +199,7 @@ if dentro
     else
         aClose  := close
 
-bool hayCuerpo = dentro and not na(cuboPre) and cuboPre == math.floor(mDia / 5) - 1
+bool hayCuerpo = dentro and not na(cuboPre) and cuboPre == int(math.floor(mDia / 5.0)) - 1
 float cLo = hayCuerpo ? math.min(pOpen, pClose) : na
 float cHi = hayCuerpo ? math.max(pOpen, pClose) : na
 
@@ -209,8 +215,8 @@ bool repetida = lado != 0 and mDia - ultMin < sep and lado == ultLado
 bool dispara  = lado != 0 and not repetida
 
 // el barrido tiene que ser del lado contrario: para vender, haber barrido arriba
-bool barrido = not usarBar or (lado > 0 ? mDia - ultBarBajo <= minBar
-                                        : mDia - ultBarAlto <= minBar)
+bool cerca = lado > 0 ? mDia - ultBarBajo <= minBar : mDia - ultBarAlto <= minBar
+bool barrido = not usarBar or cerca
 
 float stop = lado > 0 ? ta.lowest(low, retro) : ta.highest(high, retro)
 float ent  = close
@@ -267,9 +273,11 @@ if array.size(opLado) > 0
                 nFin := nFin + 1
             // modo revisión: se dibuja AHORA, en su vela de entrada
             if not enVivo and P
-                bool quiero = (modo == "Todas, ya resueltas")
-                     or ((modo == "Sólo las que ganaron")   and res == "TP")
-                     or ((modo == "Sólo las que perdieron") and res == "SL")
+                bool quiero = modo == "Todas, ya resueltas"
+                if modo == "Sólo las que ganaron"
+                    quiero := res == "TP"
+                if modo == "Sólo las que perdieron"
+                    quiero := res == "SL"
                 if quiero
                     int   x0 = array.get(opX0,  i)
                     float e0 = array.get(opEnt, i)
@@ -354,7 +362,7 @@ plotshape(enVivo and pinta and not pasa and lado < 0, "Venta descartada",  shape
 var table T = table.new(position.top_right, 2, 6, border_width = 1)
 if verTabla and barstate.islast
     int res = nTP + nSL
-    float ac = res > 0 ? nTP / res : na
+    float ac = res > 0 ? nTP / float(res) : na
     float geo = 1.0 / (1.0 + rr)
     // acierto que hace falta con el coste puesto, al stop mínimo declarado
     float x = minPips > 0 ? coste / minPips : 0
