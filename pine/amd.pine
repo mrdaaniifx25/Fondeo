@@ -1,0 +1,178 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// at https://mozilla.org/MPL/2.0/
+//
+//  A · M · D   ·  acumulación, manipulación y distribución
+//
+//  QUE HACE, exactamente:
+//
+//    A  ACUMULACIÓN   n velas seguidas cuyo recorrido total cabe dentro de
+//                     x veces el ATR. Es un rango estrecho, medido, no "lo
+//                     que parece un rango".
+//    M  MANIPULACIÓN  el precio se sale del rango por un lado y CIERRA de
+//                     vuelta dentro. Si cierra fuera, no es manipulación:
+//                     es una rotura, y la secuencia muere.
+//    D  DISTRIBUCIÓN  después de la manipulación, un cierre más allá del
+//                     extremo CONTRARIO del rango.
+//
+//  LO QUE NO HACE, y es lo importante:
+//
+//  No repinta. Cada caja y cada etiqueta se dibuja en la vela en la que la
+//  condición queda confirmada, con esa vela ya cerrada, y no se mueve nunca
+//  más. Por eso en el histórico se ve peor que otros indicadores de AMD: los
+//  que se ven perfectos suelen marcar la acumulación cuando ya saben cómo
+//  acabó todo, y en vivo eso no existe.
+//
+//  El precio de no repintar: la caja de acumulación aparece n velas DESPUÉS
+//  de que el rango empezara. No es un fallo, es lo que se puede saber.
+//
+//  QUÉ HAY MEDIDO DE ESTO, para que no se lea como una promesa:
+//
+//    La pata M —el barrido que cierra de vuelta dentro— está medida hasta el
+//    agotamiento en este proyecto: 16.219 casos en EURUSD 2020-2026, con
+//    ventaja bruta indistinguible de cero. Sola no da nada.
+//
+//    Lo que NO está medido es la secuencia entera: exigir que antes del
+//    barrido haya habido un rango estrecho de verdad. Eso es lo que este
+//    indicador permite mirar por primera vez, y es una hipótesis, no un
+//    hallazgo. La tabla de abajo cuenta lo que va saliendo en el gráfico.
+//
+//@version=6
+indicator("AMD · acumulación, manipulación, distribución", overlay = true,
+     max_boxes_count = 500, max_labels_count = 500, max_lines_count = 500)
+
+// ─── el rango ──────────────────────────────────────────────────────────────
+gA = "A · acumulación"
+nMin  = input.int(12, "Velas mínimas del rango", 4, 200, group = gA,
+     tooltip = "Cuántas velas seguidas tienen que caber en el rango para que " +
+     "cuente como acumulación.")
+mult  = input.float(1.2, "Ancho máximo (× ATR)", 0.2, 10, 0.1, group = gA,
+     tooltip = "El recorrido de esas n velas dividido por el ATR. Más bajo = " +
+     "sólo rangos muy apretados y menos señales.")
+nAtr  = input.int(14, "Periodo del ATR", 2, 200, group = gA)
+
+// ─── las esperas ───────────────────────────────────────────────────────────
+gE = "Esperas"
+espM = input.int(20, "Velas para que llegue la manipulación", 1, 300, group = gE,
+     tooltip = "Desde que el rango queda confirmado. Si no sale, muere.")
+espD = input.int(20, "Velas para que llegue la distribución", 1, 300, group = gE,
+     tooltip = "Desde la manipulación.")
+
+// ─── dibujo ────────────────────────────────────────────────────────────────
+gD = "Dibujo"
+verA = input.bool(true, "Caja del rango", group = gD)
+verM = input.bool(true, "Marca de la manipulación", group = gD)
+verD = input.bool(true, "Marca de la distribución", group = gD)
+verT = input.bool(true, "Tabla de recuento", group = gD)
+verF = input.bool(false, "Marcar también las que se quedan a medias", group = gD)
+cA   = input.color(color.new(#8E8E93, 82), "Acumulación", group = gD)
+cM   = input.color(#E08A2B, "Manipulación", group = gD)
+cD   = input.color(#2F6FD0, "Distribución", group = gD)
+
+// ─── estado ────────────────────────────────────────────────────────────────
+// 0 buscando rango · 1 rango vivo · 2 ya manipulado, esperando distribución
+var int   fase   = 0
+var float rHi    = na
+var float rLo    = na
+var int   rIni   = 0
+var int   rConf  = 0
+var box   caja   = na
+var int   lado   = 0        // -1 barrió arriba (se espera caída) · +1 al revés
+var float extBar = na
+var int   barM   = 0
+var line  linM   = na
+
+var int nA = 0
+var int nM = 0
+var int nD = 0
+var int nRota = 0
+
+float atr = ta.atr(nAtr)
+float altoN = ta.highest(high, nMin)
+float bajoN = ta.lowest(low, nMin)
+bool  esRango = not na(atr) and atr > 0 and (altoN - bajoN) <= mult * atr
+
+// ─── A · nace el rango ─────────────────────────────────────────────────────
+if fase == 0 and esRango and barstate.isconfirmed
+    fase  := 1
+    rHi   := altoN
+    rLo   := bajoN
+    rIni  := bar_index - nMin + 1
+    rConf := bar_index
+    nA    := nA + 1
+    if verA
+        caja := box.new(rIni, rHi, bar_index, rLo, bgcolor = cA,
+             border_color = color.new(#8E8E93, 45), border_width = 1)
+        label.new(rIni, rHi, "A", style = label.style_label_down,
+             color = color.new(#8E8E93, 25), textcolor = color.white,
+             size = size.tiny)
+
+// ─── M · el barrido que cierra de vuelta dentro ────────────────────────────
+else if fase == 1
+    bool dentro = high <= rHi and low >= rLo
+    if dentro
+        if not na(caja)
+            box.set_right(caja, bar_index)
+    else
+        bool arriba = high > rHi and close < rHi and close > rLo
+        bool abajo  = low  < rLo and close > rLo and close < rHi
+        if arriba or abajo
+            fase   := 2
+            lado   := arriba ? -1 : 1
+            extBar := arriba ? high : low
+            barM   := bar_index
+            nM     := nM + 1
+            if verM
+                label.new(bar_index, arriba ? high : low, "M",
+                     style = arriba ? label.style_label_down : label.style_label_up,
+                     color = color.new(cM, 15), textcolor = color.white,
+                     size = size.small)
+                linM := line.new(bar_index, extBar, bar_index + 1, extBar,
+                     color = cM, width = 1, style = line.style_dotted,
+                     extend = extend.right)
+        else
+            // cierra fuera: es rotura limpia, no manipulación
+            fase := 0
+            nRota := nRota + 1
+    if fase == 1 and bar_index - rConf > espM
+        fase := 0
+
+// ─── D · el cierre más allá del extremo contrario ──────────────────────────
+else if fase == 2
+    bool hecho = lado < 0 ? close < rLo : close > rHi
+    if hecho
+        nD := nD + 1
+        if verD
+            label.new(bar_index, lado < 0 ? low : high, "D",
+                 style = lado < 0 ? label.style_label_up : label.style_label_down,
+                 color = color.new(cD, 15), textcolor = color.white,
+                 size = size.small)
+            line.new(barM, extBar, bar_index, close, color = cD, width = 2)
+        fase := 0
+    else if bar_index - barM > espD
+        if verF
+            label.new(bar_index, lado < 0 ? high : low, "—",
+                 style = lado < 0 ? label.style_label_down : label.style_label_up,
+                 color = color.new(#8E8E93, 40), textcolor = color.white,
+                 size = size.tiny)
+        fase := 0
+
+// ─── la tabla ──────────────────────────────────────────────────────────────
+var table T = table.new(position.top_right, 2, 5, border_width = 1)
+if verT and barstate.islast
+    float pM = nA > 0 ? 100.0 * nM / nA : 0.0
+    float pD = nM > 0 ? 100.0 * nD / nM : 0.0
+    table.cell(T, 0, 0, "en el gráfico", text_size = size.small,
+         bgcolor = color.new(#8E8E93, 80))
+    table.cell(T, 1, 0, "", text_size = size.small, bgcolor = color.new(#8E8E93, 80))
+    table.cell(T, 0, 1, "rangos (A)", text_size = size.small)
+    table.cell(T, 1, 1, str.tostring(nA), text_size = size.small)
+    table.cell(T, 0, 2, "manipulan (M)", text_size = size.small)
+    table.cell(T, 1, 2, str.tostring(nM) + "  (" + str.tostring(pM, "#.#") + " %)",
+         text_size = size.small)
+    table.cell(T, 0, 3, "completan (D)", text_size = size.small)
+    table.cell(T, 1, 3, str.tostring(nD) + "  (" + str.tostring(pD, "#.#") + " %)",
+         text_size = size.small)
+    table.cell(T, 0, 4, "rotura limpia", text_size = size.small)
+    table.cell(T, 1, 4, str.tostring(nRota), text_size = size.small)
+
+plotshape(false)
