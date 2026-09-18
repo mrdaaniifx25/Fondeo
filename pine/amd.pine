@@ -25,6 +25,14 @@
 //  El precio de no repintar: la caja de acumulación aparece n velas DESPUÉS
 //  de que el rango empezara. No es un fallo, es lo que se puede saber.
 //
+//  EL LISTON DEL RANGO, corregido el 18-09-2026
+//  La primera version pedia que el recorrido de n velas cupiera en 1,2 ATR. El
+//  ATR es el recorrido de UNA vela, y el de n crece con la RAIZ de n: para 12
+//  velas lo normal son unas 3,5 ATR. La condicion era casi imposible y el
+//  grafico salia vacio. Ahora se compara contra atr*sqrt(n), asi que el
+//  parametro vale igual en cualquier temporalidad y con cualquier n:
+//      1,00 = rango corriente   0,70 = apretado   0,50 = muy apretado
+//
 //  QUÉ HAY MEDIDO DE ESTO, para que no se lea como una promesa:
 //
 //    La pata M —el barrido que cierra de vuelta dentro— está medida hasta el
@@ -45,9 +53,10 @@ gA = "A · acumulación"
 nMin  = input.int(12, "Velas mínimas del rango", 4, 200, group = gA,
      tooltip = "Cuántas velas seguidas tienen que caber en el rango para que " +
      "cuente como acumulación.")
-mult  = input.float(1.2, "Ancho máximo (× ATR)", 0.2, 10, 0.1, group = gA,
-     tooltip = "El recorrido de esas n velas dividido por el ATR. Más bajo = " +
-     "sólo rangos muy apretados y menos señales.")
+mult  = input.float(0.70, "Ancho máximo (1,00 = rango normal)", 0.10, 3.0, 0.05,
+     group = gA, tooltip = "El recorrido de las n velas comparado con lo NORMAL " +
+     "para n velas, que es ATR x raíz(n). 1,00 = un rango corriente. 0,70 = " +
+     "claramente más apretado de lo normal. 0,50 = muy apretado y pocas señales.")
 nAtr  = input.int(14, "Periodo del ATR", 2, 200, group = gA)
 
 // ─── las esperas ───────────────────────────────────────────────────────────
@@ -89,7 +98,12 @@ var int nRota = 0
 float atr = ta.atr(nAtr)
 float altoN = ta.highest(high, nMin)
 float bajoN = ta.lowest(low, nMin)
-bool  esRango = not na(atr) and atr > 0 and (altoN - bajoN) <= mult * atr
+// El ATR es el recorrido de UNA vela. El de n velas crece con la RAIZ de n,
+// no con n: por eso el listón es atr * sqrt(nMin) y no atr a secas. Asi el
+// parametro significa lo mismo con 8 velas que con 50.
+float normal = atr * math.sqrt(nMin)
+float ratio  = normal > 0 ? (altoN - bajoN) / normal : na
+bool  esRango = not na(atr) and atr > 0 and ratio <= mult
 
 // ─── A · nace el rango ─────────────────────────────────────────────────────
 if fase == 0 and esRango and barstate.isconfirmed
@@ -157,7 +171,7 @@ else if fase == 2
         fase := 0
 
 // ─── la tabla ──────────────────────────────────────────────────────────────
-var table T = table.new(position.top_right, 2, 5, border_width = 1)
+var table T = table.new(position.top_right, 2, 6, border_width = 1)
 if verT and barstate.islast
     float pM = nA > 0 ? 100.0 * nM / nA : 0.0
     float pD = nM > 0 ? 100.0 * nD / nM : 0.0
@@ -174,5 +188,9 @@ if verT and barstate.islast
          text_size = size.small)
     table.cell(T, 0, 4, "rotura limpia", text_size = size.small)
     table.cell(T, 1, 4, str.tostring(nRota), text_size = size.small)
+    table.cell(T, 0, 5, "estrechez ahora", text_size = size.small)
+    table.cell(T, 1, 5, str.tostring(ratio, "#.##") + "  (pide " +
+         str.tostring(mult, "#.##") + ")", text_size = size.small,
+         text_color = ratio <= mult ? #17914F : color.gray)
 
 plotshape(false)
