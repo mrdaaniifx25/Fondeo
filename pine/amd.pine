@@ -33,16 +33,24 @@
 //  parametro vale igual en cualquier temporalidad y con cualquier n:
 //      1,00 = rango corriente   0,70 = apretado   0,50 = muy apretado
 //
-//  QUÉ HAY MEDIDO DE ESTO, para que no se lea como una promesa:
+//  QUÉ HAY MEDIDO, tras el estudio del 18-09-2026 sobre todo el EURUSD
+//  (docs/RESULTADOS_amd.md, 15.044 secuencias en M15 y 1.119 en H4):
 //
-//    La pata M —el barrido que cierra de vuelta dentro— está medida hasta el
-//    agotamiento en este proyecto: 16.219 casos en EURUSD 2020-2026, con
-//    ventaja bruta indistinguible de cero. Sola no da nada.
+//    LA A IMPORTA, y esto es nuevo. Ordenando por lo estrecho que era el
+//    rango, el quintil más apretado completa el AMD un 22,1 % de las veces
+//    contra el 19,3 % que da la pura geometría, y el más ancho un 9,3 %
+//    contra 12,3 %. El gradiente se repite igual en M15, H1 y H4.
 //
-//    Lo que NO está medido es la secuencia entera: exigir que antes del
-//    barrido haya habido un rango estrecho de verdad. Eso es lo que este
-//    indicador permite mirar por primera vez, y es una hipótesis, no un
-//    hallazgo. La tabla de abajo cuenta lo que va saliendo en el gráfico.
+//    POR ESO LOS AJUSTES POR DEFECTO SON ÉSTOS: n = 8 y estrechez 0,90. Por
+//    encima de 1,2 de estrechez, lo que marque este indicador es peor que el
+//    azar y no merece la pena mirarlo.
+//
+//    PERO NO ES RENTABLE. La ventaja bruta del quintil apretado es -0,04:
+//    cero. Batir a la geometría por tres puntos con un R:R de 4 deja la
+//    esperanza en la raya, y el coste la hunde (-0,22 en H4, -0,74 en M15).
+//
+//    O sea: esto describe bien, y no predice. Úsalo para mirar, no para
+//    entrar.
 //
 //@version=6
 indicator("AMD · acumulación, manipulación, distribución", overlay = true,
@@ -50,10 +58,10 @@ indicator("AMD · acumulación, manipulación, distribución", overlay = true,
 
 // ─── el rango ──────────────────────────────────────────────────────────────
 gA = "A · acumulación"
-nMin  = input.int(12, "Velas mínimas del rango", 4, 200, group = gA,
+nMin  = input.int(8, "Velas mínimas del rango", 4, 200, group = gA,
      tooltip = "Cuántas velas seguidas tienen que caber en el rango para que " +
      "cuente como acumulación.")
-mult  = input.float(0.70, "Ancho máximo (1,00 = rango normal)", 0.10, 3.0, 0.05,
+mult  = input.float(0.90, "Ancho máximo (1,00 = rango normal)", 0.10, 3.0, 0.05,
      group = gA, tooltip = "El recorrido de las n velas comparado con lo NORMAL " +
      "para n velas, que es ATR x raíz(n). 1,00 = un rango corriente. 0,70 = " +
      "claramente más apretado de lo normal. 0,50 = muy apretado y pocas señales.")
