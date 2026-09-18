@@ -1,137 +1,133 @@
 // This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
 // at https://mozilla.org/MPL/2.0/
 //
-//  A · M · D   ·  acumulación, manipulación y distribución
+//  A · M · D   ·  acumulación · manipulación · distribución
+//  Configurado. No hay nada que decidir: se ajusta solo a la temporalidad.
 //
-//  QUE HACE, exactamente:
+//  ─────────────────────────────────────────────────────────────────────────
+//  LO QUE MARCA
 //
-//    A  ACUMULACIÓN   n velas seguidas cuyo recorrido total cabe dentro de
-//                     x veces el ATR. Es un rango estrecho, medido, no "lo
-//                     que parece un rango".
-//    M  MANIPULACIÓN  el precio se sale del rango por un lado y CIERRA de
-//                     vuelta dentro. Si cierra fuera, no es manipulación:
-//                     es una rotura, y la secuencia muere.
-//    D  DISTRIBUCIÓN  después de la manipulación, un cierre más allá del
-//                     extremo CONTRARIO del rango.
+//    caja gris + A   rango de acumulación: n velas que caben en un recorrido
+//                    más apretado de lo normal. Se estira mientras el precio
+//                    siga dentro.
+//    etiqueta M      manipulación: el precio SALE de la caja y CIERRA de
+//                    vuelta dentro. La línea de puntos marca hasta dónde
+//                    llegó, que es donde iría el stop.
+//    etiqueta D      distribución: cierre más allá del extremo CONTRARIO.
+//                    La línea azul es el recorrido de la M a la D.
 //
-//  LO QUE NO HACE, y es lo importante:
+//    Si la caja se rompe y NO vuelve, no hay M: es rotura limpia y muere.
 //
-//  No repinta. Cada caja y cada etiqueta se dibuja en la vela en la que la
-//  condición queda confirmada, con esa vela ya cerrada, y no se mueve nunca
-//  más. Por eso en el histórico se ve peor que otros indicadores de AMD: los
-//  que se ven perfectos suelen marcar la acumulación cuando ya saben cómo
-//  acabó todo, y en vivo eso no existe.
+//  ─────────────────────────────────────────────────────────────────────────
+//  LO QUE DICE LA TABLA
 //
-//  El precio de no repintar: la caja de acumulación aparece n velas DESPUÉS
-//  de que el rango empezara. No es un fallo, es lo que se puede saber.
+//    ESTADO          lo único que hay que mirar cada día. Verde = el mercado
+//                    está comprimido y lo que salga vale la pena mirarlo.
+//                    Rojo = por encima de 1,2 de estrechez, y ahí lo que
+//                    marque este indicador es PEOR que el azar.
 //
-//  EL LISTON DEL RANGO, corregido el 18-09-2026
-//  La primera version pedia que el recorrido de n velas cupiera en 1,2 ATR. El
-//  ATR es el recorrido de UNA vela, y el de n crece con la RAIZ de n: para 12
-//  velas lo normal son unas 3,5 ATR. La condicion era casi imposible y el
-//  grafico salia vacio. Ahora se compara contra atr*sqrt(n), asi que el
-//  parametro vale igual en cualquier temporalidad y con cualquier n:
-//      1,00 = rango corriente   0,70 = apretado   0,50 = muy apretado
+//  ─────────────────────────────────────────────────────────────────────────
+//  DE DONDE SALEN LOS AJUSTES  ·  docs/RESULTADOS_amd.md, 18-09-2026
+//  EURUSD 2020-2026: 15.044 secuencias en M15, 3.524 en H1, 1.119 en H4.
 //
-//  QUÉ HAY MEDIDO, tras el estudio del 18-09-2026 sobre todo el EURUSD
-//  (docs/RESULTADOS_amd.md, 15.044 secuencias en M15 y 1.119 en H4):
+//  Ordenando por lo estrecho que era el rango, y comparando el acierto con el
+//  que da la pura geometría:
 //
-//    LA A IMPORTA, y esto es nuevo. Ordenando por lo estrecho que era el
-//    rango, el quintil más apretado completa el AMD un 22,1 % de las veces
-//    contra el 19,3 % que da la pura geometría, y el más ancho un 9,3 %
-//    contra 12,3 %. El gradiente se repite igual en M15, H1 y H4.
+//        quintil          acierto   el del azar   diferencia
+//        1 más apretado    22,1 %      19,3 %        +2,8
+//        3                 15,7 %      15,8 %        -0,1
+//        5 más ancho        9,3 %      12,3 %        -3,0
 //
-//    POR ESO LOS AJUSTES POR DEFECTO SON ÉSTOS: n = 8 y estrechez 0,90. Por
-//    encima de 1,2 de estrechez, lo que marque este indicador es peor que el
-//    azar y no merece la pena mirarlo.
+//  Y el mismo orden se repite en las tres temporalidades:
+//        M15   +2,8  +1,4  -0,1  -2,2  -3,0
+//        H1    +2,2  +1,0  -0,6  -3,6  -5,6
+//        H4    +3,8  -0,6  -3,4  -3,7  -4,2
 //
-//    PERO NO ES RENTABLE. La ventaja bruta del quintil apretado es -0,04:
-//    cero. Batir a la geometría por tres puntos con un R:R de 4 deja la
-//    esperanza en la raya, y el coste la hunde (-0,22 en H4, -0,74 en M15).
+//  Por eso el listón está en 0,90 y el aviso rojo en 1,20.
 //
-//    O sea: esto describe bien, y no predice. Úsalo para mirar, no para
-//    entrar.
+//  ─────────────────────────────────────────────────────────────────────────
+//  LO QUE NO ES, y hay que tenerlo claro
+//
+//  NO es una señal de entrada. La ventaja bruta del quintil bueno es -0,04,
+//  o sea CERO, y el coste la hunde (-0,22 en H4, -0,74 en M15). Operar esto
+//  tal cual pierde dinero.
+//
+//  Es un TERMÓMETRO: te dice en qué estado está el mercado y cuándo merece
+//  la pena mirar. No un semáforo que diga cuándo entrar.
+//
+//  NO REPINTA. Cada caja y cada etiqueta se dibuja en la vela en que la
+//  condición queda confirmada, con esa vela ya cerrada, y no se mueve nunca.
+//  El precio de eso: la caja aparece n velas después de que el rango
+//  empezara. No es un fallo, es lo único que se puede saber en ese momento.
 //
 //@version=6
 indicator("AMD · acumulación, manipulación, distribución", overlay = true,
      max_boxes_count = 500, max_labels_count = 500, max_lines_count = 500)
 
-// ─── el rango ──────────────────────────────────────────────────────────────
-gA = "A · acumulación"
-nMin  = input.int(8, "Velas mínimas del rango", 4, 200, group = gA,
-     tooltip = "Cuántas velas seguidas tienen que caber en el rango para que " +
-     "cuente como acumulación.")
-mult  = input.float(0.90, "Ancho máximo (1,00 = rango normal)", 0.10, 3.0, 0.05,
-     group = gA, tooltip = "El recorrido de las n velas comparado con lo NORMAL " +
-     "para n velas, que es ATR x raíz(n). 1,00 = un rango corriente. 0,70 = " +
-     "claramente más apretado de lo normal. 0,50 = muy apretado y pocas señales.")
-nAtr  = input.int(14, "Periodo del ATR", 2, 200, group = gA)
+// ─── lo único ajustable, y no hace falta tocarlo ───────────────────────────
+auto = input.bool(true, "Ajuste automático (recomendado)",
+     tooltip = "Elige el tamaño del rango según la temporalidad del gráfico: " +
+     "12 velas por debajo de M30, 8 velas de M30 en adelante. Son los valores " +
+     "medidos en docs/RESULTADOS_amd.md.")
+nMan = input.int(8, "   ...o a mano: velas del rango", 4, 200)
+verF = input.bool(false, "Marcar también las que se quedan a medias")
 
-// ─── las esperas ───────────────────────────────────────────────────────────
-gE = "Esperas"
-espM = input.int(20, "Velas para que llegue la manipulación", 1, 300, group = gE,
-     tooltip = "Desde que el rango queda confirmado. Si no sale, muere.")
-espD = input.int(20, "Velas para que llegue la distribución", 1, 300, group = gE,
-     tooltip = "Desde la manipulación.")
+// ─── constantes medidas, no se tocan ───────────────────────────────────────
+float LIMITE = 0.90        // estrechez que hay que cumplir para que aporte
+float ALERTA = 1.20        // por encima de aquí es peor que el azar
+int   ESPM   = 20
+int   ESPD   = 20
+color CA = color.new(#8E8E93, 82)
+color CM = #E08A2B
+color CD = #2F6FD0
+color VERDE = #17914F
+color ROJO  = #C23B36
 
-// ─── dibujo ────────────────────────────────────────────────────────────────
-gD = "Dibujo"
-verA = input.bool(true, "Caja del rango", group = gD)
-verM = input.bool(true, "Marca de la manipulación", group = gD)
-verD = input.bool(true, "Marca de la distribución", group = gD)
-verT = input.bool(true, "Tabla de recuento", group = gD)
-verF = input.bool(false, "Marcar también las que se quedan a medias", group = gD)
-cA   = input.color(color.new(#8E8E93, 82), "Acumulación", group = gD)
-cM   = input.color(#E08A2B, "Manipulación", group = gD)
-cD   = input.color(#2F6FD0, "Distribución", group = gD)
+// ─── el rango, con el tamaño que toque ─────────────────────────────────────
+int tfmin = int(math.round(timeframe.in_seconds() / 60.0))
+bool corto = tfmin < 30
+int  nUsar = auto ? (corto ? 12 : 8) : nMan
+
+float h8  = ta.highest(high, 8),  l8  = ta.lowest(low, 8)
+float h12 = ta.highest(high, 12), l12 = ta.lowest(low, 12)
+float hm  = ta.highest(high, nMan), lm = ta.lowest(low, nMan)
+float altoN = auto ? (corto ? h12 : h8) : hm
+float bajoN = auto ? (corto ? l12 : l8) : lm
+
+float atr = ta.atr(14)
+// El ATR es el recorrido de UNA vela. El de n velas crece con la RAIZ de n,
+// no con n: por eso el listón es atr*sqrt(n) y así significa lo mismo en
+// cualquier temporalidad y con cualquier n.
+float normal = atr * math.sqrt(nUsar)
+float ratio  = normal > 0 ? (altoN - bajoN) / normal : na
+bool  esRango = not na(atr) and atr > 0 and ratio <= LIMITE
 
 // ─── estado ────────────────────────────────────────────────────────────────
-// 0 buscando rango · 1 rango vivo · 2 ya manipulado, esperando distribución
-var int   fase   = 0
+var int   fase   = 0       // 0 buscando · 1 rango vivo · 2 manipulado
 var float rHi    = na
 var float rLo    = na
-var int   rIni   = 0
 var int   rConf  = 0
 var box   caja   = na
-var int   lado   = 0        // -1 barrió arriba (se espera caída) · +1 al revés
+var int   lado   = 0
 var float extBar = na
 var int   barM   = 0
-var line  linM   = na
+var int nA = 0, nM = 0, nD = 0, nRota = 0
 
-var int nA = 0
-var int nM = 0
-var int nD = 0
-var int nRota = 0
-
-float atr = ta.atr(nAtr)
-float altoN = ta.highest(high, nMin)
-float bajoN = ta.lowest(low, nMin)
-// El ATR es el recorrido de UNA vela. El de n velas crece con la RAIZ de n,
-// no con n: por eso el listón es atr * sqrt(nMin) y no atr a secas. Asi el
-// parametro significa lo mismo con 8 velas que con 50.
-float normal = atr * math.sqrt(nMin)
-float ratio  = normal > 0 ? (altoN - bajoN) / normal : na
-bool  esRango = not na(atr) and atr > 0 and ratio <= mult
-
-// ─── A · nace el rango ─────────────────────────────────────────────────────
+// ─── A ─────────────────────────────────────────────────────────────────────
 if fase == 0 and esRango and barstate.isconfirmed
     fase  := 1
     rHi   := altoN
     rLo   := bajoN
-    rIni  := bar_index - nMin + 1
     rConf := bar_index
     nA    := nA + 1
-    if verA
-        caja := box.new(rIni, rHi, bar_index, rLo, bgcolor = cA,
-             border_color = color.new(#8E8E93, 45), border_width = 1)
-        label.new(rIni, rHi, "A", style = label.style_label_down,
-             color = color.new(#8E8E93, 25), textcolor = color.white,
-             size = size.tiny)
+    caja := box.new(bar_index - nUsar + 1, rHi, bar_index, rLo, bgcolor = CA,
+         border_color = color.new(#8E8E93, 45), border_width = 1)
+    label.new(bar_index - nUsar + 1, rHi, "A", style = label.style_label_down,
+         color = color.new(#8E8E93, 25), textcolor = color.white, size = size.tiny)
 
-// ─── M · el barrido que cierra de vuelta dentro ────────────────────────────
+// ─── M ─────────────────────────────────────────────────────────────────────
 else if fase == 1
-    bool dentro = high <= rHi and low >= rLo
-    if dentro
+    if high <= rHi and low >= rLo
         if not na(caja)
             box.set_right(caja, bar_index)
     else
@@ -143,62 +139,71 @@ else if fase == 1
             extBar := arriba ? high : low
             barM   := bar_index
             nM     := nM + 1
-            if verM
-                label.new(bar_index, arriba ? high : low, "M",
-                     style = arriba ? label.style_label_down : label.style_label_up,
-                     color = color.new(cM, 15), textcolor = color.white,
-                     size = size.small)
-                linM := line.new(bar_index, extBar, bar_index + 1, extBar,
-                     color = cM, width = 1, style = line.style_dotted,
-                     extend = extend.right)
+            label.new(bar_index, extBar, "M",
+                 style = arriba ? label.style_label_down : label.style_label_up,
+                 color = color.new(CM, 15), textcolor = color.white, size = size.small)
+            line.new(bar_index, extBar, bar_index + 1, extBar, color = CM,
+                 width = 1, style = line.style_dotted, extend = extend.right)
         else
-            // cierra fuera: es rotura limpia, no manipulación
-            fase := 0
+            fase  := 0
             nRota := nRota + 1
-    if fase == 1 and bar_index - rConf > espM
+    if fase == 1 and bar_index - rConf > ESPM
         fase := 0
 
-// ─── D · el cierre más allá del extremo contrario ──────────────────────────
+// ─── D ─────────────────────────────────────────────────────────────────────
 else if fase == 2
     bool hecho = lado < 0 ? close < rLo : close > rHi
     if hecho
         nD := nD + 1
-        if verD
-            label.new(bar_index, lado < 0 ? low : high, "D",
-                 style = lado < 0 ? label.style_label_up : label.style_label_down,
-                 color = color.new(cD, 15), textcolor = color.white,
-                 size = size.small)
-            line.new(barM, extBar, bar_index, close, color = cD, width = 2)
+        label.new(bar_index, lado < 0 ? low : high, "D",
+             style = lado < 0 ? label.style_label_up : label.style_label_down,
+             color = color.new(CD, 15), textcolor = color.white, size = size.small)
+        line.new(barM, extBar, bar_index, close, color = CD, width = 2)
         fase := 0
-    else if bar_index - barM > espD
+    else if bar_index - barM > ESPD
         if verF
             label.new(bar_index, lado < 0 ? high : low, "—",
                  style = lado < 0 ? label.style_label_down : label.style_label_up,
-                 color = color.new(#8E8E93, 40), textcolor = color.white,
-                 size = size.tiny)
+                 color = color.new(#8E8E93, 40), textcolor = color.white, size = size.tiny)
         fase := 0
 
 // ─── la tabla ──────────────────────────────────────────────────────────────
-var table T = table.new(position.top_right, 2, 6, border_width = 1)
-if verT and barstate.islast
+var table T = table.new(position.top_right, 2, 7, border_width = 1)
+if barstate.islast
+    bool ok = not na(ratio) and ratio <= LIMITE
+    bool mal = not na(ratio) and ratio > ALERTA
+    string est = na(ratio) ? "sin datos" : ok ? "MIRA" : mal ? "NO MIRES" : "flojo"
+    color cest = na(ratio) ? color.gray : ok ? VERDE : mal ? ROJO : #B07D1F
     float pM = nA > 0 ? 100.0 * nM / nA : 0.0
     float pD = nM > 0 ? 100.0 * nD / nM : 0.0
-    table.cell(T, 0, 0, "en el gráfico", text_size = size.small,
-         bgcolor = color.new(#8E8E93, 80))
-    table.cell(T, 1, 0, "", text_size = size.small, bgcolor = color.new(#8E8E93, 80))
-    table.cell(T, 0, 1, "rangos (A)", text_size = size.small)
-    table.cell(T, 1, 1, str.tostring(nA), text_size = size.small)
-    table.cell(T, 0, 2, "manipulan (M)", text_size = size.small)
-    table.cell(T, 1, 2, str.tostring(nM) + "  (" + str.tostring(pM, "#.#") + " %)",
-         text_size = size.small)
-    table.cell(T, 0, 3, "completan (D)", text_size = size.small)
-    table.cell(T, 1, 3, str.tostring(nD) + "  (" + str.tostring(pD, "#.#") + " %)",
-         text_size = size.small)
-    table.cell(T, 0, 4, "rotura limpia", text_size = size.small)
-    table.cell(T, 1, 4, str.tostring(nRota), text_size = size.small)
-    table.cell(T, 0, 5, "estrechez ahora", text_size = size.small)
-    table.cell(T, 1, 5, str.tostring(ratio, "#.##") + "  (pide " +
-         str.tostring(mult, "#.##") + ")", text_size = size.small,
-         text_color = ratio <= mult ? #17914F : color.gray)
 
-plotshape(false)
+    table.cell(T, 0, 0, "ESTADO", text_size = size.normal, text_color = color.white,
+         bgcolor = cest)
+    table.cell(T, 1, 0, est, text_size = size.normal, text_color = color.white,
+         bgcolor = cest)
+    table.cell(T, 0, 1, "estrechez", text_size = size.small)
+    table.cell(T, 1, 1, str.tostring(ratio, "#.##") + "  (pide ≤ 0,90)",
+         text_size = size.small, text_color = cest)
+    table.cell(T, 0, 2, "rango de", text_size = size.small)
+    table.cell(T, 1, 2, str.tostring(nUsar) + " velas de " + timeframe.period,
+         text_size = size.small)
+    table.cell(T, 0, 3, "rangos (A)", text_size = size.small)
+    table.cell(T, 1, 3, str.tostring(nA), text_size = size.small)
+    table.cell(T, 0, 4, "manipulan (M)", text_size = size.small)
+    table.cell(T, 1, 4, str.tostring(nM) + "  (" + str.tostring(pM, "#.#") + " %)",
+         text_size = size.small)
+    table.cell(T, 0, 5, "completan (D)", text_size = size.small)
+    table.cell(T, 1, 5, str.tostring(nD) + "  (" + str.tostring(pD, "#.#") + " %)",
+         text_size = size.small)
+    table.cell(T, 0, 6, "rotura limpia", text_size = size.small)
+    table.cell(T, 1, 6, str.tostring(nRota), text_size = size.small)
+
+// aviso si lo carga donde no significa nada
+var label avisoTF = na
+if barstate.islast and tfmin > 0 and tfmin < 5
+    if na(avisoTF)
+        avisoTF := label.new(bar_index, high, "En M1 esto no significa nada.\n" +
+             "Ponlo en M15, H1 o H4.", style = label.style_label_down,
+             color = color.new(ROJO, 10), textcolor = color.white, size = size.normal)
+    else
+        label.set_x(avisoTF, bar_index)
