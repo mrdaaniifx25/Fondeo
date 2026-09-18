@@ -13,8 +13,9 @@
 //    etiqueta M      manipulación: el precio SALE de la caja y CIERRA de
 //                    vuelta dentro. La línea de puntos marca hasta dónde
 //                    llegó, que es donde iría el stop.
-//    etiqueta D      distribución: cierre más allá del extremo CONTRARIO.
-//                    La línea azul es el recorrido de la M a la D.
+//    etiqueta D      distribución: cierre más allá del extremo CONTRARIO,
+//                    dentro de las 20 velas siguientes a la M. La línea azul
+//                    es el recorrido de la M a la D.
 //
 //    Si la caja se rompe y NO vuelve, no hay M: es rotura limpia y muere.
 //
@@ -44,6 +45,29 @@
 //        H4    +3,8  -0,6  -3,4  -3,7  -4,2
 //
 //  Por eso el listón está en 0,90 y el aviso rojo en 1,20.
+//
+//  CUANTAS D HAY QUE ESPERAR  ·  bt/amd_distribucion.py
+//  El viaje de la D es largo: el precio tiene que cruzarse el rango entero.
+//  Recorrido real tras la M, en fracciones del ancho del rango:
+//
+//        marco   mediana   llega a 0,50   a 0,75   a 1,00 (=D)
+//        M15      0,71        62,8 %      48,2 %     37,4 %
+//        H1       1,00        71,2 %      60,0 %     50,1 %
+//        H4       0,92        69,8 %      56,8 %     46,7 %
+//
+//  Asi que "mucha A, bastante M, poca D" es el aspecto CORRECTO. De cada diez
+//  manipulaciones se completan unas cuatro. Si vieras una D por cada dos M,
+//  seria que algo va mal.
+//
+//  H1 ES EL MEJOR SITIO: es el unico marco donde la mediana del recorrido
+//  llega al extremo contrario. En M15 se queda en 0,71 y la historia se corta
+//  a medias mas de la mitad de las veces.
+//
+//  OJO, dos numeros distintos y los dos ciertos:
+//    37 %  llego al otro lado en algun momento  <- lo que marca este indicador
+//    16 %  llego ANTES de darse la vuelta       <- lo que importa para operar
+//  La primera version de esta cabecera citaba el 16 % para un indicador que
+//  hace lo primero. Corregido el 18-09-2026.
 //
 //  ─────────────────────────────────────────────────────────────────────────
 //  LO QUE NO ES, y hay que tenerlo claro
