@@ -75,7 +75,8 @@ def corre(tf_alto, tf_bajo):
                 ent = Lc[j]
                 if stop > ent:
                     rgo = stop - ent
-                    ops.append(("venta", Lt[j], ent, stop, ent - RR * rgo, rgo / U, False))
+                    ops.append(("venta", Lt[j] + np.timedelta64(tf_bajo, "m"),
+                                ent, stop, ent - RR * rgo, rgo / U, False))
                     usado = k; continue
         # COMPRA
         if hasta_lo < pl[k] and Lc[j] > pl[k] and np.isfinite(ultMax) and np.isfinite(ultMin):
@@ -84,7 +85,8 @@ def corre(tf_alto, tf_bajo):
                 ent = Lc[j]
                 if stop < ent:
                     rgo = ent - stop
-                    ops.append(("compra", Lt[j], ent, stop, ent + RR * rgo, rgo / U, True))
+                    ops.append(("compra", Lt[j] + np.timedelta64(tf_bajo, "m"),
+                                ent, stop, ent + RR * rgo, rgo / U, True))
                     usado = k
 
     D = pd.DataFrame(ops, columns=["lado","t","ent","stop","obj","rgoP","largo"])

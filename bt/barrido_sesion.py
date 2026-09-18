@@ -42,9 +42,13 @@ for nom, (a, b) in SES.items():
 
 t1 = m1.ts.to_numpy(); h1 = m1.high.to_numpy(); l1 = m1.low.to_numpy()
 
+# Se entra al CIERRE de la vela de M5, no en su marca de tiempo, que es su
+# primer minuto. Resolver desde la marca meteria el recorrido de la propia
+# vela de entrada dentro de la operacion: eso ya ha pasado cuando entras.
 def resuelve(t_ent, ent, stop, obj, largo):
-    """Camino en M1 desde el minuto siguiente a la entrada."""
-    i = int(np.searchsorted(t1, np.datetime64(t_ent), side="right"))
+    """Camino en M1 desde el CIERRE de la vela de entrada, no desde su inicio."""
+    i = int(np.searchsorted(t1, np.datetime64(t_ent) + np.timedelta64(5, "m"),
+                            side="left"))
     fin = min(len(t1), i + HOR)
     for k in range(i, fin):
         if largo:

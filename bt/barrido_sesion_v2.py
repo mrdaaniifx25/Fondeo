@@ -32,8 +32,11 @@ rangos = {n: m1[(m1.h >= a) & (m1.h < b)].groupby("dia").agg(hi=("high","max"), 
 
 t1 = m1.ts.to_numpy(); h1 = m1.high.to_numpy(); l1 = m1.low.to_numpy()
 
+# Se entra al CIERRE de la vela de M5, no en su marca de tiempo, que es su
+# primer minuto. Resolver desde la marca meteria el recorrido de la propia
+# vela de entrada dentro de la operacion: eso ya ha pasado cuando entras.
 def resuelve(t_ent, stop, obj, largo):
-    i = int(np.searchsorted(t1, np.datetime64(t_ent), side="right"))
+    i = int(np.searchsorted(t1, np.datetime64(t_ent) + np.timedelta64(5, "m"), side="left"))
     for k in range(i, min(len(t1), i + HOR)):
         if largo:
             if l1[k] <= stop: return 0

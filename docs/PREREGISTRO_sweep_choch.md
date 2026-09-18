@@ -78,3 +78,37 @@ concluir nada, ni a favor ni en contra.
 Lo mejor que ha dado el proyecto es bruta **+0,048** (el modelo, con 200.000
 filas). Cualquier cosa por debajo de eso no es un hallazgo nuevo. Para que la neta
 cruce cero con un riesgo de 15 pips hace falta bruta por encima de **+0,095**.
+
+---
+
+## Ampliación · 18 de septiembre · su stop sin su gatillo
+
+El cambio de estructura como gatillo salió con bruta −0,176 (z −4,19). El stop en
+el pivote salió con el mejor coste/riesgo del proyecto (9,7 %). Se prueba la
+combinación: **quedarse el stop y tirar el gatillo**.
+
+Condición suya, literal: *"necesito que lo que hagamos sea sencillo y un ABC, que
+no dependa de cómo me siento"*. Así que todas las variantes son mecánicas y
+cerradas; ninguna admite criterio.
+
+### Las seis celdas, declaradas ahora
+
+Entrada — al cierre de la vela de M15 que **devuelve el precio dentro** del rango
+de H4, o unas velas después:
+
+    E0  esa misma vela          E1  una después          E2  dos después
+
+Stop — dos definiciones:
+
+    S1  el último pivote de estructura confirmado
+    S2  el más lejano entre ese pivote y el extremo del barrido
+
+**Celda principal: E0 + S2**, H4 + M15. Un solo contraste. El criterio no cambia:
+IC95 de la R neta entero por encima de cero.
+
+Las seis se informan. No se elige después.
+
+### Por qué E0 y no otra
+
+Es la más temprana y la más simple de contar: barre, vuelve dentro, entras. Y es
+la que menos espera, que es justo lo contrario del gatillo que acaba de fallar.
