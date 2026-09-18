@@ -88,9 +88,12 @@ int tfmin = int(math.round(timeframe.in_seconds() / 60.0))
 bool corto = tfmin < 30
 int  nUsar = auto ? (corto ? 12 : 8) : nMan
 
-float h8  = ta.highest(high, 8),  l8  = ta.lowest(low, 8)
-float h12 = ta.highest(high, 12), l12 = ta.lowest(low, 12)
-float hm  = ta.highest(high, nMan), lm = ta.lowest(low, nMan)
+float h8  = ta.highest(high, 8)
+float l8  = ta.lowest(low, 8)
+float h12 = ta.highest(high, 12)
+float l12 = ta.lowest(low, 12)
+float hm  = ta.highest(high, nMan)
+float lm  = ta.lowest(low, nMan)
 float altoN = auto ? (corto ? h12 : h8) : hm
 float bajoN = auto ? (corto ? l12 : l8) : lm
 
@@ -111,7 +114,10 @@ var box   caja   = na
 var int   lado   = 0
 var float extBar = na
 var int   barM   = 0
-var int nA = 0, nM = 0, nD = 0, nRota = 0
+var int nA = 0
+var int nM = 0
+var int nD = 0
+var int nRota = 0
 
 // ─── A ─────────────────────────────────────────────────────────────────────
 if fase == 0 and esRango and barstate.isconfirmed
