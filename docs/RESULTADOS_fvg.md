@@ -1,7 +1,8 @@
 # Resultados · las cuatro afirmaciones sobre el FVG
 
 Pre-registro `docs/PREREGISTRO_fvg.md`. Código en `bt/fvg.py`.
-Oro y DAX, M1 de 2023-01 a 2026-07. **34.000 FVG en M15**, 8.400 en H1.
+EURUSD (2021-2024 y 2026), oro y DAX (2023 a 2026-07).
+**58.000 FVG en M15**, 14.000 en H1. Tres instrumentos.
 
 ## El resultado que lo explica todo
 
@@ -16,8 +17,9 @@ estaba cerca, no porque sea un hueco. El FVG añade **un punto porcentual**.
 
 ### 1 · «El precio tiende a regresar al FVG» — CIERTA, y trivial
 
-    oro M15   vuelve 89,5 %   listón 89,0 %   exceso +0,5 %  [+0,1, +0,9]
-    DAX M15   vuelve 90,3 %   listón 89,3 %   exceso +1,0 %  [+0,5, +1,4]
+    EURUSD M15  vuelve 90,4 %   listón 89,6 %   exceso +0,9 %  [+0,5, +1,2]
+    oro    M15  vuelve 89,5 %   listón 89,0 %   exceso +0,5 %  [+0,1, +0,9]
+    DAX    M15  vuelve 90,3 %   listón 89,3 %   exceso +1,0 %  [+0,5, +1,4]
 
 Los dos intervalos quedan por encima de cero, así que por el criterio escrito es
 cierta. Pero el tamaño es de **medio punto a uno**. Es de esas afirmaciones que
@@ -25,8 +27,9 @@ son verdad y aun así no te sirven de nada.
 
 ### 2 · «El de Consolidación tiene altas probabilidades de ser testeado» — CIERTA, y por el motivo equivocado
 
-    oro M15   vuelve 94,2 %   listón 93,8 %   exceso +0,3 %  [-0,4, +1,1]
-    DAX M15   vuelve 94,0 %   listón 93,9 %   exceso +0,2 %  [-0,6, +0,9]
+    EURUSD M15  vuelve 93,7 %   listón 94,2 %   exceso -0,5 %  [-1,1, +0,1]
+    oro    M15  vuelve 94,2 %   listón 93,8 %   exceso +0,3 %  [-0,4, +1,1]
+    DAX    M15  vuelve 94,0 %   listón 93,9 %   exceso +0,2 %  [-0,6, +0,9]
 
 Es el tipo con **más** vueltas de los tres, o sea que la afirmación acierta. Pero
 su exceso es **cero**. Se testea más porque el hueco es más pequeño y está más
@@ -34,9 +37,12 @@ cerca, no porque sea de consolidación.
 
 ### 3 · «El Breakaway casi nunca se testea» — FALSA, y al revés de lo interesante
 
-    oro M15   vuelve 84,2 %   listón 81,8 %   exceso +2,4 %  [+1,4, +3,4]
-    DAX M15   vuelve 85,8 %   listón 83,3 %   exceso +2,5 %  [+1,5, +3,4]
-    DAX H1    vuelve 87,8 %   listón 84,7 %   exceso +3,0 %  [+1,3, +4,8]
+    EURUSD M15  vuelve 85,2 %   listón 82,8 %   exceso +2,4 %  [+1,6, +3,3]
+    oro    M15  vuelve 84,2 %   listón 81,8 %   exceso +2,4 %  [+1,4, +3,4]
+    DAX    M15  vuelve 85,8 %   listón 83,3 %   exceso +2,5 %  [+1,5, +3,4]
+
+**+2,4 · +2,4 · +2,5 en tres instrumentos distintos.** Esa repetición es lo que
+convierte esto en un hallazgo y no en una casualidad.
 
 **«Casi nunca» es 85 % de las veces.** La afirmación confunde "menos que los
 otros" con "casi nunca", y la diferencia es enorme si te quedas fuera esperando.
@@ -48,15 +54,18 @@ diapositivas.
 
 ### 4 · «Cuanto mayor la temporalidad, más peso» — A MEDIAS
 
-    marco    exceso oro   exceso DAX
-    M15        +0,5 %       +1,0 %
-    H1         +0,3 %       +0,8 %
-    H4         +0,6 %       -0,1 %
-    D1         +4,5 %       +3,9 %
+    marco    EURUSD     oro      DAX
+    M15       +0,9 %   +0,5 %   +1,0 %
+    H1        +0,3 %   +0,3 %   +0,8 %
+    H4        +0,6 %   +0,6 %   -0,1 %
+    D1        -0,4 %   +4,5 %   +3,9 %
 
-El diario destaca de verdad, con el intervalo por encima de cero en los dos. Pero
-no hay gradiente: H1 y H4 no se ordenan. Y el diario tiene solo unos 200 casos,
-así que el intervalo es ancho. **El diario sí, la escalera no.**
+Con solo oro y DAX parecía que el diario destacaba (+4,5 y +3,9). **EURUSD lo
+desmiente: -0,4 %.** Con 200-250 casos en diario, los intervalos son tan anchos
+que aquello era ruido. No hay escalera y el diario tampoco aguanta.
+
+Es un buen recordatorio de lo fácil que es creerse un hallazgo con dos
+instrumentos y perderlo con el tercero.
 
 ## Y el dato que de verdad sirve para leer el gráfico
 
@@ -72,9 +81,10 @@ diapositivas.
 ## Veredicto
 
     1  cierta, y de un punto porcentual
-    2  cierta, y por el motivo equivocado (exceso cero)
-    3  FALSA: es el 85 %, y encima es el mejor de los tres
-    4  solo en el diario, y sin escalera
+    2  cierta, y por el motivo equivocado: su exceso es cero en los tres
+    3  FALSA: es el 85 %, y encima es el UNICO tipo con exceso real,
+       replicado en los tres instrumentos con +2,4 / +2,4 / +2,5
+    4  NO se sostiene: lo que parecia en oro y DAX lo desmiente EURUSD
 
 El FVG no es humo: existe, es mecánico y tiene un exceso pequeño y medible. Lo
 que es humo es **el tamaño que se le atribuye**. El 90 % que impresiona es el 89 %

@@ -4,7 +4,8 @@ from math import sqrt
 
 HOR = 50
 TFS = {"M15": 15, "H1": 60, "H4": 240, "D1": 1440}
-INS = {"oro": "data/xauusd_m1.parquet", "DAX": "data/grxeur_m1.parquet"}
+INS = {"EURUSD": "data/eurusd_m1.parquet",
+       "oro": "data/xauusd_m1.parquet", "DAX": "data/grxeur_m1.parquet"}
 
 def velas(m1, mins):
     g = (m1.set_index("ts").resample(f"{mins}min", label="left", closed="left")
