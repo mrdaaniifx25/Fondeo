@@ -1,0 +1,75 @@
+==========================================================================
+BLOQUE 5 · 50 SESIONES
+==========================================================================
+  operaciones            73   en 39 sesiones (11 sin operar)  ·  1.46 por sesión
+  desenlaces             TP 44 · SL 27 · cierre 2
+  ACIERTO                62.0 %  sobre 71   ·   z = +5.12
+  stop mediano           5.6 p  ·  coste/riesgo 26.7 %
+  R BRUTA / op           +0.849   ·   suma +62.01 R
+  R NETA  / op           +0.582   ·   z = +3.45   ·   suma +42.50 R
+  por sesión             +0.850   ·   z = +4.13
+
+  la regla mecánica     -0.629 R/sesión
+  DIFERENCIA emparejada +1.479 R/sesión   ·   z = +4.94
+
+==========================================================================
+LOS TRES UMBRALES  (z > +1,64)
+==========================================================================
+  acierto sobre 33,3 %             z =  +5.12   PASA
+  R neta por operación             z =  +3.45   PASA
+  diferencia contra la regla       z =  +4.94   PASA
+
+==========================================================================
+EL CONTRASTE PRINCIPAL: SUS DESCARTES
+==========================================================================
+  descartes registrados: 3  (predije entre 25 y 75)
+  NO SE PUEDE CORRER. Con tres descartes -y dos de ellos duplicados-
+  no hay grupo de control. El contraste principal del bloque queda vacío.
+   ses  min  lado  rgo           motivo
+  37  530    -1  3.9   no me convence
+  42  595    -1  3.2 me he equivocado
+  42  595    -1  3.2 me he equivocado
+
+==========================================================================
+SECUNDARIO 1 · LA CONFIANZA
+==========================================================================
+  claro     n= 11 (15.1 %)  acierto  63.6 %  R neta +0.662
+  normal    n= 61 (83.6 %)  acierto  62.7 %  R neta +0.597
+  dudando   n=  1 ( 1.4 %)  acierto   0.0 %  R neta -1.186
+  claro contra normal: Fisher p = 1.000
+
+==========================================================================
+SECUNDARIO 2 · EL INDICADOR (sorteado, 25 sesiones cada rama)
+==========================================================================
+  con indicador    37 ops en 20 sesiones (1.48 por sesión)  acierto  58.3 %  R neta +0.472  stop 6.0p
+  sin indicador    36 ops en 19 sesiones (1.44 por sesión)  acierto  65.7 %  R neta +0.695  stop 5.2p
+  Fisher p = 0.627
+==========================================================================
+SECUNDARIO 3 · ¿SE REPLICA EL HALLAZGO DEL CUERPO?
+==========================================================================
+  73 operaciones con contexto
+
+  cuerpo / rango            n   acierto    R neta   bloques 1-4
+  ----------------------------------------------------------------
+  0-20 %                    6     66.7%    +0.768       80.8 %
+  20-40 %                  19     55.6%    +0.395       77.3 %
+  40-60 %                  15     66.7%    +0.731       76.5 %
+  60-80 %                  20     78.9%    +1.046       56.8 %
+  80-100 %                 13     38.5%    -0.116       39.1 %
+
+  ----------------------------------------------------------------
+  CUERPO LLENO (>=60 %)    33     62.5%    +0.588     50,0 %
+  el resto                 40     61.5%    +0.577     78,0 %
+
+  Fisher en el bloque 5:        p = 1.0000
+  (en los bloques 1-4 fue        p = 0,0006)
+
+  y el matiz de ayer, lejos del nivel de Asia:
+    lejos del nivel (46 ops):  cuerpo lleno 19 ops  50.0 %  ·  resto 27 ops  57.7 %   ·   p = 0.7600
+    en el nivel     (27 ops):  cuerpo lleno 14 ops  78.6 %  ·  resto 13 ops  69.2 %
+
+==========================================================================
+LOS CINCO BLOQUES JUNTOS, SOBRE EL CUERPO
+==========================================================================
+  cuerpo lleno    97 operaciones · acierto ~53.6 %
+  el resto       126 operaciones · acierto ~72.2 %

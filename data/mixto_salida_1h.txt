@@ -1,0 +1,25 @@
+MIX CRT + SESIONES · barrido de niveles de sesion en 1H · TODO EN BRUTO
+                n     %TP     R/op  bruta/d      z  sin res    stop mediano            c*
+  EURUSD    1.708   33.8%   +0.022   +0.022  +0.63     0.5%        7.2 pips     0.13 pips
+  GBPUSD    1.710   32.9%   +0.001   +0.001  +0.03     0.9%        9.1 pips     0.01 pips
+  USDJPY    1.707   32.6%   -0.010   -0.010  -0.30     0.9%       12.1 pips    -0.09 pips
+  XAUUSD      772   36.5%   +0.110   +0.110  +2.12     1.0%      331.3 cent    22.44 cent
+  DAX         760   30.5%   -0.073   -0.073  -1.46     0.8%       17.5 pts     -0.91 pts
+  NAS100    1.688   32.8%   -0.011   -0.011  -0.31     0.5%       26.0 pts     -0.19 pts
+  SP500     1.696   35.0%   +0.058   +0.058  +1.66     0.4%        6.5 pts      0.31 pts
+
+====================================================================================================
+  CONTRASTE PRINCIPAL · los siete agrupados · 10.041 operaciones en 10.041 días-instrumento
+  acierto 33.4 %  ·  R/op +0.0130  ·  BRUTA POR DÍA +0.0130  ·  z +0.92
+  -> POSITIVA, como se predijo
+====================================================================================================
+
+  por sesión operada
+    Asia       8.266   33.7%   +0.017   +1.11
+    Londres    1.494   31.9%   -0.032   -0.88
+    NY           281   34.9%   +0.126   +1.49
+
+  por antigüedad del nivel
+    de la sesión anterior    4.025   33.8%   +0.028   +1.24
+    2 a 4 sesiones           3.556   33.2%   +0.005   +0.19
+    5 o más                  2.460   33.3%   +0.001   +0.04

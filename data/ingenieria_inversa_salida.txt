@@ -1,0 +1,68 @@
+150 entradas suyas · 114 sesiones en el universo (93 con operación)
+4,902 velas candidatas (43 por sesión)
+ancladas 150 de 150  ·  velas distintas usadas: 150
+controles con las manos libres: 3,400  (descartadas 1,354 por estar dentro de una operación)
+
+==============================================================================
+SUS ENTRADAS CONTRA LOS MOMENTOS EN QUE NO ENTRÓ  (EXPLORATORIO)
+==============================================================================
+  variable                       suyas  controles      dif       z          p
+  --------------------------------------------------------------------------
+  1 distancia al nivel (p)         4.3        7.5     -4.1   -8.14   0.000000  *
+  2a cuerpo fuera del nivel       6.7%       8.6%    -1.9pt   -0.81   0.415566
+  2b solo mecha                  23.3%       8.1%   +15.2pt   +6.45   0.000000  *
+  2c la vela toca el nivel       30.0%      16.7%   +13.3pt   +4.23   0.000024  *
+  3 toques previos del nivel       1.0        2.0     -1.6   -7.23   0.000000  *
+  6 minutos desde las 08:00       40.0      122.5    -65.3  -17.60   0.000000  *
+  7 rango de la vela (p)           4.2        4.4     -0.4   -1.82   0.068593
+  (4 H4 y 5 M15 son direcciones: se miran abajo, contra SU dirección)
+
+  * = pasa Bonferroni (p < 0,00625)
+
+==============================================================================
+HACIA DÓNDE ENTRA  (solo sus 150)
+==============================================================================
+  con la rotura (compra por encima del alto, venta por debajo del bajo):
+  a favor de la rotura                     6 ( 4.0 %)   acierto  60.0 %
+  desvaneciendo (contra la rotura)         4 ( 2.7 %)   acierto   0.0 %
+  sin cuerpo fuera del nivel             140 (93.3 %)   acierto  68.4 %
+
+  contra la dirección de las temporalidades altas:
+  a favor de H4                           60 (40.0 %)   acierto  64.3 %
+  en contra de H4                         90 (60.0 %)   acierto  67.4 %
+  a favor de M15                          49 (32.7 %)   acierto  68.9 %
+  en contra de M15                       100 (66.7 %)   acierto  65.6 %
+  a favor del día hasta ese momento       62 (41.3 %)   acierto  72.9 %
+  en contra del día                       83 (55.3 %)   acierto  64.6 %
+
+  por cercanía al nivel:
+  a 0-3 pips del nivel                    56 (37.3 %)   acierto  67.9 %
+  a 3-6 pips del nivel                    41 (27.3 %)   acierto  66.7 %
+  a 6-12 pips del nivel                   41 (27.3 %)   acierto  63.2 %
+  a 12-+ pips del nivel                   12 ( 8.0 %)   acierto  66.7 %
+
+==============================================================================
+LA PREGUNTA QUE DECIDE: ¿ALGUNA DE ESAS VARIABLES SEPARA SUS GANADORAS?
+==============================================================================
+  94 ganadoras · 48 perdedoras
+  variable                           gana   pierde      dif       t         p
+  ------------------------------------------------------------------------
+  distancia al nivel (p)              4.0      4.7    -0.55   -0.50    0.6173
+  toques previos                      1.0      0.0    +0.15   +0.33    0.7411
+  minutos desde las 08:00            32.5     47.5    -4.19   -0.57    0.5692
+  stop en pips                        5.8      6.2    -0.36   -0.70    0.4842
+  dirección de H4 (±1)               -1.0     -1.0    +0.19   +1.06    0.2876
+  dirección de M15 (±1)              -1.0     -1.0    +0.10   +0.59    0.5582
+  nº de operación del bloque         12.0     16.0    -3.35   -1.50    0.1327
+  la vela toca el nivel             29.8%    29.2%    +0.6pt   +0.08    0.9389
+  solo mecha                        26.6%    16.7%    +9.9pt   +1.33    0.1851
+  cuerpo fuera                       3.2%    12.5%    -9.3pt   -2.15    0.0313
+  entra por encima del nivel        42.6%    35.4%    +7.1pt   +0.82    0.4118
+
+  a favor / en contra, acierto:
+    a favor de H4          n= 56  acierto  64.3 %  R neta +0.641
+    en contra de H4        n= 86  acierto  67.4 %  R neta +0.778
+    a favor de M15         n= 45  acierto  68.9 %  R neta +0.816
+    en contra de M15       n= 97  acierto  64.9 %  R neta +0.681
+    a favor de día         n= 59  acierto  72.9 %  R neta +0.924
+    en contra de día       n= 83  acierto  61.4 %  R neta +0.582
