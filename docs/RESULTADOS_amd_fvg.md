@@ -80,3 +80,46 @@ ahora estará contaminado por haberlo visto**.
 
 No hay más datos que reservar. La prueba honesta es correrlo desde hoy, sin
 tocar nada, y ver qué sale. Es lo que este proyecto lleva sin hacer desde agosto.
+
+---
+
+## Qué hace esto en una cuenta de 10.000 €
+
+`bt/cuenta_10k.py`, 20.000 simulaciones con la distribución real de las 587
+operaciones. Un año son 120 operaciones (117 medidas, ~10 al mes).
+
+| riesgo | €/op | lotes | final medio | peor 5 % | mejor 5 % | caída máx | acaba perdiendo |
+|---|---|---|---|---|---|---|---|
+| 0,5 % | 50 € | 0,22 | 10.235 | 9.533 | 10.954 | −3,5 % | 29,7 % |
+| **1 %** | **100 €** | **0,45** | **10.467** | 9.087 | 11.909 | −6,7 % | 29,8 % |
+| 2 % | 200 € | 0,90 | 10.951 | 8.128 | 13.807 | −12,8 % | 29,3 % |
+| 5 % | 500 € | 2,24 | 12.342 | 5.288 | 19.505 | −28,2 % | 29,5 % |
+
+**Acaba el año perdiendo 3 de cada 10 veces en los cuatro casos.** Subir el
+riesgo no mejora esa probabilidad: solo agranda los dos extremos.
+
+Con **5 lotes** (1.114 € por operación, el 11 % de la cuenta):
+
+    revienta la cuenta        12,8 %
+    acaba bajo los 10.000     31,0 %
+
+Uno de cada ocho años se queda a cero.
+
+## Y por qué no llega a los 750 €/mes
+
+    al 1 % de riesgo, un año:   +467 EUR
+    750 EUR/mes serian:       +9.000 EUR
+
+Factor de **19**. Para ganarlos habría que arriesgar unos 1.900 € por operación,
+el 19 % de la cuenta por trade, más agresivo que los 5 lotes que ya revientan el
+13 % de las veces.
+
+**No existe un tamaño que saque 750 €/mes de 10.000 € con esto.** El motor da un
+4,7 % anual y el objetivo pide un 90 %.
+
+## Lo que sí es cierto, y es nuevo
+
+Con tamaño sensato esta estrategia **no pierde dinero**, y es la primera del
+proyecto de la que se puede decir eso. Todas las anteriores tenían el signo
+negativo. El salto de aquí a 750 €/mes no lo da una estrategia mejor: lo da el
+capital.
