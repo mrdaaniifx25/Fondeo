@@ -1,3 +1,11 @@
+// ======================================================================
+// AVISO 19/09/2026 - NO USAR.
+// La medicion que justificaba esta regla estaba mal: admitia entradas
+// con el objetivo ya rebasado por el precio (38 % de la muestra, que
+// se ganaban solas). Corregida, la regla NO bate al azar: acierto
+// 63,8 % frente a un precio justo de 64,2 %, neta -0,057 R.
+// Ver docs/CORRECCION_objetivo_rebasado.md
+// ======================================================================
 // This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
 // at https://mozilla.org/MPL/2.0/
 //

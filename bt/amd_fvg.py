@@ -1,4 +1,12 @@
-"""AMD + FVG. Pre-registro docs/PREREGISTRO_amd_fvg.md"""
+"""AMD + FVG. Pre-registro docs/PREREGISTRO_amd_fvg.md
+
+CORRECCION 2026-09-19 (docs/CORRECCION_objetivo_rebasado.md): la version
+anterior calculaba la distancia al objetivo con abs(), asi que admitia
+entradas con el objetivo YA rebasado por el precio. Son el 38 % de la muestra
+de EURUSD y acertaban el 97 % solas, porque el objetivo estaba detras del
+precio en el momento de entrar. Nadie pone esa operacion. Ahora el objetivo
+tiene que estar POR DELANTE. Se imprimen las dos cifras para poder comparar.
+"""
 import numpy as np, pandas as pd
 from math import sqrt
 
@@ -60,6 +68,8 @@ def corre(V, n):
         obj = rLo if lado < 0 else rHi
         rgo = abs(stop - P); rec = abs(obj - P)
         if rgo <= 0 or rec <= 0: i = manip+1; continue
+        # el objetivo tiene que estar por delante del precio de entrada
+        delante = (P > obj) if lado < 0 else (P < obj)
         dv, dc = rec, abs(stop - P)
         azar = dc / (dv + dc)
         gana = 0; k = entra+1
@@ -74,9 +84,9 @@ def corre(V, n):
                 if l[k] <= stop: break
                 if h[k] >= obj: gana = 1; break
             k += 1
-        filas.append((kf >= 0, lado, rgo, rec/rgo, gana, azar, V.ts.iloc[entra]))
+        filas.append((kf >= 0, delante, lado, rgo, rec/rgo, gana, azar, V.ts.iloc[entra]))
         i = manip+1
-    D = pd.DataFrame(filas, columns=["fvg","lado","rgo","rr","gana","azar","t"])
+    D = pd.DataFrame(filas, columns=["fvg","delante","lado","rgo","rr","gana","azar","t"])
     D["anio"] = pd.DatetimeIndex(D.t).year
     D["Rb"] = np.where(D.gana == 1, D.rr, -1.0)
     return D
@@ -101,9 +111,12 @@ for tf, mins, n in (("H1", 60, 8),):
         m1 = m1.sort_values("ts").drop_duplicates("ts").reset_index(drop=True)
         D = corre(velas(m1, mins), n)
         print(f"  --- {ins} ---")
-        F = D[D.fvg]
+        T = D[D.fvg]
+        linea("(antiguo, con el bug)", T, U, coste)
+        F = T[T.delante]
+        print(f"      quitadas {100*(1-len(F)/len(T)):.0f} % de entradas con el objetivo ya rebasado")
         linea("CON FVG · todo", F, U, coste)
-        linea("SIN FVG · todo", D[~D.fvg], U, coste)
+        S = D[~D.fvg]; linea("SIN FVG · todo", S[S.delante], U, coste)
         cor = 2024 if ins == "EURUSD" else 2025
         linea(f"CON FVG < {cor}", F[F.anio < cor], U, coste)
         linea(f"CON FVG >= {cor}", F[F.anio >= cor], U, coste)

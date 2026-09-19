@@ -1,3 +1,20 @@
+> ## ⚠ CORREGIDO EL 19/09/2026 — ESTE RESULTADO NO SE SOSTIENE
+>
+> El 38 % de las operaciones de esta medición tenían el objetivo **ya rebasado
+> por el precio** en el momento de entrar, y se anotaban como ganadas. Nadie
+> pone esa operación. Corregido:
+>
+> | | publicado aquí | corregido |
+> |---|---|---|
+> | operaciones (EURUSD) | 587 | 367 |
+> | acierto | 76,5 % | 63,8 % |
+> | exceso sobre el azar | +6,2 | −0,4 |
+> | neta | +0,0390 | −0,0567 |
+>
+> Los tres instrumentos quedan con el cero dentro del intervalo de confianza.
+> Todo lo de abajo está mal salvo que se diga lo contrario.
+> Explicación: `docs/CORRECCION_objetivo_rebasado.md`.
+
 # Resultados · AMD + FVG
 
 Pre-registro `docs/PREREGISTRO_amd_fvg.md`. Código en `bt/amd_fvg.py`.

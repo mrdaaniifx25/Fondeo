@@ -9,7 +9,7 @@ HTML = r'''<title>AMD + FVG en el gráfico</title>
   --fondo:#f2f5f8; --panel:#fdfdfe; --panel2:#f6f8fb; --linea:#dde3ea;
   --tinta:#12161c; --tinta2:#4e5864; --tinta3:#8b95a1;
   --alc:#0ca30c; --baj:#d03b3b; --acc:#2a78d6; --naranja:#e08a2b;
-  --gris:rgba(142,142,147,.16);
+  --gris:rgba(142,142,147,.16); --aviso-f:#fdf2f2; --aviso-b:#f0d2d2;
   --sombra:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -17,7 +17,7 @@ HTML = r'''<title>AMD + FVG en el gráfico</title>
   --fondo:#10131a; --panel:#181c24; --panel2:#1d222b; --linea:#29303a;
   --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
   --alc:#22b422; --baj:#e05555; --acc:#3987e5; --naranja:#d95926;
-  --gris:rgba(142,142,147,.2);
+  --gris:rgba(142,142,147,.2); --aviso-f:#2a1a1a; --aviso-b:#4a2c2c;
   --sombra:0 1px 2px rgba(0,0,0,.3);
 }}
 :root[data-theme="dark"]{
@@ -25,7 +25,7 @@ HTML = r'''<title>AMD + FVG en el gráfico</title>
   --fondo:#10131a; --panel:#181c24; --panel2:#1d222b; --linea:#29303a;
   --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
   --alc:#22b422; --baj:#e05555; --acc:#3987e5; --naranja:#d95926;
-  --gris:rgba(142,142,147,.2);
+  --gris:rgba(142,142,147,.2); --aviso-f:#2a1a1a; --aviso-b:#4a2c2c;
   --sombra:0 1px 2px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box}
@@ -63,13 +63,27 @@ svg{display:block;width:100%;min-width:760px;height:auto}
 .ley span{display:flex;align-items:center;gap:6px}
 .ley i{width:15px;height:11px;border-radius:2px;display:block}
 .nota{font-size:13px;color:var(--tinta3);line-height:1.6;margin-top:16px}
+  .aviso{background:var(--aviso-f);border:1px solid var(--aviso-b);
+         border-left:3px solid var(--baj);border-radius:8px;padding:14px 16px;
+         margin:18px 0 0;font-size:14px;line-height:1.55;color:var(--tinta)}
+  .aviso b{color:var(--baj)}
+  .aviso code{font-size:12.5px;background:var(--fondo2);padding:1px 5px;border-radius:4px}
 </style>
 
 <div class="env">
   <h1>AMD + FVG en el gráfico</h1>
-  <p class="sub">Veinticuatro operaciones reales de EURUSD en H1, de las 587 que da
-     la regla. Doce ganadoras y doce perdedoras, elegidas al azar. Es lo que verás
-     en TradingView.</p>
+  <p class="sub">Veinticuatro operaciones reales de EURUSD en H1, de las 367 que da
+     la regla. Doce ganadoras y doce perdedoras, elegidas al azar.</p>
+
+  <div class="aviso">
+    <b>Corregido el 19/09/2026.</b> La primera versión de esta página decía 587
+    operaciones y 76,5 % de acierto. Estaba mal: 220 de aquellas «operaciones»
+    tenían el objetivo <b>ya rebasado</b> por el precio en el momento de entrar,
+    así que se ganaban solas y nadie las habría puesto nunca. Quitadas ésas
+    quedan 367 operaciones y <b>63,8 %</b> de acierto, que es exactamente lo que
+    predice la geometría del stop y el objetivo. La regla no bate al azar.
+    Explicación entera en <code>docs/CORRECCION_objetivo_rebasado.md</code>.
+  </div>
 
   <div class="pasos">
     <div><div class="n" style="color:var(--tinta3)">A</div><b>Se aprieta</b>

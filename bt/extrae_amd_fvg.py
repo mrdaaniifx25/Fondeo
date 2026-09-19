@@ -51,6 +51,9 @@ while i < N-1:
     obj = rLo if lado < 0 else rHi
     rgo, rec = abs(stop-ent), abs(obj-ent)
     if rgo <= 0 or rec <= 0: i = manip+1; continue
+    # el objetivo tiene que estar POR DELANTE del precio de entrada: si ya esta
+    # rebasado, esa operacion no existe. Ver docs/CORRECCION_objetivo_rebasado.md
+    if (ent <= obj) if lado < 0 else (ent >= obj): i = manip+1; continue
     gana = 0; fin = min(kf+1+ESPD, N)-1
     for k in range(kf+1, min(kf+1+ESPD, N)):
         if lado < 0:
