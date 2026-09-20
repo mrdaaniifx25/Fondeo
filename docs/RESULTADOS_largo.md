@@ -75,3 +75,39 @@ Y hay que decir la otra mitad: el percentil 89 es exactamente lo que produce el
 ruido con esta muestra bastante a menudo. **Esto no es un hallazgo.** Es la
 primera vez en el proyecto que el resultado es «todavía no se ve» en vez de
 «no está».
+
+---
+
+# Actualización 20/09/2026 · con EURUSD 2025
+
+El usuario subió el EURUSD 2025 que faltaba. 613 → **669 semanas** juntando los
+tres. Siguen haciendo falta ~1.275.
+
+| barras | K | antes | ahora | percentil frente a 1.000 barajas |
+|---|---|---|---|---|
+| semanas | 1 | +0,0254 | +0,0276 | 63 |
+| **semanas** | **3** | +0,0612 (perc. 89) | **+0,0814** [+0,005, +0,158] | **96** |
+| semanas | 6 | +0,0296 | +0,0445 | — |
+| semanas | 12 | +0,0258 | +0,0157 | — |
+| meses | 1 | +0,1338 | +0,2031 | 97 · **contaminado** |
+| meses | 3 | +0,1406 | +0,1634 | 85 · **contaminado** |
+
+Las mensuales siguen descartadas: la señal está larga el 75,6 % del tiempo en
+oro y el 71,8 % en DAX, en una muestra donde subieron +130 % y +514 %.
+
+## Semanas K=3 cruza el 95. Y no se reclama.
+
+Por tres razones, escritas antes de que a nadie le dé tiempo a ilusionarse:
+
+1. **Es una celda de ocho.** Con ocho celdas al 5 % se espera que 0,4 crucen
+   por azar. Ver una cruzar no es sorprendente.
+2. **Se movió del percentil 89 al 96 con un 9 % más de datos.** Un resultado
+   que cambia de lado con 56 semanas más es frágil por definición.
+3. **No tiene prueba fuera de muestra.** Y hoy mismo, en
+   `docs/RESULTADOS_finta_2025.md`, el otro candidato del proyecto —que también
+   estaba al filo y también tenía una racha bonita— se cayó en cuanto vio un
+   año que no había visto.
+
+Así que **semanas K=3 pasa a ser la siguiente hipótesis declarada**, no un
+hallazgo. Se prueba contra el histórico 2010-2022 de DAX y oro cuando exista, y
+se declara antes como se declaró la de la finta.
