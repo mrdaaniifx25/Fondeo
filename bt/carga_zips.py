@@ -36,8 +36,8 @@ def junta(patrones, salida):
 
 os.makedirs("data", exist_ok=True)
 print("reconstruyendo desde los ZIP del repositorio:")
-junta(["material/*XAUUSD_M1????.zip", "reservado/*XAUUSD_M1??????.zip"],
-      "data/xauusd_m1.parquet")
-junta(["material/*GRXEUR_M1????.zip", "reservado/*GRXEUR_M1??????.zip"],
-      "data/grxeur_m1.parquet")
-junta(["material/*EURUSD_M1*.zip"], "data/eurusd_m1_parcial.parquet")
+# 20-09-2026: los patrones de ???? solo cogian los ZIP anuales y se dejaban
+# fuera los mensuales (XAUUSD_M1202601_1.zip). Ahora entra todo.
+junta(["material/*XAUUSD_M1*.zip", "reservado/*XAUUSD_M1*.zip"], "data/xauusd_m1.parquet")
+junta(["material/*GRXEUR_M1*.zip", "reservado/*GRXEUR_M1*.zip"], "data/grxeur_m1.parquet")
+junta(["material/*EURUSD_M1*.zip"], "data/eurusd_m1.parquet")
