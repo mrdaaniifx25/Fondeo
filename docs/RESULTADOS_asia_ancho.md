@@ -1,5 +1,10 @@
 # Resultado · el filtro de contexto con stops anchos
 
+> **RETRACTADO (21/09/2026).** Se apoyaba en la ventaja bruta de
+> `RESULTADOS_asia_contexto.md`, que no reproduce con los datos actuales.
+> Ver `docs/RESULTADOS_sesiones_oro_dax.md`.
+
+
 Ejecutado el 28 de agosto de 2026 según `docs/PREREGISTRO_asia_ancho.md`.
 `bt/asia_ancho.py`. Y con una corrección de método que cambia la lectura.
 

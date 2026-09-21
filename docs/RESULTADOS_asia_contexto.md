@@ -1,5 +1,10 @@
 # Resultado · el contexto de M15 y H1
 
+> **RETRACTADO (21/09/2026).** Con los datos actuales este resultado no se
+> reproduce: la bruta de +0,071 sale −0,022 y la diferencia baja de z +9,92 a
+> z +3,03. Ver `docs/RESULTADOS_sesiones_oro_dax.md`.
+
+
 Ejecutado el 28 de agosto de 2026 según `docs/PREREGISTRO_asia_contexto.md`.
 Una sola pasada. `bt/asia_contexto.py`.
 
