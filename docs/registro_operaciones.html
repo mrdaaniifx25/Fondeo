@@ -1,427 +1,416 @@
-<title>Registro de operaciones</title>
+<title>Registro de operaciones ajenas</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 :root{
-  color-scheme: light;
-  --fondo:#f2f5f8; --panel:#fdfdfe; --panel2:#f6f8fb;
-  --tinta:#12161c; --tinta2:#4e5864; --tinta3:#8b95a1;
-  --linea:#dde3ea; --linea2:#eaeff4;
-  --s1:#2a78d6; --s2:#eb6834; --ok:#0ca30c; --mal:#d03b3b;
-  --s1w:rgba(42,120,214,.12); --okw:rgba(12,163,12,.10); --malw:rgba(208,59,59,.10);
-  --sombra:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+  color-scheme:light;
+  --fondo:#eceff3; --panel:#ffffff; --panel2:#f4f7fa; --linea:#d6dde5;
+  --tinta:#101419; --tinta2:#5b6774; --tinta3:#8b98a6;
+  --verde:#1a7f4b; --verde-f:#e3f2e9; --rojo:#b8403a; --rojo-f:#fbe8e7;
+  --ambar:#9a6a12; --ambar-f:#fbf1dc; --acc:#2a6fb8;
+  --sombra:0 1px 2px rgba(16,26,40,.06), 0 2px 8px rgba(16,26,40,.05);
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  color-scheme: dark;
-  --fondo:#10131a; --panel:#181c24; --panel2:#1d222b;
-  --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
-  --linea:#29303a; --linea2:#20262f;
-  --s1:#3987e5; --s2:#d95926; --ok:#22b422; --mal:#e05555;
-  --s1w:rgba(57,135,229,.16); --okw:rgba(34,180,34,.14); --malw:rgba(224,85,85,.14);
-  --sombra:0 1px 2px rgba(0,0,0,.3);
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --fondo:#0e1217; --panel:#171c23; --panel2:#1d242c; --linea:#28303a;
+  --tinta:#eef2f7; --tinta2:#9daab8; --tinta3:#6a7885;
+  --verde:#3ba86a; --verde-f:#14301f; --rojo:#d4605a; --rojo-f:#331a19;
+  --ambar:#c99633; --ambar-f:#2e2412; --acc:#4a8fd6;
+  --sombra:0 1px 2px rgba(0,0,0,.35);
 }}
 :root[data-theme="dark"]{
-  color-scheme: dark;
-  --fondo:#10131a; --panel:#181c24; --panel2:#1d222b;
-  --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
-  --linea:#29303a; --linea2:#20262f;
-  --s1:#3987e5; --s2:#d95926; --ok:#22b422; --mal:#e05555;
-  --s1w:rgba(57,135,229,.16); --okw:rgba(34,180,34,.14); --malw:rgba(224,85,85,.14);
-  --sombra:0 1px 2px rgba(0,0,0,.3);
+  color-scheme:dark;
+  --fondo:#0e1217; --panel:#171c23; --panel2:#1d242c; --linea:#28303a;
+  --tinta:#eef2f7; --tinta2:#9daab8; --tinta3:#6a7885;
+  --verde:#3ba86a; --verde-f:#14301f; --rojo:#d4605a; --rojo-f:#331a19;
+  --ambar:#c99633; --ambar-f:#2e2412; --acc:#4a8fd6;
+  --sombra:0 1px 2px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
-body{background:var(--fondo); color:var(--tinta); margin:0;
-  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif; font-size:15px; line-height:1.55}
-.env{max-width:820px; margin:0 auto; padding-block:26px 64px; padding-left:18px; padding-right:18px}
-h1,h2{font-family:Archivo,system-ui,sans-serif; text-wrap:balance; margin:0}
-.mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+body{margin:0;background:var(--fondo);color:var(--tinta);
+     font:400 15px/1.55 "IBM Plex Sans",system-ui,-apple-system,sans-serif;
+     padding:0 16px;padding-block:24px 48px}
+.env{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font:700 27px/1.15 Archivo,system-ui,sans-serif;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.sub{margin:6px 0 0;color:var(--tinta2);font-size:15px;max-width:60ch}
+.rotulo{font:600 11px/1 "IBM Plex Mono",monospace;letter-spacing:.11em;
+        text-transform:uppercase;color:var(--tinta3);margin:0 0 12px}
+.panel{background:var(--panel);border:1px solid var(--linea);border-radius:12px;
+       box-shadow:var(--sombra);padding:18px}
 
-header{margin-bottom:22px}
-header .eti{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--s2);
-  font-weight:600; letter-spacing:.09em; text-transform:uppercase}
-header h1{font-size:29px; font-weight:700; letter-spacing:-.025em; margin:5px 0 8px}
-header p{margin:0; color:var(--tinta2); max-width:60ch; font-size:14.5px}
+/* ---- marcador ---- */
+.marcador{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+          background:var(--linea);border:1px solid var(--linea);
+          border-radius:12px;overflow:hidden}
+@media(max-width:600px){.marcador{grid-template-columns:repeat(2,1fr)}}
+.cif{background:var(--panel);padding:14px 16px}
+.cif .k{font:600 10.5px/1.3 "IBM Plex Mono",monospace;letter-spacing:.09em;
+        text-transform:uppercase;color:var(--tinta3)}
+.cif .v{font:600 27px/1.1 Archivo,sans-serif;margin-top:6px;letter-spacing:-.02em;
+        font-variant-numeric:tabular-nums}
+.cif .n{font-size:12.5px;color:var(--tinta2);margin-top:4px;line-height:1.4}
+.v.ok{color:var(--verde)} .v.mal{color:var(--rojo)} .v.neutro{color:var(--ambar)}
 
-section{margin-top:26px}
-section > h2{font-size:17px; font-weight:650; letter-spacing:-.01em; margin-bottom:10px;
-  display:flex; align-items:baseline; gap:9px; flex-wrap:wrap}
-section > h2 .cnt{font-family:"IBM Plex Mono",monospace; font-size:12.5px;
-  color:var(--tinta3); font-weight:500}
-.caja{background:var(--panel); border:1px solid var(--linea); border-radius:10px;
-  box-shadow:var(--sombra); overflow:hidden}
+.veredicto{margin-top:14px;border-radius:9px;padding:12px 14px;font-size:14.5px;
+           line-height:1.5;background:var(--panel2);border-left:3px solid var(--tinta3)}
+.veredicto.ok{background:var(--verde-f);border-left-color:var(--verde)}
+.veredicto.mal{background:var(--rojo-f);border-left-color:var(--rojo)}
+.veredicto.esp{background:var(--ambar-f);border-left-color:var(--ambar)}
+.veredicto b{font-variant-numeric:tabular-nums}
 
-/* marcador */
-.marca{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px;
-  background:var(--linea2)}
-.marca > div{background:var(--panel); padding:14px 16px}
-.marca .k{font-size:11px; letter-spacing:.06em; text-transform:uppercase;
-  color:var(--tinta3); font-weight:600}
-.marca .v{font-family:"IBM Plex Mono",monospace; font-size:25px; font-weight:600;
-  font-variant-numeric:tabular-nums; letter-spacing:-.02em; margin-top:2px}
-.marca .s{font-size:12px; color:var(--tinta3); margin-top:1px}
-.pos{color:var(--ok)} .neg{color:var(--mal)} .neu{color:var(--tinta)}
+/* ---- formulario ---- */
+.rejilla{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.rejilla{grid-template-columns:repeat(2,1fr)}}
+.campo{display:flex;flex-direction:column;gap:5px;min-width:0}
+.campo.ancho{grid-column:span 2}
+label{font:600 11.5px/1 "IBM Plex Sans",sans-serif;color:var(--tinta2);
+      letter-spacing:.02em}
+input,select{font:500 15px/1 "IBM Plex Mono",monospace;padding:10px 11px;
+  border:1px solid var(--linea);border-radius:8px;background:var(--panel2);
+  color:var(--tinta);width:100%;min-width:0}
+select{font-family:"IBM Plex Sans",sans-serif}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:1px;border-color:var(--acc)}
+input.mal{border-color:var(--rojo)}
+.previo{margin-top:14px;background:var(--panel2);border-radius:9px;padding:12px 14px;
+        font:400 13.5px/1.9 "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+        color:var(--tinta2);overflow-x:auto}
+.previo b{color:var(--tinta);font-weight:600}
+.previo .umb{color:var(--ambar);font-weight:600}
+.acciones{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center}
+button{font:600 14px/1 Archivo,sans-serif;padding:11px 18px;border-radius:8px;
+       border:1px solid var(--tinta);background:var(--tinta);color:var(--panel);
+       cursor:pointer;transition:opacity .15s}
+button.sec{background:transparent;color:var(--tinta2);border-color:var(--linea)}
+button:hover{opacity:.85}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.aviso{font-size:13px;color:var(--tinta2)}
+.aviso.err{color:var(--rojo)}
 
-/* formulario */
-form{padding:16px}
-.fila{display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:12px;
-  margin-bottom:12px}
-.campo label{display:block; font-size:12px; font-weight:600; color:var(--tinta2);
-  margin-bottom:4px}
-.campo input, .campo select, .campo textarea{width:100%; font:inherit;
-  font-family:"IBM Plex Mono",monospace; font-size:16px; padding:10px 11px;
-  border:1px solid var(--linea); border-radius:8px; background:var(--panel2);
-  color:var(--tinta); -webkit-appearance:none; appearance:none}
-.campo textarea{font-family:inherit; font-size:15px; min-height:56px; resize:vertical}
-.campo select{background-image:none}
-.campo ::placeholder{color:var(--tinta3); opacity:.7}
-.lados{display:grid; grid-template-columns:1fr 1fr; gap:8px}
-.lados button{font:inherit; font-weight:600; font-size:15px; padding:11px;
-  border:1px solid var(--linea); border-radius:8px; background:var(--panel2);
-  color:var(--tinta2); cursor:pointer}
-.lados button[aria-pressed="true"]{color:#fff; border-color:transparent}
-#lado-c[aria-pressed="true"]{background:var(--s1)}
-#lado-v[aria-pressed="true"]{background:var(--s2)}
-
-.cuenta{background:var(--panel2); border:1px solid var(--linea2); border-radius:9px;
-  padding:13px 15px; margin-bottom:13px}
-.cuenta .par{display:flex; justify-content:space-between; align-items:baseline;
-  gap:12px; padding:5px 0; font-size:13.5px}
-.cuenta .par + .par{border-top:1px solid var(--linea2)}
-.cuenta .par span:first-child{color:var(--tinta2)}
-.cuenta .par b{font-family:"IBM Plex Mono",monospace; font-size:16px; font-weight:600;
-  font-variant-numeric:tabular-nums; white-space:nowrap}
-.cuenta .aviso{font-size:12.5px; color:var(--tinta3); margin:8px 0 0; line-height:1.45}
-
-.marcar{display:flex; align-items:flex-start; gap:10px; padding:11px 13px;
-  border:1px solid var(--linea); border-radius:8px; background:var(--panel2);
-  margin-bottom:12px; cursor:pointer}
-.marcar input{width:20px; height:20px; margin:1px 0 0; accent-color:var(--s1); flex:none}
-.marcar div{font-size:13.5px}
-.marcar b{display:block; font-size:14px}
-.marcar small{color:var(--tinta3); display:block; margin-top:1px; line-height:1.4}
-
-.guardar{width:100%; font:inherit; font-weight:600; font-size:16px; padding:13px;
-  border:0; border-radius:8px; background:var(--s1); color:#fff; cursor:pointer}
-.guardar:disabled{opacity:.4; cursor:default}
-
-/* operaciones */
-.op{padding:13px 15px; border-bottom:1px solid var(--linea2)}
-.op:last-child{border-bottom:0}
-.op .cab{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-bottom:3px}
-.op .dir{font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
-  padding:2px 7px; border-radius:4px}
-.op .dir.c{background:var(--s1w); color:var(--s1)}
-.op .dir.v{background:rgba(235,104,52,.13); color:var(--s2)}
-.op .cua{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--tinta2)}
-.op .det{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--tinta3);
-  font-variant-numeric:tabular-nums}
-.op .nota{font-size:13px; color:var(--tinta2); margin-top:4px; font-style:italic}
-.op .acc{display:flex; gap:7px; flex-wrap:wrap; margin-top:10px}
-.op .acc button{font:inherit; font-size:13.5px; font-weight:600; padding:8px 13px;
-  border:1px solid var(--linea); border-radius:7px; background:var(--panel2);
-  color:var(--tinta); cursor:pointer}
-.op .acc .btp{border-color:var(--ok); color:var(--ok)}
-.op .acc .bsl{border-color:var(--mal); color:var(--mal)}
-.res{font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:600;
-  margin-left:auto; white-space:nowrap}
-.pasada{opacity:.62}
-.vacio{padding:20px 16px; color:var(--tinta3); font-size:14px}
-.pie{margin-top:30px; font-size:12.5px; color:var(--tinta3); line-height:1.5}
-:focus-visible{outline:2px solid var(--s1); outline-offset:2px}
-@media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
+/* ---- tabla ---- */
+.tw{overflow-x:auto;margin:0 -18px;padding:0 18px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:620px}
+th,td{text-align:right;padding:9px 8px;border-bottom:1px solid var(--linea);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font:600 10.5px/1.3 "IBM Plex Mono",monospace;letter-spacing:.07em;
+   text-transform:uppercase;color:var(--tinta3)}
+td{font-variant-numeric:tabular-nums;font-family:"IBM Plex Mono",monospace}
+td.txt{font-family:"IBM Plex Sans",sans-serif}
+tr:last-child td{border-bottom:0}
+.pil{display:inline-block;font:600 10.5px/1 "IBM Plex Mono",monospace;
+     padding:5px 8px;border-radius:5px;letter-spacing:.04em;cursor:pointer;
+     border:1px solid transparent}
+.pil.tp{background:var(--verde-f);color:var(--verde)}
+.pil.sl{background:var(--rojo-f);color:var(--rojo)}
+.pil.pen{background:var(--panel2);color:var(--tinta3);border-color:var(--linea)}
+.borrar{background:none;border:0;color:var(--tinta3);cursor:pointer;font-size:16px;
+        padding:2px 6px;line-height:1}
+.borrar:hover{color:var(--rojo);opacity:1}
+.vacio{color:var(--tinta2);font-size:14.5px;line-height:1.6;padding:6px 0}
+.vacio code{background:var(--panel2);padding:2px 6px;border-radius:4px;font-size:13px}
+.pie{font-size:13px;color:var(--tinta3);line-height:1.6;margin:0}
+.pie b{color:var(--tinta2)}
 </style>
 
 <div class="env">
-<header>
-  <div class="eti">EURUSD · sesión de 08:00 a 11:30</div>
-  <h1>Registro de operaciones</h1>
-  <p>Apunta cada operación <strong>antes</strong> de saber cómo acaba, y también las que
-     ves y decides no tomar. Sin esa segunda parte el registro se infla solo y no mide nada.</p>
-</header>
 
-<section>
-  <h2>Cómo va</h2>
-  <div class="caja"><div class="marca" id="marca"></div></div>
-</section>
-
-<section>
-  <h2>Nueva operación</h2>
-  <div class="caja">
-    <form id="f" autocomplete="off">
-      <div class="fila">
-        <div class="campo">
-          <label for="ins">Instrumento</label>
-          <select id="ins">
-            <option value="EURUSD">EURUSD</option>
-            <option value="GBPUSD">GBPUSD</option>
-            <option value="USDJPY">USDJPY</option>
-            <option value="XAUUSD">XAUUSD</option>
-            <option value="GER40">GER40</option>
-            <option value="NAS100">NAS100</option>
-          </select>
-        </div>
-        <div class="campo">
-          <label for="coste">Coste ida y vuelta (pips)</label>
-          <input type="number" id="coste" step="0.01" min="0" value="1.43">
-        </div>
-      </div>
-      <div class="fila" style="grid-template-columns:1fr">
-        <div class="campo">
-          <label>Dirección</label>
-          <div class="lados">
-            <button type="button" id="lado-c" aria-pressed="false">Compra</button>
-            <button type="button" id="lado-v" aria-pressed="true">Venta</button>
-          </div>
-        </div>
-      </div>
-      <div class="fila">
-        <div class="campo">
-          <label for="ent">Entrada</label>
-          <input type="number" id="ent" step="0.00001" inputmode="decimal" placeholder="1,16387">
-        </div>
-        <div class="campo">
-          <label for="stp">Stop</label>
-          <input type="number" id="stp" step="0.00001" inputmode="decimal" placeholder="1,16415">
-        </div>
-        <div class="campo">
-          <label for="obj">Objetivo</label>
-          <input type="number" id="obj" step="0.00001" inputmode="decimal" placeholder="1,16330">
-        </div>
-      </div>
-
-      <div class="cuenta" id="cuenta"></div>
-
-      <label class="marcar" for="tomada">
-        <input type="checkbox" id="tomada" checked>
-        <div><b>La he tomado</b>
-          <small>Desmárcalo si la viste y la dejaste pasar. Esas también cuentan:
-            en agosto, meterlas bajó tu resultado de z +3,29 a z +1,49.</small></div>
-      </label>
-
-      <div class="fila" style="grid-template-columns:1fr">
-        <div class="campo">
-          <label for="nota">Por qué la tomas o la pasas</label>
-          <textarea id="nota" placeholder="Una línea. Sirve para releerlo dentro de tres meses."></textarea>
-        </div>
-      </div>
-      <button type="submit" class="guardar" id="btn">Guardar</button>
-    </form>
+  <div>
+    <h1>Registro de operaciones ajenas</h1>
+    <p class="sub">Pega los tres precios de cada operación que publique. La página calcula
+       el riesgo, el R:R y <b>el acierto que esa geometría necesita para empatar</b> — y
+       lo va acumulando hasta que la muestra diga algo.</p>
   </div>
-</section>
 
-<section>
-  <h2>Sin cerrar <span class="cnt" id="c-ab"></span></h2>
-  <div class="caja" id="abiertas"></div>
-</section>
+  <div class="marcador">
+    <div class="cif"><div class="k">Operaciones</div><div class="v" id="cN">0</div>
+      <div class="n" id="cNn">ninguna todavía</div></div>
+    <div class="cif"><div class="k">Acierto medido</div><div class="v neutro" id="cA">—</div>
+      <div class="n" id="cAn">hacen falta resueltas</div></div>
+    <div class="cif"><div class="k">Umbral necesario</div><div class="v neutro" id="cU">—</div>
+      <div class="n">para no perder dinero</div></div>
+    <div class="cif"><div class="k">R neta media</div><div class="v neutro" id="cR">—</div>
+      <div class="n">por operación, con coste</div></div>
+  </div>
+  <div class="veredicto esp" id="veredicto">
+    Con menos de <b>30</b> operaciones resueltas no se puede concluir nada: una racha de
+    2 de 3 la produce una regla muerta el 30&nbsp;% de las semanas. Sigue pegando.
+  </div>
 
-<section>
-  <h2>Historial <span class="cnt" id="c-hi"></span></h2>
-  <div class="caja" id="historial"></div>
-</section>
+  <div class="panel">
+    <p class="rotulo">Nueva operación</p>
+    <div class="rejilla">
+      <div class="campo"><label for="f">Fecha</label><input type="date" id="f"></div>
+      <div class="campo"><label for="h">Hora</label><input type="time" id="h" value="09:50"></div>
+      <div class="campo"><label for="ins">Activo</label><select id="ins"></select></div>
+      <div class="campo"><label for="e">Entrada</label>
+        <input type="text" id="e" inputmode="decimal" placeholder="1,15508"></div>
+      <div class="campo"><label for="s">Stop</label>
+        <input type="text" id="s" inputmode="decimal" placeholder="1,15567"></div>
+      <div class="campo"><label for="o">Objetivo</label>
+        <input type="text" id="o" inputmode="decimal" placeholder="1,15389"></div>
+      <div class="campo"><label for="c">Coste (pips o puntos)</label>
+        <input type="text" id="c" inputmode="decimal" value="1,43"></div>
+      <div class="campo ancho"><label for="r">Resultado</label>
+        <select id="r">
+          <option value="pen">Pendiente — todavía no sé cómo acabó</option>
+          <option value="tp">Llegó al objetivo (TP)</option>
+          <option value="sl">Saltó el stop (SL)</option>
+        </select></div>
+    </div>
+    <div class="previo" id="previo">Escribe los tres precios y aquí aparecen las cuentas.</div>
+    <div class="acciones">
+      <button id="btn">Guardar operación</button>
+      <button class="sec" id="btnLimpia">Limpiar</button>
+      <span class="aviso" id="aviso"></span>
+    </div>
+  </div>
 
-<p class="pie">Los datos se guardan en esta página y siguen aquí la próxima vez que la abras.
-  El momento en que guardas cada operación queda grabado — es lo que hace que esto sea un
-  registro y no una lista de recuerdos.</p>
+  <div class="panel">
+    <p class="rotulo">Lo registrado</p>
+    <div id="zonaTabla">
+      <div class="vacio" id="vacio">Todavía no hay ninguna. La primera que pegues aparecerá aquí,
+        con su riesgo en pips y el <code>umbral</code> que necesitaba.</div>
+    </div>
+  </div>
+
+  <p class="pie">Umbral = <b>(1 + coste/riesgo) ÷ (1 + R:R)</b>. Es el porcentaje de acierto
+     que hace falta sólo para quedar a cero con esa geometría. Toca el resultado de una fila
+     para cambiarlo entre pendiente, TP y SL.</p>
+
 </div>
 
 <script>
 (function(){
-"use strict";
-var $ = function(s){ return document.querySelector(s); };
-var PIP = {EURUSD:1e-4, GBPUSD:1e-4, USDJPY:1e-2, XAUUSD:1e-2, GER40:1, NAS100:1};
-var COSTE = {EURUSD:1.43, GBPUSD:1.60, USDJPY:1.50, XAUUSD:20, GER40:2, NAS100:1.5};
-var lado = -1, db = null, ops = [], guardando = false;
+  var INS = [
+    {id:"EURUSD", nom:"EUR/USD",  pip:0.0001, coste:1.43, dec:5},
+    {id:"GBPUSD", nom:"GBP/USD",  pip:0.0001, coste:1.60, dec:5},
+    {id:"USDJPY", nom:"USD/JPY",  pip:0.01,   coste:1.40, dec:3},
+    {id:"XAUUSD", nom:"Oro",      pip:0.01,   coste:35.0, dec:2},
+    {id:"GER40",  nom:"DAX",      pip:1.0,    coste:1.60, dec:1},
+    {id:"NAS100", nom:"Nasdaq",   pip:1.0,    coste:1.50, dec:1},
+    {id:"SPX500", nom:"S&P 500",  pip:1.0,    coste:0.60, dec:1}
+  ];
+  var $ = function(i){ return document.getElementById(i); };
+  var db = null, filas = [], desuscribe = null;
 
-function es(v,d){ return v.toLocaleString("es-ES",
-    {minimumFractionDigits:d, maximumFractionDigits:d}); }
-function sig(v,d){ return (v>=0?"+":"") + es(v,d); }
+  var selIns = $("ins");
+  INS.forEach(function(x){
+    var o = document.createElement("option");
+    o.value = x.id; o.textContent = x.nom + "  ·  " + x.id;
+    selIns.appendChild(o);
+  });
+  $("f").value = new Date().toISOString().slice(0,10);
 
-// riesgo, R:R real con coste, acierto necesario
-function calc(o){
-  var pip = PIP[o.ins] || 1e-4;
-  var rgo = Math.abs(o.ent - o.stop) / pip;
-  var tp  = Math.abs(o.obj - o.ent) / pip;
-  if (!(rgo > 0)) return null;
-  var cR = o.coste / rgo;
-  var gana = tp/rgo - cR, pierde = -1 - cR;
-  return {rgo:rgo, tp:tp, rrTV:tp/rgo, cR:cR, gana:gana, pierde:pierde,
-          rrReal:gana/Math.abs(pierde),
-          pNec:Math.abs(pierde)/(gana+Math.abs(pierde))};
-}
-function rDe(o){
-  var c = calc(o); if (!c) return null;
-  if (o.res === "TP") return c.gana;
-  if (o.res === "SL") return c.pierde;
-  if (o.res === "mano" && typeof o.rMano === "number") return o.rMano - c.cR;
-  return null;
-}
-
-function pintaCuenta(){
-  var o = leeForm(), c = o && calc(o);
-  if (!c){
-    $("#cuenta").innerHTML = '<p class="aviso" style="margin:0">Escribe entrada, stop y '
-      + 'objetivo y aquí te digo lo que de verdad estás jugando.</p>';
-    return;
+  function ins(){ return INS.filter(function(x){ return x.id === selIns.value; })[0]; }
+  function num(t){
+    if(t === null || t === undefined) return NaN;
+    var s = String(t).trim().replace(/\s/g, "").replace(",", ".");
+    return s === "" ? NaN : parseFloat(s);
   }
-  var mal = c.rrReal < 1.3;
-  $("#cuenta").innerHTML =
-    '<div class="par"><span>Riesgo</span><b>' + es(c.rgo,1) + ' pips</b></div>' +
-    '<div class="par"><span>R:R que ves en TradingView</span><b>' + es(c.rrTV,2) + '</b></div>' +
-    '<div class="par"><span>El coste se lleva</span><b class="' + (c.cR>0.2?'neg':'') + '">'
-      + es(c.cR*100,1) + ' % del riesgo</b></div>' +
-    '<div class="par"><span><strong>Tu R:R real</strong></span><b class="'
-      + (mal?'neg':'pos') + '">' + es(c.rrReal,2) + '</b></div>' +
-    '<div class="par"><span>Acierto que necesitas</span><b>' + es(c.pNec*100,1) + ' %</b></div>' +
-    (mal ? '<p class="aviso">Con ese stop el coste se come el descuento del 1:2. '
-      + 'TradingView no conoce tu spread ni tu comisión, así que te enseña ' + es(c.rrTV,2)
-      + ' cuando estás jugando ' + es(c.rrReal,2) + '.</p>' : '');
-}
+  function fx(v, d){ return v.toFixed(d).replace(".", ","); }
 
-function leeForm(){
-  var ent = parseFloat($("#ent").value), stp = parseFloat($("#stp").value),
-      obj = parseFloat($("#obj").value), coste = parseFloat($("#coste").value);
-  if (!isFinite(ent) || !isFinite(stp) || !isFinite(obj) || !isFinite(coste)) return null;
-  if ((obj - ent) * lado <= 0 || (stp - ent) * lado >= 0) return null;
-  return {ins:$("#ins").value, lado:lado, ent:ent, stop:stp, obj:obj, coste:coste};
-}
-
-function marcador(){
-  var t = ops.filter(function(o){ return o.tomada; });
-  var res = t.filter(function(o){ return rDe(o) !== null; });
-  var tp = res.filter(function(o){ return o.res === "TP"; }).length;
-  var ac = res.length ? tp / res.length : null;
-  var sum = 0, nec = 0;
-  res.forEach(function(o){ sum += rDe(o); });
-  t.forEach(function(o){ var c = calc(o); if (c) nec += c.pNec; });
-  nec = t.length ? nec / t.length : null;
-  var pas = ops.length - t.length;
-  var media = res.length ? sum / res.length : null;
-
-  function tile(k, v, cl, s){
-    return '<div><div class="k">' + k + '</div><div class="v ' + (cl||'neu') + '">' + v
-      + '</div><div class="s">' + (s||'') + '</div></div>';
+  function cuentas(){
+    var I = ins();
+    var e = num($("e").value), s = num($("s").value), o = num($("o").value), c = num($("c").value);
+    if(!isFinite(e) || !isFinite(s) || !isFinite(o) || !isFinite(c)) return null;
+    var lado = s > e ? -1 : 1;                       // stop arriba = venta
+    var rgo = Math.abs(s - e) / I.pip;
+    var rec = Math.abs(o - e) / I.pip;
+    if(rgo <= 0 || rec <= 0) return null;
+    // el objetivo tiene que estar al otro lado del stop
+    if(lado < 0 && !(o < e)) return {error:"El objetivo tiene que estar por DEBAJO de la entrada (stop arriba = venta)."};
+    if(lado > 0 && !(o > e)) return {error:"El objetivo tiene que estar por ENCIMA de la entrada (stop abajo = compra)."};
+    var rr = rec / rgo, cr = c / rgo;
+    return { lado:lado, rgo:rgo, rec:rec, rr:rr, cr:cr,
+             umbral:(1 + cr) / (1 + rr),
+             rTP:rr - cr, rSL:-1 - cr };
   }
-  $("#marca").innerHTML =
-    tile("Operaciones", String(t.length), "", res.length + " cerradas · " + pas + " pasadas") +
-    tile("Acierto", ac === null ? "—" : es(ac*100,1) + " %",
-         ac === null ? "" : (nec !== null && ac >= nec ? "pos" : "neg"),
-         nec === null ? "haz falta más" : "necesitas " + es(nec*100,1) + " %") +
-    tile("R neta por operación", media === null ? "—" : sig(media,3),
-         media === null ? "" : (media > 0 ? "pos" : "neg"),
-         "ya con el coste descontado") +
-    tile("Para saberlo", String(Math.max(0, 50 - res.length)),
-         "", res.length >= 50 ? "ya hay muestra" : "cerradas que faltan");
-}
 
-function ficha(o, abierta){
-  var c = calc(o), r = rDe(o);
-  var d = new Date(o.ts);
-  var cua = d.toLocaleDateString("es-ES", {day:"2-digit", month:"short"}) + " · "
-          + d.toLocaleTimeString("es-ES", {hour:"2-digit", minute:"2-digit"});
-  var resTxt = "";
-  if (r !== null) resTxt = '<span class="res ' + (r>0?"pos":"neg") + '">'
-      + (o.res === "mano" ? "a mano " : o.res + " ") + sig(r,2) + ' R</span>';
-  else if (o.res === "fuera") resTxt = '<span class="res">sin resolver</span>';
-  return '<div class="op' + (o.tomada ? '' : ' pasada') + '" data-id="' + o.id + '">'
-    + '<div class="cab"><span class="dir ' + (o.lado>0?'c':'v') + '">'
-      + (o.lado>0?'compra':'venta') + '</span>'
-    + '<span class="cua">' + o.ins + ' · ' + cua + '</span>' + resTxt + '</div>'
-    + '<div class="det">' + (c ? 'riesgo ' + es(c.rgo,1) + ' p · R:R real '
-      + es(c.rrReal,2) + ' (TV ' + es(c.rrTV,2) + ')' : '')
-      + (o.tomada ? '' : ' · NO tomada') + '</div>'
-    + (o.nota ? '<div class="nota">' + o.nota.replace(/[<>&]/g,"") + '</div>' : '')
-    + (abierta ? '<div class="acc">'
-        + '<button class="btp" data-r="TP">Llegó al objetivo</button>'
-        + '<button class="bsl" data-r="SL">Se fue al stop</button>'
-        + '<button data-r="fuera">Cerré sin resolver</button></div>' : '')
-    + '</div>';
-}
+  function pintaPrevio(){
+    var q = cuentas(), el = $("previo"), I = ins();
+    if(!q){ el.innerHTML = "Escribe los tres precios y aquí aparecen las cuentas."; return; }
+    if(q.error){ el.innerHTML = '<span style="color:var(--rojo)">' + q.error + "</span>"; return; }
+    var u = "pips";
+    if(I.pip === 1) u = "puntos"; else if(I.id === "XAUUSD") u = "céntimos";
+    el.innerHTML =
+      (q.lado < 0 ? "VENTA" : "COMPRA") + "  ·  riesgo <b>" + fx(q.rgo,1) + " " + u +
+      "</b>  ·  recorrido <b>" + fx(q.rec,1) + "</b>  ·  R:R <b>" + fx(q.rr,2) + "</b><br>" +
+      "coste <b>" + fx(100*q.cr,1) + " %</b> del riesgo  →  umbral de empate " +
+      '<span class="umb">' + fx(100*q.umbral,1) + " %</span><br>" +
+      "si TP <b>" + (q.rTP>=0?"+":"") + fx(q.rTP,3) + " R</b>  ·  si SL <b>" + fx(q.rSL,3) + " R</b>";
+  }
 
-function pinta(){
-  ops.sort(function(a,b){ return b.ts.localeCompare(a.ts); });
-  var ab = ops.filter(function(o){ return !o.res; });
-  var hi = ops.filter(function(o){ return !!o.res; });
-  $("#c-ab").textContent = ab.length ? ab.length : "";
-  $("#c-hi").textContent = hi.length ? hi.length : "";
-  $("#abiertas").innerHTML = ab.length
-    ? ab.map(function(o){ return ficha(o, true); }).join("")
-    : '<p class="vacio">Nada pendiente. Cuando guardes una operación aparece aquí '
-      + 'hasta que le pongas resultado.</p>';
-  $("#historial").innerHTML = hi.length
-    ? hi.map(function(o){ return ficha(o, false); }).join("")
-    : '<p class="vacio">Todavía sin operaciones cerradas.</p>';
-  marcador();
-}
+  ["e","s","o","c"].forEach(function(i){ $(i).addEventListener("input", pintaPrevio); });
+  selIns.addEventListener("change", function(){
+    $("c").value = String(ins().coste).replace(".", ","); pintaPrevio();
+  });
 
-function cargaLocal(){
-  try {
-    var raw = localStorage.getItem("registro_ops");
-    if (raw) ops = JSON.parse(raw);
-  } catch (e) {}
-}
-function guardaLocal(){
-  try { localStorage.setItem("registro_ops", JSON.stringify(ops)); } catch (e) {}
-}
+  // ---------- marcador ----------
+  function marcador(){
+    var res = filas.filter(function(r){ return r.resultado === "tp" || r.resultado === "sl"; });
+    $("cN").textContent = filas.length;
+    $("cNn").textContent = filas.length === 0 ? "ninguna todavía"
+        : res.length + " resuelta" + (res.length===1?"":"s") + " · " + (filas.length-res.length) + " pendiente" + ((filas.length-res.length)===1?"":"s");
+    var vA = $("cA"), vU = $("cU"), vR = $("cR"), ver = $("veredicto");
+    if(!filas.length){
+      vA.textContent = vU.textContent = vR.textContent = "—";
+      vA.className = vU.className = vR.className = "v neutro";
+      $("cAn").textContent = "hacen falta resueltas";
+      ver.className = "veredicto esp";
+      ver.innerHTML = "Con menos de <b>30</b> operaciones resueltas no se puede concluir nada: " +
+        "una racha de 2 de 3 la produce una regla muerta el 30&nbsp;% de las semanas. Sigue pegando.";
+      return;
+    }
+    var umb = filas.reduce(function(a,r){ return a + r.umbral; }, 0) / filas.length;
+    vU.textContent = fx(100*umb,1) + " %";
+    vU.className = "v neutro";
+    if(!res.length){
+      vA.textContent = "—"; vA.className = "v neutro";
+      $("cAn").textContent = "ninguna resuelta aún";
+      vR.textContent = "—"; vR.className = "v neutro";
+      ver.className = "veredicto esp";
+      ver.innerHTML = "Ya hay <b>" + filas.length + "</b> operación" + (filas.length===1?"":"es") +
+        " anotada" + (filas.length===1?"":"s") + ", pero ninguna resuelta. Marca el resultado cuando lo sepas.";
+      return;
+    }
+    var ac = res.filter(function(r){ return r.resultado === "tp"; }).length / res.length;
+    var rn = res.reduce(function(a,r){ return a + (r.resultado==="tp" ? r.rTP : r.rSL); }, 0) / res.length;
+    vA.textContent = fx(100*ac,1) + " %";
+    vA.className = "v " + (ac >= umb ? "ok" : "mal");
+    $("cAn").textContent = "sobre " + res.length + " resuelta" + (res.length===1?"":"s");
+    vR.textContent = (rn>=0?"+":"") + fx(rn,3);
+    vR.className = "v " + (rn > 0 ? "ok" : "mal");
+    var ee = Math.sqrt(Math.max(ac*(1-ac),0.01) / res.length) * 1.96;
+    if(res.length < 30){
+      ver.className = "veredicto esp";
+      ver.innerHTML = "<b>" + res.length + "</b> resueltas. Acierto <b>" + fx(100*ac,1) +
+        " %</b> contra un umbral de <b>" + fx(100*umb,1) + " %</b>, pero con este tamaño el margen es " +
+        "de ±<b>" + fx(100*ee,1) + "</b> puntos. <b>Todavía no dice nada.</b> Faltan " +
+        (30-res.length) + " para empezar a mirarlo.";
+    } else if(ac - ee > umb){
+      ver.className = "veredicto ok";
+      ver.innerHTML = "Sobre <b>" + res.length + "</b> resueltas, el acierto (<b>" + fx(100*ac,1) +
+        " %</b> ±" + fx(100*ee,1) + ") queda <b>por encima</b> del umbral de " + fx(100*umb,1) +
+        " %. Con esta muestra, su geometría sale rentable.";
+    } else if(ac + ee < umb){
+      ver.className = "veredicto mal";
+      ver.innerHTML = "Sobre <b>" + res.length + "</b> resueltas, el acierto (<b>" + fx(100*ac,1) +
+        " %</b> ±" + fx(100*ee,1) + ") queda <b>por debajo</b> del umbral de " + fx(100*umb,1) +
+        " %. Con esta muestra, esa geometría pierde dinero.";
+    } else {
+      ver.className = "veredicto esp";
+      ver.innerHTML = "Sobre <b>" + res.length + "</b> resueltas, el acierto es <b>" + fx(100*ac,1) +
+        " %</b> ±" + fx(100*ee,1) + " y el umbral <b>" + fx(100*umb,1) +
+        " %</b>. El intervalo los cruza: <b>sigue sin poder decidirse.</b>";
+    }
+  }
 
-$("#lado-c").onclick = function(){ lado = 1;
-  $("#lado-c").setAttribute("aria-pressed","true");
-  $("#lado-v").setAttribute("aria-pressed","false"); pintaCuenta(); };
-$("#lado-v").onclick = function(){ lado = -1;
-  $("#lado-v").setAttribute("aria-pressed","true");
-  $("#lado-c").setAttribute("aria-pressed","false"); pintaCuenta(); };
-["ent","stp","obj","coste","ins"].forEach(function(k){
-  $("#"+k).addEventListener("input", pintaCuenta); });
-$("#ins").addEventListener("change", function(){
-  $("#coste").value = COSTE[$("#ins").value]; pintaCuenta(); });
+  // ---------- tabla ----------
+  var ETI = {tp:"TP", sl:"SL", pen:"pendiente"};
+  function tabla(){
+    var z = $("zonaTabla");
+    if(!filas.length){
+      z.innerHTML = '<div class="vacio">Todavía no hay ninguna. La primera que pegues aparecerá ' +
+        'aquí, con su riesgo en pips y el <code>umbral</code> que necesitaba.</div>';
+      return;
+    }
+    var h = '<div class="tw"><table><thead><tr><th>Cuándo</th><th>Activo</th><th>Lado</th>' +
+            '<th>Riesgo</th><th>R:R</th><th>Coste</th><th>Umbral</th><th>Resultado</th>' +
+            '<th>R neta</th><th></th></tr></thead><tbody>';
+    filas.forEach(function(r){
+      var rn = r.resultado === "tp" ? r.rTP : (r.resultado === "sl" ? r.rSL : null);
+      h += '<tr><td class="txt">' + (r.fecha||"") + " " + (r.hora||"") + "</td>" +
+        '<td class="txt">' + r.ins + "</td>" +
+        '<td class="txt">' + (r.lado < 0 ? "venta" : "compra") + "</td>" +
+        "<td>" + fx(r.rgo,1) + "</td><td>" + fx(r.rr,2) + "</td>" +
+        "<td>" + fx(100*r.cr,1) + " %</td>" +
+        '<td style="color:var(--ambar)">' + fx(100*r.umbral,1) + " %</td>" +
+        '<td><span class="pil ' + r.resultado + '" data-id="' + r.id + '">' + ETI[r.resultado] + "</span></td>" +
+        "<td" + (rn===null?"" : ' style="color:var(--' + (rn>0?"verde":"rojo") + ')"') + ">" +
+        (rn===null ? "—" : (rn>=0?"+":"") + fx(rn,3)) + "</td>" +
+        '<td><button class="borrar" data-borra="' + r.id + '" aria-label="Borrar">×</button></td></tr>';
+    });
+    z.innerHTML = h + "</tbody></table></div>";
+    z.querySelectorAll(".pil").forEach(function(p){
+      p.addEventListener("click", function(){ cicla(p.getAttribute("data-id")); });
+    });
+    z.querySelectorAll("[data-borra]").forEach(function(b){
+      b.addEventListener("click", function(){ borra(b.getAttribute("data-borra")); });
+    });
+  }
 
-$("#f").addEventListener("submit", function(e){
-  e.preventDefault();
-  var o = leeForm();
-  if (!o){ $("#cuenta").innerHTML = '<p class="aviso" style="margin:0;color:var(--mal)">'
-      + 'Revisa los tres precios: el stop tiene que quedar al otro lado de la entrada '
-      + 'que el objetivo.</p>'; return; }
-  if (guardando) return;
-  guardando = true; $("#btn").disabled = true;
-  o.id = "op" + Date.now();
-  o.ts = new Date().toISOString();
-  o.tomada = $("#tomada").checked;
-  o.nota = $("#nota").value.trim();
-  o.res = null;
-  ops.push(o); guardaLocal(); pinta();
-  $("#ent").value = ""; $("#stp").value = ""; $("#obj").value = ""; $("#nota").value = "";
-  pintaCuenta();
-  var fin = function(){ guardando = false; $("#btn").disabled = false; };
-  if (db) db.doc("ops/" + o.id).set(o).then(fin, fin); else fin();
-});
+  function pinta(){ marcador(); tabla(); }
 
-document.addEventListener("click", function(e){
-  var b = e.target.closest("[data-r]"); if (!b) return;
-  var id = b.closest(".op").dataset.id;
-  var o = ops.filter(function(x){ return x.id === id; })[0]; if (!o) return;
-  o.res = b.dataset.r;
-  o.tsRes = new Date().toISOString();
-  guardaLocal(); pinta();
-  if (db) db.doc("ops/" + id).set(o).catch(function(){});
-});
+  // ---------- almacenamiento ----------
+  function aviso(t, err){
+    var a = $("aviso"); a.textContent = t || ""; a.className = "aviso" + (err ? " err" : "");
+  }
 
-$("#coste").value = COSTE.EURUSD;
-cargaLocal(); pinta(); pintaCuenta();
+  function guarda(){
+    var q = cuentas();
+    if(!q){ aviso("Faltan precios.", true); return; }
+    if(q.error){ aviso(q.error, true); return; }
+    if(!db){ aviso("No se puede guardar en este dispositivo.", true); return; }
+    var doc = {
+      fecha:$("f").value, hora:$("h").value, ins:selIns.value,
+      entrada:num($("e").value), stop:num($("s").value), objetivo:num($("o").value),
+      coste:num($("c").value), resultado:$("r").value,
+      lado:q.lado, rgo:q.rgo, rec:q.rec, rr:q.rr, cr:q.cr,
+      umbral:q.umbral, rTP:q.rTP, rSL:q.rSL,
+      creado:new Date().toISOString()
+    };
+    $("btn").disabled = true; aviso("Guardando…");
+    db.collection("operaciones").add(doc).then(function(){
+      aviso("Guardada.");
+      ["e","s","o"].forEach(function(i){ $(i).value = ""; });
+      $("r").value = "pen"; pintaPrevio();
+      setTimeout(function(){ aviso(""); }, 2500);
+    })["catch"](function(err){
+      aviso(err && err.code === "invalid_argument"
+        ? "No tienes permiso para escribir aquí." : "No se pudo guardar. Inténtalo otra vez.", true);
+    }).then(function(){ $("btn").disabled = false; });
+  }
 
-if (window.claude && window.claude.use){
-  window.claude.use("db").then(function(d){
-    if (!d) return;
-    db = d;
-    db.collection("ops").onSnapshot(function(snap){
-      var vistos = {};
-      snap.docs.forEach(function(s){
-        var x = s.data(); if (!x) return;
-        x.id = s.id; vistos[s.id] = true;
-        var i = -1;
-        ops.forEach(function(y, k){ if (y.id === s.id) i = k; });
-        if (i >= 0) ops[i] = x; else ops.push(x);
-      });
-      guardaLocal(); pinta();
-    }, function(){});
-  }, function(){});
-}
+  function cicla(id){
+    var r = filas.filter(function(x){ return x.id === id; })[0];
+    if(!r || !db) return;
+    var sig = r.resultado === "pen" ? "tp" : (r.resultado === "tp" ? "sl" : "pen");
+    db.doc("operaciones/" + id).update({resultado: sig})["catch"](function(){
+      aviso("No se pudo cambiar el resultado.", true);
+    });
+  }
+  function borra(id){
+    if(!db) return;
+    db.doc("operaciones/" + id)["delete"]()["catch"](function(){
+      aviso("No se pudo borrar.", true);
+    });
+  }
+
+  $("btn").addEventListener("click", guarda);
+  $("btnLimpia").addEventListener("click", function(){
+    ["e","s","o"].forEach(function(i){ $(i).value = ""; });
+    $("r").value = "pen"; pintaPrevio(); aviso("");
+  });
+
+  pintaPrevio(); pinta();
+
+  if(window.claude && window.claude.use){
+    window.claude.use("db").then(function(d){
+      if(!d){ aviso("Modo sólo lectura: este dispositivo no guarda.", true); return; }
+      db = d;
+      desuscribe = db.collection("operaciones").orderBy("creado", "desc").limit(300)
+        .onSnapshot(function(snap){
+          filas = snap.docs.map(function(s){
+            var v = s.data() || {};
+            v.id = s.id;
+            if(typeof v.umbral !== "number") v.umbral = (1 + (v.cr||0)) / (1 + (v.rr||1));
+            if(typeof v.rTP !== "number") v.rTP = (v.rr||0) - (v.cr||0);
+            if(typeof v.rSL !== "number") v.rSL = -1 - (v.cr||0);
+            if(!v.resultado) v.resultado = "pen";
+            return v;
+          });
+          pinta();
+        }, function(){ aviso("Se perdió la conexión con el registro.", true); });
+    });
+  }
 })();
 </script>
