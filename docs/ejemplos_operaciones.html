@@ -145,8 +145,17 @@ const KZ = [[540,660],[840,990]];   // 09:00-11:00 y 14:00-16:30, en minutos
 
 function dibuja(e){
   const v = e.velas, n = v.length, N = e.niveles || {};
+  const enNY = e.sesion === "NuevaYork";
+  // la SESION ANTERIOR es Asia si operas Londres, y Londres si operas NY
+  const refHi = enNY ? N.lon_hi : N.asia_hi, refLo = enNY ? N.lon_lo : N.asia_lo;
+  const refNom = enNY ? "Londres" : "Asia";
+  const refCol = enNY ? "var(--londres)" : "var(--asia)";
+  const otroHi = enNY ? N.asia_hi : N.lon_hi, otroLo = enNY ? N.asia_lo : N.lon_lo;
+  const otroNom = enNY ? "Asia" : "Londres";
+  const otroCol = enNY ? "var(--asia)" : "var(--londres)";
   const extras = [];
-  if (N.asia_hi != null) extras.push(N.asia_hi, N.asia_lo);
+  if (refHi != null) extras.push(refHi, refLo);
+  if (otroHi != null) extras.push(otroHi, otroLo);
   if (N.pdh != null) extras.push(N.pdh, N.pdl);
   const todos = [...v.map(x=>x.l), ...v.map(x=>x.h), e.sl, e.tp, e.nivel];
   let lo0 = Math.min(...todos), hi0 = Math.max(...todos);
@@ -199,14 +208,17 @@ function dibuja(e){
      + `height="${Math.abs(y(e.tp)-y(e.entrada))}" fill="var(--gana)" opacity="0.15"/>`;
 
   // --- niveles de referencia ---
-  const nivLinea = (p, col, dash, w) =>
+  const nivLinea = (p, col, dash, w, op) =>
     (p == null || p < lo || p > hi) ? "" :
     `<line x1="${PL}" y1="${y(p)}" x2="${xf}" y2="${y(p)}" stroke="${col}" `
-    + `stroke-width="${w}" stroke-dasharray="${dash}" opacity="0.85"/>`;
-  s += nivLinea(N.asia_hi, "var(--asia)", "2 3", 1);
-  s += nivLinea(N.asia_lo, "var(--asia)", "2 3", 1);
-  s += nivLinea(N.pdh, "var(--pdh)", "1 4", 1);
-  s += nivLinea(N.pdl, "var(--pdh)", "1 4", 1);
+    + `stroke-width="${w}" stroke-dasharray="${dash}" opacity="${op}"/>`;
+  // la sesion de referencia va mas marcada; la otra, tenue
+  s += nivLinea(otroHi, otroCol, "1 5", 1, 0.4);
+  s += nivLinea(otroLo, otroCol, "1 5", 1, 0.4);
+  s += nivLinea(N.pdh, "var(--pdh)", "1 4", 1, 0.7);
+  s += nivLinea(N.pdl, "var(--pdh)", "1 4", 1, 0.7);
+  s += nivLinea(refHi, refCol, "4 3", 1.4, 0.95);
+  s += nivLinea(refLo, refCol, "4 3", 1.4, 0.95);
   s += `<line x1="${PL}" y1="${y(e.nivel)}" x2="${xf}" y2="${y(e.nivel)}" `
      + `stroke="var(--nivel)" stroke-width="1.7" stroke-dasharray="6 3"/>`;
 
@@ -243,10 +255,12 @@ function dibuja(e){
   s += et(e.sl, "stop", "var(--pierde)", 600);
   s += et(e.tp, "objetivo", "var(--gana)", 600);
   s += et(e.nivel, (e.etiqueta||"nivel H1"), "var(--nivel)", 600);
-  s += et(N.asia_hi, "Asia alto", "var(--asia)", 400);
-  s += et(N.asia_lo, "Asia bajo", "var(--asia)", 400);
+  s += et(refHi, refNom + " alto", refCol, 600);
+  s += et(refLo, refNom + " bajo", refCol, 600);
   s += et(N.pdh, "PDH", "var(--pdh)", 400);
   s += et(N.pdl, "PDL", "var(--pdh)", 400);
+  s += et(otroHi, otroNom + " alto", otroCol, 400);
+  s += et(otroLo, otroNom + " bajo", otroCol, 400);
 
   [0, Math.floor(n/2), n-1].forEach(k=>{
     s += `<text x="${x(k)}" y="${H-8}" font-size="10" fill="var(--ink-3)" `
@@ -288,6 +302,8 @@ for (const [k, d] of Object.entries(DATOS)){
          + `<span><i style="background:var(--londres);opacity:.55"></i>Londres</span>`
          + `<span><i style="background:var(--ny);opacity:.55"></i>NY</span>`
          + `<span><i style="background:var(--kz);opacity:.35"></i>killzone</span>`
+         + `<span style="color:var(--ink);font-weight:600">sesión anterior: `
+         + `${e.sesion === "NuevaYork" ? "Londres" : "Asia"}</span>`
          + `</div>`
          + `<div class="nota-caja">`
          + `<label for="n-${k}-${i}">¿Por qué tú no habrías entrado aquí?</label>`
