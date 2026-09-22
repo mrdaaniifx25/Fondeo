@@ -33,12 +33,32 @@ def pivotes(d, tf, piv=3):
             np.array([x[1] for x in out]), np.array([x[2] for x in out], int))
 NT, NP, NL = pivotes(V60, 60)
 
+_dia = m1.groupby("dia").agg(hi=("high","max"), lo=("low","min"), n=("close","size"))
+_dia = _dia[_dia.n > 200]
+_asia = m1[m1.hm < 800].groupby("dia").agg(hi=("high","max"), lo=("low","min"), n=("close","size"))
+_asia = _asia[_asia.n > 120]
+_lon = m1[(m1.hm>=800)&(m1.hm<1400)].groupby("dia").agg(hi=("high","max"), lo=("low","min"), n=("close","size"))
+_lon = _lon[_lon.n > 120]
+
 def contexto(V, i_ent, antes=45, despues=55):
     a = max(0, i_ent-antes); b = min(len(V), i_ent+despues)
     s = V.iloc[a:b]
-    return a, [dict(t=pd.Timestamp(r.t).strftime("%Y-%m-%d %H:%M"),
-                    o=round(r.o,5), h=round(r.h,5), l=round(r.l,5), c=round(r.c,5))
-               for r in s.itertuples()]
+    velas_ = [dict(t=pd.Timestamp(r.t).strftime("%Y-%m-%d %H:%M"),
+                   o=round(r.o,5), h=round(r.h,5), l=round(r.l,5), c=round(r.c,5))
+              for r in s.itertuples()]
+    # niveles del dia en que se entra
+    d2 = pd.Timestamp(V.t.iloc[i_ent]).normalize()
+    niv = {}
+    if d2 in _asia.index:
+        niv["asia_hi"] = round(float(_asia.hi[d2]),5); niv["asia_lo"] = round(float(_asia.lo[d2]),5)
+    if d2 in _lon.index:
+        niv["lon_hi"] = round(float(_lon.hi[d2]),5); niv["lon_lo"] = round(float(_lon.lo[d2]),5)
+    if d2 in _dia.index:
+        k = list(_dia.index).index(d2)
+        if k > 0:
+            niv["pdh"] = round(float(_dia.hi.iloc[k-1]),5)
+            niv["pdl"] = round(float(_dia.lo.iloc[k-1]),5)
+    return a, velas_, niv
 
 # ================= ESTRATEGIA 1 · Benjamin (M2, nivel H1, 1:2) ================
 def benjamin():
@@ -77,6 +97,7 @@ def benjamin():
             isl = int(np.argmax(gs)) if gs.any() else 10**9
             res = "TP" if it < isl else ("SL" if isl < 10**9 else "abierta")
             ops.append(dict(i_barrido=k, i_ent=kf, lado=int(lado), nivel=float(niv),
+                            sesion="Londres" if hm[kf] < 12 else "NuevaYork",
                             entrada=float(P), sl=float(S), tp=float(O),
                             riesgo=round(rgo/U,1), res=res,
                             minutos=int(min(it,isl)) if res != "abierta" else None))
@@ -166,13 +187,21 @@ for nombre, fn, V, tf in (("benjamin", benjamin, V2, 2), ("lozano", lozano, V5, 
     print(f"{nombre}: {len(ops):,} operaciones · {len(g)} TP · {len(p)} SL "
           f"({100*len(g)/max(len(g)+len(p),1):.1f} % de acierto)")
     rng = np.random.default_rng(3)
-    sel = ([g[k] for k in rng.choice(len(g), 3, replace=False)] +
-           [p[k] for k in rng.choice(len(p), 3, replace=False)])
+    sel = []
+    for ses in ("Londres", "NuevaYork"):
+        for grupo, cuantas in ((g, 2), (p, 2)):
+            cand = [o for o in grupo if o.get("sesion") == ses]
+            if not cand: continue
+            idx = rng.choice(len(cand), min(cuantas, len(cand)), replace=False)
+            sel += [cand[k] for k in idx]
+    print(f"  seleccion: " + ", ".join(
+        f"{ses} {sum(1 for o in sel if o['sesion']==ses and o['res']==r)} {r}"
+        for ses in ("Londres","NuevaYork") for r in ("TP","SL")))
     ejs = []
     for o in sel:
-        base, velas_ = contexto(V, o["i_ent"])
+        base, velas_, niv = contexto(V, o["i_ent"])
         ejs.append(dict(**{k:v for k,v in o.items() if not k.startswith("i_")},
-                        tf=tf, velas=velas_,
+                        tf=tf, velas=velas_, niveles=niv,
                         i_barrido=o["i_barrido"]-base, i_ent=o["i_ent"]-base))
     SALIDA[nombre] = dict(n=len(ops), tp=len(g), sl=len(p), ejemplos=ejs)
 def limpia(x):

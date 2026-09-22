@@ -1,4 +1,4 @@
-<title>Doce Operaciones Reales</title>
+<title>Dieciséis Operaciones Reales</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
   :root{
@@ -8,6 +8,8 @@
     --sube:#0b6e4f; --baja:#a83318;
     --gana:#0b6e4f; --gana-bg:#e4f2ec; --pierde:#a83318; --pierde-bg:#fae9e4;
     --nivel:#8a5a00;
+    --asia:#5b6b8c; --londres:#1d5cba; --ny:#7a4b9c; --kz:#8a5a00;
+    --pdh:#6b7783;
   }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
     --ground:#0e1319; --surface:#161d26; --surface-2:#1d2631;
@@ -15,14 +17,18 @@
     --line:#26313d; --line-2:#33404e; --acento:#6ba3f5;
     --sube:#4fc99a; --baja:#f08a6c;
     --gana:#4fc99a; --gana-bg:#122b23; --pierde:#f08a6c; --pierde-bg:#2e1a14;
-    --nivel:#d9a441; } }
+    --nivel:#d9a441;
+    --asia:#7d8db0; --londres:#6ba3f5; --ny:#b18ad4; --kz:#d9a441;
+    --pdh:#8b96a3; } }
   :root[data-theme="dark"]{
     --ground:#0e1319; --surface:#161d26; --surface-2:#1d2631;
     --ink:#e9edf2; --ink-2:#9aa6b4; --ink-3:#6b7783;
     --line:#26313d; --line-2:#33404e; --acento:#6ba3f5;
     --sube:#4fc99a; --baja:#f08a6c;
     --gana:#4fc99a; --gana-bg:#122b23; --pierde:#f08a6c; --pierde-bg:#2e1a14;
-    --nivel:#d9a441; }
+    --nivel:#d9a441;
+    --asia:#7d8db0; --londres:#6ba3f5; --ny:#b18ad4; --kz:#d9a441;
+    --pdh:#8b96a3; }
 
   body{background:var(--ground); color:var(--ink);
     font-family:"Public Sans",system-ui,sans-serif; font-size:15px; line-height:1.6;
@@ -91,10 +97,11 @@
 <div class="hoja">
   <header class="cabecera">
     <p class="rotulo">EURUSD · operaciones reales del histórico</p>
-    <h1>Doce Operaciones Reales</h1>
-    <p class="sub">Seis de la regla de Benjamin y seis de la de Lozano, sacadas del
-    histórico de EURUSD tal y como las habría disparado la regla: tres que ganaron y
-    tres que perdieron de cada una. Mismas velas, mismos niveles, mismos stops.</p>
+    <h1>Dieciséis Operaciones Reales</h1>
+    <p class="sub">Ocho de la regla de Benjamin y ocho de la de Lozano, sacadas del
+    histórico de EURUSD tal y como las habría disparado la regla: <b>dos ganadas y dos
+    perdidas en Londres, y otras tantas en Nueva York</b>, de cada estrategia. Mismas
+    velas, mismas sesiones, mismos niveles, mismos stops.</p>
   </header>
   <div id="cuerpo"></div>
   <footer>
@@ -131,63 +138,119 @@ const META = {
   }
 };
 
-const W = 820, H = 300, PL = 8, PR = 74, PT = 16, PB = 26;
+const W = 860, H = 320, PL = 8, PR = 84, PT = 26, PB = 26;
+const SES = [[0,8,"Asia","var(--asia)"], [8,14,"Londres","var(--londres)"],
+             [14,23,"NY","var(--ny)"]];
+const KZ = [[540,660],[840,990]];   // 09:00-11:00 y 14:00-16:30, en minutos
 
 function dibuja(e){
-  const v = e.velas, n = v.length;
-  const lo0 = Math.min(...v.map(x=>x.l), e.sl, e.tp, e.nivel);
-  const hi0 = Math.max(...v.map(x=>x.h), e.sl, e.tp, e.nivel);
+  const v = e.velas, n = v.length, N = e.niveles || {};
+  const extras = [];
+  if (N.asia_hi != null) extras.push(N.asia_hi, N.asia_lo);
+  if (N.pdh != null) extras.push(N.pdh, N.pdl);
+  const todos = [...v.map(x=>x.l), ...v.map(x=>x.h), e.sl, e.tp, e.nivel];
+  let lo0 = Math.min(...todos), hi0 = Math.max(...todos);
+  // los niveles extra sólo amplían si están cerca; si no, se recortan al borde
+  extras.forEach(p => { if (p > lo0 - (hi0-lo0)*0.5 && p < hi0 + (hi0-lo0)*0.5){
+    lo0 = Math.min(lo0,p); hi0 = Math.max(hi0,p); } });
   const pad = (hi0-lo0)*0.06, lo = lo0-pad, hi = hi0+pad, rg = hi-lo || 1;
-  const bw = (W-PL-PR)/n;
-  const x = i => PL + bw*(i+0.5);
-  const y = p => PT + (H-PT-PB)*(1-(p-lo)/rg);
-  const largo = e.lado > 0;
+  const bw = (W-PL-PR)/n, x = i => PL + bw*(i+0.5), y = p => PT + (H-PT-PB)*(1-(p-lo)/rg);
+  const largo = e.lado > 0, xf = W-PR;
+  const min = c => { const [hh,mm] = c.t.slice(11).split(":"); return +hh*60 + +mm; };
   let s = "";
 
-  // zonas de riesgo y objetivo, desde la entrada hasta el final
-  const xe = x(e.i_ent), xf = W-PR;
+  // --- franjas de sesión ---
+  let i = 0;
+  while (i < n){
+    const m = min(v[i]), s0 = SES.find(z => m >= z[0]*60 && m < z[1]*60);
+    if (!s0){ i++; continue; }
+    let j = i;
+    while (j+1 < n && min(v[j+1]) >= s0[0]*60 && min(v[j+1]) < s0[1]*60
+           && v[j+1].t.slice(0,10) === v[i].t.slice(0,10)) j++;
+    const x0 = x(i)-bw/2, an = Math.max(x(j)-x(i)+bw, 1.5);
+    s += `<rect x="${x0}" y="${PT}" width="${an}" height="${H-PT-PB}" `
+       + `fill="${s0[3]}" opacity="0.07"/>`;
+    s += `<rect x="${x0}" y="${PT-9}" width="${an}" height="7" fill="${s0[3]}" opacity="0.5"/>`;
+    if (an > 34) s += `<text x="${x0+an/2}" y="${PT-13}" font-size="9.5" fill="${s0[3]}" `
+       + `text-anchor="middle" font-family="monospace" letter-spacing="0.5">${s0[2]}</text>`;
+    i = j+1;
+  }
+  // --- killzones ---
+  i = 0;
+  while (i < n){
+    const m = min(v[i]);
+    if (!KZ.some(z => m >= z[0] && m < z[1])){ i++; continue; }
+    let j = i;
+    while (j+1 < n && KZ.some(z => min(v[j+1]) >= z[0] && min(v[j+1]) < z[1])
+           && v[j+1].t.slice(0,10) === v[i].t.slice(0,10)) j++;
+    const x0 = x(i)-bw/2, an = Math.max(x(j)-x(i)+bw, 1.5);
+    s += `<rect x="${x0}" y="${PT}" width="${an}" height="${H-PT-PB}" `
+       + `fill="var(--kz)" opacity="0.07"/>`;
+    s += `<line x1="${x0}" y1="${PT}" x2="${x0}" y2="${H-PB}" stroke="var(--kz)" `
+       + `stroke-width="0.8" opacity="0.5"/>`;
+    i = j+1;
+  }
+
+  // --- zonas de riesgo y objetivo ---
+  const xe = x(e.i_ent);
   s += `<rect x="${xe}" y="${y(Math.max(e.entrada,e.sl))}" width="${xf-xe}" `
-     + `height="${Math.abs(y(e.sl)-y(e.entrada))}" fill="var(--pierde)" opacity="0.13"/>`;
+     + `height="${Math.abs(y(e.sl)-y(e.entrada))}" fill="var(--pierde)" opacity="0.15"/>`;
   s += `<rect x="${xe}" y="${y(Math.max(e.entrada,e.tp))}" width="${xf-xe}" `
-     + `height="${Math.abs(y(e.tp)-y(e.entrada))}" fill="var(--gana)" opacity="0.13"/>`;
+     + `height="${Math.abs(y(e.tp)-y(e.entrada))}" fill="var(--gana)" opacity="0.15"/>`;
 
-  // el nivel atacado
+  // --- niveles de referencia ---
+  const nivLinea = (p, col, dash, w) =>
+    (p == null || p < lo || p > hi) ? "" :
+    `<line x1="${PL}" y1="${y(p)}" x2="${xf}" y2="${y(p)}" stroke="${col}" `
+    + `stroke-width="${w}" stroke-dasharray="${dash}" opacity="0.85"/>`;
+  s += nivLinea(N.asia_hi, "var(--asia)", "2 3", 1);
+  s += nivLinea(N.asia_lo, "var(--asia)", "2 3", 1);
+  s += nivLinea(N.pdh, "var(--pdh)", "1 4", 1);
+  s += nivLinea(N.pdl, "var(--pdh)", "1 4", 1);
   s += `<line x1="${PL}" y1="${y(e.nivel)}" x2="${xf}" y2="${y(e.nivel)}" `
-     + `stroke="var(--nivel)" stroke-width="1.6" stroke-dasharray="6 3"/>`;
+     + `stroke="var(--nivel)" stroke-width="1.7" stroke-dasharray="6 3"/>`;
 
-  // velas
-  v.forEach((c,i)=>{
+  // --- velas ---
+  v.forEach((c,k)=>{
     const col = c.c>=c.o ? "var(--sube)" : "var(--baja)";
     const o1 = Math.min(y(c.o), y(c.c)), o2 = Math.max(y(c.o), y(c.c));
-    s += `<line x1="${x(i)}" y1="${y(c.h)}" x2="${x(i)}" y2="${y(c.l)}" `
-       + `stroke="${col}" stroke-width="1"/>`;
-    s += `<rect x="${x(i)-bw*0.32}" y="${o1}" width="${bw*0.64}" `
+    s += `<line x1="${x(k)}" y1="${y(c.h)}" x2="${x(k)}" y2="${y(c.l)}" stroke="${col}" stroke-width="1"/>`;
+    s += `<rect x="${x(k)-bw*0.32}" y="${o1}" width="${bw*0.64}" `
        + `height="${Math.max(o2-o1,0.8)}" fill="${col}"/>`;
   });
 
-  // marcas del barrido y de la entrada
+  // --- marcas ---
   const yb = largo ? y(v[e.i_barrido].l)+12 : y(v[e.i_barrido].h)-12;
   s += `<path d="M ${x(e.i_barrido)} ${yb} l -5 ${largo?9:-9} l 10 0 Z" fill="var(--nivel)"/>`;
-  s += `<text x="${x(e.i_barrido)}" y="${yb+(largo?23:-14)}" font-size="10" `
-     + `fill="var(--nivel)" text-anchor="middle" font-family="monospace">barrido</text>`;
+  s += `<text x="${x(e.i_barrido)}" y="${yb+(largo?23:-14)}" font-size="10" fill="var(--nivel)" `
+     + `text-anchor="middle" font-family="monospace">barrido</text>`;
   s += `<line x1="${xe}" y1="${PT}" x2="${xe}" y2="${H-PB}" stroke="var(--acento)" `
      + `stroke-width="1" stroke-dasharray="3 3"/>`;
-  s += `<circle cx="${xe}" cy="${y(e.entrada)}" r="3.6" fill="var(--acento)"/>`;
+  s += `<circle cx="${xe}" cy="${y(e.entrada)}" r="3.8" fill="var(--acento)"/>`;
 
-  // etiquetas de precio a la derecha
-  const et = (p, t, c) => `<line x1="${xf}" y1="${y(p)}" x2="${xf+5}" y2="${y(p)}" `
-     + `stroke="${c}" stroke-width="1"/>`
-     + `<text x="${xf+9}" y="${y(p)+3.5}" font-size="10.5" fill="${c}" `
-     + `font-family="monospace">${t}</text>`;
-  s += et(e.nivel, e.nivel.toFixed(5), "var(--nivel)");
-  s += et(e.entrada, "entrada " + e.entrada.toFixed(5), "var(--acento)");
-  s += et(e.sl, "stop " + e.sl.toFixed(5), "var(--pierde)");
-  s += et(e.tp, "objetivo " + e.tp.toFixed(5), "var(--gana)");
+  // --- etiquetas de precio ---
+  const usados = [];
+  const et = (p, t2, c, peso) => {
+    if (p == null || p < lo || p > hi) return "";
+    const yy = y(p);
+    if (usados.some(u => Math.abs(u-yy) < 11)) return "";
+    usados.push(yy);
+    return `<line x1="${xf}" y1="${yy}" x2="${xf+5}" y2="${yy}" stroke="${c}" stroke-width="1"/>`
+      + `<text x="${xf+9}" y="${yy+3.5}" font-size="10" fill="${c}" `
+      + `font-weight="${peso}" font-family="monospace">${t2}</text>`;
+  };
+  s += et(e.entrada, "entrada", "var(--acento)", 600);
+  s += et(e.sl, "stop", "var(--pierde)", 600);
+  s += et(e.tp, "objetivo", "var(--gana)", 600);
+  s += et(e.nivel, (e.etiqueta||"nivel H1"), "var(--nivel)", 600);
+  s += et(N.asia_hi, "Asia alto", "var(--asia)", 400);
+  s += et(N.asia_lo, "Asia bajo", "var(--asia)", 400);
+  s += et(N.pdh, "PDH", "var(--pdh)", 400);
+  s += et(N.pdl, "PDL", "var(--pdh)", 400);
 
-  // fechas abajo
-  [0, Math.floor(n/2), n-1].forEach(i=>{
-    s += `<text x="${x(i)}" y="${H-8}" font-size="10" fill="var(--ink-3)" `
-       + `text-anchor="middle" font-family="monospace">${v[i].t.slice(5,16)}</text>`;
+  [0, Math.floor(n/2), n-1].forEach(k=>{
+    s += `<text x="${x(k)}" y="${H-8}" font-size="10" fill="var(--ink-3)" `
+       + `text-anchor="middle" font-family="monospace">${v[k].t.slice(5,16)}</text>`;
   });
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${s}</svg>`;
 }
@@ -211,6 +274,7 @@ for (const [k, d] of Object.entries(DATOS)){
          + `<span class="pill ${gana?"g":"p"}">${gana?"GANA +2R":"PIERDE −1R"}</span>`
          + `<span class="fecha">${f}</span>`
          + `<span class="dato">${e.lado>0?"COMPRA":"VENTA"}</span>`
+         + `<span class="dato">sesión ${e.sesion}</span>`
          + `<span class="dato">nivel ${e.etiqueta||"H1"} · ${e.nivel.toFixed(5)}</span>`
          + `<span class="dato">riesgo ${e.riesgo} pips</span>`
          + `<span class="dato">M${e.tf}</span>`
@@ -220,6 +284,10 @@ for (const [k, d] of Object.entries(DATOS)){
          + `<span><i style="background:var(--pierde);opacity:.4"></i>zona de riesgo (1R)</span>`
          + `<span><i style="background:var(--gana);opacity:.4"></i>zona de objetivo (2R)</span>`
          + `<span><i style="background:var(--acento)"></i>entrada</span>`
+         + `<span><i style="background:var(--asia);opacity:.55"></i>Asia</span>`
+         + `<span><i style="background:var(--londres);opacity:.55"></i>Londres</span>`
+         + `<span><i style="background:var(--ny);opacity:.55"></i>NY</span>`
+         + `<span><i style="background:var(--kz);opacity:.35"></i>killzone</span>`
          + `</div>`
          + `<div class="nota-caja">`
          + `<label for="n-${k}-${i}">¿Por qué tú no habrías entrado aquí?</label>`
@@ -230,13 +298,13 @@ for (const [k, d] of Object.entries(DATOS)){
   html += `</section>`;
 }
 html += `<section><h2>Lo que hay que mirar</h2>`
-     + `<p class="sub">Las seis ganadoras son bonitas. Las seis perdedoras también lo son:`
+     + `<p class="sub">Las ocho ganadoras son bonitas. Las ocho perdedoras también lo son:`
      + ` el barrido es igual de limpio, el nivel igual de válido, la vela de entrada igual`
      + ` de clara. Ésa es toda la cuestión.</p>`
      + `<p class="nota ojo">Si al mirar una perdedora piensas «yo esa no la habría`
      + ` cogido», apunta <b>por qué</b> antes de ver el resultado de la siguiente. Eso`
      + ` es un filtro nuevo, y se puede medir. Lo que no vale es saberlo después.</p>`
-     + `<p class="nota">Las doce salieron por sorteo dentro de su grupo, no elegidas a`
+     + `<p class="nota">Las dieciséis salieron por sorteo dentro de su grupo, no elegidas a`
      + ` mano. Con 33,6 % y 25,3 % de acierto, si mirases cien seguidas verías dos de`
      + ` cada tres perder.</p></section>`;
 document.getElementById("cuerpo").innerHTML = html;
@@ -247,7 +315,7 @@ html = document.getElementById("cuerpo").innerHTML;
 document.getElementById("cuerpo").innerHTML = html + `
   <div class="cierre">
     <h3>Y en general</h3>
-    <p class="sub" style="margin-bottom:11px">Si al mirar las doce te sale una regla
+    <p class="sub" style="margin-bottom:11px">Si al mirar las dieciséis te sale una regla
     que valga para todas, escríbela aquí. Con que sea concreta me basta para medirla.</p>
     <textarea id="n-general" data-id="general" style="width:100%;box-sizing:border-box;
       min-height:110px;resize:vertical;font-family:'Public Sans',sans-serif;font-size:14px;
