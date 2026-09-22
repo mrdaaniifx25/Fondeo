@@ -154,3 +154,5 @@ p = p - flip.astype(float)*COSTE_RUIDO
 mfx = p.mean(axis=1).dropna()
 linea("FX solo · completa", mfx)
 linea("FX solo · 2013-2026", mfx[mfx.index.year >= 2013])
+
+m12.to_csv("data/ext/serie_momento.csv")
