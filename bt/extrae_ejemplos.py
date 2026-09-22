@@ -46,19 +46,41 @@ def contexto(V, i_ent, antes=45, despues=55):
     velas_ = [dict(t=pd.Timestamp(r.t).strftime("%Y-%m-%d %H:%M"),
                    o=round(r.o,5), h=round(r.h,5), l=round(r.l,5), c=round(r.c,5))
               for r in s.itertuples()]
-    # niveles del dia en que se entra
-    d2 = pd.Timestamp(V.t.iloc[i_ent]).normalize()
-    niv = {}
+    # MAPA DE LIQUIDEZ: todos los niveles vivos en el momento de entrar
+    t_ent = pd.Timestamp(V.t.iloc[i_ent]); d2 = t_ent.normalize()
+    P = float(V.c.iloc[i_ent])
+    cand = []
+    def mete(nom, p, tipo):
+        if p is None or not np.isfinite(p): return
+        cand.append(dict(nom=nom, p=round(float(p),5), tipo=tipo))
     if d2 in _asia.index:
-        niv["asia_hi"] = round(float(_asia.hi[d2]),5); niv["asia_lo"] = round(float(_asia.lo[d2]),5)
-    if d2 in _lon.index:
-        niv["lon_hi"] = round(float(_lon.hi[d2]),5); niv["lon_lo"] = round(float(_lon.lo[d2]),5)
+        mete("Asia alto", _asia.hi[d2], "alto"); mete("Asia bajo", _asia.lo[d2], "bajo")
+    if d2 in _lon.index and t_ent.hour >= 14:
+        mete("Londres alto", _lon.hi[d2], "alto"); mete("Londres bajo", _lon.lo[d2], "bajo")
     if d2 in _dia.index:
         k = list(_dia.index).index(d2)
         if k > 0:
-            niv["pdh"] = round(float(_dia.hi.iloc[k-1]),5)
-            niv["pdl"] = round(float(_dia.lo.iloc[k-1]),5)
-    return a, velas_, niv
+            mete("PDH", _dia.hi.iloc[k-1], "alto"); mete("PDL", _dia.lo.iloc[k-1], "bajo")
+        if k > 1:
+            mete("máx. 2 días", _dia.hi.iloc[k-2], "alto"); mete("mín. 2 días", _dia.lo.iloc[k-2], "bajo")
+        # sesion de NY del dia anterior
+        if k > 0:
+            dprev = _dia.index[k-1]
+            ny = m1[(m1.dia == dprev) & (m1.hm >= 1400)]
+            if len(ny) > 120:
+                mete("NY alto (ayer)", ny.high.max(), "alto")
+                mete("NY bajo (ayer)", ny.low.min(), "bajo")
+    # ¿sigue vivo? (no barrido entre su formacion y la entrada) -> se mira solo hoy
+    k0 = int(np.searchsorted(MT, d2.to_datetime64(), "left"))
+    k1 = int(np.searchsorted(MT, t_ent.to_datetime64(), "right"))
+    hoy_h = MH[k0:k1].max() if k1 > k0 else P
+    hoy_l = ML[k0:k1].min() if k1 > k0 else P
+    for c in cand:
+        c["vivo"] = bool(hoy_h < c["p"]) if c["tipo"] == "alto" else bool(hoy_l > c["p"])
+        c["dist"] = round((c["p"]-P)/U, 1)
+    cand.sort(key=lambda c: c["p"])
+    niv = {c["nom"].replace(" ","_").replace(".","").lower(): c["p"] for c in cand}
+    return a, velas_, dict(lista=cand, **niv)
 
 # ================= ESTRATEGIA 1 · Benjamin (M2, nivel H1, 1:2) ================
 def benjamin():
@@ -200,6 +222,26 @@ for nombre, fn, V, tf in (("benjamin", benjamin, V2, 2), ("lozano", lozano, V5, 
     ejs = []
     for o in sel:
         base, velas_, niv = contexto(V, o["i_ent"])
+        # --- lo que el usuario quiere ver ---
+        largo = o["lado"] > 0; P = o["entrada"]; SL = o["sl"]; TP = o["tp"]
+        L = niv["lista"]
+        # nivel mas cercano al OBJETIVO, en el sentido de la operacion
+        delante = [c for c in L if (c["p"] > P) == largo]
+        niv["tp_cerca"] = min(delante, key=lambda c: abs(c["p"]-TP)) if delante else None
+        if niv["tp_cerca"]:
+            niv["tp_cerca"] = dict(niv["tp_cerca"],
+                                   a_pips=round((niv["tp_cerca"]["p"]-TP)/U*(1 if largo else -1), 1))
+        # liquidez VIVA por detras del stop (el precio iria a por ella primero)
+        detras = [c for c in L if c["vivo"] and ((c["p"] < SL) if largo else (c["p"] > SL))]
+        niv["detras_stop"] = (max(detras, key=lambda c: c["p"]) if largo
+                              else min(detras, key=lambda c: c["p"])) if detras else None
+        if niv["detras_stop"]:
+            niv["detras_stop"] = dict(niv["detras_stop"],
+                a_pips=round(abs(niv["detras_stop"]["p"]-SL)/U, 1))
+        # liquidez VIVA entre la entrada y el stop (aun mas cerca)
+        medio = [c for c in L if c["vivo"] and
+                 ((SL <= c["p"] <= P) if largo else (P <= c["p"] <= SL))]
+        niv["entre"] = len(medio)
         ejs.append(dict(**{k:v for k,v in o.items() if not k.startswith("i_")},
                         tf=tf, velas=velas_, niveles=niv,
                         i_barrido=o["i_barrido"]-base, i_ent=o["i_ent"]-base))
