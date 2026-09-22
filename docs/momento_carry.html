@@ -14,8 +14,7 @@
     :root:not([data-theme="light"]){
       --ground:#0e1319; --surface:#161d26; --surface-2:#1d2631;
       --ink:#e9edf2; --ink-2:#9aa6b4; --ink-3:#6b7783;
-      --line:#26313d; --line-2:#33404e;
-      --acento:#6ba3f5;
+      --line:#26313d; --line-2:#33404e; --acento:#6ba3f5;
       --compra:#4fc99a; --compra-bg:#122b23;
       --venta:#f08a6c; --venta-bg:#2e1a14;
       --aviso:#d9a441; --aviso-bg:#2b2213;
@@ -24,40 +23,46 @@
   :root[data-theme="dark"]{
     --ground:#0e1319; --surface:#161d26; --surface-2:#1d2631;
     --ink:#e9edf2; --ink-2:#9aa6b4; --ink-3:#6b7783;
-    --line:#26313d; --line-2:#33404e;
-    --acento:#6ba3f5;
+    --line:#26313d; --line-2:#33404e; --acento:#6ba3f5;
     --compra:#4fc99a; --compra-bg:#122b23;
     --venta:#f08a6c; --venta-bg:#2e1a14;
     --aviso:#d9a441; --aviso-bg:#2b2213;
   }
 
-  body{
-    background:var(--ground); color:var(--ink);
+  body{background:var(--ground); color:var(--ink);
     font-family:"Public Sans",system-ui,sans-serif; font-size:15px; line-height:1.6;
-    padding-inline:18px; padding-block:0;
-  }
-  .hoja{max-width:790px; margin:0 auto; padding-block:34px 72px;}
-
+    padding-inline:18px; padding-block:0;}
+  .hoja{max-width:800px; margin:0 auto; padding-block:34px 72px;}
   h1{font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:clamp(28px,6vw,40px);
      letter-spacing:-.025em; line-height:1.08; margin:0; text-wrap:balance;}
   h2{font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:20px;
      letter-spacing:-.012em; margin:0 0 4px; text-wrap:balance;}
   .rotulo{font-family:"Archivo",system-ui,sans-serif; font-size:11px; font-weight:600;
      letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3);}
-  p{margin:0;}
-  .sub{color:var(--ink-2); max-width:62ch;}
+  p{margin:0;} .sub{color:var(--ink-2); max-width:62ch;}
   .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;}
-
   section{margin-top:46px;}
   .cabecera{display:flex; flex-direction:column; gap:12px; padding-bottom:26px;
             border-bottom:2px solid var(--ink);}
-
-  .cifras{display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:1px;
+  .cifras{display:grid; grid-template-columns:repeat(auto-fit,minmax(138px,1fr)); gap:1px;
           background:var(--line); border:1px solid var(--line); margin-top:26px;}
   .cifra{background:var(--surface); padding:14px 15px;}
   .cifra .v{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
             font-size:22px; font-weight:600; letter-spacing:-.02em; display:block; line-height:1.25;}
   .cifra .k{font-size:11.5px; color:var(--ink-3); letter-spacing:.04em; margin-top:2px;}
+
+  ol.etapas{list-style:none; counter-reset:e; padding:0; margin:20px 0 0;
+            display:flex; flex-direction:column; gap:1px; background:var(--line);
+            border:1px solid var(--line);}
+  ol.etapas li{counter-increment:e; background:var(--surface); padding:16px 16px 16px 58px;
+               position:relative;}
+  ol.etapas li::before{content:"Fase " counter(e); position:absolute; left:16px; top:17px;
+    font-family:"Archivo",sans-serif; font-size:9.5px; font-weight:600; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--acento); width:34px; line-height:1.3;}
+  ol.etapas b{font-weight:600;}
+  ol.etapas .det{color:var(--ink-2); font-size:14px; margin-top:3px; display:block;}
+  ol.etapas .cuando{font-family:"IBM Plex Mono",monospace; font-size:12px;
+    color:var(--ink-3); margin-top:6px; display:block;}
 
   .mandos{display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;
           background:var(--surface-2); border:1px solid var(--line);
@@ -83,7 +88,7 @@
   th:first-child,td:first-child{text-align:left;}
   td{padding:10px 13px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap;}
   tr:last-child td{border-bottom:0;}
-  .par{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:14.5px; letter-spacing:-.01em;}
+  .par{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:14.5px;}
   .num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:14px;}
   .lote{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
         font-size:15px; font-weight:600;}
@@ -104,6 +109,9 @@
   ol.rutina b{font-weight:600;}
   ol.rutina .det{color:var(--ink-2); font-size:14px; margin-top:3px; display:block;}
 
+  ol.preguntas{padding-left:20px; margin:16px 0 0; color:var(--ink-2);
+               display:flex; flex-direction:column; gap:9px;}
+  ol.preguntas b{color:var(--ink); font-weight:600;}
   .nota{border-left:3px solid var(--line-2); padding:2px 0 2px 15px; color:var(--ink-2);
         margin-top:16px; max-width:62ch;}
   .nota.ojo{border-left-color:var(--aviso); background:var(--aviso-bg);
@@ -123,217 +131,256 @@
 <div class="hoja">
 
   <header class="cabecera">
-    <p class="rotulo">Cartera de divisas · revisión mensual</p>
+    <p class="rotulo">Plan de fondeo · revisión mensual</p>
     <h1>Momento y Carry</h1>
-    <p class="sub">Dos efectos medidos sobre 632 meses y 26 mercados: la tendencia de doce meses
-    y el diferencial de tipos. Se hunden en momentos distintos, así que juntos caen mucho menos
-    que por separado. Se toca <b>una vez al mes</b>.</p>
+    <p class="sub">Cuatro cuentas de 10.000 €, doce posiciones de divisas que se
+    tocan una vez al mes, y un camino simulado sobre 632 meses medidos hasta los
+    <b>300 € al mes</b>. Entrada: 356 €.</p>
   </header>
 
   <div class="cifras">
+    <div class="cifra"><span class="v">356 €</span><span class="k">entrada · 4 retos de 10k</span></div>
+    <div class="cifra"><span class="v">98 %</span><span class="k">llega al objetivo</span></div>
+    <div class="cifra"><span class="v">15</span><span class="k">meses hasta 300 €/mes</span></div>
+    <div class="cifra"><span class="v">479 €</span><span class="k">renta al 4º año</span></div>
     <div class="cifra"><span class="v">t +7,29</span><span class="k">632 meses, 1971-2026</span></div>
-    <div class="cifra"><span class="v">1,00</span><span class="k">Sharpe</span></div>
-    <div class="cifra"><span class="v">68,4 %</span><span class="k">meses en positivo</span></div>
-    <div class="cifra"><span class="v" id="c-ret">+2,3 %</span><span class="k">al año</span></div>
-    <div class="cifra"><span class="v" id="c-dd">−5,0 %</span><span class="k">peor caída histórica</span></div>
   </div>
 
   <section>
+    <h2>El camino</h2>
+    <p class="sub">Simulado entero 4.000 veces con los rendimientos reales:
+    comprar retos, pasarlos, cobrar, reinvertir en más cuentas hasta llegar,
+    y a partir de ahí retirar todo.</p>
+    <ol class="etapas">
+      <li><b>Compra los cuatro retos de 10.000 € a la vez.</b>
+        <span class="det">356 €. Comprarlos a la vez y no de uno en uno sube la
+        probabilidad de llegar del <b>67 % al 98 %</b>: no es que diversifiquen
+        el rendimiento —corren la misma señal— sino el calendario. Cada cuenta
+        está en un punto distinto de su ciclo de caída.</span>
+        <span class="cuando">mes 0 · −356 €</span></li>
+      <li><b>Pasa las dos fases con el sistema, sin tocarlo.</b>
+        <span class="det">+8 % y luego +4 %. A 18,7 % anual eso son unos cinco
+        meses por fase. Alguna cuenta morirá por el camino: se repone con lo que
+        se vaya cobrando.</span>
+        <span class="cuando">meses 1-10 · ~5 meses por fase</span></li>
+      <li><b>Cobra cada mes y reinvierte hasta tener cuatro vivas.</b>
+        <span class="det">Todo lo que pase del saldo inicial se retira. Los
+        primeros cobros no se gastan: compran los retos de reposición. La
+        fondeadora devuelve la cuota en el primer cobro.</span>
+        <span class="cuando">meses 6-15 · ~958 € en retos en cuatro años</span></li>
+      <li><b>Cuando la media de doce meses pase de 300 €, vive de ello.</b>
+        <span class="det">A partir de ahí se deja de reinvertir y se retira todo.
+        Mediana al cuarto año: <b>479 €/mes</b>.</span>
+        <span class="cuando">mes 15 de mediana · 25 si toca el régimen flojo</span></li>
+    </ol>
+    <p class="nota ojo"><b>Si no tienes los 356 €</b>, con un solo reto de 89 €
+    también se llega reinvirtiendo los cobros: 67 % de probabilidad y 22 meses de
+    mediana. Es el camino lento, pero no exige ahorrar antes de empezar.</p>
+  </section>
+
+  <section>
     <h2>Las posiciones de este mes</h2>
-    <p class="sub">Señal calculada con los cierres de <b>agosto de 2026</b>. Cada posición se abre
-    a mercado, sin stop: el tamaño <em>es</em> el control de riesgo. Se mantienen hasta la próxima
-    revisión.</p>
+    <p class="sub">Señal calculada con los cierres de <b>agosto de 2026</b>.
+    Se abren a mercado, <b>sin stop</b>: el tamaño es el control de riesgo.
+    Se mantienen hasta la próxima revisión.</p>
 
     <div class="mandos">
       <div class="campo">
-        <label for="cuenta">Tamaño de la cuenta (€)</label>
-        <input id="cuenta" type="number" value="50000" min="1000" step="1000">
+        <label for="cuenta">Tamaño de cada cuenta (€)</label>
+        <input id="cuenta" type="number" value="10000" min="1000" step="1000">
       </div>
       <div class="campo">
-        <label for="modo">Dimensionado</label>
+        <label for="modo">Escala</label>
         <div class="grupo" id="modo">
-          <button id="b-pru" aria-pressed="true">Prudente</button>
-          <button id="b-agr" aria-pressed="false">Agresivo</button>
-        </div>
-      </div>
-      <div class="campo">
-        <label for="filtro">Pares</label>
-        <div class="grupo" id="filtro">
-          <button id="b-liq" aria-pressed="true">Sólo líquidos</button>
-          <button id="b-tod" aria-pressed="false">Los 18</button>
+          <button id="b-agr" aria-pressed="true">4× · el plan</button>
+          <button id="b-pru" aria-pressed="false">1× · conservador</button>
         </div>
       </div>
     </div>
 
     <div class="tabla-caja">
       <table>
-        <thead>
-          <tr>
-            <th>Par</th><th>Dirección</th><th>Fuerza</th>
-            <th>σ mensual</th><th>Nocional</th><th>Lotes</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Par</th><th>Dirección</th><th>Fuerza</th>
+          <th>σ mensual</th><th>Nocional</th><th>Lotes</th>
+        </tr></thead>
         <tbody id="filas"></tbody>
       </table>
     </div>
     <p class="nota" id="resumen"></p>
-    <p class="nota ojo"><b>Los seis que no son líquidos</b> —BRL, MYR, KRW, DKK, INR, THB— sólo
-    valen si tu bróker los cotiza con un spread razonable. Si el spread supera el 0,3 % del
-    nocional, déjalos fuera: el sistema no aguanta ese peaje. Con los doce líquidos funciona igual.</p>
+    <p class="nota ojo"><b>El lote mínimo de MT5 es 0,01.</b> Con 10.000 € al 4×
+    las doce posiciones entran sin redondear a cero — que era el riesgo real de
+    operar esto en una cuenta pequeña. Por debajo de 5.000 € por cuenta empiezan
+    a caerse posiciones y el plan deja de funcionar.</p>
   </section>
 
   <section>
     <h2>La rutina</h2>
-    <p class="sub">El último día hábil del mes, unos veinte minutos. Ni un clic más en todo el mes.</p>
+    <p class="sub">El último día hábil del mes, veinte minutos, en las cuatro
+    cuentas a la vez. Ni un clic más en todo el mes.</p>
     <ol class="rutina">
       <li><b>Apunta el cierre mensual de cada par.</b>
         <span class="det">El precio del último día del mes. Doce números.</span></li>
       <li><b>Calcula el momento de cada par.</b>
-        <span class="det">¿El precio de hoy está por encima del de hace 1, 3, 6 y 12 meses?
-        Cuenta +1 por cada sí y −1 por cada no, y divide entre cuatro. Sale un número entre −1 y +1.</span></li>
+        <span class="det">¿El precio de hoy está por encima del de hace 1, 3, 6 y
+        12 meses? Cuenta +1 por cada sí y −1 por cada no, y divide entre cuatro.</span></li>
       <li><b>Ordena los pares por el swap que te paga el bróker.</b>
-        <span class="det">El tercio que más paga: carry +1. El tercio que más cobra: carry −1.
-        El tercio de en medio: 0. <b>Usa el swap real de tu plataforma</b>, no una estimación.</span></li>
+        <span class="det">El tercio que más paga: carry +1. El que más cobra: −1.
+        El de en medio: 0. <b>Usa el swap real de tu plataforma</b> — es mejor
+        dato que el que yo pude medir.</span></li>
       <li><b>Suma las dos señales a mitades.</b>
-        <span class="det">señal = (momento + carry) ÷ 2. Si sale entre −0,25 y +0,25, ese par se queda fuera.</span></li>
-      <li><b>Ajusta las posiciones a los lotes de la tabla.</b>
-        <span class="det">Si una posición ya está en el sentido correcto, sólo corriges el tamaño.
-        No la cierras y la vuelves a abrir: pagarías el spread dos veces.</span></li>
-      <li><b>Cierra la plataforma.</b>
-        <span class="det">Sin stops que mover, sin break even, sin mirar el gráfico. El mes que
-        viene, otra vez.</span></li>
+        <span class="det">señal = (momento + carry) ÷ 2. Entre −0,25 y +0,25, ese
+        par se queda fuera.</span></li>
+      <li><b>Ajusta los lotes en las cuatro cuentas.</b>
+        <span class="det">Si una posición ya va en el sentido correcto, sólo
+        corriges el tamaño. No la cierras y la reabres: pagarías el spread dos veces.</span></li>
+      <li><b>Retira lo que pase del saldo inicial y cierra la plataforma.</b>
+        <span class="det">Sin stops que mover, sin break even, sin mirar el
+        gráfico. El mes que viene, otra vez.</span></li>
     </ol>
   </section>
 
   <section>
     <h2>De dónde salen los lotes</h2>
-    <p class="sub">El tamaño se fija para que un movimiento normal de un mes valga lo mismo en
-    todos los pares. Así el yen y el rand pesan igual en la cartera, aunque uno se mueva el triple.</p>
+    <p class="sub">El tamaño se fija para que un movimiento normal de un mes valga
+    lo mismo en todos los pares. Así el yen y el rand pesan igual, aunque uno se
+    mueva el triple.</p>
     <div class="formula">
 nocional = cuenta × riesgo × |señal| ÷ σ_mensual
 <span class="c">──────────────────────────────────────────────────</span>
-<span class="c">ejemplo · GBPUSD, cuenta 50.000 €, prudente</span>
-riesgo    = 0,125 %      <span class="c">← 0,25 % en modo agresivo</span>
+<span class="c">ejemplo · GBPUSD, cuenta de 10.000 €, escala 4×</span>
+riesgo    = 1,0 %        <span class="c">← 0,25 % base × 4</span>
 señal     = +1,00        <span class="c">← momento +1,00 · carry +1</span>
 σ_mensual = 1,93 %       <span class="c">← desviación de los últimos 36 meses</span>
 
-nocional  = 50.000 × 0,00125 × 1,00 ÷ 0,0193 = <b>3.238 €</b>
-lotes     = 3.238 ÷ 100.000 = <b>0,03</b>
+nocional  = 10.000 × 0,01 × 1,00 ÷ 0,0193 = <b>5.188 €</b>
+lotes     = 5.188 ÷ 100.000 = <b>0,05</b>
     </div>
-    <p class="nota">σ_mensual se recalcula una vez al año, no cada mes. Los lotes son de la divisa
-    base del par (100.000 unidades por lote).</p>
+    <p class="nota">σ_mensual se recalcula una vez al año, no cada mes. Los lotes
+    son de la divisa base del par (100.000 unidades por lote).</p>
   </section>
 
   <section>
     <h2>Qué vas a ver mes a mes</h2>
-    <p class="sub">Esto es lo que hace que la gente abandone un sistema que funciona. Léelo ahora,
-    con la cabeza fría, para reconocerlo cuando pase.</p>
+    <p class="sub">Esto es lo que hace que la gente abandone un sistema que
+    funciona. Léelo ahora, con la cabeza fría, para reconocerlo cuando pase.</p>
     <div class="tabla-caja" style="margin-top:16px">
       <table>
-        <thead><tr><th>Lo que pasa</th><th>Cada cuánto</th><th>Prudente</th><th>Agresivo</th></tr></thead>
+        <thead><tr><th>Lo que pasa</th><th>Cada cuánto</th><th>Al 4×</th></tr></thead>
         <tbody>
-          <tr><td>Mes en positivo</td><td class="num">68 de cada 100</td><td class="num">—</td><td class="num">—</td></tr>
-          <tr><td>Mes en pérdida</td><td class="num">32 de cada 100</td><td class="num">—</td><td class="num">—</td></tr>
-          <tr><td>Peor mes de 55 años</td><td class="num">una vez</td><td class="num">−2,98 %</td><td class="num">−5,95 %</td></tr>
-          <tr><td>Racha más larga de meses perdiendo</td><td class="num">una vez</td><td class="num">6 meses</td><td class="num">6 meses</td></tr>
-          <tr><td>Peor caída acumulada</td><td class="num">una vez</td><td class="num">−5,0 %</td><td class="num">−10,0 %</td></tr>
-          <tr><td>Volatilidad</td><td class="num">siempre</td><td class="num">2,3 %/año</td><td class="num">4,6 %/año</td></tr>
+          <tr><td>Mes en positivo</td><td class="num">68 de cada 100</td><td class="num">—</td></tr>
+          <tr><td>Mes en pérdida</td><td class="num">32 de cada 100</td><td class="num">—</td></tr>
+          <tr><td>Racha más larga de meses perdiendo</td><td class="num">una vez</td><td class="num">6 meses</td></tr>
+          <tr><td>Peor mes de 55 años</td><td class="num">una vez</td><td class="num">−23,8 %</td></tr>
+          <tr><td>Cuentas que pierdes en 3 años</td><td class="num">mediana</td><td class="num">2 de 4</td></tr>
+          <tr><td>Rentabilidad</td><td class="num">al año</td><td class="num">+18,7 %</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="nota ojo"><b>Seis meses seguidos perdiendo es normal en este sistema.</b> Ha pasado
-    y volverá a pasar. Si abandonas en el quinto, te llevas la pérdida entera y ninguna de las
-    recuperaciones. Ése es el único modo realista de que esto salga mal.</p>
+    <p class="nota ojo"><b>Perder cuentas es parte del plan, no un fallo.</b> Al
+    4× la caída histórica del sistema es del 40 % y el límite es del 10 %: vas a
+    reventar cuentas cada año o año y medio. Eso ya está contado en los 958 € de
+    retos. Lo que no puede pasar es que reduzcas la escala después de una mala
+    racha — ahí es donde se pierde el dinero de verdad.</p>
+  </section>
+
+  <section>
+    <h2>Antes de pagar nada, pregunta esto</h2>
+    <p class="sub">Cuestan un correo. Las dos primeras pueden invalidar el plan entero.</p>
+    <ol class="preguntas">
+      <li><b>¿El reto tiene plazo máximo?</b> Con 18,7 % anual, el +8 % tarda unos
+      cinco meses. Si caduca a 30 o 60 días, este sistema no lo pasa nunca.</li>
+      <li><b>¿Hay regla de días mínimos operando?</b> Con doce operaciones al año
+      puede incumplirse.</li>
+      <li><b>¿Se pueden mantener posiciones el fin de semana?</b></li>
+      <li><b>¿Cuántas cuentas simultáneas permiten?</b> El plan necesita cuatro.</li>
+      <li><b>¿El swap lleva recargo sobre el de mercado?</b> Se modeló 1,5 puntos
+      anuales. Si es mucho más, la pata de carry se resiente.</li>
+    </ol>
   </section>
 
   <section>
     <h2>Lo que esto no es</h2>
     <dl class="limites">
-      <dt>No te da 750 € al mes sobre 50.000.</dt>
-      <dd>Te da <b>97 €</b> en modo prudente y <b>194 €</b> en agresivo. Para 750 € hacen falta
-      entre <b>193.000 €</b> y <b>386.000 €</b> de capital. La estrategia ya no es el problema:
-      el capital sí.</dd>
-
-      <dt>Los últimos trece años son más flojos que los cincuenta anteriores.</dt>
-      <dd>Sharpe +0,45 desde 2013 frente a +1,20 antes de 2000. El momento se apagó después de
-      2008; el carry lo compensa en parte. Dimensiona con el dato reciente, no con el histórico.</dd>
+      <dt>No es rápido y no es seguro.</dt>
+      <dd>Mediana de <b>15 meses</b> hasta los 300 €. En el régimen flojo
+      (2013-2026, Sharpe 0,45 en vez de 1,00) son <b>25 meses y un 68 %</b> de
+      probabilidad en vez del 98 %. La horquilla honesta de renta al cuarto año
+      es de <b>205 a 479 €/mes</b>.</dd>
 
       <dt>El carry lo tienes mejor medido tú que yo.</dt>
-      <dd>Yo lo estimé con la inflación del Banco Mundial porque no hay serie de tipos accesible.
-      <b>Tu plataforma te enseña el swap real de cada par.</b> Ése es el dato bueno: úsalo.</dd>
+      <dd>Lo estimé con la inflación del Banco Mundial porque no hay serie de
+      tipos accesible. <b>Tu plataforma te enseña el swap real.</b> Ése es el dato
+      bueno: úsalo en el paso 3.</dd>
 
-      <dt>No es intradía y no se parece a nada que hayas probado.</dt>
-      <dd>No hay niveles, ni barridos, ni sesiones, ni stops. Se toca doce veces al año.
-      Si te aburre, es buena señal.</dd>
+      <dt>No se parece a nada que hayas probado.</dt>
+      <dd>No hay niveles, ni barridos, ni sesiones, ni stops, ni gráficos. Se toca
+      doce veces al año. Si te aburre, es buena señal.</dd>
     </dl>
   </section>
 
   <footer>
-    Medido sobre 22 divisas del Reserve Federal desde 1971, más oro, WTI, Brent, gas natural y
-    S&amp;P 500. Pre-registros y resultados en <span class="mono">docs/RESULTADOS_momento_largo.md</span>
-    y <span class="mono">docs/RESULTADOS_carry.md</span>.
+    Medido sobre 22 divisas del Reserve Federal desde 1971, más oro, WTI, Brent,
+    gas natural y S&amp;P 500. Pre-registros y resultados en
+    <span class="mono">docs/RESULTADOS_momento_largo.md</span>,
+    <span class="mono">docs/RESULTADOS_carry.md</span> y
+    <span class="mono">docs/RESULTADOS_plan.md</span>.
   </footer>
 </div>
 
 <script>
   const PARES = [
-    {p:"USDCNH", d:"COMPRAR", s:-1.00, sig:0.0087, liq:true},
-    {p:"USDSEK", d:"VENDER",  s: 1.00, sig:0.0314, liq:true},
-    {p:"GBPUSD", d:"COMPRAR", s: 1.00, sig:0.0193, liq:true},
-    {p:"USDBRL", d:"VENDER",  s: 0.75, sig:0.0289, liq:false},
-    {p:"USDNOK", d:"COMPRAR", s:-0.75, sig:0.0316, liq:true},
-    {p:"USDSGD", d:"COMPRAR", s:-0.75, sig:0.0139, liq:true},
-    {p:"USDJPY", d:"VENDER",  s: 0.50, sig:0.0297, liq:true},
-    {p:"USDMYR", d:"COMPRAR", s:-0.50, sig:0.0228, liq:false},
-    {p:"USDMXN", d:"COMPRAR", s:-0.50, sig:0.0263, liq:true},
-    {p:"NZDUSD", d:"COMPRAR", s: 0.50, sig:0.0313, liq:true},
-    {p:"USDKRW", d:"COMPRAR", s:-0.50, sig:0.0290, liq:false},
-    {p:"AUDUSD", d:"COMPRAR", s: 0.25, sig:0.0263, liq:true},
-    {p:"USDCAD", d:"VENDER",  s: 0.25, sig:0.0172, liq:true},
-    {p:"USDDKK", d:"COMPRAR", s:-0.25, sig:0.0195, liq:false},
-    {p:"EURUSD", d:"COMPRAR", s: 0.25, sig:0.0195, liq:true},
-    {p:"USDINR", d:"VENDER",  s: 0.25, sig:0.0097, liq:false},
-    {p:"USDZAR", d:"VENDER",  s: 0.25, sig:0.0244, liq:true},
-    {p:"USDTHB", d:"VENDER",  s: 0.25, sig:0.0218, liq:false}
+    {p:"USDCNH", d:"COMPRAR", s:-1.00, sig:0.0087},
+    {p:"USDSEK", d:"VENDER",  s: 1.00, sig:0.0314},
+    {p:"GBPUSD", d:"COMPRAR", s: 1.00, sig:0.0193},
+    {p:"USDNOK", d:"COMPRAR", s:-0.75, sig:0.0316},
+    {p:"USDSGD", d:"COMPRAR", s:-0.75, sig:0.0139},
+    {p:"USDJPY", d:"VENDER",  s: 0.50, sig:0.0297},
+    {p:"USDMXN", d:"COMPRAR", s:-0.50, sig:0.0263},
+    {p:"NZDUSD", d:"COMPRAR", s: 0.50, sig:0.0313},
+    {p:"AUDUSD", d:"COMPRAR", s: 0.25, sig:0.0263},
+    {p:"USDCAD", d:"VENDER",  s: 0.25, sig:0.0172},
+    {p:"EURUSD", d:"COMPRAR", s: 0.25, sig:0.0195},
+    {p:"USDZAR", d:"VENDER",  s: 0.25, sig:0.0244}
   ];
-  let prudente = true, soloLiq = true;
+  let escala4 = true;
   const eu = n => n.toLocaleString("es-ES",{maximumFractionDigits:0});
   const $ = id => document.getElementById(id);
 
   function pinta(){
-    const cuenta = Math.max(1000, +$("cuenta").value || 50000);
-    const riesgo = prudente ? 0.00125 : 0.0025;
-    const lista = PARES.filter(x => soloLiq ? x.liq : true);
-    const maxAbs = Math.max(...lista.map(x => Math.abs(x.s)));
-    $("filas").innerHTML = lista.map(x => {
+    const cuenta = Math.max(1000, +$("cuenta").value || 10000);
+    const riesgo = escala4 ? 0.01 : 0.0025;
+    const maxAbs = Math.max(...PARES.map(x => Math.abs(x.s)));
+    let fuera = 0, totalNoc = 0;
+    $("filas").innerHTML = PARES.map(x => {
       const noc = cuenta * riesgo * Math.abs(x.s) / x.sig;
+      const lotes = noc/100000;
+      totalNoc += noc;
+      if (lotes < 0.005) fuera++;
       const anchura = Math.round(58 * Math.abs(x.s) / maxAbs);
-      return `<tr>
+      const gris = lotes < 0.005 ? ' style="opacity:.42"' : '';
+      return `<tr${gris}>
         <td class="par">${x.p}</td>
         <td><span class="dir ${x.d === "COMPRAR" ? "c" : "v"}">${x.d}</span></td>
         <td><span class="fuerza" style="width:${anchura}px"></span>
             <span class="num" style="margin-left:7px">${Math.abs(x.s).toFixed(2)}</span></td>
         <td class="num">${(100*x.sig).toFixed(2)} %</td>
         <td class="num">${eu(noc)} €</td>
-        <td class="lote">${(noc/100000).toFixed(2)}</td>
+        <td class="lote">${lotes < 0.005 ? "—" : lotes.toFixed(2)}</td>
       </tr>`;
     }).join("");
-    const totalNoc = lista.reduce((a,x) => a + cuenta*riesgo*Math.abs(x.s)/x.sig, 0);
-    $("resumen").innerHTML = `<b>${lista.length} posiciones</b> · nocional total
-      <b>${eu(totalNoc)} €</b> (${(100*totalNoc/cuenta).toFixed(0)} % de la cuenta, repartido entre
+    const aviso = fuera
+      ? ` · <b style="color:var(--venta)">${fuera} no llegan al lote mínimo de 0,01 y se quedan fuera</b>`
+      : " · las doce entran con el lote mínimo de 0,01";
+    $("resumen").innerHTML = `<b>${PARES.length - fuera} posiciones</b> · nocional total
+      <b>${eu(totalNoc)} €</b> (${(totalNoc/cuenta).toFixed(1)}× la cuenta, repartido entre
       divisas que se mueven en sentidos distintos) · riesgo por posición
-      <b>${(100*riesgo).toFixed(3)} %</b>.`;
-    $("c-ret").textContent = prudente ? "+2,3 %" : "+4,7 %";
-    $("c-dd").textContent  = prudente ? "−5,0 %" : "−10,0 %";
+      <b>${(100*riesgo).toFixed(2)} %</b>${aviso}.`;
   }
-  function modo(p){ prudente = p; $("b-pru").setAttribute("aria-pressed", p);
-                    $("b-agr").setAttribute("aria-pressed", !p); pinta(); }
-  function filtro(l){ soloLiq = l; $("b-liq").setAttribute("aria-pressed", l);
-                      $("b-tod").setAttribute("aria-pressed", !l); pinta(); }
-  $("b-pru").onclick = () => modo(true);
-  $("b-agr").onclick = () => modo(false);
-  $("b-liq").onclick = () => filtro(true);
-  $("b-tod").onclick = () => filtro(false);
+  function modo(a){ escala4 = a; $("b-agr").setAttribute("aria-pressed", a);
+                    $("b-pru").setAttribute("aria-pressed", !a); pinta(); }
+  $("b-agr").onclick = () => modo(true);
+  $("b-pru").onclick = () => modo(false);
   $("cuenta").oninput = pinta;
   pinta();
 </script>
