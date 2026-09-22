@@ -1,0 +1,339 @@
+<title>Momento y Carry</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#f5f7f9; --surface:#ffffff; --surface-2:#eef1f5;
+    --ink:#131920; --ink-2:#56626f; --ink-3:#8b96a3;
+    --line:#dfe4ea; --line-2:#c9d1da;
+    --acento:#1d5cba;
+    --compra:#0b6e4f; --compra-bg:#e4f2ec;
+    --venta:#a83318; --venta-bg:#fae9e4;
+    --aviso:#8a5a00; --aviso-bg:#fbf1dd;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0e1319; --surface:#161d26; --surface-2:#1d2631;
+      --ink:#e9edf2; --ink-2:#9aa6b4; --ink-3:#6b7783;
+      --line:#26313d; --line-2:#33404e;
+      --acento:#6ba3f5;
+      --compra:#4fc99a; --compra-bg:#122b23;
+      --venta:#f08a6c; --venta-bg:#2e1a14;
+      --aviso:#d9a441; --aviso-bg:#2b2213;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0e1319; --surface:#161d26; --surface-2:#1d2631;
+    --ink:#e9edf2; --ink-2:#9aa6b4; --ink-3:#6b7783;
+    --line:#26313d; --line-2:#33404e;
+    --acento:#6ba3f5;
+    --compra:#4fc99a; --compra-bg:#122b23;
+    --venta:#f08a6c; --venta-bg:#2e1a14;
+    --aviso:#d9a441; --aviso-bg:#2b2213;
+  }
+
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:"Public Sans",system-ui,sans-serif; font-size:15px; line-height:1.6;
+    padding-inline:18px; padding-block:0;
+  }
+  .hoja{max-width:790px; margin:0 auto; padding-block:34px 72px;}
+
+  h1{font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:clamp(28px,6vw,40px);
+     letter-spacing:-.025em; line-height:1.08; margin:0; text-wrap:balance;}
+  h2{font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:20px;
+     letter-spacing:-.012em; margin:0 0 4px; text-wrap:balance;}
+  .rotulo{font-family:"Archivo",system-ui,sans-serif; font-size:11px; font-weight:600;
+     letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3);}
+  p{margin:0;}
+  .sub{color:var(--ink-2); max-width:62ch;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+
+  section{margin-top:46px;}
+  .cabecera{display:flex; flex-direction:column; gap:12px; padding-bottom:26px;
+            border-bottom:2px solid var(--ink);}
+
+  .cifras{display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:1px;
+          background:var(--line); border:1px solid var(--line); margin-top:26px;}
+  .cifra{background:var(--surface); padding:14px 15px;}
+  .cifra .v{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+            font-size:22px; font-weight:600; letter-spacing:-.02em; display:block; line-height:1.25;}
+  .cifra .k{font-size:11.5px; color:var(--ink-3); letter-spacing:.04em; margin-top:2px;}
+
+  .mandos{display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;
+          background:var(--surface-2); border:1px solid var(--line);
+          padding:15px 16px; margin:18px 0 20px;}
+  .campo{display:flex; flex-direction:column; gap:5px;}
+  .campo label{font-size:11.5px; font-weight:600; letter-spacing:.05em;
+               text-transform:uppercase; color:var(--ink-3);}
+  input[type=number]{font-family:"IBM Plex Mono",monospace; font-size:16px; font-weight:500;
+    background:var(--surface); color:var(--ink); border:1px solid var(--line-2);
+    padding:7px 10px; width:130px; border-radius:2px;}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--acento); outline-offset:2px;}
+  .grupo{display:flex; border:1px solid var(--line-2); border-radius:2px; overflow:hidden;}
+  .grupo button{font-family:"Public Sans",sans-serif; font-size:13.5px; font-weight:500;
+    background:var(--surface); color:var(--ink-2); border:0; padding:8px 13px; cursor:pointer;}
+  .grupo button+button{border-left:1px solid var(--line-2);}
+  .grupo button[aria-pressed=true]{background:var(--ink); color:var(--ground); font-weight:600;}
+
+  .tabla-caja{overflow-x:auto; border:1px solid var(--line); background:var(--surface);}
+  table{border-collapse:collapse; width:100%; min-width:540px;}
+  th{font-family:"Archivo",sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.1em;
+     text-transform:uppercase; color:var(--ink-3); text-align:right;
+     padding:11px 13px; border-bottom:1px solid var(--line-2); white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;}
+  td{padding:10px 13px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap;}
+  tr:last-child td{border-bottom:0;}
+  .par{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:14.5px; letter-spacing:-.01em;}
+  .num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:14px;}
+  .lote{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+        font-size:15px; font-weight:600;}
+  .dir{font-family:"Archivo",sans-serif; font-size:11px; font-weight:600; letter-spacing:.07em;
+       padding:3px 8px; border-radius:2px; display:inline-block;}
+  .dir.c{background:var(--compra-bg); color:var(--compra);}
+  .dir.v{background:var(--venta-bg); color:var(--venta);}
+  .fuerza{display:inline-block; height:7px; background:var(--acento); vertical-align:middle;
+          border-radius:1px; min-width:3px;}
+
+  ol.rutina{list-style:none; counter-reset:p; padding:0; margin:18px 0 0;
+            display:flex; flex-direction:column; gap:1px; background:var(--line);
+            border:1px solid var(--line);}
+  ol.rutina li{counter-increment:p; background:var(--surface); padding:15px 16px 15px 54px;
+               position:relative;}
+  ol.rutina li::before{content:counter(p); position:absolute; left:16px; top:15px;
+    font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:600; color:var(--acento);}
+  ol.rutina b{font-weight:600;}
+  ol.rutina .det{color:var(--ink-2); font-size:14px; margin-top:3px; display:block;}
+
+  .nota{border-left:3px solid var(--line-2); padding:2px 0 2px 15px; color:var(--ink-2);
+        margin-top:16px; max-width:62ch;}
+  .nota.ojo{border-left-color:var(--aviso); background:var(--aviso-bg);
+            padding:12px 15px; color:var(--ink);}
+  .formula{background:var(--surface); border:1px solid var(--line); padding:15px 16px;
+    font-family:"IBM Plex Mono",monospace; font-size:13.5px; line-height:1.85;
+    overflow-x:auto; margin-top:16px;}
+  .formula .c{color:var(--ink-3);}
+  dl.limites{margin:16px 0 0; display:flex; flex-direction:column; gap:14px;}
+  dl.limites dt{font-weight:600;}
+  dl.limites dd{margin:2px 0 0; color:var(--ink-2); max-width:62ch;}
+  footer{margin-top:52px; padding-top:20px; border-top:1px solid var(--line);
+          color:var(--ink-3); font-size:13px;}
+  @media (max-width:520px){ .cifra .v{font-size:19px;} }
+</style>
+
+<div class="hoja">
+
+  <header class="cabecera">
+    <p class="rotulo">Cartera de divisas · revisión mensual</p>
+    <h1>Momento y Carry</h1>
+    <p class="sub">Dos efectos medidos sobre 632 meses y 26 mercados: la tendencia de doce meses
+    y el diferencial de tipos. Se hunden en momentos distintos, así que juntos caen mucho menos
+    que por separado. Se toca <b>una vez al mes</b>.</p>
+  </header>
+
+  <div class="cifras">
+    <div class="cifra"><span class="v">t +7,29</span><span class="k">632 meses, 1971-2026</span></div>
+    <div class="cifra"><span class="v">1,00</span><span class="k">Sharpe</span></div>
+    <div class="cifra"><span class="v">68,4 %</span><span class="k">meses en positivo</span></div>
+    <div class="cifra"><span class="v" id="c-ret">+2,3 %</span><span class="k">al año</span></div>
+    <div class="cifra"><span class="v" id="c-dd">−5,0 %</span><span class="k">peor caída histórica</span></div>
+  </div>
+
+  <section>
+    <h2>Las posiciones de este mes</h2>
+    <p class="sub">Señal calculada con los cierres de <b>agosto de 2026</b>. Cada posición se abre
+    a mercado, sin stop: el tamaño <em>es</em> el control de riesgo. Se mantienen hasta la próxima
+    revisión.</p>
+
+    <div class="mandos">
+      <div class="campo">
+        <label for="cuenta">Tamaño de la cuenta (€)</label>
+        <input id="cuenta" type="number" value="50000" min="1000" step="1000">
+      </div>
+      <div class="campo">
+        <label for="modo">Dimensionado</label>
+        <div class="grupo" id="modo">
+          <button id="b-pru" aria-pressed="true">Prudente</button>
+          <button id="b-agr" aria-pressed="false">Agresivo</button>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="filtro">Pares</label>
+        <div class="grupo" id="filtro">
+          <button id="b-liq" aria-pressed="true">Sólo líquidos</button>
+          <button id="b-tod" aria-pressed="false">Los 18</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabla-caja">
+      <table>
+        <thead>
+          <tr>
+            <th>Par</th><th>Dirección</th><th>Fuerza</th>
+            <th>σ mensual</th><th>Nocional</th><th>Lotes</th>
+          </tr>
+        </thead>
+        <tbody id="filas"></tbody>
+      </table>
+    </div>
+    <p class="nota" id="resumen"></p>
+    <p class="nota ojo"><b>Los seis que no son líquidos</b> —BRL, MYR, KRW, DKK, INR, THB— sólo
+    valen si tu bróker los cotiza con un spread razonable. Si el spread supera el 0,3 % del
+    nocional, déjalos fuera: el sistema no aguanta ese peaje. Con los doce líquidos funciona igual.</p>
+  </section>
+
+  <section>
+    <h2>La rutina</h2>
+    <p class="sub">El último día hábil del mes, unos veinte minutos. Ni un clic más en todo el mes.</p>
+    <ol class="rutina">
+      <li><b>Apunta el cierre mensual de cada par.</b>
+        <span class="det">El precio del último día del mes. Doce números.</span></li>
+      <li><b>Calcula el momento de cada par.</b>
+        <span class="det">¿El precio de hoy está por encima del de hace 1, 3, 6 y 12 meses?
+        Cuenta +1 por cada sí y −1 por cada no, y divide entre cuatro. Sale un número entre −1 y +1.</span></li>
+      <li><b>Ordena los pares por el swap que te paga el bróker.</b>
+        <span class="det">El tercio que más paga: carry +1. El tercio que más cobra: carry −1.
+        El tercio de en medio: 0. <b>Usa el swap real de tu plataforma</b>, no una estimación.</span></li>
+      <li><b>Suma las dos señales a mitades.</b>
+        <span class="det">señal = (momento + carry) ÷ 2. Si sale entre −0,25 y +0,25, ese par se queda fuera.</span></li>
+      <li><b>Ajusta las posiciones a los lotes de la tabla.</b>
+        <span class="det">Si una posición ya está en el sentido correcto, sólo corriges el tamaño.
+        No la cierras y la vuelves a abrir: pagarías el spread dos veces.</span></li>
+      <li><b>Cierra la plataforma.</b>
+        <span class="det">Sin stops que mover, sin break even, sin mirar el gráfico. El mes que
+        viene, otra vez.</span></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>De dónde salen los lotes</h2>
+    <p class="sub">El tamaño se fija para que un movimiento normal de un mes valga lo mismo en
+    todos los pares. Así el yen y el rand pesan igual en la cartera, aunque uno se mueva el triple.</p>
+    <div class="formula">
+nocional = cuenta × riesgo × |señal| ÷ σ_mensual
+<span class="c">──────────────────────────────────────────────────</span>
+<span class="c">ejemplo · GBPUSD, cuenta 50.000 €, prudente</span>
+riesgo    = 0,125 %      <span class="c">← 0,25 % en modo agresivo</span>
+señal     = +1,00        <span class="c">← momento +1,00 · carry +1</span>
+σ_mensual = 1,93 %       <span class="c">← desviación de los últimos 36 meses</span>
+
+nocional  = 50.000 × 0,00125 × 1,00 ÷ 0,0193 = <b>3.238 €</b>
+lotes     = 3.238 ÷ 100.000 = <b>0,03</b>
+    </div>
+    <p class="nota">σ_mensual se recalcula una vez al año, no cada mes. Los lotes son de la divisa
+    base del par (100.000 unidades por lote).</p>
+  </section>
+
+  <section>
+    <h2>Qué vas a ver mes a mes</h2>
+    <p class="sub">Esto es lo que hace que la gente abandone un sistema que funciona. Léelo ahora,
+    con la cabeza fría, para reconocerlo cuando pase.</p>
+    <div class="tabla-caja" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Lo que pasa</th><th>Cada cuánto</th><th>Prudente</th><th>Agresivo</th></tr></thead>
+        <tbody>
+          <tr><td>Mes en positivo</td><td class="num">68 de cada 100</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Mes en pérdida</td><td class="num">32 de cada 100</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Peor mes de 55 años</td><td class="num">una vez</td><td class="num">−2,98 %</td><td class="num">−5,95 %</td></tr>
+          <tr><td>Racha más larga de meses perdiendo</td><td class="num">una vez</td><td class="num">6 meses</td><td class="num">6 meses</td></tr>
+          <tr><td>Peor caída acumulada</td><td class="num">una vez</td><td class="num">−5,0 %</td><td class="num">−10,0 %</td></tr>
+          <tr><td>Volatilidad</td><td class="num">siempre</td><td class="num">2,3 %/año</td><td class="num">4,6 %/año</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota ojo"><b>Seis meses seguidos perdiendo es normal en este sistema.</b> Ha pasado
+    y volverá a pasar. Si abandonas en el quinto, te llevas la pérdida entera y ninguna de las
+    recuperaciones. Ése es el único modo realista de que esto salga mal.</p>
+  </section>
+
+  <section>
+    <h2>Lo que esto no es</h2>
+    <dl class="limites">
+      <dt>No te da 750 € al mes sobre 50.000.</dt>
+      <dd>Te da <b>97 €</b> en modo prudente y <b>194 €</b> en agresivo. Para 750 € hacen falta
+      entre <b>193.000 €</b> y <b>386.000 €</b> de capital. La estrategia ya no es el problema:
+      el capital sí.</dd>
+
+      <dt>Los últimos trece años son más flojos que los cincuenta anteriores.</dt>
+      <dd>Sharpe +0,45 desde 2013 frente a +1,20 antes de 2000. El momento se apagó después de
+      2008; el carry lo compensa en parte. Dimensiona con el dato reciente, no con el histórico.</dd>
+
+      <dt>El carry lo tienes mejor medido tú que yo.</dt>
+      <dd>Yo lo estimé con la inflación del Banco Mundial porque no hay serie de tipos accesible.
+      <b>Tu plataforma te enseña el swap real de cada par.</b> Ése es el dato bueno: úsalo.</dd>
+
+      <dt>No es intradía y no se parece a nada que hayas probado.</dt>
+      <dd>No hay niveles, ni barridos, ni sesiones, ni stops. Se toca doce veces al año.
+      Si te aburre, es buena señal.</dd>
+    </dl>
+  </section>
+
+  <footer>
+    Medido sobre 22 divisas del Reserve Federal desde 1971, más oro, WTI, Brent, gas natural y
+    S&amp;P 500. Pre-registros y resultados en <span class="mono">docs/RESULTADOS_momento_largo.md</span>
+    y <span class="mono">docs/RESULTADOS_carry.md</span>.
+  </footer>
+</div>
+
+<script>
+  const PARES = [
+    {p:"USDCNH", d:"COMPRAR", s:-1.00, sig:0.0087, liq:true},
+    {p:"USDSEK", d:"VENDER",  s: 1.00, sig:0.0314, liq:true},
+    {p:"GBPUSD", d:"COMPRAR", s: 1.00, sig:0.0193, liq:true},
+    {p:"USDBRL", d:"VENDER",  s: 0.75, sig:0.0289, liq:false},
+    {p:"USDNOK", d:"COMPRAR", s:-0.75, sig:0.0316, liq:true},
+    {p:"USDSGD", d:"COMPRAR", s:-0.75, sig:0.0139, liq:true},
+    {p:"USDJPY", d:"VENDER",  s: 0.50, sig:0.0297, liq:true},
+    {p:"USDMYR", d:"COMPRAR", s:-0.50, sig:0.0228, liq:false},
+    {p:"USDMXN", d:"COMPRAR", s:-0.50, sig:0.0263, liq:true},
+    {p:"NZDUSD", d:"COMPRAR", s: 0.50, sig:0.0313, liq:true},
+    {p:"USDKRW", d:"COMPRAR", s:-0.50, sig:0.0290, liq:false},
+    {p:"AUDUSD", d:"COMPRAR", s: 0.25, sig:0.0263, liq:true},
+    {p:"USDCAD", d:"VENDER",  s: 0.25, sig:0.0172, liq:true},
+    {p:"USDDKK", d:"COMPRAR", s:-0.25, sig:0.0195, liq:false},
+    {p:"EURUSD", d:"COMPRAR", s: 0.25, sig:0.0195, liq:true},
+    {p:"USDINR", d:"VENDER",  s: 0.25, sig:0.0097, liq:false},
+    {p:"USDZAR", d:"VENDER",  s: 0.25, sig:0.0244, liq:true},
+    {p:"USDTHB", d:"VENDER",  s: 0.25, sig:0.0218, liq:false}
+  ];
+  let prudente = true, soloLiq = true;
+  const eu = n => n.toLocaleString("es-ES",{maximumFractionDigits:0});
+  const $ = id => document.getElementById(id);
+
+  function pinta(){
+    const cuenta = Math.max(1000, +$("cuenta").value || 50000);
+    const riesgo = prudente ? 0.00125 : 0.0025;
+    const lista = PARES.filter(x => soloLiq ? x.liq : true);
+    const maxAbs = Math.max(...lista.map(x => Math.abs(x.s)));
+    $("filas").innerHTML = lista.map(x => {
+      const noc = cuenta * riesgo * Math.abs(x.s) / x.sig;
+      const anchura = Math.round(58 * Math.abs(x.s) / maxAbs);
+      return `<tr>
+        <td class="par">${x.p}</td>
+        <td><span class="dir ${x.d === "COMPRAR" ? "c" : "v"}">${x.d}</span></td>
+        <td><span class="fuerza" style="width:${anchura}px"></span>
+            <span class="num" style="margin-left:7px">${Math.abs(x.s).toFixed(2)}</span></td>
+        <td class="num">${(100*x.sig).toFixed(2)} %</td>
+        <td class="num">${eu(noc)} €</td>
+        <td class="lote">${(noc/100000).toFixed(2)}</td>
+      </tr>`;
+    }).join("");
+    const totalNoc = lista.reduce((a,x) => a + cuenta*riesgo*Math.abs(x.s)/x.sig, 0);
+    $("resumen").innerHTML = `<b>${lista.length} posiciones</b> · nocional total
+      <b>${eu(totalNoc)} €</b> (${(100*totalNoc/cuenta).toFixed(0)} % de la cuenta, repartido entre
+      divisas que se mueven en sentidos distintos) · riesgo por posición
+      <b>${(100*riesgo).toFixed(3)} %</b>.`;
+    $("c-ret").textContent = prudente ? "+2,3 %" : "+4,7 %";
+    $("c-dd").textContent  = prudente ? "−5,0 %" : "−10,0 %";
+  }
+  function modo(p){ prudente = p; $("b-pru").setAttribute("aria-pressed", p);
+                    $("b-agr").setAttribute("aria-pressed", !p); pinta(); }
+  function filtro(l){ soloLiq = l; $("b-liq").setAttribute("aria-pressed", l);
+                      $("b-tod").setAttribute("aria-pressed", !l); pinta(); }
+  $("b-pru").onclick = () => modo(true);
+  $("b-agr").onclick = () => modo(false);
+  $("b-liq").onclick = () => filtro(true);
+  $("b-tod").onclick = () => filtro(false);
+  $("cuenta").oninput = pinta;
+  pinta();
+</script>
