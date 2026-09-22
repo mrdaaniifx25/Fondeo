@@ -18,7 +18,7 @@ def velas(mins):
     g = g[g.n >= max(1, mins*0.3)].reset_index().rename(columns={"loc":"t"})
     return g
 
-V2, V5, V60 = velas(2), velas(5), velas(60)
+V2, V5, V15, V60 = velas(2), velas(5), velas(15), velas(60)
 
 def pivotes(d, tf, piv=3):
     h, l = d.h.to_numpy(), d.l.to_numpy(); t = d.t.to_numpy("datetime64[ns]")
@@ -222,6 +222,14 @@ for nombre, fn, V, tf in (("benjamin", benjamin, V2, 2), ("lozano", lozano, V5, 
     ejs = []
     for o in sel:
         base, velas_, niv = contexto(V, o["i_ent"])
+        # --- gráfico de contexto en M15: 40 horas alrededor de la entrada ---
+        t_e = pd.Timestamp(V.t.iloc[o["i_ent"]])
+        t15 = V15.t.to_numpy("datetime64[ns]")
+        j = int(np.searchsorted(t15, t_e.to_datetime64(), "right")) - 1
+        ja, jb = max(0, j-120), min(len(V15), j+40)
+        ctx = [dict(t=pd.Timestamp(r.t).strftime("%Y-%m-%d %H:%M"),
+                    o=round(r.o,5), h=round(r.h,5), l=round(r.l,5), c=round(r.c,5))
+               for r in V15.iloc[ja:jb].itertuples()]
         # --- lo que el usuario quiere ver ---
         largo = o["lado"] > 0; P = o["entrada"]; SL = o["sl"]; TP = o["tp"]
         L = niv["lista"]
@@ -243,7 +251,7 @@ for nombre, fn, V, tf in (("benjamin", benjamin, V2, 2), ("lozano", lozano, V5, 
                  ((SL <= c["p"] <= P) if largo else (P <= c["p"] <= SL))]
         niv["entre"] = len(medio)
         ejs.append(dict(**{k:v for k,v in o.items() if not k.startswith("i_")},
-                        tf=tf, velas=velas_, niveles=niv,
+                        tf=tf, velas=velas_, niveles=niv, ctx=ctx, ctx_ent=j-ja,
                         i_barrido=o["i_barrido"]-base, i_ent=o["i_ent"]-base))
     SALIDA[nombre] = dict(n=len(ops), tp=len(g), sl=len(p), ejemplos=ejs)
 def limpia(x):
