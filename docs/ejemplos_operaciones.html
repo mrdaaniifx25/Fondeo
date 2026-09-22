@@ -66,6 +66,24 @@
         margin-top:16px; max-width:64ch;}
   .nota.ojo{border-left-color:var(--nivel); background:color-mix(in srgb, var(--nivel) 11%, transparent);
             padding:13px 15px; color:var(--ink);}
+
+  .nota-caja{border-top:1px solid var(--line); padding:13px 15px; background:var(--surface-2);}
+  .nota-caja label{display:block; font-family:"Archivo",sans-serif; font-size:11px;
+    font-weight:600; letter-spacing:.07em; text-transform:uppercase;
+    color:var(--ink-3); margin-bottom:7px;}
+  .nota-caja textarea{width:100%; box-sizing:border-box; min-height:64px; resize:vertical;
+    font-family:"Public Sans",sans-serif; font-size:14px; line-height:1.55;
+    background:var(--surface); color:var(--ink); border:1px solid var(--line-2);
+    border-radius:2px; padding:9px 11px;}
+  .nota-caja textarea:focus-visible{outline:2px solid var(--acento); outline-offset:1px;}
+  .estado{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3);
+    margin-top:6px; min-height:16px;}
+  .estado.ok{color:var(--gana);}
+  .estado.mal{color:var(--pierde);}
+  .cierre{border:1px solid var(--line); background:var(--surface); padding:17px;
+    margin-top:22px;}
+  .cierre h3{font-family:"Archivo",sans-serif; font-size:17px; font-weight:600;
+    margin:0 0 4px; letter-spacing:-.01em;}
   footer{margin-top:52px; padding-top:20px; border-top:1px solid var(--line);
          color:var(--ink-3); font-size:13px;}
 </style>
@@ -186,7 +204,7 @@ for (const [k, d] of Object.entries(DATOS)){
        + `<div><b>${acierto.toFixed(1)} %</b>acertadas</div>`
        + `<div><b>33,3 %</b>lo que da el azar a 1:2</div>`
        + `</div></div>`;
-  d.ejemplos.forEach(e=>{
+  d.ejemplos.forEach((e,i)=>{
     const gana = e.res === "TP";
     const f = e.velas[e.i_ent].t;
     html += `<div class="op"><div class="op-cab">`
@@ -202,7 +220,12 @@ for (const [k, d] of Object.entries(DATOS)){
          + `<span><i style="background:var(--pierde);opacity:.4"></i>zona de riesgo (1R)</span>`
          + `<span><i style="background:var(--gana);opacity:.4"></i>zona de objetivo (2R)</span>`
          + `<span><i style="background:var(--acento)"></i>entrada</span>`
-         + `</div></div>`;
+         + `</div>`
+         + `<div class="nota-caja">`
+         + `<label for="n-${k}-${i}">¿Por qué tú no habrías entrado aquí?</label>`
+         + `<textarea id="n-${k}-${i}" data-id="${k}_${i}" `
+         + `placeholder="Lo que ves y la regla no ve. Sé concreto: «el barrido no llegó al nivel de H4», «venía de tres velas seguidas en contra», «era la última media hora de la sesión»…"></textarea>`
+         + `<div class="estado" id="e-${k}-${i}"></div></div></div>`;
   });
   html += `</section>`;
 }
@@ -217,4 +240,61 @@ html += `<section><h2>Lo que hay que mirar</h2>`
      + ` mano. Con 33,6 % y 25,3 % de acierto, si mirases cien seguidas verías dos de`
      + ` cada tres perder.</p></section>`;
 document.getElementById("cuerpo").innerHTML = html;
+
+
+// ------------------------- guardado de las notas -------------------------
+html = document.getElementById("cuerpo").innerHTML;
+document.getElementById("cuerpo").innerHTML = html + `
+  <div class="cierre">
+    <h3>Y en general</h3>
+    <p class="sub" style="margin-bottom:11px">Si al mirar las doce te sale una regla
+    que valga para todas, escríbela aquí. Con que sea concreta me basta para medirla.</p>
+    <textarea id="n-general" data-id="general" style="width:100%;box-sizing:border-box;
+      min-height:110px;resize:vertical;font-family:'Public Sans',sans-serif;font-size:14px;
+      line-height:1.55;background:var(--surface);color:var(--ink);
+      border:1px solid var(--line-2);border-radius:2px;padding:10px 12px"
+      placeholder="Por ejemplo: «sólo entraría si el barrido se come el nivel por más de 2 pips», o «no entraría si la vela de entrada mide más del doble que la media»."></textarea>
+    <div class="estado" id="e-general"></div>
+  </div>`;
+
+(async () => {
+  const cajas = [...document.querySelectorAll("textarea[data-id]")];
+  const est = id => document.getElementById("e-" + id.replace("_","-")) ||
+                    document.getElementById("e-" + id);
+  const db = await claude.use("db");
+  if (!db){
+    cajas.forEach(c => { const e = est(c.dataset.id);
+      if (e){ e.textContent = "no se puede guardar en esta vista"; e.className = "estado mal"; } });
+    return;
+  }
+  try {
+    const q = await db.collection("notas").get();
+    q.docs.forEach(d => {
+      const c = document.querySelector(`textarea[data-id="${d.id}"]`);
+      if (c && d.data() && d.data().texto){
+        c.value = d.data().texto;
+        const e = est(d.id); if (e){ e.textContent = "guardado"; e.className = "estado ok"; }
+      }
+    });
+  } catch (err) { /* coleccion vacia todavia */ }
+
+  const pend = new Map();
+  cajas.forEach(c => {
+    c.addEventListener("input", () => {
+      const id = c.dataset.id, e = est(id);
+      if (e){ e.textContent = "escribiendo…"; e.className = "estado"; }
+      clearTimeout(pend.get(id));
+      pend.set(id, setTimeout(async () => {
+        try {
+          await db.doc("notas/" + id).set({
+            texto: c.value, actualizado: new Date().toISOString() });
+          if (e){ e.textContent = "guardado"; e.className = "estado ok"; }
+        } catch (err) {
+          if (e){ e.textContent = "no se pudo guardar: " + (err.code || "error");
+                  e.className = "estado mal"; }
+        }
+      }, 900));
+    });
+  });
+})();
 </script>
