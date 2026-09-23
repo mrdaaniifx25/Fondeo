@@ -1,0 +1,283 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// at https://mozilla.org/MPL/2.0/
+//
+//  SU REGLA · todas las señales del histórico
+//
+//  Marca TODOS los disparos de la regla tal y como está medida en
+//  bt/su_regla_instrumentos.py, sin filtrar nada por defecto:
+//
+//      cuerpo de la ÚLTIMA vela de M5 cerrada
+//      cierre de una M1 por encima  -> compra
+//      cierre de una M1 por debajo  -> venta
+//      stop   = extremo de los últimos 10 minutos (incluida la vela de entrada)
+//      objetivo = 1:2
+//      no se repite señal del mismo lado antes de 4 minutos
+//      ventana 08:00-11:30 hora de Madrid; lo que no resuelve dentro, se cierra
+//
+//  Para qué sirve mirarlo:
+//
+//    · la regla dispara unas 35 veces al día. Usted toma de una a tres. O sea
+//      que su operativa NO es la regla: es su selección sobre ella. Eso se ve
+//      de un vistazo aquí y no se ve en ninguna tabla.
+//
+//    · medido sobre 70.381 señales resueltas de EURUSD, 2020-2026:
+//          acierto 31,3 %  ·  geometría pura de un 1:2 = 33,3 %
+//          bruta -0,060 R  ·  coste 0,386 R  ·  neta -0,446 R
+//      el stop mediano son 4,6 pips y el coste se lleva el 38,6 % del riesgo.
+//
+//    · el deslizador de stop mínimo enseña el precio de arreglarlo por las
+//      bravas: con 15 pips el peaje baja al 7,8 %, pero sólo sobrevive el
+//      2,4 % de las señales y su acierto cae al 26,6 %. Neta -0,279 R.
+//      Muévalo y véalo: no hay ningún valor que cruce el cero.
+//
+//  Ponlo en un gráfico de M1. En otra temporalidad no significa nada.
+//
+//  AUDITORÍA CONTRA EL BACKTEST
+//  La lógica de este script se reimplementó barra a barra, con su mismo estado
+//  y el mismo orden de ejecución, y se comparó contra
+//  bt/su_regla_instrumentos.py sobre agosto de 2026:
+//
+//      referencia    734 señales
+//      este script   734 señales
+//      faltan 0 · sobran 0 · coinciden en día, hora, lado, entrada y stop
+//      en 729 de 734
+//
+//  Las 5 restantes difieren SÓLO en el stop y todas caen en los primeros
+//  minutos de la ventana (08:05-08:07). El backtest corta la mirada atrás en
+//  el inicio de la ventana; aquí ta.lowest/ta.highest ven los 10 minutos
+//  reales, incluidos los previos a las 08:00. Este script es el que coincide
+//  con lo que usted ve en pantalla.
+//
+//  Reproducible: scratchpad sim_pine.py, descrito en docs/PINE_su_regla.md
+//
+//  AVISO: escrito sin poder compilarlo aquí. La lógica está auditada, la
+//  sintaxis no. Si TradingView se queja, pega el error tal cual.
+//@version=6
+indicator("Su regla · todas las señales", overlay = true,
+     max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500)
+
+// ─── ajustes ───────────────────────────────────────────────────────────────
+gV = "Ventana"
+tz    = input.string("Europe/Madrid", "Huso horario", group = gV,
+     options = ["Europe/Madrid", "Europe/London", "America/New_York", "UTC"])
+hIni  = input.int(8,  "Empieza a las (hora)",  0, 23, group = gV)
+mIni  = input.int(0,  "        y minuto",      0, 59, group = gV)
+hFin  = input.int(11, "Acaba a las (hora)",    0, 23, group = gV)
+mFin  = input.int(30, "        y minuto",      0, 59, group = gV)
+
+gR = "La regla"
+sep   = input.int(4,  "Minutos sin repetir el mismo lado", 0, 60, group = gR)
+retro = input.int(10, "Minutos hacia atrás para el stop",  1, 60, group = gR)
+rr    = input.float(2.0, "Objetivo (múltiplos del riesgo)", 0.1, 10, 0.1, group = gR)
+
+gF = "Filtro de stop mínimo"
+minPips = input.float(0.0, "Stop mínimo (pips) · 0 = sin filtro", 0, 100, 0.5,
+     group = gF, tooltip = "Medido: con 15 pips sólo pasa el 2,4 % de las " +
+     "señales y el acierto cae del 31,3 % al 26,6 %.")
+soloPasa = input.bool(false, "Ocultar las que no pasan", group = gF)
+
+gD = "Dibujo"
+verCuerpo = input.bool(true,  "Cuerpo de la M5 anterior",     group = gD)
+verCajas  = input.bool(true,  "Riesgo y objetivo de cada señal", group = gD)
+verTabla  = input.bool(true,  "Tabla de recuento",            group = gD)
+cCompra = input.color(color.new(#2a78d6, 0), "Compra", group = gD, inline = "c")
+cVenta  = input.color(color.new(#eb6834, 0), "Venta",  group = gD, inline = "c")
+cGris   = input.color(color.new(#8b95a1, 40), "Descartada", group = gD)
+
+// ─── ventana ───────────────────────────────────────────────────────────────
+int hAct = hour(time, tz)
+int mAct = minute(time, tz)
+int mDia = hAct * 60 + mAct
+dentro = mDia >= hIni * 60 + mIni and mDia <= hFin * 60 + mFin
+bool nuevoDia = na(time[1]) or dayofmonth(time, tz) != dayofmonth(time[1], tz)
+
+float pip = syminfo.type == "forex" ? syminfo.mintick * 10 : syminfo.mintick
+
+// ─── cuerpo de la última M5 CERRADA, construido desde el propio M1 ──────────
+// El cubo de 5 minutos se cierra cuando cambia el índice; sólo cuentan las
+// velas de dentro de la ventana, igual que en el backtest.
+var int   cuboAct = na          // índice del cubo en curso
+var float aOpen   = na          // apertura del cubo en curso
+var float aClose  = na          // último cierre del cubo en curso
+var int   cuboPre = na          // índice del último cubo CERRADO
+var float pOpen   = na
+var float pClose  = na
+
+if nuevoDia
+    cuboAct := na
+    aOpen   := na
+    aClose  := na
+    cuboPre := na
+    pOpen   := na
+    pClose  := na
+
+if dentro
+    int c = math.floor(mDia / 5)
+    if na(cuboAct)
+        cuboAct := c
+        aOpen   := open
+        aClose  := close
+    else if c != cuboAct
+        cuboPre := cuboAct                    // el cubo anterior acaba de cerrar
+        pOpen   := aOpen
+        pClose  := aClose
+        cuboAct := c
+        aOpen   := open
+        aClose  := close
+    else
+        aClose  := close
+
+// el cuerpo sólo vale si el cubo cerrado es EXACTAMENTE el inmediatamente previo
+bool hayCuerpo = dentro and not na(cuboPre) and cuboPre == math.floor(mDia / 5) - 1
+float cLo = hayCuerpo ? math.min(pOpen, pClose) : na
+float cHi = hayCuerpo ? math.max(pOpen, pClose) : na
+
+plot(verCuerpo and hayCuerpo ? cHi : na, "Cuerpo M5 · techo", cGris, 1,
+     plot.style_stepline)
+plot(verCuerpo and hayCuerpo ? cLo : na, "Cuerpo M5 · suelo",  cGris, 1,
+     plot.style_stepline)
+
+// ─── el disparo ────────────────────────────────────────────────────────────
+var int ultMin  = -999
+var int ultLado = 0
+if nuevoDia
+    ultMin  := -999
+    ultLado := 0
+
+int lado = hayCuerpo ? (close > cHi ? 1 : close < cLo ? -1 : 0) : 0
+bool repetida = lado != 0 and mDia - ultMin < sep and lado == ultLado
+bool dispara  = lado != 0 and not repetida
+
+float stop = lado > 0 ? ta.lowest(low, retro) : ta.highest(high, retro)
+float ent  = close
+float rgo  = math.abs(ent - stop)
+float obj  = ent + lado * rr * rgo
+bool  vale = dispara and rgo > 0
+float rgoP = rgo / pip
+bool  pasa = vale and rgoP >= minPips
+bool  pinta = vale and (pasa or not soloPasa)
+
+if vale
+    ultMin  := mDia
+    ultLado := lado
+
+// ─── operaciones vivas, para resolverlas hacia delante ─────────────────────
+var array<int>   opLado = array.new<int>()
+var array<float> opStop = array.new<float>()
+var array<float> opObj  = array.new<float>()
+var array<box>   opCaja = array.new<box>()
+var array<line>  opLin  = array.new<line>()
+var array<bool>  opPasa = array.new<bool>()
+
+var int nTot   = 0
+var int nPasa  = 0
+var int nTP    = 0
+var int nSL    = 0
+var int nFuera = 0
+var int nTPf   = 0
+var int nSLf   = 0
+
+// Se resuelve ANTES de crear: si no, una senal podria cerrarse contra su
+// propia vela de entrada, que es mirar al futuro. En el backtest la
+// busqueda empieza en k+1.
+// resolver: primer toque de stop u objetivo, en velas POSTERIORES a la entrada
+if array.size(opLado) > 0
+    for i = array.size(opLado) - 1 to 0
+        int   L = array.get(opLado, i)
+        float S = array.get(opStop, i)
+        float O = array.get(opObj,  i)
+        bool  P = array.get(opPasa, i)
+        bool  tocaS = L > 0 ? low  <= S : high >= S
+        bool  tocaO = L > 0 ? high >= O : low  <= O
+        // fin de ventana: lo que no ha resuelto se cierra, como en el backtest
+        bool  fin = not dentro or barstate.islast
+        if tocaS or tocaO or fin
+            string res = tocaS and tocaO ? "SL" : tocaS ? "SL" : tocaO ? "TP" : "fuera"
+            if res == "TP"
+                nTP := nTP + 1
+                if P
+                    nTPf := nTPf + 1
+            else if res == "SL"
+                nSL := nSL + 1
+                if P
+                    nSLf := nSLf + 1
+            else
+                nFuera := nFuera + 1
+            box b = array.get(opCaja, i)
+            line l = array.get(opLin,  i)
+            if not na(b)
+                box.set_right(b, bar_index)
+                if res != "TP"
+                    box.set_bgcolor(b, color.new(#d03b3b, 85))
+                    box.set_border_color(b, color.new(#d03b3b, 30))
+            if not na(l)
+                line.set_x2(l, bar_index)
+                if res == "TP"
+                    line.set_color(l, color.new(#0ca30c, 0))
+                    line.set_style(l, line.style_solid)
+            array.remove(opLado, i)
+            array.remove(opStop, i)
+            array.remove(opObj,  i)
+            array.remove(opCaja, i)
+            array.remove(opLin,  i)
+            array.remove(opPasa, i)
+        else if not na(array.get(opCaja, i))
+            box.set_right(array.get(opCaja, i), bar_index)
+            line.set_x2(array.get(opLin, i),  bar_index)
+
+if pinta
+    nTot := nTot + 1
+    if pasa
+        nPasa := nPasa + 1
+    color cc = pasa ? (lado > 0 ? cCompra : cVenta) : cGris
+    box caja = na
+    line lin = na
+    if verCajas and pasa
+        caja := box.new(bar_index, ent, bar_index, stop, border_color = cc,
+             border_width = 1, bgcolor = color.new(cc, 88))
+        lin  := line.new(bar_index, obj, bar_index, obj, color = cc, width = 1,
+             style = line.style_dotted)
+    array.push(opLado, lado)
+    array.push(opStop, stop)
+    array.push(opObj,  obj)
+    array.push(opCaja, caja)
+    array.push(opLin,  lin)
+    array.push(opPasa, pasa)
+
+// ─── las flechas ───────────────────────────────────────────────────────────
+plotshape(pinta and lado > 0 and pasa,  "Compra", shape.triangleup,
+     location.belowbar, cCompra, size = size.tiny)
+plotshape(pinta and lado < 0 and pasa,  "Venta",  shape.triangledown,
+     location.abovebar, cVenta,  size = size.tiny)
+plotshape(pinta and lado > 0 and not pasa, "Compra descartada", shape.circle,
+     location.belowbar, cGris, size = size.auto)
+plotshape(pinta and lado < 0 and not pasa, "Venta descartada",  shape.circle,
+     location.abovebar, cGris, size = size.auto)
+
+// ─── la tabla ──────────────────────────────────────────────────────────────
+var table T = table.new(position.top_right, 2, 7, border_width = 1)
+if verTabla and barstate.islast
+    int res = nTP + nSL
+    float ac = res > 0 ? nTP / res : na
+    int resf = nTPf + nSLf
+    float acf = resf > 0 ? nTPf / resf : na
+    float geo = 1.0 / (1.0 + rr)
+    table.cell(T, 0, 0, "en el gráfico", text_size = size.small, bgcolor = color.new(#8b95a1, 80))
+    table.cell(T, 1, 0, "",              text_size = size.small, bgcolor = color.new(#8b95a1, 80))
+    table.cell(T, 0, 1, "señales",  text_size = size.small)
+    table.cell(T, 1, 1, str.tostring(nTot), text_size = size.small)
+    table.cell(T, 0, 2, "resueltas TP / SL", text_size = size.small)
+    table.cell(T, 1, 2, str.tostring(nTP) + " / " + str.tostring(nSL), text_size = size.small)
+    table.cell(T, 0, 3, "sin resolver", text_size = size.small)
+    table.cell(T, 1, 3, str.tostring(nFuera), text_size = size.small)
+    table.cell(T, 0, 4, "acierto", text_size = size.small)
+    table.cell(T, 1, 4, na(ac) ? "-" : str.tostring(ac * 100, "#.#") + " %",
+         text_size = size.small,
+         text_color = na(ac) ? color.gray : ac > geo ? #0ca30c : #d03b3b)
+    table.cell(T, 0, 5, "el que da CERO bruto", text_size = size.small)
+    table.cell(T, 1, 5, str.tostring(geo * 100, "#.#") + " %", text_size = size.small)
+    table.cell(T, 0, 6, minPips > 0 ? "pasan el filtro" : "sin filtro", text_size = size.small)
+    table.cell(T, 1, 6, minPips > 0 ? str.tostring(nPasa) + "  (" +
+         (nTot > 0 ? str.tostring(100.0 * nPasa / nTot, "#.#") : "0") + " %)" +
+         (na(acf) ? "" : "  ac " + str.tostring(acf * 100, "#.#") + " %") : "-",
+         text_size = size.small)

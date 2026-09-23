@@ -1,0 +1,27 @@
+========================================================================
+CUÁNTAS CAPTURAS DE TP PRODUCE UNA ESTRATEGIA QUE PIERDE DINERO
+========================================================================
+
+  A · regla del nivel de Asia (medida: -0,685 R por sesión, PERDEDORA)
+    de 500 personas, tras 20 mañanas:
+      acaban el mes en verde ............    5  (1 %)
+      con mas del +4 % .................    0  (0 %)
+      con mas del +8 % (pasan la fase 1)     0  (0 %)
+      media real de la estrategia ...... -13.4 %
+
+  B · una moneda perfecta con coste (33,3 % a 1:2, stop de 6 pips)
+    de 500 personas, tras 20 mañanas:
+      acaban el mes en verde ............   83  (17 %)
+      con mas del +4 % .................   31  (6 %)
+      con mas del +8 % (pasan la fase 1)    13  (3 %)
+      media real de la estrategia ...... -6.6 %
+
+========================================================================
+Y LAS RACHAS DE OPERACIONES SUELTAS
+========================================================================
+  moneda a 1:2 (33,3 %)              · 3 TP seguidos: 1 de cada 27 intentos  ·  en 500 personas x 30 operaciones: 556 veces al mes
+  moneda a 1:2 (33,3 %)              · 5 TP seguidos: 1 de cada 243 intentos  ·  en 500 personas x 30 operaciones: 62 veces al mes
+  moneda a 1:2 (33,3 %)              · 8 TP seguidos: 1 de cada 6,561 intentos  ·  en 500 personas x 30 operaciones: 2 veces al mes
+  la regla de Asia (22,2 % medido)   · 3 TP seguidos: 1 de cada 91 intentos  ·  en 500 personas x 30 operaciones: 164 veces al mes
+  la regla de Asia (22,2 % medido)   · 5 TP seguidos: 1 de cada 1,855 intentos  ·  en 500 personas x 30 operaciones: 8 veces al mes
+  la regla de Asia (22,2 % medido)   · 8 TP seguidos: 1 de cada 169,503 intentos  ·  en 500 personas x 30 operaciones: 0 veces al mes

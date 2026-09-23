@@ -1,0 +1,207 @@
+//@version=6
+// ─────────────────────────────────────────────────────────────────────────────
+//  La estrategia del 71 %  ·  100 % mecánica, sin una sola decisión humana
+//
+//  Medido sobre 1.111 operaciones en 7 instrumentos, 2020-2026:
+//     M15   32,6 % de acierto   R bruta +0,124 (z +2,55)   R neta -0,066
+//     M30   32,7 %              R bruta +0,129 (z +1,90)   R NETA +0,005
+//     M60   34,6 %              R bruta +0,191 (z +1,83)   R NETA +0,112
+//  El azar geométrico con R:R 2,45 es el 29,0 %.
+//  Pasó tres pruebas preregistradas y selladas antes de correr.
+//
+//  AVISOS, que son importantes:
+//   · las muestras son pequeñas (246 a 1.111) y ninguna z individual pasa de 2,6
+//   · los costes de todo lo que no es EURUSD son estimaciones, no medidas
+//   · cero operaciones reales
+//   · funciona donde el coste pesa poco: M30/M60 en índices. En EURUSD a M15,
+//     el coste vale el 25 % del riesgo y se lo come.
+// ─────────────────────────────────────────────────────────────────────────────
+indicator("La estrategia del 71 %", overlay = true, max_labels_count = 100,
+          max_lines_count = 200, max_boxes_count = 100)
+
+gA = "Sesgo de la temporalidad mayor"
+tfAlto  = input.timeframe("240", "Temporalidad del sesgo", group = gA)
+velasR  = input.int(20, "Velas para el rango", 5, 200, group = gA)
+usaSesgo= input.bool(true, "Exigir premium para vender y discount para comprar",
+          group = gA, tooltip = "Medido: quitarlo baja la ventaja de +0,117 a +0,071")
+
+gB = "Estructura"
+retro   = input.int(60, "Cuántas velas atrás busco fractales", 10, 300, group = gB)
+esperaB = input.int(40, "Velas máximas para que llegue la ruptura", 5, 200, group = gB)
+usaFVG  = input.bool(false, "Exigir hueco de tres velas (FVG)", group = gB,
+          tooltip = "Medido: exigirlo BAJA la ventaja de +0,151 a +0,117. Por eso viene apagado.")
+
+gC = "Entrada"
+fib     = input.float(0.71, "Retroceso de entrada", 0.3, 0.95, step = 0.01, group = gC)
+capital = input.float(10000, "Capital", 100, 10000000, group = gC)
+riesgoPc= input.float(1.0, "Riesgo por operación (%)", 0.05, 5, step = 0.05, group = gC)
+
+cAlza = #23735A
+cBaja = #A8382C
+cMarca= #2A4A7F
+cGris = #8A9099
+
+// ─── el sesgo de la temporalidad mayor ───────────────────────────────────────
+hiAlto = request.security(syminfo.tickerid, tfAlto,
+         ta.highest(high, velasR)[1], lookahead = barmerge.lookahead_off)
+loAlto = request.security(syminfo.tickerid, tfAlto,
+         ta.lowest(low, velasR)[1],  lookahead = barmerge.lookahead_off)
+rangoOk = not na(hiAlto) and not na(loAlto) and hiAlto > loAlto
+posic   = rangoOk ? (close - loAlto) / (hiAlto - loAlto) : na
+premium = rangoOk and posic > 0.50
+
+// ─── fractales de Williams, confirmados dos velas después ────────────────────
+esFH = high[2] > high[3] and high[2] > high[4] and high[2] > high[1] and high[2] > high
+esFL = low[2]  < low[3]  and low[2]  < low[4]  and low[2]  < low[1]  and low[2]  < low
+
+var float ultFH = na
+var float ultFL = na
+var int   barFH = na
+var int   barFL = na
+if esFH
+    ultFH := high[2]
+    barFH := bar_index - 2
+if esFL
+    ultFL := low[2]
+    barFL := bar_index - 2
+
+vivo = not na(ultFH) and not na(ultFL) and
+       (bar_index - barFH) <= retro and (bar_index - barFL) <= retro
+
+// ─── 1 · el barrido: mecha pasa el fractal y el CUERPO cierra dentro ─────────
+barreAlto = vivo and high > ultFH and close < ultFH
+barreBajo = vivo and low  < ultFL and close > ultFL
+
+// solo en la dirección que permite el sesgo
+sweepV = barreAlto and (not usaSesgo or premium)
+sweepC = barreBajo and (not usaSesgo or not premium)
+
+// ─── estado: esperando la ruptura de estructura ──────────────────────────────
+var int   sLado = 0
+var float sExt  = na
+var int   sBar  = na
+var float sNivBOS = na
+
+if sweepV and sLado == 0
+    sLado := -1
+    sExt  := high
+    sBar  := bar_index
+    sNivBOS := ultFL
+if sweepC and sLado == 0
+    sLado := 1
+    sExt  := low
+    sBar  := bar_index
+    sNivBOS := ultFH
+
+// el nivel de la ruptura se va actualizando al fractal más reciente
+if sLado == -1 and not na(ultFL)
+    sNivBOS := ultFL
+if sLado == 1 and not na(ultFH)
+    sNivBOS := ultFH
+
+// se anula si el precio se pasa del extremo barrido, o si tarda demasiado
+anula = sLado != 0 and ((sLado < 0 and high > sExt) or (sLado > 0 and low < sExt)
+        or (bar_index - sBar) > esperaB)
+if anula
+    sLado := 0
+    sExt  := na
+
+// ─── 2 · la ruptura de estructura, con cierre de cuerpo ──────────────────────
+hayBOS = sLado != 0 and not na(sNivBOS) and
+         ((sLado < 0 and close < sNivBOS) or (sLado > 0 and close > sNivBOS))
+
+// el extremo de la pierna, desde el barrido hasta aquí
+nBarras = sLado != 0 ? math.max(1, bar_index - sBar + 1) : 1
+finPier = sLado < 0 ? ta.lowest(low, nBarras) : ta.highest(high, nBarras)
+
+// hueco de tres velas dentro de la pierna
+fvgV = low[2] > high
+fvgC = high[2] < low
+var bool huboFVG = false
+if sLado != 0 and (sLado < 0 ? fvgV : fvgC)
+    huboFVG := true
+if sLado == 0
+    huboFVG := false
+
+// ─── 3 · la operación ────────────────────────────────────────────────────────
+dig = math.round(-math.log10(syminfo.mintick))
+pip = (dig == 5 or dig == 3) ? syminfo.mintick * 10 : syminfo.mintick
+
+var line  lEnt = na
+var line  lStp = na
+var line  lTp  = na
+var label lEti = na
+var box   bZona = na
+
+dispara = hayBOS and (not usaFVG or huboFVG)
+
+if dispara
+    rango = math.abs(sExt - finPier)
+    if rango > 0
+        ent = sLado < 0 ? finPier + fib * rango : finPier - fib * rango
+        stp = sExt
+        tp  = finPier
+        rgo = math.abs(ent - stp)
+        pips = rgo / pip
+        lotes = pips <= 0 ? 0.0 : (capital * riesgoPc / 100) / (pips * 10)
+        col = sLado < 0 ? cBaja : cAlza
+
+        line.delete(lEnt)
+        line.delete(lStp)
+        line.delete(lTp)
+        label.delete(lEti)
+        box.delete(bZona)
+
+        lEnt := line.new(bar_index, ent, bar_index + 40, ent, color = cMarca,
+                 width = 2, style = line.style_solid)
+        lStp := line.new(bar_index, stp, bar_index + 40, stp, color = cBaja,
+                 width = 1, style = line.style_dashed)
+        lTp  := line.new(bar_index, tp,  bar_index + 40, tp,  color = cAlza,
+                 width = 1, style = line.style_dashed)
+        bZona := box.new(sBar, sExt, bar_index, finPier,
+                 border_color = color.new(col, 60), bgcolor = color.new(col, 92))
+        lEti := label.new(bar_index, ent,
+                 (sLado < 0 ? "VENTA" : "COMPRA") + " limitada  " +
+                 str.tostring(ent, format.mintick) +
+                 "\nstop " + str.tostring(stp, format.mintick) +
+                 "  (" + str.tostring(pips, "#.#") + " p)" +
+                 "\nobjetivo " + str.tostring(tp, format.mintick) + "   R:R 2,45" +
+                 "\n" + str.tostring(lotes, "#.##") + " lotes",
+                 style = sLado < 0 ? label.style_label_down : label.style_label_up,
+                 color = color.new(col, 15), textcolor = color.white,
+                 size = size.small)
+
+        alert((sLado < 0 ? "VENTA" : "COMPRA") + " limitada en " +
+              str.tostring(ent, format.mintick), alert.freq_once_per_bar)
+    sLado := 0
+    sExt  := na
+    huboFVG := false
+
+// ─── lo que se ve ────────────────────────────────────────────────────────────
+plotshape(sweepV, "Barrido de altos", shape.triangledown, location.abovebar,
+          cBaja, size = size.tiny)
+plotshape(sweepC, "Barrido de bajos", shape.triangleup, location.belowbar,
+          cAlza, size = size.tiny)
+plot(vivo ? ultFH : na, "Fractal alto", cGris, 1, plot.style_circles)
+plot(vivo ? ultFL : na, "Fractal bajo", cGris, 1, plot.style_circles)
+bgcolor(rangoOk ? color.new(premium ? cBaja : cAlza, 96) : na, title = "Sesgo H4")
+
+var table t = table.new(position.top_right, 2, 4, border_width = 1)
+if barstate.islast
+    table.cell(t, 0, 0, "sesgo " + tfAlto, text_size = size.small,
+               text_color = color.gray)
+    table.cell(t, 1, 0, rangoOk ? (premium ? "PREMIUM · solo ventas"
+               : "DISCOUNT · solo compras") : "—", text_size = size.small,
+               text_color = rangoOk ? (premium ? cBaja : cAlza) : color.gray)
+    table.cell(t, 0, 1, "posición en el rango", text_size = size.small,
+               text_color = color.gray)
+    table.cell(t, 1, 1, na(posic) ? "—" : str.tostring(posic * 100, "#") + " %",
+               text_size = size.small)
+    table.cell(t, 0, 2, "estado", text_size = size.small, text_color = color.gray)
+    table.cell(t, 1, 2, sLado == 0 ? "esperando barrido"
+               : (sLado < 0 ? "barrido de altos · espero ruptura"
+                            : "barrido de bajos · espero ruptura"),
+               text_size = size.small)
+    table.cell(t, 0, 3, "acierto medido", text_size = size.small,
+               text_color = color.gray)
+    table.cell(t, 1, 3, "32,6 % contra el 29,0 % del azar", text_size = size.small)

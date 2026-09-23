@@ -1,0 +1,265 @@
+<title>El pasillo de las dos puertas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --suelo:#e9edf1; --panel:#fdfefe; --panel2:#f3f6f9; --linea:#d3dbe3;
+  --tinta:#141a20; --tinta2:#57646f; --tinta3:#8a97a3;
+  --verde:#1c7f48; --verde-f:#dcefe3; --rojo:#bf4038; --rojo-f:#f7e2e0;
+  --azul:#2c6fb5; --sombra:0 1px 2px rgba(20,30,45,.06), 0 2px 8px rgba(20,30,45,.05);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --suelo:#0f1318; --panel:#171d24; --panel2:#1d242c; --linea:#2a333c;
+  --tinta:#eef3f7; --tinta2:#a4b1bd; --tinta3:#6b7883;
+  --verde:#3fa96a; --verde-f:#16301f; --rojo:#d9605a; --rojo-f:#331a18;
+  --azul:#4c8fd4; --sombra:0 1px 2px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --suelo:#0f1318; --panel:#171d24; --panel2:#1d242c; --linea:#2a333c;
+  --tinta:#eef3f7; --tinta2:#a4b1bd; --tinta3:#6b7883;
+  --verde:#3fa96a; --verde-f:#16301f; --rojo:#d9605a; --rojo-f:#331a18;
+  --azul:#4c8fd4; --sombra:0 1px 2px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--suelo);color:var(--tinta);
+     font:400 16px/1.6 "IBM Plex Sans",system-ui,-apple-system,sans-serif;
+     padding:0 16px;padding-block:28px 44px}
+.env{max-width:840px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font:700 30px/1.15 Archivo,system-ui,sans-serif;margin:0;text-wrap:balance;letter-spacing:-.02em}
+.tesis{margin:0;color:var(--tinta2);font-size:17px;max-width:62ch}
+.tesis b{color:var(--tinta)}
+
+.tarjeta{background:var(--panel);border:1px solid var(--linea);border-radius:12px;
+         box-shadow:var(--sombra);padding:20px}
+.rotulo{font:600 11px/1 "IBM Plex Mono",monospace;letter-spacing:.11em;
+        text-transform:uppercase;color:var(--tinta3);margin:0 0 14px}
+
+/* ---- el pasillo ---- */
+.pasillo{position:relative;height:132px;margin:6px 0 4px;
+         background:var(--panel2);border-radius:10px;overflow:hidden}
+.franja{position:absolute;left:0;right:0;top:50%;height:2px;background:var(--linea)}
+.puerta{position:absolute;top:14px;bottom:14px;width:12px;border-radius:3px}
+.puerta.v{background:var(--verde)} .puerta.r{background:var(--rojo)}
+.pet{position:absolute;top:10px;font:600 11px/1 "IBM Plex Mono",monospace;
+     letter-spacing:.06em;white-space:nowrap}
+.pet.r{left:14px} .pet.v{right:14px}
+.pet.v{color:var(--verde)} .pet.r{color:var(--rojo)}
+.tu{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;
+    background:var(--azul);transform:translate(-50%,-50%);z-index:3;
+    box-shadow:0 0 0 3px var(--panel2)}
+.tu-et{position:absolute;bottom:8px;font:600 11px/1 "IBM Plex Mono",monospace;
+       color:var(--azul);transform:translateX(-50%)}
+.rastro{position:absolute;top:50%;height:2px;background:var(--azul);opacity:.28;
+        transform:translateY(-50%)}
+
+/* ---- mandos ---- */
+.mandos{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:560px){.mandos{grid-template-columns:1fr}}
+.mando label{display:flex;justify-content:space-between;align-items:baseline;
+             font:600 13px/1 "IBM Plex Sans",sans-serif;margin-bottom:9px}
+.mando .val{font:600 15px/1 "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.mando.v label{color:var(--verde)} .mando.r label{color:var(--rojo)}
+input[type=range]{width:100%;accent-color:var(--azul);height:26px;cursor:pointer}
+.mando.v input{accent-color:var(--verde)} .mando.r input{accent-color:var(--rojo)}
+
+/* ---- resultado ---- */
+.grande{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--linea);
+        border:1px solid var(--linea);border-radius:12px;overflow:hidden;margin-top:4px}
+@media(max-width:560px){.grande{grid-template-columns:1fr}}
+.caja{background:var(--panel);padding:18px 20px}
+.caja .k{font:600 11px/1 "IBM Plex Mono",monospace;letter-spacing:.09em;
+         text-transform:uppercase;color:var(--tinta3)}
+.caja .n{font:600 38px/1.05 Archivo,sans-serif;margin-top:9px;letter-spacing:-.02em;
+         font-variant-numeric:tabular-nums}
+.caja .n.ok{color:var(--verde)}
+.caja .p{font-size:13.5px;color:var(--tinta2);margin-top:7px;line-height:1.45}
+
+/* ---- cuentas ---- */
+.cuenta{font:400 14.5px/1.85 "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+        background:var(--panel2);border-radius:9px;padding:15px 17px;margin-top:16px;
+        overflow-x:auto}
+.cuenta .g{color:var(--verde)} .cuenta .p{color:var(--rojo)}
+.cuenta hr{border:0;border-top:1px solid var(--linea);margin:7px 0}
+.cuenta .tot{font-weight:600}
+
+/* ---- simulacion ---- */
+.sim{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:4px}
+button{font:600 14px/1 Archivo,sans-serif;padding:12px 20px;border-radius:9px;
+       border:1px solid var(--tinta);background:var(--tinta);color:var(--panel);
+       cursor:pointer;transition:opacity .15s}
+button:hover{opacity:.85} button:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.marcador{font:600 15px/1.5 "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+          color:var(--tinta2)}
+.marcador b{color:var(--tinta);font-size:19px}
+
+/* ---- tabla real ---- */
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{text-align:right;padding:9px 10px;border-bottom:1px solid var(--linea)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.07em;
+   text-transform:uppercase;color:var(--tinta3)}
+td{font-variant-numeric:tabular-nums}
+td.m{font-family:"IBM Plex Mono",monospace}
+tr:last-child td{border-bottom:0}
+.tw{overflow-x:auto}
+.nota{font-size:13.5px;color:var(--tinta3);line-height:1.6;margin:0}
+.cierre{border-left:3px solid var(--azul);padding:4px 0 4px 16px;margin:0;
+        font-size:16.5px;color:var(--tinta);max-width:60ch}
+</style>
+
+<div class="env">
+
+  <div>
+    <h1>El pasillo de las dos puertas</h1>
+    <p class="tesis">Vas dando tumbos por un pasillo, un paso al azar cada vez. Hay una puerta
+       delante y otra detrás. <b>Llegas antes a la que está más cerca</b> — y eso no tiene
+       ningún mérito. Mueve las puertas y mira qué pasa con el porcentaje. Y con el dinero.</p>
+  </div>
+
+  <div class="tarjeta">
+    <p class="rotulo">El pasillo</p>
+    <div class="pasillo" id="pasillo">
+      <div class="franja"></div>
+      <div class="rastro" id="rastro"></div>
+      <div class="puerta r" id="pr"></div>
+      <div class="puerta v" id="pv"></div>
+      <div class="pet r" id="er">stop</div>
+      <div class="pet v" id="ev">objetivo</div>
+      <div class="tu" id="tu"></div>
+      <div class="tu-et" id="tue">entras aquí</div>
+    </div>
+
+    <div class="mandos">
+      <div class="mando v">
+        <label for="obj"><span>Objetivo · la puerta de delante</span><span class="val" id="vobj">12 pasos</span></label>
+        <input type="range" id="obj" min="1" max="100" value="12">
+      </div>
+      <div class="mando r">
+        <label for="stop"><span>Stop · la puerta de detrás</span><span class="val" id="vstop">20 pasos</span></label>
+        <input type="range" id="stop" min="1" max="100" value="20">
+      </div>
+    </div>
+  </div>
+
+  <div class="grande">
+    <div class="caja">
+      <div class="k">Aciertas</div>
+      <div class="n ok" id="nAcierto">62,5 %</div>
+      <p class="p" id="pAcierto">Llegas a la puerta verde antes que a la roja en 62 de cada 100 intentos. Sin adivinar nada.</p>
+    </div>
+    <div class="caja">
+      <div class="k">Ganas</div>
+      <div class="n" id="nDinero">0,0 pips</div>
+      <p class="p">Por cada 100 operaciones. Muevas las puertas donde las muevas, esto se queda clavado en cero.</p>
+    </div>
+  </div>
+
+  <div class="tarjeta">
+    <p class="rotulo">La cuenta, con 100 operaciones</p>
+    <div class="cuenta" id="cuenta"></div>
+    <p class="nota" style="margin-top:12px">Ganas poco muchas veces, o mucho pocas veces. Siempre sale lo mismo.</p>
+  </div>
+
+  <div class="tarjeta">
+    <p class="rotulo">Y que no es una fórmula mía</p>
+    <p class="tesis" style="margin:0 0 16px;font-size:16px">Suelta borrachos de verdad en el pasillo.
+       Cada uno da pasos al azar hasta que toca una puerta. Nadie sabe nada, nadie predice nada.</p>
+    <div class="sim">
+      <button id="btn">Soltar 2.000 borrachos</button>
+      <div class="marcador" id="marcador">todavía no has soltado ninguno</div>
+    </div>
+  </div>
+
+  <div class="tarjeta">
+    <p class="rotulo">Lo que salió en el proyecto</p>
+    <div class="tw"><table>
+      <thead><tr><th>Qué se midió</th><th>Le tocaba</th><th>Sacó</th><th>Diferencia</th></tr></thead>
+      <tbody>
+        <tr><td>Entradas <b>al azar</b> · 7,2 / 20,0</td><td class="m">26,5 %</td><td class="m">25,4 %</td><td class="m">−1,1</td></tr>
+        <tr><td>Entradas <b>al azar</b> · 10,6 / 18,7</td><td class="m">36,2 %</td><td class="m">36,3 %</td><td class="m">+0,1</td></tr>
+        <tr><td>Entradas <b>al azar</b> · 20,0 / 11,0</td><td class="m">64,5 %</td><td class="m">63,4 %</td><td class="m">−1,1</td></tr>
+        <tr><td><b>AMD + FVG</b> (EURUSD, 367 ops)</td><td class="m">64,2 %</td><td class="m">63,8 %</td><td class="m">−0,4</td></tr>
+        <tr><td><b>Tu regla de la EMA</b> (9.506 ops)</td><td class="m">76,5 %</td><td class="m">75,0 %</td><td class="m">−1,5</td></tr>
+      </tbody>
+    </table></div>
+    <p class="nota" style="margin-top:14px">Las tres primeras son entradas en minutos al azar del histórico:
+       ni caja, ni finta, ni hueco, ni media móvil. Salen igual que las otras dos.</p>
+  </div>
+
+  <p class="cierre">Por eso «tengo un 80&nbsp;% de acierto» no dice nada hasta que sepas
+     a cuántos pasos puso las dos puertas. Lo único que valdría es <b>llegar a la verde más veces
+     de las que te tocan</b>. Eso no lo hemos encontrado ni una vez en 30 mediciones.</p>
+
+</div>
+
+<script>
+(function(){
+  var obj=document.getElementById('obj'), stop=document.getElementById('stop');
+  var vobj=document.getElementById('vobj'), vstop=document.getElementById('vstop');
+  var pv=document.getElementById('pv'), pr=document.getElementById('pr');
+  var ev=document.getElementById('ev'), er=document.getElementById('er');
+  var tu=document.getElementById('tu'), tue=document.getElementById('tue');
+  var rastro=document.getElementById('rastro');
+  var nA=document.getElementById('nAcierto'), pA=document.getElementById('pAcierto');
+  var nD=document.getElementById('nDinero'), cuenta=document.getElementById('cuenta');
+  var btn=document.getElementById('btn'), marc=document.getElementById('marcador');
+
+  function num(x,d){ return x.toFixed(d===undefined?1:d).replace('.',','); }
+
+  function pinta(){
+    var A=+obj.value, B=+stop.value;
+    vobj.textContent = A+' paso'+(A===1?'':'s');
+    vstop.textContent = B+' paso'+(B===1?'':'s');
+
+    // el pasillo: 6% a cada lado de margen, tu posicion segun el reparto
+    var tot=A+B, izq=6, der=94, ancho=der-izq;
+    var xTu = izq + ancho*(B/tot);
+    pr.style.left = izq+'%'; pv.style.left = 'calc('+der+'% - 12px)';
+    tu.style.left = xTu+'%'; tue.style.left = xTu+'%';
+    rastro.style.left = izq+'%'; rastro.style.width = ancho+'%';
+    er.textContent = 'stop · '+B; ev.textContent = A+' · objetivo';
+
+    var p = B/tot;                       // probabilidad de llegar antes a la verde
+    nA.textContent = num(100*p)+' %';
+    pA.textContent = 'Llegas a la puerta verde antes que a la roja en '+Math.round(100*p)+
+                     ' de cada 100 intentos. Sin adivinar nada.';
+
+    var g = 100*p*A, per = 100*(1-p)*B, neto = g-per;
+    nD.textContent = (neto>=0?'+':'−')+num(Math.abs(neto))+' pips';
+    cuenta.innerHTML =
+      '<div class="g">'+num(100*p)+' ganadas × '+A+' pasos &nbsp;=&nbsp; +'+num(g,0)+'</div>'+
+      '<div class="p">'+num(100*(1-p))+' perdidas × '+B+' pasos &nbsp;=&nbsp; −'+num(per,0)+'</div>'+
+      '<hr><div class="tot">total de las 100 &nbsp;=&nbsp; '+(neto>=0?'+':'−')+num(Math.abs(neto),0)+'</div>';
+
+    marc.textContent = 'todavía no has soltado ninguno';
+    marc.classList.remove('hecho');
+  }
+
+  function soltar(){
+    var A=+obj.value, B=+stop.value, N=2000, gana=0;
+    btn.disabled=true; marc.textContent='andando…';
+    setTimeout(function(){
+      for(var i=0;i<N;i++){
+        var x=0, t=0, tope=40*(A+B)*(A+B);
+        while(t++<tope){
+          x += (Math.random()<0.5 ? 1 : -1);
+          if(x>=A){ gana++; break; }
+          if(x<=-B){ break; }
+        }
+      }
+      var real=100*gana/N, teo=100*B/(A+B);
+      marc.innerHTML='llegaron a la verde <b>'+num(real)+' %</b> &nbsp;·&nbsp; '+
+                     'les tocaba '+num(teo)+' %';
+      btn.disabled=false;
+    },30);
+  }
+
+  obj.addEventListener('input',pinta);
+  stop.addEventListener('input',pinta);
+  btn.addEventListener('click',soltar);
+  pinta();
+})();
+</script>
