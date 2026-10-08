@@ -1,0 +1,474 @@
+<title>CRT Máster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --papel:#F3F5F8; --tarjeta:#FFFFFF; --hueco:#E8ECF2; --linea:#D6DCE5;
+  --tinta:#141821; --suave:#59616F; --tenue:#89919F;
+  --acento:#2B5FA8; --acento-sua:#E3ECF8;
+  --si:#237A63; --si-sua:#E2F1EC;
+  --no:#A8452C; --no-sua:#F8E8E3;
+  --duda:#8A6410; --duda-sua:#F8F0DC;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --papel:#101318; --tarjeta:#171B22; --hueco:#1D222A; --linea:#292F39;
+  --tinta:#E5E9F0; --suave:#98A0AE; --tenue:#69717F;
+  --acento:#7BA6E0; --acento-sua:#18222F;
+  --si:#48B394; --si-sua:#13251F;
+  --no:#D4705A; --no-sua:#2A1A16;
+  --duda:#D9AC4A; --duda-sua:#2A2416;
+}}
+:root[data-theme="dark"]{
+  --papel:#101318; --tarjeta:#171B22; --hueco:#1D222A; --linea:#292F39;
+  --tinta:#E5E9F0; --suave:#98A0AE; --tenue:#69717F;
+  --acento:#7BA6E0; --acento-sua:#18222F;
+  --si:#48B394; --si-sua:#13251F;
+  --no:#D4705A; --no-sua:#2A1A16;
+  --duda:#D9AC4A; --duda-sua:#2A2416;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--papel);color:var(--tinta);
+  font-family:"Source Serif 4",Georgia,serif;font-size:17.5px;line-height:1.66;
+  -webkit-font-smoothing:antialiased}
+.env{max-width:1120px;margin:0 auto;padding:0 24px 90px}
+.col{max-width:650px}
+h1,h2,h3,h4,.eti{font-family:Archivo,system-ui,sans-serif}
+h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.05;font-weight:800;
+  letter-spacing:-.03em;margin:0 0 16px;text-wrap:balance}
+h2{font-size:1.58rem;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;
+  line-height:1.2;text-wrap:balance}
+h3{font-size:1.05rem;font-weight:600;margin:32px 0 8px}
+p{margin:0 0 16px}
+.eti{font-size:11px;text-transform:uppercase;letter-spacing:.14em;
+  font-weight:700;color:var(--tenue)}
+
+header.port{padding:72px 0 42px;border-bottom:1px solid var(--linea)}
+header.port .sub{font-size:1.2rem;color:var(--suave);max-width:590px;margin:0 0 28px}
+
+.veredicto{background:var(--tarjeta);border:1px solid var(--linea);
+  border-left:4px solid var(--acento);border-radius:9px;padding:22px 26px;max-width:650px}
+.veredicto .eti{color:var(--acento);display:block;margin-bottom:8px}
+.veredicto p{margin:0;font-size:1.03rem}
+
+section{padding:50px 0;border-bottom:1px solid var(--linea)}
+.cabecera{display:flex;gap:19px;align-items:baseline;margin-bottom:24px}
+.num{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--acento);
+  font-weight:600;padding-top:5px;min-width:24px}
+.entradilla{font-size:1.05rem;color:var(--suave);margin:0}
+
+.tw{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;width:100%;font-family:Archivo,sans-serif;font-size:13.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--linea)}
+th{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--tenue)}
+td.n{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+tr.destaca td{background:var(--si-sua)}
+tr.destaca td.n{font-weight:600}
+
+pre{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.62;
+  background:var(--tarjeta);border:1px solid var(--linea);border-radius:9px;
+  padding:18px 20px;overflow-x:auto;margin:22px 0;color:var(--tinta)}
+code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--hueco);
+  padding:1px 5px;border-radius:4px}
+
+.cita{border-left:2.5px solid var(--acento);padding:2px 0 2px 19px;margin:20px 0;font-style:italic}
+.nota{background:var(--hueco);border-radius:9px;padding:16px 19px;margin:20px 0;
+  font-size:.95rem;color:var(--suave)}
+.nota b{color:var(--tinta)}
+.alerta{background:var(--duda-sua);border:1px solid color-mix(in srgb,var(--duda) 32%,transparent);
+  border-radius:9px;padding:16px 19px;margin:20px 0;font-size:.95rem}
+.alerta .eti{color:var(--duda);display:block;margin-bottom:6px}
+
+.fichas{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:16px;margin:26px 0}
+.ficha{background:var(--tarjeta);border:1px solid var(--linea);border-radius:10px;
+  padding:17px 19px;display:flex;flex-direction:column;gap:6px}
+.ficha .top{display:flex;align-items:center;gap:8px}
+.marca{font-family:Archivo,sans-serif;font-size:10.5px;font-weight:700;
+  padding:2px 8px;border-radius:999px;letter-spacing:.06em}
+.m-si{background:var(--si-sua);color:var(--si)}
+.m-no{background:var(--no-sua);color:var(--no)}
+.ficha h4{font-family:Archivo,sans-serif;font-size:.98rem;font-weight:600;margin:0}
+.ficha p{font-size:.9rem;color:var(--suave);margin:0}
+.ficha .dato{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--tenue);margin-top:2px}
+
+ul,ol{margin:0 0 16px;padding-left:21px}
+li{margin:7px 0}
+li::marker{color:var(--tenue)}
+figure{margin:30px 0}
+figure svg{width:100%;height:auto;display:block;color:var(--tinta)}
+figcaption{font-family:Archivo,sans-serif;font-size:13px;color:var(--suave);
+  margin-top:11px;max-width:620px;line-height:1.5}
+.marco{background:var(--tarjeta);border:1px solid var(--linea);border-radius:10px;
+  padding:24px 22px 18px;overflow-x:auto}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="env">
+<header class="port">
+  <div class="col">
+    <span class="eti">Estrategia unificada</span>
+    <h1>CRT Máster</h1>
+    <p class="sub">Todo el material puesto junto, con un criterio para decidir
+    qué entra: lo que midió mejor. No lo que suena mejor.</p>
+  </div>
+  <div class="veredicto">
+    <span class="eti">El resultado, por delante</span>
+    <p>La estrategia máster resultó ser <b>la más simple de todas</b>, operada en
+    <b>temporalidades mucho más altas</b> de las que usa nadie del material. No
+    porque el patrón funcione mejor allí —funciona igual en todas— sino porque
+    allí el coste no se lo come.</p>
+  </div>
+</header>
+
+<section>
+  <div class="cabecera"><span class="num">01</span><div class="col">
+    <h2>El criterio para unificar</h2>
+    <p class="entradilla">Porque «lo mejor de cada uno» puede significar dos
+    cosas muy distintas.</p>
+  </div></div>
+  <div class="col">
+    <p>Podría coger de cada fuente la pieza más elaborada y montarlas todas:
+    contexto diario, doble liquidez, killzones, order block, FVG, confluencia de
+    cuatro temporalidades. Saldría un método impresionante.</p>
+    <p><b>Eso es exactamente cómo se construyeron los métodos que llevamos toda
+    la semana desmontando</b>, y ya sabemos en qué acaba: cada capa que añadí a
+    lo largo de estas pruebas <i>restó</i>. El CRT desnudo rinde +0,075 R; el CRT
+    canónico con todas sus confluencias, +0,025. Tres veces menos.</p>
+    <p>Así que el criterio aquí es otro y es incómodo: <b>entra lo que se midió
+    mejor, aunque sea menos vistoso; se queda fuera lo que no aportó, aunque
+    tenga buena explicación detrás.</b></p>
+  </div>
+</section>
+
+<section>
+  <div class="cabecera"><span class="num">02</span><div class="col">
+    <h2>El inventario, pieza por pieza</h2>
+    <p class="entradilla">Qué entra, qué se queda fuera, y con qué número.</p>
+  </div></div>
+
+  <div class="fichas">
+    <div class="ficha"><div class="top"><span class="marca m-si">ENTRA</span></div>
+      <h4>El patrón de tres velas</h4>
+      <p>Vela base, barrido de un extremo, cierre dentro del cuerpo, objetivo en
+      el extremo opuesto.</p>
+      <span class="dato">+0,082 R bruto · plano en 7 temporalidades</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-si">ENTRA</span></div>
+      <h4>El objetivo estructural</h4>
+      <p>El extremo opuesto de la vela base, no un múltiplo del riesgo. Es lo que
+      produce los R:R altos.</p>
+      <span class="dato">R:R mediano 1,3 · sin filtro adicional</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-si">ENTRA</span></div>
+      <h4>Temporalidad alta</h4>
+      <p>La pieza nueva, y la que lo cambia todo. H12 o diario en vez de M15.</p>
+      <span class="dato">coste 2,3-3,4 % del riesgo, no 14 %</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-si">ENTRA</span></div>
+      <h4>El R:R como cociente</h4>
+      <p>Premio dividido entre riesgo, calculado antes de entrar. No mejoró el
+      acierto, pero es gestión de riesgo sana por sí sola.</p>
+      <span class="dato">no medido como ventaja · sí como disciplina</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-no">FUERA</span></div>
+      <h4>Killzones y horarios</h4>
+      <p>Restan sobre el CRT. Y las ventanas de reversión y continuación no
+      separan nada dentro de sus propias bandas.</p>
+      <span class="dato">−0,2998 sobre CRT · horarios z −0,13 a −1,46</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-no">FUERA</span></div>
+      <h4>Doble y triple liquidez</h4>
+      <p>El gradiente que afirman no existe, y el tercer escalón sale peor que el
+      primero.</p>
+      <span class="dato">triple − simple = +0,006 R · z +0,06</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-no">FUERA</span></div>
+      <h4>La cadena multi-temporalidad</h4>
+      <p>Acumular objetivos de 1D, 12H y 4H antes de entrar en 1H.</p>
+      <span class="dato">0 de 12 celdas · mejor +0,133 → −0,008 recortada</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-no">FUERA</span></div>
+      <h4>El reinicio como disparo</h4>
+      <p>Entrar cuando la temporalidad de ejecución se da la vuelta. Empeora el
+      resultado en vez de mejorarlo.</p>
+      <span class="dato">−0,165 neta · z −2,38 · peor que sin él</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-no">FUERA</span></div>
+      <h4>Order block, FVG, envolvente</h4>
+      <p>Como gatillo de entrada. Las 4 confirmaciones pierden incluso sin coste.</p>
+      <span class="dato">−0,0194 R sin coste · 23 variantes, ninguna positiva</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-no">FUERA</span></div>
+      <h4>Contexto diario y bias</h4>
+      <p>Cinco lecturas distintas del contexto de la diaria; ninguna separa.</p>
+      <span class="dato">|z| entre 0,34 y 1,26 · hacía falta 2,58</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-no">FUERA</span></div>
+      <h4>Correlaciones como confirmación</h4>
+      <p>No confirman: concentran riesgo. Dos pares correlacionados es una
+      operación al doble de tamaño.</p>
+      <span class="dato">EUR pesa 57,6 % del DXY: es el mismo dato</span></div>
+
+    <div class="ficha"><div class="top"><span class="marca m-no">FUERA</span></div>
+      <h4>Fibonacci y mitigación</h4>
+      <p>Entrada por retroceso en M5, zonas mitigadas una sola vez.</p>
+      <span class="dato">IC excluye el coste en 3 de 4 celdas</span></div>
+  </div>
+
+  <div class="col">
+    <div class="nota"><b>Cuatro entran, ocho se quedan fuera.</b> Y las cuatro
+    que entran son las cuatro más simples. Eso no es casualidad ni pereza: es el
+    hallazgo más repetido de toda la investigación.</div>
+  </div>
+</section>
+<section>
+  <div class="cabecera"><span class="num">03</span><div class="col">
+    <h2>La cuenta que lo decide todo</h2>
+    <p class="entradilla">Es una división, y no la había hecho hasta hoy.</p>
+  </div></div>
+  <div class="col">
+    <p>El coste en unidades de riesgo es <code>coste_fijo ÷ riesgo</code>. Un
+    stop de 8 pips con 1,2 pips de coste: el 15 % de lo que arriesgas se va antes
+    de empezar. El mismo stop a 48 pips: el 2,3 %.</p>
+    <p>Toda la semana he medido este patrón en M5, M15 y H1 — donde el stop es
+    una vela pequeña y el coste se lleva entre el 7 y el 15 %. La pregunta que
+    no me había hecho: <b>¿aguanta el patrón cuando el stop es más ancho?</b></p>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>marco</th><th class="n">operaciones</th><th class="n">al año</th>
+      <th class="n">riesgo mediano</th><th class="n">coste %R</th>
+      <th class="n">R bruta</th><th class="n">R neta</th></tr>
+    <tr><td>H1</td><td class="n">47.408</td><td class="n">7.183</td><td class="n">8,1</td><td class="n">14,3 %</td><td class="n">+0,087</td><td class="n">−0,141</td></tr>
+    <tr><td>H2</td><td class="n">23.180</td><td class="n">3.512</td><td class="n">11,7</td><td class="n">9,9 %</td><td class="n">+0,132</td><td class="n">−0,024</td></tr>
+    <tr><td>H4</td><td class="n">11.392</td><td class="n">1.726</td><td class="n">17,2</td><td class="n">6,7 %</td><td class="n">+0,075</td><td class="n">−0,030</td></tr>
+    <tr><td>H6</td><td class="n">6.973</td><td class="n">1.057</td><td class="n">21,1</td><td class="n">5,4 %</td><td class="n">+0,065</td><td class="n">−0,017</td></tr>
+    <tr><td>H8</td><td class="n">4.930</td><td class="n">747</td><td class="n">25,3</td><td class="n">4,6 %</td><td class="n">+0,064</td><td class="n">−0,006</td></tr>
+    <tr class="destaca"><td><b>H12</b></td><td class="n">3.108</td><td class="n">471</td><td class="n">32,5</td><td class="n">3,4 %</td><td class="n">+0,125</td><td class="n"><b>+0,072</b></td></tr>
+    <tr class="destaca"><td><b>D1</b></td><td class="n">1.952</td><td class="n">296</td><td class="n">47,7</td><td class="n">2,3 %</td><td class="n">+0,042</td><td class="n"><b>+0,009</b></td></tr>
+  </table></div>
+
+  <figure>
+    <div class="marco">
+      <svg viewBox="0 0 720 300" role="img" aria-label="La ventaja bruta se mantiene plana en las siete temporalidades mientras el coste como porcentaje del riesgo cae de 14 por ciento a 2 por ciento, de modo que la neta cruza el cero entre H8 y H12">
+        <defs><marker id="mA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+        <line x1="70" y1="240" x2="660" y2="240" stroke="currentColor" stroke-opacity=".35"/>
+        <line x1="70" y1="40" x2="70" y2="240" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="62" y="46" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" fill-opacity=".6">15%</text>
+        <text x="62" y="244" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" fill-opacity=".6">0</text>
+
+        <polyline points="110,240 190,240 270,240 350,240 430,240 510,240 590,240"
+          fill="none" stroke="none"/>
+        <!-- coste: cae -->
+        <polyline points="110,49 190,108 270,151 350,168 430,179 510,195 590,209"
+          fill="none" stroke="var(--no)" stroke-width="2.4"/>
+        <!-- bruta: plana en 0,082 R  ->  8,2 % de escala -->
+        <line x1="110" y1="130" x2="590" y2="130" stroke="var(--si)" stroke-width="2.4" stroke-dasharray="7 4"/>
+        <text x="600" y="134" font-family="Archivo,sans-serif" font-size="11.5" fill="var(--si)">ventaja bruta</text>
+        <text x="600" y="149" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--si)" fill-opacity=".8">+0,082 R · plana</text>
+        <text x="600" y="213" font-family="Archivo,sans-serif" font-size="11.5" fill="var(--no)">coste</text>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" fill-opacity=".65" text-anchor="middle">
+          <text x="110" y="258">H1</text><text x="190" y="258">H2</text>
+          <text x="270" y="258">H4</text><text x="350" y="258">H6</text>
+          <text x="430" y="258">H8</text><text x="510" y="258">H12</text>
+          <text x="590" y="258">D1</text>
+        </g>
+        <circle cx="110" cy="49" r="3.5" fill="var(--no)"/><circle cx="190" cy="108" r="3.5" fill="var(--no)"/>
+        <circle cx="270" cy="151" r="3.5" fill="var(--no)"/><circle cx="350" cy="168" r="3.5" fill="var(--no)"/>
+        <circle cx="430" cy="179" r="3.5" fill="var(--no)"/><circle cx="510" cy="195" r="3.5" fill="var(--no)"/>
+        <circle cx="590" cy="209" r="3.5" fill="var(--no)"/>
+        <rect x="466" y="34" width="168" height="200" fill="var(--si)" fill-opacity=".07"/>
+        <text x="550" y="26" text-anchor="middle" font-family="Archivo,sans-serif" font-size="11" font-weight="600" fill="var(--si)">aquí la bruta supera al coste</text>
+        <line x1="466" y1="130" x2="466" y2="195" stroke="var(--acento)" stroke-width="1.4" marker-end="url(#mA)"/>
+        <text x="458" y="168" text-anchor="end" font-family="Archivo,sans-serif" font-size="11" fill="var(--acento)">se cruzan</text>
+      </svg>
+    </div>
+    <figcaption>La línea verde es la ventaja bruta: <b>plana</b> — prueba de
+    heterogeneidad Q = 7,75 con 6 grados de libertad, no hay señal de que dependa
+    del marco. La roja es el coste: <b>cae</b>, con correlación −1,000 contra el
+    riesgo, porque es una división. Se cruzan entre H8 y H12.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>Y aquí está el punto que da sentido a toda la semana:</p>
+    <div class="nota"><b>El patrón funciona igual en todos los marcos. Lo que
+    cambia es cuánto te cobran por operarlo.</b> Todo el material —y todo lo que
+    yo había medido— lo opera en M5, M15 y H1, que es exactamente donde peor
+    sale. No por el patrón: por la división.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cabecera"><span class="num">04</span><div class="col">
+    <h2>La estrategia</h2>
+    <p class="entradilla">Cabe en media página. Ese es el resultado, no un
+    resumen del resultado.</p>
+  </div></div>
+  <div class="col">
+    <pre>MARCO         Diario, o 12 horas.
+              NADA por debajo de 8 horas.
+
+VELA BASE     La vela anterior. Su rango es el terreno;
+              su cuerpo, la zona de cierre válida.
+
+SETUP         La vela actual:
+                · se lleva UN extremo de la base (uno solo)
+                · cierra DENTRO del cuerpo de la base
+
+ENTRADA       Al cierre de esa vela. No antes.
+
+STOP          El extremo del barrido, más un colchón.
+
+OBJETIVO      El extremo OPUESTO de la vela base.
+              No un múltiplo del riesgo: un sitio del gráfico.
+
+FILTRO        Riesgo mínimo = 3 veces el coste de ida y vuelta.
+              Si el stop queda más cerca, no es operable.
+
+NO SE USA     killzones · sesiones · order block · FVG
+              doble liquidez · reinicio · contexto diario
+              Fibonacci · confluencia de temporalidades
+              correlaciones como confirmación</pre>
+
+    <p>Eso es todo. Sobre cinco instrumentos, en diario, salen <b>unas 300
+    operaciones al año</b> — unas 60 por instrumento, poco más de una a la
+    semana. Y como el marco es diario, se mira una vez al día.</p>
+
+    <h3>Lo que cabe esperar, con los números en la mano</h3>
+    <div class="tw"><table>
+      <tr><th></th><th class="n">diario</th><th class="n">12 horas</th></tr>
+      <tr><td>operaciones al año (5 instrumentos)</td><td class="n">296</td><td class="n">471</td></tr>
+      <tr><td>acierto</td><td class="n">47,2 %</td><td class="n">46,1 %</td></tr>
+      <tr><td>R:R mediano</td><td class="n">1,33</td><td class="n">1,47</td></tr>
+      <tr><td>coste como % del riesgo</td><td class="n">2,3 %</td><td class="n">3,4 %</td></tr>
+      <tr><td>ventaja bruta medida</td><td class="n">+0,042</td><td class="n">+0,125</td></tr>
+      <tr><td><b>ventaja neta implícita</b></td><td class="n"><b>+0,059</b></td><td class="n"><b>+0,048</b></td></tr>
+    </table></div>
+    <p>La neta implícita usa la bruta ponderada de las siete temporalidades
+    (+0,082), que es la estimación más sólida porque la prueba de heterogeneidad
+    dice que la bruta no depende del marco.</p>
+    <p>Con un 1 % de riesgo por operación y 300 operaciones al año, +0,05 R por
+    operación son <b>unos 15 puntos porcentuales al año antes de impuestos</b>.
+    No es hacerse rico. Es una ventaja pequeña y real, que es la única clase de
+    ventaja que existe.</p>
+  </div>
+</section>
+<section>
+  <div class="cabecera"><span class="num">05</span><div class="col">
+    <h2>Por qué esto NO está confirmado</h2>
+    <p class="entradilla">Y por qué te lo digo antes de que lo operes, no
+    después.</p>
+  </div></div>
+  <div class="col">
+    <div class="alerta"><span class="eti">Tres motivos, ninguno cosmético</span>
+    <b>1 · Es un barrido, no una predicción.</b> He mirado siete temporalidades y
+    he señalado las dos mejores. El mecanismo —bruta plana, coste decreciente— es
+    sólido y previo, pero el número concreto de H12 no lo predije.
+    <br><br>
+    <b>2 · Ninguna neta supera el umbral corregido.</b> H12 da neta +0,072 con
+    error típico ≈0,031, o sea z ≈ 2,35. Con siete contrastes hace falta |z| >
+    2,69. <b>No llega.</b>
+    <br><br>
+    <b>3 · El intervalo agregado no vale.</b> Juntar las siete temporalidades da
+    un intervalo estrechísimo, pero <b>no son independientes</b>: un rango de
+    H12 contiene rangos de H4, y las siete salen de los mismos precios. Es el
+    mismo error de repeticiones no independientes que ya cometí dos veces esta
+    semana. No lo cometo una tercera.</div>
+
+    <h3>La prueba que lo decidiría</h3>
+    <p>Datos que <b>nunca he visto</b>. De HistData se bajan gratis y no los
+    tenemos:</p>
+    <pre>AUDUSD   USDCAD   USDCHF   EURGBP   NZDUSD   XAUUSD   US30</pre>
+    <p>Y la predicción queda escrita <b>antes</b> de mirarlos:</p>
+    <div class="cita">En diario y 12 horas, ventaja neta positiva. En H1,
+    negativa. El cruce, entre H8 y H12.</div>
+    <p>Con tres instrumentos nuevos hay muestra para decidirlo. Si sale, es lo
+    primero de toda la investigación que sobrevive a una prueba ciega. Si no
+    sale, se cae y se dice.</p>
+  </div>
+</section>
+
+<section>
+  <div class="cabecera"><span class="num">06</span><div class="col">
+    <h2>Lo que cambia si operas así</h2>
+    <p class="entradilla">Porque el marco diario no es solo un ajuste técnico.</p>
+  </div></div>
+  <div class="col">
+    <h3>El stop es grande</h3>
+    <p>47 pips de mediana en diario, contra 8 en H1. Con un 1 % de riesgo por
+    operación eso significa <b>posiciones seis veces más pequeñas</b>. La cuenta
+    del tamaño la manda el stop, no la corazonada.</p>
+
+    <h3>Una operación a la semana por instrumento</h3>
+    <p>No hay nada que hacer durante el día. Se mira al cierre diario, se marca
+    si hay setup, y se deja la orden. Para alguien que trabaja, esto es una
+    ventaja enorme y no un inconveniente.</p>
+
+    <h3>Y una advertencia seria sobre el fondeo</h3>
+    <div class="alerta"><span class="eti">Léelo dos veces</span>
+    Un stop diario de 47 pips en cinco instrumentos a la vez puede juntar varias
+    pérdidas el mismo día. Las cuentas de fondeo tienen <b>límite de pérdida
+    diaria</b>, normalmente el 5 %. Con un 1 % por operación y cuatro setups
+    simultáneos, un mal día te saca.
+    <br><br>
+    Y las correlaciones lo empeoran: EURUSD y GBPUSD el mismo día son la misma
+    operación al doble. <b>Máximo una posición por bloque correlacionado.</b>
+    </div>
+
+    <h3>El horizonte</h3>
+    <p>Con +0,05 R por operación y desviación típica de ~1,2 R, hacen falta del
+    orden de <b>2.000 operaciones</b> para distinguir esa ventaja del cero con
+    confianza. A 300 al año son casi siete años.</p>
+    <p>Eso no significa que no funcione. Significa que <b>no vas a saber si
+    funciona en el plazo en que necesitas saberlo</b>, y que cualquier racha de
+    veinte operaciones —buena o mala— no te va a decir nada. Es la aritmética de
+    una ventaja pequeña, no un defecto de este método en particular.</p>
+  </div>
+</section>
+
+<section>
+  <div class="cabecera"><span class="num">07</span><div class="col">
+    <h2>Las cinco cosas que de verdad se aprendieron</h2>
+    <p class="entradilla">Valgan lo que valgan el CRT y esta estrategia.</p>
+  </div></div>
+  <div class="col">
+    <ol>
+      <li><b>El coste no es un detalle, es la variable principal.</b> El mismo
+      patrón da −0,141 R en H1 y +0,072 en H12. No cambió el patrón: cambió el
+      denominador de una división.</li>
+
+      <li><b>Lo simple bate a lo complejo, y está medido.</b> Cuatro piezas
+      entran, ocho se quedan fuera, y las cuatro que entran son las cuatro más
+      simples. Cada capa que añadí a lo largo de la semana restó.</li>
+
+      <li><b>Una afirmación con gradiente es un regalo.</b> «La doble liquidez
+      aumenta la probabilidad, la triple más» es contrastable en una tarde. Las
+      afirmaciones vagas no lo son. Cuando alguien te enseñe un método, busca
+      dónde da un número ordenado.</li>
+
+      <li><b>Los resultados demasiado buenos son errores propios.</b> Cuatro
+      veces esta semana: un z de 10,73 por leer el futuro, un R:R de 1198 por un
+      stop de dos pips, un control de inversión de +21, y un gradiente de z 3,74
+      por contar la misma operación doce veces. Los cuatro los encontré porque
+      el número era demasiado bonito.</li>
+
+      <li><b>La ventaja pequeña es la única clase de ventaja que existe.</b>
+      +0,08 R brutos, una y otra vez, en todo lo que se midió. Lo que decide no
+      es encontrar algo grande: es que lo pequeño quede por encima del coste.</li>
+    </ol>
+  </div>
+</section>
+
+<footer style="padding:44px 0 0;color:var(--tenue);font-family:Archivo,sans-serif;font-size:13px">
+  <div class="col">
+    <p style="margin:0">Fuentes unificadas: guía CRT de Rubén Villahermosa ·
+    ~250 publicaciones de <code>@bctrades__</code> y su respuesta directa sobre
+    reinicios · <code>@trader.derivados</code> · dos vídeos de estrategia · pack
+    de indicadores de nico66fx · lista de correlaciones.<br>
+    Mediciones sobre EURUSD, GBPUSD, USDJPY, NASDAQ y S&amp;P 500, datos de un
+    minuto, enero de 2020 a julio de 2026. Código, pre-registros y resultados
+    completos en el repositorio.</p>
+  </div>
+</footer>
+</div>

@@ -1,0 +1,86 @@
+S01 · 08:45 COMPRA ent 1.18725 sl 1.18684 (4.1p) tp 1.18807 -> TP +2 R a las 08:57 [t+0m T1]
+S01 · 09:05 COMPRA ent 1.18831 sl 1.18799 (3.2p) tp 1.18895 -> TP +2 R a las 09:13 [t+0m T1]
+S02 · 08:35 VENTA ent 1.18962 sl 1.19013 (5.1p) tp 1.1886 -> TP +2 R a las 08:57 [t+1m T1]
+S02 · 09:07 COMPRA ent 1.18892 sl 1.18841 (5.1p) tp 1.18994 -> TP +2 R a las 09:30 [t+2m T1]
+S03 · 08:36 COMPRA ent 1.19753 sl 1.1969 (6.3p) tp 1.19879 -> TP +2 R a las 09:25 [t+3m T1]
+S04 · 08:20 COMPRA ent 1.20184 sl 1.20126 (5.8p) tp 1.203 -> TP +2 R a las 08:56 [t+4m T1]
+S04 · 10:15 COMPRA ent 1.20355 sl 1.20297 (5.8p) tp 1.20471 -> TP +2 R a las 10:52 [t+5m T1]
+S05 · 08:08 COMPRA ent 1.2133 sl 1.21252 (7.8p) tp 1.21486 -> TP +2 R a las 10:53 [t+5m T1]
+S06 · 08:57 VENTA ent 1.18993 sl 1.19031 (3.8p) tp 1.18917 -> SL -1 R a las 09:01 [t+7m T1] | falló: nivel+precipitada
+S07 · SIN OPERACIONES
+S08 · 09:02 COMPRA ent 1.17662 sl 1.17602 (6p) tp 1.17782 -> TP +2 R a las 10:10 [t+10m T1]
+S08 · 10:14 VENTA ent 1.17796 sl 1.17831 (3.5p) tp 1.17726 -> SL -1 R a las 10:25 [t+10m T1] | falló: stopcorto
+S09 · SIN OPERACIONES
+S10 · 08:12 VENTA ent 1.16414 sl 1.16465 (5.1p) tp 1.16312 -> TP +2 R a las 09:10 [t+11m T1]
+S11 · 08:37 COMPRA ent 1.12703 sl 1.12639 (6.4p) tp 1.12831 -> SL -1 R a las 08:57 [t+19m T1] | falló: contexto
+S11 · 09:25 COMPRA ent 1.12686 sl 1.12591 (9.5p) tp 1.12876 -> TP +2 R a las 10:19 [t+20m T1]
+S12 · 08:40 COMPRA ent 1.12689 sl 1.12635 (5.4p) tp 1.12797 -> TP +2 R a las 10:19 [t+21m T1]
+S12 · 10:44 COMPRA ent 1.12809 sl 1.12745 (6.4p) tp 1.12937 -> TP +2 R a las 11:23 [t+21m T1]
+S13 · 08:07 COMPRA ent 1.13389 sl 1.13346 (4.3p) tp 1.13475 -> TP +2 R a las 09:05 [t+22m T1]
+S13 · 09:15 VENTA ent 1.13418 sl 1.13465 (4.7p) tp 1.13324 -> SL -1 R a las 09:20 [t+23m T1]
+S13 · 10:33 VENTA ent 1.13417 sl 1.13476 (5.9p) tp 1.13299 -> TP +2 R a las 10:48 [t+23m T1]
+S14 · 08:45 COMPRA ent 1.13004 sl 1.12919 (8.5p) tp 1.13174 -> TP +2 R a las 09:22 [t+24m T1]
+S14 · 09:27 COMPRA ent 1.13191 sl 1.13107 (8.4p) tp 1.13359 -> TP +2 R a las 10:26 [t+24m T1]
+S15 · 08:16 COMPRA ent 1.09908 sl 1.09832 (7.6p) tp 1.1006 -> TP +2 R a las 08:45 [t+25m T1]
+S15 · 10:17 VENTA ent 1.0995 sl 1.10065 (11.5p) tp 1.0972 -> SL -1 R a las 11:08 [t+26m T1] | falló: nada
+S16 · 08:33 COMPRA ent 1.09707 sl 1.09632 (7.5p) tp 1.09857 -> TP +2 R a las 09:26 [t+27m T1]
+S16 · 10:06 VENTA ent 1.09782 sl 1.09847 (6.5p) tp 1.09652 -> SL -1 R a las 10:12 [t+27m T1] | falló: stopcorto
+S17 · SIN OPERACIONES
+S18 · 10:12 COMPRA ent 0.98733 sl 0.98645 (8.8p) tp 0.98909 -> SL -1 R a las 10:20 [t+29m T1] | falló: contexto+precipitada
+S19 · 08:05 COMPRA ent 1.04552 sl 1.04464 (8.8p) tp 1.04728 -> SL -1 R a las 08:14 [t+30m T1]
+S19 · 08:20 COMPRA ent 1.045 sl 1.04412 (8.8p) tp 1.04676 -> TP +2 R a las 09:49 [t+30m T1]
+S20 · 08:25 COMPRA ent 1.06046 sl 1.0588 (16.6p) tp 1.06378 -> TP +2 R a las 10:59 [t+31m T1]
+S21 · 08:10 COMPRA ent 1.07911 sl 1.07852 (5.9p) tp 1.08029 -> SL -1 R a las 08:50 [t+39m T1] | falló: tarde+precipitada
+S22 · 08:11 COMPRA ent 1.08308 sl 1.08227 (8.1p) tp 1.0847 -> SL -1 R a las 08:59 [t+40m T1]
+S22 · 09:22 COMPRA ent 1.08293 sl 1.08205 (8.8p) tp 1.08469 -> cierre +1.72 R a las 11:30 [t+40m T1] | falló: nivel
+S23 · 08:06 VENTA ent 1.09734 sl 1.09812 (7.8p) tp 1.09578 -> TP +2 R a las 08:32 [t+41m T1]
+S24 · 08:05 COMPRA ent 1.07718 sl 1.07663 (5.5p) tp 1.07828 -> TP +2 R a las 08:14 [t+42m T1]
+S25 · SIN OPERACIONES
+S26 · 08:05 COMPRA ent 1.06844 sl 1.06806 (3.8p) tp 1.0692 -> TP +2 R a las 08:41 [t+44m T1]
+S26 · 08:50 VENTA ent 1.06863 sl 1.06904 (4.1p) tp 1.06781 -> TP +2 R a las 09:10 [t+44m T1]
+S26 · 09:12 COMPRA ent 1.06809 sl 1.06768 (4.1p) tp 1.06891 -> SL -1 R a las 09:14 [t+44m T1]
+S26 · 09:24 COMPRA ent 1.06784 sl 1.06743 (4.1p) tp 1.06866 -> TP +2 R a las 09:35 [t+44m T1] | falló: stopcorto
+S27 · 08:15 VENTA ent 1.07038 sl 1.07073 (3.5p) tp 1.06968 -> SL -1 R a las 08:39 [t+46m T1]
+S27 · 09:15 VENTA ent 1.0702 sl 1.07039 (1.9p) tp 1.06982 -> TP +2 R a las 09:18 [t+46m T1] | falló: nivel
+S28 · 08:25 VENTA ent 1.09838 sl 1.09872 (3.4p) tp 1.0977 -> TP +2 R a las 09:00 [t+47m T1]
+S29 · SIN OPERACIONES
+S30 · 09:05 VENTA ent 1.06819 sl 1.06884 (6.5p) tp 1.06689 -> cierre +0.78 R a las 11:30 [t+49m T1]
+S31 · 08:04 COMPRA ent 1.0701 sl 1.06945 (6.5p) tp 1.0714 -> SL -1 R a las 08:10 [t+54m T1]
+S31 · 08:40 COMPRA ent 1.06964 sl 1.06899 (6.5p) tp 1.07094 -> TP +2 R a las 09:02 [t+55m T1]
+S31 · 09:15 VENTA ent 1.07026 sl 1.07091 (6.5p) tp 1.06896 -> SL -1 R a las 09:33 [t+55m T1]
+S32 · 08:02 COMPRA ent 1.08372 sl 1.0834 (3.2p) tp 1.08436 -> SL -1 R a las 08:43 [t+57m T1]
+S32 · 09:18 COMPRA ent 1.08356 sl 1.08324 (3.2p) tp 1.0842 -> TP +2 R a las 10:40 [t+57m T1] | falló: nivel
+S33 · 08:15 COMPRA ent 1.09038 sl 1.08907 (13.1p) tp 1.093 -> TP +2 R a las 09:14 [t+58m T1]
+S34 · 08:21 COMPRA ent 1.11604 sl 1.1156 (4.4p) tp 1.11692 -> TP +2 R a las 09:03 [t+59m T1]
+S35 · 08:10 VENTA ent 1.06098 sl 1.06138 (4p) tp 1.06018 -> TP +2 R a las 09:02 [t+60m T1]
+S35 · 09:12 COMPRA ent 1.0602 sl 1.05929 (9.1p) tp 1.06202 -> TP +2 R a las 10:26 [t+60m T1]
+S36 · 08:05 COMPRA ent 1.03787 sl 1.03709 (7.8p) tp 1.03943 -> TP +2 R a las 09:22 [t+61m T1]
+S37 · SIN OPERACIONES
+S38 · SIN OPERACIONES
+S39 · SIN OPERACIONES
+S40 · 08:32 COMPRA ent 1.07868 sl 1.0777 (9.8p) tp 1.08064 -> TP +2 R a las 10:10 [t+63m T1]
+S41 · SIN OPERACIONES
+S42 · 08:03 COMPRA ent 1.13136 sl 1.13014 (12.2p) tp 1.1338 -> cierre +1.52 R a las 11:30 [t+66m T1]
+S43 · SIN OPERACIONES
+S44 · 08:25 COMPRA ent 1.16308 sl 1.16235 (7.3p) tp 1.16454 -> SL -1 R a las 08:59 [t+67m T1]
+S44 · 09:25 COMPRA ent 1.16262 sl 1.16173 (8.9p) tp 1.1644 -> TP +2 R a las 09:50 [t+67m T1]
+S45 · SIN OPERACIONES
+S46 · 08:01 COMPRA ent 1.16595 sl 1.16528 (6.7p) tp 1.16729 -> TP +2 R a las 11:00 [t+68m T1]
+S47 · 08:01 VENTA ent 1.18406 sl 1.1844 (3.4p) tp 1.18338 -> TP +2 R a las 08:30 [t+69m T1]
+S47 · 09:00 COMPRA ent 1.18335 sl 1.18297 (3.8p) tp 1.18411 -> TP +2 R a las 09:45 [t+69m T1]
+S48 · 08:03 VENTA ent 1.17943 sl 1.17991 (4.8p) tp 1.17847 -> SL -1 R a las 08:35 [t+69m T1]
+S48 · 09:00 VENTA ent 1.17989 sl 1.18037 (4.8p) tp 1.17893 -> SL -1 R a las 09:19 [t+70m T1]
+S49 · 08:13 VENTA ent 1.17044 sl 1.17082 (3.8p) tp 1.16968 -> SL -1 R a las 08:46 [t+70m T1] | falló: precipitada
+S49 · 08:57 VENTA ent 1.17036 sl 1.17074 (3.8p) tp 1.1696 -> SL -1 R a las 09:06 [t+71m T1]
+S50 · 08:14 COMPRA ent 1.13798 sl 1.1376 (3.8p) tp 1.13874 -> TP +2 R a las 09:00 [t+71m T1]
+
+CUENTAS
+    intento 1: PASA con 11000 $ en la sesión 3
+    intento 2: PASA con 10800 $ en la sesión 10
+    intento 3: PASA con 10800 $ en la sesión 13
+    intento 4: PASA con 10800 $ en la sesión 20
+    intento 5: PASA con 10872 $ en la sesión 26
+    intento 6: PASA con 10878 $ en la sesión 34
+    intento 7: PASA con 10800 $ en la sesión 40
+    intento 8: PASA con 10852 $ en la sesión 47
+    intento 9: en curso con 9800 $

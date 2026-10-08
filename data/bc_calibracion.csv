@@ -1,0 +1,13 @@
+huso,lectura,aciertos,d1,d2
+UTC,A,1,ningun rango en los 5 dias previos,"SI (1 rangos, lados [-1], ult 2026-07-27)"
+NY,B,1,"SI (3 rangos, lados [-1, 1], ult 2026-07-22)",ningun rango en los 5 dias previos
+UTC,C,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+UTC,B,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+NY,A,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+NY,C,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+Madrid,A,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+Madrid,B,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+Madrid,C,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+Broker,A,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+Broker,B,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos
+Broker,C,0,ningun rango en los 5 dias previos,ningun rango en los 5 dias previos

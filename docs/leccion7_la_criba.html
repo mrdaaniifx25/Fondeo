@@ -1,0 +1,361 @@
+<title>La criba de los 10 segundos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --fondo:#f2f5f8; --panel:#fdfdfe; --panel2:#f6f8fb;
+  --tinta:#12161c; --tinta2:#4e5864; --tinta3:#8b95a1;
+  --linea:#dde3ea; --linea2:#eaeff4;
+  --s1:#2a78d6; --s2:#eb6834; --ok:#0ca30c; --mal:#d03b3b;
+  --s1w:rgba(42,120,214,.12); --s2w:rgba(235,104,52,.12);
+  --okw:rgba(12,163,12,.10); --malw:rgba(208,59,59,.10);
+  --sombra:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme: dark;
+  --fondo:#10131a; --panel:#181c24; --panel2:#1d222b;
+  --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
+  --linea:#29303a; --linea2:#20262f;
+  --s1:#3987e5; --s2:#d95926; --ok:#0ca30c; --mal:#d03b3b;
+  --s1w:rgba(57,135,229,.16); --s2w:rgba(217,89,38,.16);
+  --okw:rgba(12,163,12,.14); --malw:rgba(208,59,59,.14);
+  --sombra:0 1px 2px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --fondo:#10131a; --panel:#181c24; --panel2:#1d222b;
+  --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
+  --linea:#29303a; --linea2:#20262f;
+  --s1:#3987e5; --s2:#d95926; --ok:#0ca30c; --mal:#d03b3b;
+  --s1w:rgba(57,135,229,.16); --s2w:rgba(217,89,38,.16);
+  --okw:rgba(12,163,12,.14); --malw:rgba(208,59,59,.14);
+  --sombra:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--fondo); color:var(--tinta); margin:0;
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif; font-size:15px; line-height:1.6}
+.env{max-width:1080px; margin:0 auto; padding:34px 20px 72px}
+h1,h2,h3{font-family:Archivo,system-ui,sans-serif; text-wrap:balance; margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+.eti{font-size:10.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--tinta3); font-weight:600}
+
+header{border-bottom:1px solid var(--linea); padding-bottom:22px; margin-bottom:30px}
+header .paso{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--s2);
+  font-weight:600; letter-spacing:.08em}
+header h1{font-size:34px; font-weight:700; letter-spacing:-.025em; margin:6px 0 10px}
+header p{margin:0; color:var(--tinta2); max-width:64ch; font-size:16px}
+
+section{margin-bottom:34px}
+section > h2{font-size:20px; font-weight:650; letter-spacing:-.01em; margin-bottom:6px;
+  display:flex; align-items:baseline; gap:11px}
+section > h2 .num{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--s2);
+  font-weight:600}
+section > .intro{color:var(--tinta2); margin:0 0 16px; max-width:66ch}
+
+.caja{background:var(--panel); border:1px solid var(--linea); border-radius:9px;
+  box-shadow:var(--sombra); overflow:hidden}
+.cuerpo{padding:18px}
+
+svg{display:block; width:100%; height:auto}
+
+/* --- leyenda de las tres entradas --- */
+.tres{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1px;
+  background:var(--linea2); border-top:1px solid var(--linea2)}
+.tres > div{background:var(--panel); padding:14px 16px}
+.tres b{display:block; font-size:14px; margin-bottom:3px}
+.tres p{margin:0; font-size:13px; color:var(--tinta2); line-height:1.5}
+.pt{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px;
+  vertical-align:middle}
+
+/* --- navegador de casos --- */
+.mandos{display:flex; flex-wrap:wrap; gap:9px; align-items:center;
+  padding:13px 18px; border-bottom:1px solid var(--linea2); background:var(--panel2)}
+.mandos button{font:inherit; font-size:13px; font-weight:500; padding:6px 13px;
+  border:1px solid var(--linea); border-radius:6px; background:var(--panel);
+  color:var(--tinta); cursor:pointer}
+.mandos button:hover{background:var(--linea2)}
+.mandos button:disabled{opacity:.4; cursor:default}
+.mandos button[aria-pressed="true"]{background:var(--s1); border-color:var(--s1); color:#fff}
+.mandos .cuenta{font-family:"IBM Plex Mono",monospace; font-size:12.5px;
+  color:var(--tinta2); margin-left:auto}
+:focus-visible{outline:2px solid var(--s1); outline-offset:2px}
+
+.tarjetas{display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+  background:var(--linea2); border-top:1px solid var(--linea2)}
+@media (max-width:760px){.tarjetas{grid-template-columns:1fr}}
+.tarjeta{background:var(--panel); padding:15px 17px}
+.tarjeta .cab{display:flex; align-items:center; gap:8px; margin-bottom:9px}
+.tarjeta .cab b{font-size:14px; font-weight:600}
+.tarjeta .fila{display:flex; justify-content:space-between; font-size:13px;
+  padding:3px 0; color:var(--tinta2)}
+.tarjeta .fila span:last-child{font-family:"IBM Plex Mono",monospace;
+  color:var(--tinta); font-variant-numeric:tabular-nums}
+.res{margin-top:10px; padding:8px 11px; border-radius:6px; font-size:13px;
+  font-weight:600; text-align:center}
+.res.ok{background:var(--okw); color:var(--ok)}
+.res.mal{background:var(--malw); color:var(--mal)}
+.res.neu{background:var(--panel2); color:var(--tinta2)}
+.res.fuera{background:var(--s2w); color:var(--s2)}
+
+/* --- comparacion agregada --- */
+.barras{display:grid; grid-template-columns:repeat(auto-fit,minmax(238px,1fr)); gap:1px;
+  background:var(--linea2)}
+.barras > div{background:var(--panel); padding:17px 19px}
+.barras h3{font-size:13.5px; font-weight:600; margin-bottom:3px}
+.barras .sub{font-size:12px; color:var(--tinta3); margin-bottom:13px}
+.bar{display:grid; grid-template-columns:92px 1fr 66px; gap:10px; align-items:center;
+  margin-bottom:8px}
+.bar .n{font-size:12px; color:var(--tinta2)}
+.pista{height:19px; background:var(--linea2); border-radius:3px; overflow:hidden}
+.pista span{display:block; height:100%; border-radius:3px}
+.bar .v{font-family:"IBM Plex Mono",monospace; font-size:13.5px; font-weight:600;
+  text-align:right; font-variant-numeric:tabular-nums}
+
+.remate{background:var(--panel); border:1px solid var(--linea); border-left:4px solid var(--s2);
+  border-radius:9px; padding:20px 24px; box-shadow:var(--sombra)}
+.remate h2{font-size:19px; margin-bottom:9px}
+.remate p{margin:0 0 11px; color:var(--tinta2)}
+.remate p:last-child{margin-bottom:0}
+.remate strong{color:var(--tinta); font-weight:600}
+.regla{background:var(--panel2); border-radius:7px; padding:13px 16px; margin:14px 0;
+  font-family:"IBM Plex Mono",monospace; font-size:14px; font-weight:500; color:var(--tinta)}
+.nota{font-size:12.5px; color:var(--tinta3); padding:12px 18px; line-height:1.6;
+  border-top:1px solid var(--linea2)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+.ecua{padding:26px 24px; text-align:center; font-family:"IBM Plex Mono",monospace}
+.ecua .l1{font-size:22px; font-weight:600; color:var(--tinta); letter-spacing:-.01em}
+.ecua .l2{font-size:14px; color:var(--tinta3); margin-top:11px}
+.ecua b{color:var(--s1)} .ecua i{color:var(--s2); font-style:normal}
+
+.calc{display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:1px;
+  background:var(--linea2)}
+@media (max-width:780px){.calc{grid-template-columns:1fr}}
+.entradas{background:var(--panel); padding:20px}
+.campo{margin-bottom:17px}
+.campo:last-child{margin-bottom:0}
+.campo label{display:flex; justify-content:space-between; align-items:baseline;
+  font-size:12.5px; font-weight:600; color:var(--tinta2); margin-bottom:6px}
+.campo label span{font-family:"IBM Plex Mono",monospace; font-size:15px;
+  color:var(--s1); font-weight:600}
+.campo input[type=range]{width:100%; accent-color:var(--s1); height:24px; display:block}
+.campo .pista-txt{font-size:11.5px; color:var(--tinta3); margin-top:3px}
+
+.salida{background:var(--panel); padding:20px}
+.veredicto{border-radius:8px; padding:17px 19px; margin-bottom:17px}
+.veredicto.si{background:var(--okw); border:1px solid var(--ok)}
+.veredicto.no{background:var(--malw); border:1px solid var(--mal)}
+.veredicto .tit{font-family:Archivo,sans-serif; font-size:21px; font-weight:700;
+  letter-spacing:-.02em; margin-bottom:5px}
+.veredicto.si .tit{color:var(--ok)} .veredicto.no .tit{color:var(--mal)}
+.veredicto p{margin:0; font-size:13.5px; color:var(--tinta2); line-height:1.55}
+.pasos{display:flex; flex-direction:column; gap:1px; background:var(--linea2);
+  border:1px solid var(--linea2); border-radius:7px; overflow:hidden}
+.paso2{background:var(--panel); padding:11px 15px; display:grid;
+  grid-template-columns:1fr auto; gap:12px; align-items:baseline}
+.paso2 .k{font-size:13px; color:var(--tinta2)}
+.paso2 .k small{display:block; font-size:11.5px; color:var(--tinta3); margin-top:1px}
+.paso2 .v{font-family:"IBM Plex Mono",monospace; font-size:16px; font-weight:600;
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+.pos{color:var(--ok)} .neg{color:var(--mal)}
+
+.presets{display:flex; flex-wrap:wrap; gap:7px; padding:14px 20px;
+  border-top:1px solid var(--linea2); background:var(--panel2); align-items:center}
+.presets span{font-size:12px; color:var(--tinta3); margin-right:4px}
+.presets button{font:inherit; font-size:12.5px; padding:5px 11px; border-radius:6px;
+  border:1px solid var(--linea); background:var(--panel); color:var(--tinta); cursor:pointer}
+.presets button:hover{background:var(--linea2)}
+:focus-visible{outline:2px solid var(--s1); outline-offset:2px}
+
+table{border-collapse:collapse; width:100%; font-size:13px}
+th{text-align:right; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--tinta3); padding:9px 13px; border-bottom:1px solid var(--linea); font-weight:600}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 13px; border-bottom:1px solid var(--linea2);
+  font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+tr.bueno td{background:var(--okw)}
+</style>
+
+<div class="env">
+<header>
+  <div class="paso">LECCIÓN 7 · CRT</div>
+  <h1>La criba de los 10 segundos</h1>
+  <p>Toda estrategia, sea la que sea, pasa o no pasa por una división. No hace falta
+     backtest, ni indicadores, ni saber quién la enseña. Con cuatro números sabes si
+     puede ganar dinero <em>antes</em> de perder un mes probándola.</p>
+</header>
+
+<section>
+  <h2><span class="num">01</span> La ecuación</h2>
+  <div class="caja">
+    <div class="ecua">
+      <div class="l1">lo que te llevas &nbsp;=&nbsp; <b>tu ventaja</b> &nbsp;−&nbsp;
+        <i>coste ÷ stop</i></div>
+      <div class="l2">las dos en la misma unidad: múltiplos de lo que arriesgas (R)</div>
+    </div>
+    <p class="nota">El coste es fijo: lo que te cobra el bróker por abrir y cerrar,
+      lo mismo si arriesgas 5 pips que 50. Por eso, <b>cuanto más estrecho es tu stop,
+      mayor porcentaje de tu riesgo se lleva</b>. Ésa es toda la trampa del scalping,
+      y no depende del patrón que uses.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">02</span> La calculadora</h2>
+  <p class="intro">Mueve los cuatro. El veredicto de la derecha se recalcula solo.</p>
+  <div class="caja">
+    <div class="calc">
+      <div class="entradas">
+        <div class="campo">
+          <label for="i-coste">Coste ida y vuelta <span id="v-coste"></span></label>
+          <input type="range" id="i-coste" min="0.2" max="5" step="0.01" value="1.43">
+          <div class="pista-txt">Medido: EURUSD 1,43 · GBPUSD 1,60 · USDJPY 1,50</div>
+        </div>
+        <div class="campo">
+          <label for="i-stop">Tu stop <span id="v-stop"></span></label>
+          <input type="range" id="i-stop" min="2" max="80" step="1" value="17">
+          <div class="pista-txt">Lo que arriesgas por operación, en pips.
+            Arranca en 17: el stop mediano del CRT en H4</div>
+        </div>
+        <div class="campo">
+          <label for="i-rr">Tu R:R <span id="v-rr"></span></label>
+          <input type="range" id="i-rr" min="0.2" max="6" step="0.01" value="1.25">
+          <div class="pista-txt">Cuánto cobras si aciertas, en múltiplos del riesgo.
+            En el CRT no lo eliges tú: lo pone la distancia al extremo del rango</div>
+        </div>
+        <div class="campo">
+          <label for="i-ac">Tu acierto <span id="v-ac"></span></label>
+          <input type="range" id="i-ac" min="5" max="90" step="0.1" value="47.7">
+          <div class="pista-txt">Sé honesto. Casi todo el mundo se pone 10 puntos de más</div>
+        </div>
+      </div>
+      <div class="salida">
+        <div class="veredicto" id="ver"><div class="tit" id="ver-t"></div>
+          <p id="ver-p"></p></div>
+        <div class="pasos" id="pasos"></div>
+      </div>
+    </div>
+    <div class="presets"><span>Cargar el CRT medido, en EURUSD:</span>
+      <button data-p="crt1">H1</button>
+      <button data-p="crt4">H4</button>
+      <button data-p="crt12">H12</button>
+      <button data-p="crtd">D1</button>
+      <button data-p="scalp">Scalping de M1</button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">03</span> El umbral, medido</h2>
+  <p class="intro">La ventaja bruta del CRT es prácticamente la misma en todas las
+     temporalidades: <strong>+0,082 R de media</strong>. Lo único que cambia entre marcos
+     es cuánto se lleva el coste. Esto son datos reales, cinco instrumentos, 2020-2026.</p>
+  <div class="caja">
+    <table><thead><tr><th>marco</th><th>ops/año</th><th>stop mediano</th>
+      <th>coste, % del riesgo</th><th>R bruta</th><th>R neta</th></tr></thead>
+      <tbody id="tabla-tf"></tbody></table>
+    <p class="nota">Fíjate en que la columna de la <b>bruta</b> no mejora al subir de marco
+      —va dando tumbos entre +0,042 y +0,132— y la <b>neta</b> sí, en escalera.
+      Lo que cambia no es el patrón: es el peaje.</p>
+    <p class="nota"><b>Aviso uno.</b> La neta no es la resta de las dos columnas anteriores.
+      El coste que ves está calculado sobre el stop <em>mediano</em>, pero la neta está
+      medida operación a operación — y las operaciones de stop pequeño pagan un peaje
+      desproporcionado que la mediana esconde. Por eso la neta real sale peor que la resta.
+      Es la misma división, mirada de cerca.</p>
+    <p class="nota"><b>Aviso dos.</b> Que H12 y D1 salgan en verde <em>no</em> significa que estén
+      resueltas. Se han probado siete temporalidades, y la mejor —H12, +0,072— da
+      z ≈ 2,35 cuando con siete intentos hace falta |z| &gt; 2,69. <b>No llega.</b>
+      Lo que la tabla demuestra no es que H12 gane: es <b>por qué</b> los marcos pequeños
+      pierden.</p>
+  </div>
+</section>
+
+<section class="remate">
+  <h2>La regla que te llevas</h2>
+  <div class="regla" id="regla-final"></div>
+  <p>Ese número sale de dividir tu coste entre la mayor ventaja bruta que se ha medido
+     en todo este trabajo (+0,082 R). <strong>Por debajo de ese stop, pierdes por
+     división, no por análisis</strong>: da igual el patrón, el indicador o la
+     confluencia que le pongas encima.</p>
+  <p>Y funciona al revés también: cuando alguien te enseñe una estrategia, pregúntale
+     dos cosas — <strong>cuánto arriesga por operación y cuánto le cobra su bróker</strong>.
+     Con eso ya sabes si lo que va a contarte después puede ser cierto.</p>
+</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const es=(v,d)=>v.toLocaleString("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d});
+const num=(v,d=3)=>(v>=0?"+":"")+es(v,d);
+const BRUTA_CRT = 0.082;
+const TF=[["H1",7183,8.1,.143,.087,-.141],["H2",3512,11.7,.099,.132,-.024],
+  ["H4",1726,17.2,.067,.075,-.030],["H6",1057,21.1,.054,.065,-.017],
+  ["H8",747,25.3,.046,.064,-.006],["H12",471,32.5,.034,.125,.072],
+  ["D1",296,47.7,.023,.042,.009]];
+// coste, stop, R:R, acierto. Los R:R son los que reproducen la bruta medida
+// de cada marco a partir de su acierto real (tabla del apartado 03).
+const PRE={crt1:[1.43, 8,1.20,49.4], crt4:[1.43,17,1.25,47.7],
+           crt12:[1.43,32,1.44,46.1], crtd:[1.43,48,1.21,47.2],
+           scalp:[1.43, 4,2.00,33.0]};
+
+function calc(){
+  const c=+$("#i-coste").value, s=+$("#i-stop").value,
+        rr=+$("#i-rr").value, p=+$("#i-ac").value/100;
+  $("#v-coste").textContent=es(c,2)+" pips";
+  $("#v-stop").textContent=es(s,0)+" pips";
+  $("#v-rr").textContent=es(rr,2);
+  $("#v-ac").textContent=es(p*100,1)+" %";
+  const cR=c/s, bruta=p*rr-(1-p), neta=bruta-cR;
+  const pAzar=1/(1+rr), pNec=(1+cR)/(1+rr);
+  const stopMin=c/BRUTA_CRT;
+  const f=(k,sub,v,cl="")=>`<div class="paso2"><span class="k">${k}<small>${sub}</small></span>
+    <span class="v ${cl}">${v}</span></div>`;
+  $("#pasos").innerHTML =
+    f("El coste se lleva","de cada operación que arriesgas",
+      es(cR*100,1)+" % del riesgo", cR>0.12?"neg":cR>0.08?"":"pos") +
+    f("Acierto que da CERO bruto","el azar puro con ese R:R", es(pAzar*100,1)+" %") +
+    f("Acierto que necesitas","para no perder dinero, ya con el coste",
+      pNec>1 ? "imposible" : es(pNec*100,1)+" %", p>=pNec?"pos":"neg") +
+    f("Tu ventaja BRUTA","por operación, antes de costes", num(bruta), bruta>0?"pos":"neg") +
+    f("Tu resultado NETO","por operación, lo que llega a tu cuenta",
+      num(neta), neta>0?"pos":"neg") +
+    f("Stop mínimo viable","con la mejor ventaja bruta medida (+0,082 R)",
+      es(stopMin,1)+" pips", s>=stopMin?"pos":"neg");
+  const ok = neta>0;
+  $("#ver").className = "veredicto "+(ok?"si":"no");
+  $("#ver-t").textContent = ok ? "Puede ganar dinero" : "No puede ganar dinero";
+  $("#ver-p").innerHTML = ok
+    ? `Necesitas acertar el <b>${es(pNec*100,1)} %</b> y estás poniendo
+       <b>${es(p*100,1)} %</b>. Te sobran ${es((p-pNec)*100,1)} puntos.
+       Ahora la pregunta de verdad: <b>¿ese acierto es real o es el que te gustaría tener?</b>`
+    : (s < stopMin
+      ? `Con un stop de ${es(s,0)} pips y ${es(c,2)} de coste, el peaje es el
+         <b>${es(cR*100,1)} %</b> de tu riesgo. Harían falta al menos
+         <b>${es(stopMin,1)} pips</b> de stop para que la mejor ventaja conocida empatara.
+         <b>No es cuestión del patrón: es la división.</b>`
+      : pNec>1
+      ? `Con R:R ${es(rr,2)} y ese coste haría falta acertar el
+         <b>${es(pNec*100,1)} %</b> de las veces. Más del 100 % no existe:
+         <b>esta combinación no puede empatar ni acertando siempre.</b>`
+      : `El stop da de sobra, pero con R:R ${es(rr,2)} necesitas acertar el
+         <b>${es(pNec*100,1)} %</b> y estás poniendo <b>${es(p*100,1)} %</b>.
+         Faltan ${es((pNec-p)*100,1)} puntos.`);
+  $("#regla-final").innerHTML =
+    `Con un coste de ${es(c,2)} pips, tu stop no puede bajar de <b>${es(stopMin,1)} pips</b>.`;
+}
+["i-coste","i-stop","i-rr","i-ac"].forEach(k=>$("#"+k).oninput=calc);
+document.querySelectorAll(".presets button").forEach(b=>b.onclick=()=>{
+  const v=PRE[b.dataset.p];
+  $("#i-coste").value=v[0]; $("#i-stop").value=v[1];
+  $("#i-rr").value=v[2]; $("#i-ac").value=v[3]; calc();});
+$("#tabla-tf").innerHTML = TF.map(([n,ops,st,c,b,ne])=>
+  `<tr class="${ne>0?'bueno':''}"><td>${n}</td><td>${ops.toLocaleString("es-ES")}</td>
+   <td>${es(st,1)} p</td><td>${es(c*100,1)} %</td><td>${num(b)}</td>
+   <td class="${ne>0?'pos':'neg'}">${num(ne)}</td></tr>`).join("");
+calc();
+})();
+</script>

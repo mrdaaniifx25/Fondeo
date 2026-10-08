@@ -1,0 +1,930 @@
+<title>Manual operativo CRT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --fondo:#F2F4F3; --panel:#FFFFFF; --hueco:#E6EAE9; --linea:#D3D9D8;
+  --tinta:#12181A; --suave:#556065; --tenue:#848E92;
+  --acc:#146B63; --acc-sua:#DCEEEC;
+  --alza:#2A7D5F; --baja:#B2523A;
+  --avi:#8A5D0F; --avi-sua:#F7EEDA;
+  --paso:#146B63;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --fondo:#0E1214; --panel:#161B1E; --hueco:#1B2124; --linea:#283034;
+  --tinta:#E3E9E8; --suave:#93A0A3; --tenue:#6B7679;
+  --acc:#4FB5A6; --acc-sua:#122725;
+  --alza:#41B389; --baja:#D0745A;
+  --avi:#D9A93F; --avi-sua:#2A2416;
+  --paso:#4FB5A6;
+}}
+:root[data-theme="dark"]{
+  --fondo:#0E1214; --panel:#161B1E; --hueco:#1B2124; --linea:#283034;
+  --tinta:#E3E9E8; --suave:#93A0A3; --tenue:#6B7679;
+  --acc:#4FB5A6; --acc-sua:#122725;
+  --alza:#41B389; --baja:#D0745A;
+  --avi:#D9A93F; --avi-sua:#2A2416;
+  --paso:#4FB5A6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:1.62;
+  -webkit-font-smoothing:antialiased}
+.env{max-width:1080px;margin:0 auto;padding:0 22px 90px}
+.col{max-width:680px}
+h1,h2,h3,h4,.eti,.paso-t{font-family:Archivo,system-ui,sans-serif}
+h1{font-size:clamp(1.9rem,4.6vw,2.9rem);line-height:1.06;font-weight:800;
+  letter-spacing:-.03em;margin:0 0 14px;text-wrap:balance}
+h2{font-size:1.44rem;font-weight:700;letter-spacing:-.02em;margin:0;line-height:1.22}
+h3{font-size:1.02rem;font-weight:600;margin:30px 0 8px;letter-spacing:-.005em}
+h4{font-size:.94rem;font-weight:600;margin:20px 0 5px}
+p{margin:0 0 15px}
+.eti{font-size:10.5px;text-transform:uppercase;letter-spacing:.15em;font-weight:700;color:var(--tenue)}
+
+header.port{padding:66px 0 38px;border-bottom:2px solid var(--acc)}
+header.port .sub{font-size:1.14rem;color:var(--suave);max-width:600px;margin:0}
+
+.parte{margin:56px 0 0;padding:22px 0 0;border-top:2px solid var(--acc)}
+.parte .eti{color:var(--acc)}
+.parte h2{font-size:1.72rem;margin-top:4px}
+.parte .int{color:var(--suave);margin:8px 0 0;max-width:640px}
+
+section{padding:36px 0;border-bottom:1px solid var(--linea)}
+.cab{display:flex;gap:16px;align-items:baseline;margin-bottom:18px}
+.n{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--acc);
+  font-weight:600;padding-top:5px;min-width:26px}
+
+/* pasos numerados */
+.pasos{counter-reset:p;display:flex;flex-direction:column;gap:14px;margin:24px 0}
+.paso{background:var(--panel);border:1px solid var(--linea);border-radius:9px;
+  padding:16px 19px 16px 56px;position:relative}
+.paso::before{counter-increment:p;content:counter(p);position:absolute;left:17px;top:15px;
+  font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+  color:var(--panel);background:var(--paso);width:23px;height:23px;border-radius:50%;
+  display:grid;place-items:center}
+.paso-t{font-weight:600;font-size:.99rem;margin:0 0 4px}
+.paso p{margin:0;font-size:.93rem;color:var(--suave)}
+.paso p+p{margin-top:7px}
+.paso .fuente{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--tenue);
+  margin-top:8px;display:block}
+
+pre{font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.6;
+  background:var(--panel);border:1px solid var(--linea);border-radius:8px;
+  padding:16px 18px;overflow-x:auto;margin:20px 0;color:var(--tinta)}
+code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--hueco);
+  padding:1px 5px;border-radius:4px}
+
+.tw{overflow-x:auto;margin:20px 0}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--linea);vertical-align:top}
+th{font-family:Archivo,sans-serif;font-weight:700;font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--tenue)}
+td.n2{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.cita{border-left:2.5px solid var(--acc);padding:1px 0 1px 17px;margin:18px 0;
+  font-style:italic;color:var(--tinta)}
+.cita cite{display:block;font-style:normal;font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;color:var(--tenue);margin-top:7px;letter-spacing:.03em}
+.nota{background:var(--hueco);border-radius:8px;padding:15px 18px;margin:18px 0;
+  font-size:.93rem;color:var(--suave)}
+.nota b{color:var(--tinta)}
+.avi{background:var(--avi-sua);border:1px solid color-mix(in srgb,var(--avi) 30%,transparent);
+  border-radius:8px;padding:15px 18px;margin:18px 0;font-size:.93rem}
+.avi .eti{color:var(--avi);display:block;margin-bottom:5px}
+.res{background:var(--acc-sua);border:1px solid color-mix(in srgb,var(--acc) 30%,transparent);
+  border-radius:8px;padding:15px 18px;margin:18px 0;font-size:.93rem}
+.res .eti{color:var(--acc);display:block;margin-bottom:5px}
+
+ul,ol{margin:0 0 15px;padding-left:20px}
+li{margin:6px 0}
+li::marker{color:var(--tenue)}
+dl.d{display:grid;grid-template-columns:auto 1fr;gap:9px 18px;margin:18px 0}
+dl.d dt{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--acc);font-weight:500;padding-top:2px}
+dl.d dd{margin:0;font-size:.95rem}
+@media(max-width:600px){dl.d{grid-template-columns:1fr;gap:2px}
+  dl.d dd{margin-bottom:12px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="env">
+<header class="port">
+  <div class="col">
+    <span class="eti">Manual operativo</span>
+    <h1>Manual operativo CRT</h1>
+    <p class="sub">Todos los criterios de todas las fuentes, unificados en un
+    solo método. Cada regla en la versión de quien mejor la explica, y las
+    contradicciones resueltas a la vista.</p>
+  </div>
+</header>
+
+<section>
+  <div class="col">
+    <h3>Cómo se ha unificado</h3>
+    <p>Las fuentes no dicen lo mismo, y en varios sitios se contradicen. El
+    criterio para resolverlo ha sido: <b>se queda la versión que da un
+    procedimiento ejecutable</b>, no la que suena mejor. Donde una fuente explica
+    algo con más detalle que las otras, esa manda.</p>
+    <div class="tw"><table>
+      <tr><th>criterio</th><th>fuente que manda</th><th>por qué</th></tr>
+      <tr><td>Patrón de tres velas</td><td>Villahermosa</td><td>es quien lo define con precisión de vela a vela</td></tr>
+      <tr><td>Rejilla de temporalidades</td><td>bctrades</td><td>Villahermosa se queda en H4; bctrades explica la cadena entera</td></tr>
+      <tr><td>Estados del rango</td><td>bctrades</td><td>único que distingue reiniciado de descartado</td></tr>
+      <tr><td>Momento de entrar</td><td>Villahermosa</td><td>su «Error #1» es la explicación más clara de por qué se espera</td></tr>
+      <tr><td>Objetivo y R:R</td><td>bctrades</td><td>explica <em>por qué</em> el R:R cambia según dónde entras</td></tr>
+      <tr><td>Order block</td><td>trader.derivados</td><td>da un procedimiento; la otra definición no</td></tr>
+      <tr><td>Sweep contra run</td><td>vídeo de liquidez</td><td>la distinción más limpia de todo el material</td></tr>
+      <tr><td>Niveles de sesión</td><td>vídeo de liquidez</td><td>los reduce a cuatro y dice por qué</td></tr>
+      <tr><td>Killzones</td><td>Villahermosa</td><td>da horas exactas, no «la apertura»</td></tr>
+      <tr><td>Stop</td><td>deducido de los gráficos</td><td>ninguna fuente lo escribe</td></tr>
+    </table></div>
+    <div class="nota"><b>Este documento explica el método, no lo avala.</b> Lo
+    que dieron las mediciones está en los otros dos documentos y no se repite
+    aquí — salvo donde hay un dato que cambia cómo se ejecuta, que sí se dice en
+    su sitio.</div>
+  </div>
+</section>
+
+<div class="parte">
+  <span class="eti">Parte I</span>
+  <h2>El marco</h2>
+  <p class="int">Antes de mirar un gráfico hay que saber qué temporalidad manda,
+  cuál confirma y cuál ejecuta. Es la parte que más se salta la gente y la que
+  ordena todo lo demás.</p>
+</div>
+
+<section>
+  <div class="cab"><span class="n">1.1</span><div class="col"><h2>Las tres funciones</h2></div></div>
+  <div class="col">
+    <p>Cada temporalidad hace <b>un trabajo distinto</b>. No se mira «el gráfico»:
+    se mira cada marco buscando una cosa concreta.</p>
+    <dl class="d">
+      <dt>CONTEXTO</dt><dd>Dónde está el objetivo grande y en qué dirección. Es
+      quien decide si hoy buscas compras o ventas. <b>Diario y 12 horas.</b></dd>
+      <dt>ESTRUCTURA</dt><dd>Confirma que las temporalidades intermedias van al
+      mismo sitio. Acumula objetivos. <b>8, 4 y 2 horas.</b></dd>
+      <dt>CONFIRMACIÓN</dt><dd>Es donde se busca el cierre que autoriza la
+      operación. <b>1 hora.</b></dd>
+      <dt>GATILLO</dt><dd>Afina la entrada para reducir el stop. Opcional.
+      <b>15, 10 o 5 minutos.</b></dd>
+    </dl>
+    <div class="res"><span class="eti">Regla de oro del marco</span>
+    <b>Nunca se opera contra el contexto.</b> Si el diario y el de 12 horas
+    apuntan arriba, hoy solo se buscan compras — por muy bonita que sea la venta
+    que aparezca en 15 minutos.</div>
+
+    <h3>La rejilla horaria</h3>
+    <p>Cada bloque tiene que empezar siempre a la misma hora o la lectura no es
+    reproducible. La rejilla que usan:</p>
+    <pre>Diario     cambia a las 00:00
+12 horas   00:00 y 12:00
+8 horas    00:00 · 08:00 · 16:00
+4 horas    00:00 · 04:00 · 08:00 · 12:00 · 16:00 · 20:00
+1 hora     en punto</pre>
+    <div class="avi"><span class="eti">Lo que hay que fijar antes de nada</span>
+    <b>Estas horas dependen del huso de tu gráfico</b>, y ninguna fuente dice
+    cuál usa. Elige uno —el de tu bróker es lo razonable— y <b>no lo cambies
+    nunca</b>. Un mismo día leído con dos husos distintos da dos estrategias
+    distintas.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">1.2</span><div class="col"><h2>La vela base y el rango</h2></div></div>
+  <div class="col">
+    <p>La unidad de todo el método. En cualquier temporalidad:</p>
+    <dl class="d">
+      <dt>Vela base</dt><dd>La vela anterior. Su <b>rango</b> (máximo a mínimo) es
+      el terreno. Su <b>cuerpo</b> (apertura a cierre) es la zona de cierre
+      válida.</dd>
+      <dt>Barrido</dt><dd>La vela siguiente sale por uno de los dos extremos.
+      Solo uno: si sale por los dos, no vale.</dd>
+      <dt>Rango creado</dt><dd>Esa misma vela <b>cierra dentro del cuerpo</b> de
+      la base. Ahí nace el rango.</dd>
+      <dt>Objetivo</dt><dd>El extremo <b>opuesto</b> de la vela base. Barre el
+      mínimo → objetivo en el máximo, y al revés.</dd>
+    </dl>
+    <div class="cita">La manipulación, donde el precio liquida esa vela base y
+    cierra dentro del cuerpo creando un rango.<cite>bctrades</cite></div>
+    <div class="nota"><b>Cierra dentro del CUERPO, no del rango.</b> Es más
+    estricto y es lo que dicen. Si cierra dentro del rango pero fuera del cuerpo,
+    el rango no está creado.</div>
+  </div>
+</section>
+<div class="parte">
+  <span class="eti">Parte II</span>
+  <h2>Los cinco estados del rango</h2>
+  <p class="int">Un rango no está simplemente vivo o muerto. Confundir un
+  reinicio con una invalidación es, según ellos, el error que más operaciones
+  buenas hace abandonar.</p>
+</div>
+
+<section>
+  <div class="cab"><span class="n">2.1</span><div class="col"><h2>Los estados</h2></div></div>
+  <div class="col">
+    <dl class="d">
+      <dt>CREADO</dt><dd>Se cumple el patrón. Nace el objetivo.</dd>
+      <dt>ACTIVADO</dt><dd>El precio vuelve a buscar esa misma liquidez. La idea
+      se pone en marcha.</dd>
+      <dt>CONTINUACIÓN</dt><dd>Respeta la estructura y avanza. Sigue vigente.</dd>
+      <dt>COMPLETADO</dt><dd>Alcanza el objetivo. Se acabó.</dd>
+      <dt>REINICIADO</dt><dd>Se lleva el extremo <b>contrario</b> de la base.
+      <b>No lo mata: lo da la vuelta.</b></dd>
+      <dt>DESCARTADO</dt><dd>Tras el reinicio, además <b>cierra fuera</b>. Ahora
+      sí se cae.</dd>
+    </dl>
+    <div class="cita">Tras un reinicio, el rango solo se descarta si el precio
+    confirma con un cierre fuera del rango principal.<cite>bctrades</cite></div>
+    <div class="res"><span class="eti">La regla práctica</span>
+    <b>Un toque no invalida. Solo invalida un cierre.</b> Si el precio se lleva
+    el otro extremo pero vuelve a meterse, la estructura sigue viva — cambiada de
+    signo, pero viva.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">2.2</span><div class="col"><h2>Cómo se opera un reinicio</h2></div></div>
+  <div class="col">
+    <p>Esta es la parte que no está publicada y que mandaron por privado. Tiene
+    <b>dos usos, y ninguno es «entrar porque sí»</b>.</p>
+
+    <h3>Uso 1 · Protegerte</h3>
+    <div class="cita">Si en esa temporalidad que tenemos cerrada al alza, por la
+    cual estamos buscando compras, se nos crea una reiniciada bajista, debemos
+    protegernos. Porque las demás temporalidades todavía no han cerrado y el
+    precio nos está mostrando que todavía tiene posibilidad de desplazarse en
+    ambas direcciones.<cite>bctrades · respuesta directa</cite></div>
+    <p><b>Traducido a regla:</b> si aparece un reinicio <i>en contra</i> de lo que
+    buscas y las temporalidades mayores todavía no han cerrado su vela, <b>no
+    entras</b>. Esperas a ver qué confirma.</p>
+
+    <h3>Uso 2 · Encontrar el momento de alineación</h3>
+    <div class="cita">Tenemos 1D para subir, 4H para subir, 1H para bajar.
+    Queremos compras. Las superiores están alineadas al alza pero la 1H va en
+    contra. En este caso buscamos una reiniciada alcista en 1H. Cuando aparece,
+    esa temporalidad vuelve a alinearse con el contexto de 4H y 1D.<cite>bctrades · respuesta directa</cite></div>
+    <p><b>Traducido a regla:</b> cuando el contexto ya apunta a tu favor pero la
+    temporalidad de confirmación va en contra, <b>no descartas la idea: esperas
+    el reinicio que la dé la vuelta</b>. Ese reinicio es tu momento de entrada.</p>
+
+    <div class="res"><span class="eti">Lo que resuelve esto</span>
+    Es la respuesta a la pregunta «¿y si el contexto está bien pero la hora va en
+    contra?». La respuesta del método es: <b>no es un descarte, es una espera</b>,
+    y tiene un disparo concreto.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">2.3</span><div class="col"><h2>Los cuatro reinicios</h2></div></div>
+  <div class="col">
+    <p>Cuatro trayectorias posibles. Lo que las une: <b>que un rango se reinicie
+    no significa que la dirección cambie.</b></p>
+    <div class="tw"><table>
+      <tr><th>caso</th><th>qué pasa</th><th>qué hacer</th></tr>
+      <tr><td class="n2">1 · doble toma</td>
+        <td>El rango se reinicia, va a su objetivo, y luego el precio vuelve a tomar
+        la liquidez del rango inicial. Doble toma.</td>
+        <td>Esa segunda toma <b>realinea</b>. Vuelve el objetivo original.</td></tr>
+      <tr><td class="n2">2 · descarte y reactivación</td>
+        <td>Cierra fuera y descarta. Pero la siguiente vela vuelve a tomar el
+        extremo y reactiva la estructura.</td>
+        <td>Un descarte <b>no es definitivo</b> si el precio vuelve a activar.</td></tr>
+      <tr><td class="n2">3 · reinicio del reinicio</td>
+        <td>El rango se reinicia en contra, pero ese rango interno también se
+        reinicia.</td>
+        <td>El precio se reorganiza y <b>vuelve a la narrativa principal</b>.</td></tr>
+      <tr><td class="n2">4 · el que no prospera</td>
+        <td>Aparece un rango interno en contra, pero la vela siguiente no lo
+        reinicia y sigue directa.</td>
+        <td>El reinicio interno <b>no cambió nada</b>. La dirección principal manda.</td></tr>
+    </table></div>
+    <div class="nota">Los cuatro casos son <b>descriptivos</b>: sirven para leer
+    qué está pasando, no son cuatro setups distintos. El setup es siempre el
+    mismo; lo que cambia es si el contexto sigue en pie.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">2.4</span><div class="col"><h2>Liquidez simple, doble y triple</h2></div></div>
+  <div class="col">
+    <p>El precio puede volver al mismo extremo las veces que quiera mientras siga
+    cerrando dentro de la vela base. Cada visita cuenta.</p>
+    <div class="tw"><table>
+      <tr><th>veces</th><th>qué dicen que significa</th></tr>
+      <tr><td class="n2">1 · simple</td><td>crea el rango y define el objetivo</td></tr>
+      <tr><td class="n2">2 · doble</td><td>«confirma la estructura y aumenta la probabilidad»</td></tr>
+      <tr><td class="n2">3+ · triple</td><td>«refuerza la estructura y la aumenta todavía más»</td></tr>
+    </table></div>
+    <div class="cita">La doble y la triple ocurren cuando al precio le falta una
+    activación de rango en otra temporalidad.<cite>bctrades</cite></div>
+    <p>Esa última frase es la parte útil: <b>una doble liquidez te está diciendo
+    que mires arriba</b>, porque suele significar que una temporalidad mayor
+    todavía no ha activado su rango.</p>
+  </div>
+</section>
+
+<div class="parte">
+  <span class="eti">Parte III</span>
+  <h2>La lectura, de arriba a abajo</h2>
+  <p class="int">Los cinco pasos en el orden en que se hacen. No se empieza por
+  abajo nunca: el gráfico pequeño solo sirve para afinar una decisión que ya
+  está tomada arriba.</p>
+</div>
+
+<section>
+  <div class="col">
+    <div class="pasos">
+      <div class="paso">
+        <p class="paso-t">Diario · ¿hay un objetivo pendiente y en qué dirección?</p>
+        <p>Mira las dos últimas velas diarias. ¿Se llevó la última un extremo de
+        la anterior y cerró dentro de su cuerpo? Entonces hay rango creado y el
+        objetivo está en el extremo opuesto.</p>
+        <p>Si no hay nada, <b>el día no tiene sesgo</b> y se baja a 12 horas a ver
+        si lo hay ahí. Si tampoco, hoy no se opera con contexto.</p>
+        <span class="fuente">bctrades · «la temporalidad que tenga objetivo pendiente»</span>
+      </div>
+      <div class="paso">
+        <p class="paso-t">12 horas · el objetivo principal</p>
+        <p>Es el marco de trabajo real. Aquí se define <b>hasta dónde</b> va la
+        operación. Marca el objetivo y compruébalo contra el diario: si apuntan al
+        mismo sitio, el contexto es fuerte.</p>
+        <span class="fuente">bctrades · «identificamos la activación de rango y un posible objetivo»</span>
+      </div>
+      <div class="paso">
+        <p class="paso-t">8, 4 y 2 horas · acumular objetivos</p>
+        <p>Se comprueba si los marcos intermedios tienen rango activo <b>en la
+        misma dirección</b>. Cada uno que se suma refuerza la idea.</p>
+        <p>Cuantos más apunten al mismo sitio, mejor el contexto. Si uno va en
+        contra, no invalida — pero baja la calidad.</p>
+        <span class="fuente">bctrades · «vamos acumulando objetivos y reforzando la dirección»</span>
+      </div>
+      <div class="paso">
+        <p class="paso-t">1 hora · el cierre que autoriza</p>
+        <p>Aquí se busca que se cree un rango <b>en la misma dirección</b> que el
+        contexto. Y se espera <b>al cierre de la vela</b>.</p>
+        <p>Si la 1H va en contra, no se descarta: se espera el <b>reinicio</b> que
+        la realinee (§2.2).</p>
+        <span class="fuente">bctrades · «entramos en el cierre de 1H» · Villahermosa · «Error #1»</span>
+      </div>
+      <div class="paso">
+        <p class="paso-t">15, 10 o 5 minutos · afinar (opcional)</p>
+        <p>Bajar aquí <b>solo sirve para reducir el stop</b>. Se busca el mismo
+        patrón, en la misma dirección, y se entra al cierre.</p>
+        <p>Es opcional a propósito: cuanto más abajo entras, más pequeño el stop
+        pero más te cobra el coste en proporción. No es gratis.</p>
+        <span class="fuente">bctrades · ejecución en 15M, 10M y hasta 2M</span>
+      </div>
+    </div>
+    <div class="avi"><span class="eti">El error que más se comete</span>
+    <b>Entrar antes de que cierre la vela.</b> Villahermosa lo llama «Error #1, el
+    mayor destructor de cuentas», y las tres fuentes coinciden en lo mismo por su
+    cuenta. Una vela que «se ve que va a cerrar así» todavía puede cerrar de otra
+    manera, y entonces la señal nunca existió.</div>
+  </div>
+</section>
+<div class="parte">
+  <span class="eti">Parte IV</span>
+  <h2>La ejecución</h2>
+  <p class="int">Entrada, stop, objetivo y gestión. La parte donde el material
+  original es más disperso, y por tanto donde más ha habido que unificar.</p>
+</div>
+
+<section>
+  <div class="cab"><span class="n">4.1</span><div class="col"><h2>La entrada</h2></div></div>
+  <div class="col">
+    <p><b>Al cierre de la vela que crea el rango en la temporalidad de
+    confirmación.</b> Ni antes ni después.</p>
+    <p>Villahermosa añade un matiz que las otras fuentes no dan y que merece la
+    pena: en vez de entrar a mercado, deja una <b>orden pendiente</b> en el
+    extremo de la vela del barrido. Así o entra con confirmación de que el
+    movimiento arranca, o no entra.</p>
+    <div class="tw"><table>
+      <tr><th>modalidad</th><th>dónde va la orden</th><th>qué implica</th></tr>
+      <tr><td>Agresiva</td><td>a mercado, al cierre de la vela</td><td>entras siempre; peor precio medio</td></tr>
+      <tr><td>Conservadora</td><td>orden pendiente en el extremo del barrido</td><td>te pierdes las que arrancan sin volver; mejor precio</td></tr>
+    </table></div>
+    <div class="nota"><b>Elige una y no las mezcles.</b> Alternar según lo que te
+    apetezca ese día convierte el método en una corazonada con pasos.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">4.2</span><div class="col"><h2>El stop</h2></div></div>
+  <div class="col">
+    <p>Ninguna fuente lo escribe. En todos sus gráficos está en el mismo sitio:</p>
+    <pre>compra   stop = mínimo de la vela del barrido  −  colchón
+venta    stop = máximo de la vela del barrido  +  colchón</pre>
+    <p>El colchón es pequeño: uno o dos ticks. Sirve para no salir por la mecha
+    exacta.</p>
+    <div class="res"><span class="eti">Filtro de ejecutabilidad</span>
+    <b>Si el stop queda a menos de tres veces el coste de ida y vuelta, no es
+    operable.</b> Un stop de 4 pips con 1,2 de coste significa que el 30 % de lo
+    que arriesgas se va antes de empezar. No es una operación, es una donación.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">4.3</span><div class="col"><h2>El objetivo, y las tres zonas</h2></div></div>
+  <div class="col">
+    <p><b>El objetivo es un sitio del gráfico, no un múltiplo del riesgo.</b> El
+    extremo opuesto de la vela base de la temporalidad que manda.</p>
+    <p>Y de ahí sale su filtro de calidad, que es la aportación más útil de todo
+    el material:</p>
+    <pre>R:R = (distancia al objetivo) ÷ (distancia al stop)
+
+  >= 3      zona óptima              adelante
+  ~ 2       continuación             vale, con menos margen
+  ~ 1       últimas oportunidades    llegas tarde</pre>
+    <div class="cita">No solo importa identificar el PO3, sino saber dónde está
+    el precio dentro de él y qué RR nos ofrece esa fase. Esto nos permite decidir
+    si la entrada tiene sentido.<cite>bctrades</cite></div>
+    <p><b>El mismo setup vale o no vale según cuánto recorrido quede.</b> Eso es
+    lo que en otros sitios se llama «que se vea bien», aquí escrito como una
+    división que puedes hacer antes de pulsar el botón.</p>
+    <div class="nota"><b>Cuando hay varios objetivos alineados</b> —4H, 12H y
+    diario— el conservador es tomar el <b>más cercano</b>. Ellos hablan de ir «a
+    los objetivos de 12H y diario» en plural, lo que sugiere parciales; pero no
+    explican dónde ni cuánto, así que esa parte queda sin regla.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">4.4</span><div class="col"><h2>Cuándo NO se opera</h2></div></div>
+  <div class="col">
+    <p>La sección más corta del material original y la más importante. Reunidas
+    todas las condiciones de abstención que aparecen dispersas:</p>
+    <ul>
+      <li><b>No hay objetivo pendiente</b> en ninguna temporalidad de contexto.</li>
+      <li><b>El contexto va en contra</b> de lo que ves abajo.</li>
+      <li><b>Hay un reinicio en contra</b> y las mayores todavía no han cerrado
+      su vela (§2.2).</li>
+      <li><b>La vela no ha cerrado.</b> Sin cierre no hay señal.</li>
+      <li><b>El R:R sale por debajo de 1.</b> Estás llegando tarde.</li>
+      <li><b>El stop queda a menos de 3× el coste.</b> No es ejecutable.</li>
+      <li><b>La vela se llevó los dos extremos</b> de la base. No es un barrido
+      limpio, es una envolvente.</li>
+      <li><b>Ya tienes una posición abierta en un instrumento correlacionado</b>
+      (§5.4).</li>
+    </ul>
+    <p>Villahermosa añade dos límites de disciplina que las otras fuentes no
+    dan: <b>máximo dos o tres operaciones al día</b>, y <b>una zona solo se opera
+    la primera vez</b> — si el precio vuelve a la misma zona, ya está mitigada y
+    no cuenta.</p>
+  </div>
+</section>
+
+<div class="parte">
+  <span class="eti">Parte V</span>
+  <h2>Las confluencias</h2>
+  <p class="int">Todo lo que acompaña al patrón. Cada una con su definición
+  buena, porque varias circulan con dos definiciones incompatibles.</p>
+</div>
+
+<section>
+  <div class="cab"><span class="n">5.1</span><div class="col"><h2>Order block y FVG</h2></div></div>
+  <div class="col">
+    <div class="avi"><span class="eti">Cuidado con esto</span>
+    <b>«Order block» significa dos cosas distintas</b> en el material que
+    circula. Si mezclas fuentes acabas con reglas incompatibles sin darte
+    cuenta.</div>
+    <div class="tw"><table>
+      <tr><th></th><th>definición</th><th>entrada</th></tr>
+      <tr><td><b>Clásica</b><br><span style="font-size:11px;color:var(--tenue)">trader.derivados</span></td>
+        <td>La última vela contraria antes de un movimiento fuerte</td>
+        <td>Marcas su rango y <b>esperas a que el precio vuelva</b></td></tr>
+      <tr><td><b>Del vídeo</b><br><span style="font-size:11px;color:var(--tenue)">vídeo de liquidez</span></td>
+        <td>La propia vela envolvente que gira el precio</td>
+        <td><b>Inmediata</b>, al cierre de esa vela</td></tr>
+    </table></div>
+    <p><b>Se usa la clásica</b>, porque da un procedimiento: marcar zona, esperar
+    retorno, buscar rechazo. La otra es simplemente «entra en la envolvente», que
+    ya está cubierto por el patrón principal.</p>
+    <p>bctrades le da un uso concreto y distinto: <b>CRT completado en 15M + order
+    block en 1H = confirmación de continuidad</b>. No es una entrada, es una
+    señal de que el movimiento tiene intención de seguir.</p>
+
+    <h4>Fair Value Gap</h4>
+    <p>El hueco entre tres velas que no se solapan. <b>Un FVG no es una señal, es
+    una sala de espera</b>: se forma, el precio se va, y la entrada aparece si
+    vuelve. Tres sitios donde entrar dentro del hueco: borde cercano (se llena
+    casi siempre, peor precio), 50 % (el estándar) y borde lejano (mejor precio,
+    se llena poco).</p>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">5.2</span><div class="col"><h2>Sweep contra run</h2></div></div>
+  <div class="col">
+    <p>La distinción más limpia de todo el material, y en realidad es el mismo
+    patrón de la Parte I con otro nombre:</p>
+    <dl class="d">
+      <dt>SWEEP</dt><dd>La mecha se lleva el nivel pero el cuerpo queda del otro
+      lado. Era una trampa. <b>Se opera a favor de la vuelta.</b></dd>
+      <dt>RUN</dt><dd>Cierra con cuerpo más allá del nivel. Tiene fuerza de
+      verdad. <b>No se opera la vuelta: se espera.</b></dd>
+    </dl>
+    <div class="nota">Sweep = rango creado. Run = rango descartado. Es el mismo
+    suceso descrito por dos escuelas distintas.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">5.3</span><div class="col"><h2>Niveles, sesiones y horarios</h2></div></div>
+  <div class="col">
+    <h4>Los cuatro niveles que importan</h4>
+    <p>Máximo y mínimo del <b>día anterior</b>, y máximo y mínimo de la
+    <b>sesión anterior</b>. Y ya está.</p>
+    <div class="cita">Son los niveles que mira todo el mundo. Donde mira todo el
+    mundo es donde todo el mundo deja sus stops, y los stops son la gasolina del
+    mercado.<cite>vídeo de liquidez</cite></div>
+    <p>Un nivel <b>se gasta</b> cuando el precio lo deja atrás con cuerpo. A
+    partir de ahí ya no es liquidez pendiente y deja de contar.</p>
+
+    <h4>Killzones · horas de Madrid</h4>
+    <pre>08:00 – 11:00    apertura de Londres
+13:00 – 16:00    apertura de Nueva York (divisas)
+15:30 – 17:00    apertura del contado americano (índices)
+16:00 – 18:00    cierre de Londres
+
+11:00 – 13:00    almuerzo europeo · se excluye</pre>
+
+    <h4>Y para el EURUSD en concreto</h4>
+    <pre>09:00 – 15:00    ventana de reversión
+12:00 – 17:00    ventana de continuación</pre>
+    <div class="nota">Estas dos ventanas se solapan de 12 a 15. En la práctica
+    eso significa que <b>de 12 a 15 el marco no dice nada</b>: caben las dos
+    lecturas, así que ahí manda el contexto y no la hora.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">5.4</span><div class="col"><h2>Correlaciones</h2></div></div>
+  <div class="col">
+    <p>Los bloques que se mueven juntos:</p>
+    <pre>XAUUSD — XAGUSD          EURUSD — GBPUSD
+AUDUSD — NZDUSD          EURJPY — GBPJPY
+USDCHF — USDJPY          US500 — NAS100 — US30
+UKOIL  — WTI             BTC — ETH
+
+inversa:  EURUSD — DXY   (el euro pesa el 57,6 % del índice)</pre>
+    <div class="avi"><span class="eti">La regla que de verdad importa</span>
+    <b>Máximo una posición abierta por bloque.</b> EURUSD y GBPUSD a la vez no es
+    diversificar: es la misma operación al doble de tamaño. En una cuenta de
+    fondeo, eso es lo que hace saltar el límite de pérdida diaria.</div>
+    <p>Y sobre usarlas para confirmar: si el EURUSD sube, el DXY <b>tiene</b> que
+    bajar — el euro es más de la mitad del índice. Verlo no confirma nada, es el
+    mismo dato dos veces. <b>Lo informativo es la divergencia</b>: si el EURUSD
+    sube y el DXY no baja, el movimiento no es del euro sino de las otras
+    divisas de la cesta, y eso sí te dice algo.</p>
+  </div>
+</section>
+<div class="parte">
+  <span class="eti">Parte VI</span>
+  <h2>La operativa diaria</h2>
+  <p class="int">Todo lo anterior condensado en lo que se hace de verdad
+  delante del gráfico, en el orden en que se hace.</p>
+</div>
+
+<section>
+  <div class="cab"><span class="n">6.1</span><div class="col"><h2>La rutina</h2></div></div>
+  <div class="col">
+    <pre>AL CIERRE DIARIO  ·  una vez al día, 10 minutos
+
+  1  Marca en cada instrumento: ¿hay rango creado en diario?
+     ¿Y en 12 horas? Apunta dirección y objetivo.
+  2  Marca los cuatro niveles: máx/mín del día anterior
+     y de la sesión anterior.
+  3  Si no hay objetivo pendiente en ningún marco de
+     contexto, ese instrumento no se mira hoy.
+
+ANTES DE LA APERTURA QUE VAYAS A OPERAR  ·  20 minutos
+
+  4  Repasa 8H, 4H y 2H: ¿cuántas apuntan al mismo sitio?
+  5  Pon alarmas en los niveles marcados.
+  6  Cierra el portátil. No se hace nada más hasta que suene.
+
+CUANDO SALTE LA ALARMA
+
+  7  ¿Se creó rango en 1H en la dirección del contexto?
+     · sí        -> sigue al paso 8
+     · no, va en contra  -> espera el REINICIO que la realinee
+     · nada      -> no hay operación
+  8  ESPERA EL CIERRE de la vela de 1H.
+  9  Calcula:  riesgo = |entrada − stop|
+               premio = |objetivo mayor − entrada|
+               R:R    = premio / riesgo
+ 10  ¿R:R >= 3?  ¿riesgo >= 3x el coste?  ¿sin posición en
+     un correlacionado?   ->  ejecuta.
+ 11  Anota la operación antes de que se mueva el precio.
+
+DESPUÉS
+
+ 12  Objetivo o stop. No se toca.
+ 13  Registro: temporalidades alineadas, tomas de liquidez,
+     R:R real, hora, resultado.</pre>
+    <div class="res"><span class="eti">La rutina completa son 30 minutos al día</span>
+    Diez al cierre diario y veinte antes de la apertura que operes. Si te lleva
+    más, es que estás buscando operaciones en vez de esperarlas.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">6.2</span><div class="col"><h2>La lista de comprobación</h2></div></div>
+  <div class="col">
+    <p>Para tener al lado. <b>Ocho casillas, todas o ninguna.</b></p>
+    <pre>CONTEXTO
+  [ ] 1  Hay objetivo pendiente en diario o en 12 horas
+  [ ] 2  Sé la dirección, y no la he decidido yo
+  [ ] 3  Al menos un marco intermedio (8H/4H/2H) acompaña
+
+ESTRUCTURA
+  [ ] 4  El rango de contexto sigue vivo
+         (reiniciado vale · descartado no)
+  [ ] 5  No hay reinicio en contra con las mayores sin cerrar
+
+DISPARO
+  [ ] 6  Rango creado en 1H en la dirección del contexto
+  [ ] 7  LA VELA HA CERRADO
+
+LA CUENTA
+  [ ] 8  R:R >= 3   ·   riesgo >= 3x coste
+         ·   sin posición en un correlacionado</pre>
+    <div class="avi"><span class="eti">La casilla 7</span>
+    Es la que más se salta todo el mundo y la que separa este método de apostar.
+    Todas las fuentes coinciden en ella por su cuenta, que es lo más parecido a
+    una prueba independiente que hay en el material.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">6.3</span><div class="col"><h2>El registro</h2></div></div>
+  <div class="col">
+    <p>Sin esto no sabrás nunca qué parte del método funciona para ti. Una línea
+    por operación:</p>
+    <pre>fecha · hora · instrumento · dirección
+marco del contexto · marco de ejecución
+objetivos alineados (1, 2, 3...)
+tomas de liquidez (simple / doble / triple)
+zona de R:R (óptima / continuación / últimas)
+entrada · stop · objetivo · R:R calculado
+resultado en R</pre>
+    <div class="nota">Con cincuenta líneas de éstas puedes cruzar cualquier
+    columna contra el resultado y ver qué aporta <b>en tus manos</b>, que es
+    distinto de lo que aporte en general.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">6.4</span><div class="col"><h2>Lo que el método no dice</h2></div></div>
+  <div class="col">
+    <p>Para que sepas dónde estás improvisando cuando improvises:</p>
+    <div class="tw"><table>
+      <tr><th>hueco</th><th>lo que hay</th></tr>
+      <tr><td><b>El huso horario</b> de la rejilla</td>
+        <td>Ninguna fuente lo dice. Elige uno y no lo cambies.</td></tr>
+      <tr><td><b>Dónde va el stop</b>, por escrito</td>
+        <td>Nadie lo escribe. Lo de §4.2 está deducido de sus gráficos.</td></tr>
+      <tr><td><b>Gestión después de entrar</b></td>
+        <td>Nada. Ni parciales, ni breakeven, ni trailing.</td></tr>
+      <tr><td><b>Tamaño de posición</b></td>
+        <td>Nada, más allá del R:R.</td></tr>
+      <tr><td><b>Objetivo cuando hay varios alineados</b></td>
+        <td>Hablan en plural pero no dan regla. Aquí se toma el más cercano.</td></tr>
+      <tr><td><b>Cuánto es discrecional</b></td>
+        <td>Sin respuesta. Es el hueco más grande de todos.</td></tr>
+    </table></div>
+    <div class="nota">Estos seis huecos no son crítica: son el mapa de dónde vas
+    a tener que decidir tú. <b>Decide una vez, escríbelo, y no lo cambies sobre
+    la marcha.</b> Un método con seis huecos rellenados de forma consistente es
+    operable; el mismo método rellenado distinto cada día, no.</div>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <div class="res"><span class="eti">Los otros dos documentos</span>
+    Este manual explica <b>cómo se opera el método</b>. Hay dos más que responden
+    otras preguntas: la <b>formación</b> explica de dónde sale cada concepto y por
+    qué, para entenderlo desde cero; y el documento de <b>evidencia</b> recoge qué
+    dieron las mediciones sobre seis años y medio de datos, pieza por pieza.
+    <br><br>
+    Los tres dicen cosas distintas y los tres son ciertos a la vez. Este es el
+    que te llevas al gráfico.</div>
+  </div>
+</section>
+
+<div class="parte">
+  <span class="eti">Parte VII</span>
+  <h2>Definiciones para el indicador</h2>
+  <p class="int">Todo lo anterior lo puede operar una persona porque una persona
+  rellena los huecos sin darse cuenta. Un indicador no puede. Esta parte cierra
+  los diecisiete sitios donde la teoría deja de ser precisa y el código tiene que
+  decidir igualmente.</p>
+</div>
+
+<section>
+  <div class="col">
+    <div class="avi"><span class="eti">Cómo leer esta parte</span>
+    Cada regla lleva marcado su origen. <b>FUENTE</b> = está en el material.
+    <b>DECISIÓN</b> = no está, y hay que elegir algo para poder programar.
+    Las decisiones son mías y son discutibles; lo que no es discutible es que
+    haya que tomarlas.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.1</span><div class="col"><h2>Comparaciones exactas</h2></div></div>
+  <div class="col">
+    <p>Un «se lleva el extremo» hay que escribirlo con un signo concreto.</p>
+    <div class="tw"><table>
+      <tr><th>caso</th><th>regla</th><th>origen</th></tr>
+      <tr><td>Barrido del máximo</td><td class="n2">high &gt; base_high</td><td>DECISIÓN · estricto</td></tr>
+      <tr><td>Barrido del mínimo</td><td class="n2">low &lt; base_low</td><td>DECISIÓN · estricto</td></tr>
+      <tr><td>Cierre dentro del cuerpo</td><td class="n2">min(o,c)base &lt;= close &lt;= max(o,c)base</td><td>FUENTE · inclusivo</td></tr>
+      <tr><td>Se lleva los dos extremos</td><td>no hay setup</td><td>FUENTE</td></tr>
+    </table></div>
+    <p><b>Por qué estricto y no «mayor o igual»:</b> tocar exactamente el mismo
+    precio no es llevarse la liquidez, es llegar a ella. Con datos de un minuto
+    el empate exacto es raro, pero con velas grandes pasa, y hay que decidirlo.</p>
+
+    <h3>La vela base doji</h3>
+    <p>Si apertura y cierre coinciden, el cuerpo tiene altura cero y «cerrar
+    dentro del cuerpo» es imposible.</p>
+    <div class="res"><span class="eti">DECISIÓN</span>
+    Si <code>|apertura − cierre| &lt; 10 % del rango</code> de la vela base, se usa
+    el <b>rango completo</b> en vez del cuerpo. Por debajo de ese umbral el cuerpo
+    no distingue nada.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.2</span><div class="col"><h2>La vida del rango · la máquina de estados</h2></div></div>
+  <div class="col">
+    <p>Es lo más delicado, porque el manual describe estados pero no las
+    transiciones completas.</p>
+    <pre>estado inicial: NINGUNO
+
+NINGUNO --[barrido de un extremo + cierre en cuerpo]--> CREADO
+                                                        objetivo = extremo opuesto
+
+CREADO  --[precio alcanza el objetivo]-----------------> COMPLETADO   (fin)
+CREADO  --[se lleva el extremo CONTRARIO]--------------> REINICIADO
+CREADO  --[nace un rango nuevo en esta TF]-------------> RELEVADO     (fin)
+CREADO  --[pasan N velas sin nada]---------------------> CADUCADO     (fin)
+
+REINICIADO --[cierra FUERA del rango base]-------------> DESCARTADO   (fin)
+REINICIADO --[vuelve a cerrar dentro del cuerpo]-------> CREADO
+                                                         con la dirección INVERTIDA
+                                                         y objetivo en el otro extremo</pre>
+
+    <div class="res"><span class="eti">DECISIÓN · qué objetivo tiene un rango reiniciado</span>
+    El manual dice que el reinicio «lo da la vuelta» pero no dice cuál es el
+    objetivo nuevo. Se toma: <b>el rango invierte su dirección y el objetivo pasa
+    al extremo contrario de la misma vela base</b>. La vela base no cambia; cambia
+    de qué lado se lee.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · cuánto vive un rango</span>
+    Ninguna fuente lo dice, y sin un límite un rango de diario de hace tres
+    semanas seguiría contando. Se fija en <b>10 velas de su propia
+    temporalidad</b>. Un rango de 12H caduca en cinco días; uno de diario, en dos
+    semanas.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · dos rangos vivos a la vez</span>
+    Si nace un rango nuevo en la misma temporalidad, <b>releva al anterior</b>.
+    Solo hay un rango vivo por temporalidad en cada momento. Es lo más simple y
+    evita que se acumulen objetivos contradictorios del mismo marco.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · qué cierre descarta</span>
+    El cierre de una vela <b>de la propia temporalidad del rango</b>. Un cierre de
+    5 minutos no descarta un rango de 12 horas. Si no, cualquier vela pequeña
+    invalidaría todo constantemente.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.3</span><div class="col"><h2>El contexto</h2></div></div>
+  <div class="col">
+    <div class="res"><span class="eti">DECISIÓN · el diario y el de 12H se contradicen</span>
+    <b>Manda el marco mayor.</b> Si el diario dice arriba y el de 12 horas dice
+    abajo, la dirección del día es arriba y el de 12 horas se ignora — no se opera
+    en su contra, pero tampoco cuenta como objetivo alineado.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · cuántos marcos intermedios hacen falta</span>
+    En la lista de comprobación puse «al menos un marco intermedio acompaña».
+    <b>Eso me lo inventé yo</b>, no está en ninguna fuente. Para el indicador se
+    fija así: <b>se cuenta y se muestra</b> cuántos acompañan (0, 1, 2 o 3) y
+    <b>no se filtra por ello</b>. Que decida quien mira.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · el precio ya pasó el objetivo</span>
+    Si el objetivo de una temporalidad queda por detrás del precio actual, ese
+    rango pasa a <b>COMPLETADO</b> aunque el precio llegara sin que lo estuviéramos
+    mirando. No se cuenta como objetivo pendiente.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.4</span><div class="col"><h2>La ejecución</h2></div></div>
+  <div class="col">
+    <div class="res"><span class="eti">DECISIÓN · el stop cuando la entrada viene de un reinicio</span>
+    El disparo por reinicio (§2.2, uso 2) entra al cierre de la vela que reinicia.
+    El stop va en <b>el extremo de esa misma vela</b>, igual que en la entrada
+    normal. Es lo consistente con §4.2.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · killzone, ¿formación o entrada?</span>
+    Se comprueba sobre <b>la vela de entrada</b>, no sobre la formación del rango
+    de contexto. El contexto se construye a cualquier hora; lo que se filtra es
+    cuándo ejecutas.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · qué es «la misma zona» para la mitigación</span>
+    Villahermosa dice que una zona vale una sola vez. Se implementa como:
+    <b>el rango de una vela base concreta se opera una vez</b>. Si el precio vuelve
+    y vuelve a cumplir el patrón sobre <i>la misma</i> vela base, no cuenta. Sobre
+    una vela base nueva, sí.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · varios objetivos alineados</span>
+    Se muestra <b>el más cercano</b> como objetivo operativo y se listan los demás
+    como referencia. El R:R se calcula contra el más cercano, que es lo
+    conservador.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.5</span><div class="col"><h2>Los datos</h2></div></div>
+  <div class="col">
+    <div class="res"><span class="eti">DECISIÓN · huecos de fin de semana</span>
+    El lunes abre con hueco casi siempre. Si la apertura del lunes queda fuera del
+    rango del viernes, <b>cuenta como barrido igual</b> — pero se marca en pantalla
+    como «por hueco», porque no es lo mismo que un barrido intradía y conviene
+    verlo.</div>
+
+    <div class="res"><span class="eti">DECISIÓN · velas incompletas</span>
+    Festivos, cierres anticipados, días de baja liquidez. Una vela con <b>menos
+    del 50 % de los minutos esperados</b> no se usa ni como base ni como barrido.
+    Se salta.</div>
+
+    <div class="avi"><span class="eti">El huso horario · lo más importante de toda esta parte</span>
+    <b>El indicador tiene que llevar el huso como parámetro visible, no
+    escondido.</b> Y una vez elegido, no se toca. Los bloques de 12H, 8H y 4H
+    empiezan a horas distintas según el huso, y eso cambia qué vela es la base —
+    o sea, cambia la estrategia entera.
+    <br><br>
+    Si algún día cambias el huso «a ver qué tal», deja de ser el mismo método y
+    todo lo que hayas registrado antes deja de ser comparable.</div>
+  </div>
+</section>
+
+<section>
+  <div class="cab"><span class="n">7.6</span><div class="col"><h2>Qué tiene que mostrar el indicador</h2></div></div>
+  <div class="col">
+    <p>Para que sirva de aviso y de comprobación, no solo de dibujo:</p>
+    <h4>En el gráfico</h4>
+    <ul>
+      <li>La <b>vela base</b> de cada temporalidad activa, con su rango y su
+      cuerpo marcados por separado.</li>
+      <li>El <b>objetivo</b> de cada rango vivo, con etiqueta de qué marco es.</li>
+      <li>El <b>estado</b> de cada rango en color: creado · reiniciado ·
+      descartado · completado · caducado.</li>
+      <li>Los <b>cuatro niveles</b>: máx/mín del día y de la sesión anterior, y
+      cuáles están ya gastados.</li>
+      <li>Cuando hay setup: <b>entrada, stop y objetivo</b> con los precios.</li>
+    </ul>
+    <h4>En el panel</h4>
+    <pre>CONTEXTO        dirección · qué marco manda · objetivo
+ALINEACIÓN      cuántos marcos acompañan (0-3)
+ESTADO          el del rango de cada temporalidad
+TOMAS           simple / doble / triple
+LAS 8 CASILLAS  con su check o su cruz
+LA CUENTA       riesgo · premio · R:R · zona
+VETO            si algo lo bloquea, QUÉ lo bloquea</pre>
+    <div class="res"><span class="eti">Lo que más falta en los indicadores que existen</span>
+    <b>Que diga por qué NO hay operación.</b> Casi todos dibujan cuando hay señal
+    y callan cuando no. Lo útil para aprender es lo contrario: «hay contexto y hay
+    rango en 1H, pero el R:R sale 1,4 — llegas tarde». Eso enseña. Un triángulo
+    verde no.</div>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <div class="avi"><span class="eti">Resumen honesto de la Parte VII</span>
+    De los diecisiete puntos, <b>cuatro salen del material y trece son decisiones
+    mías</b>. Eso no es un defecto del método: es lo normal cuando se pasa de una
+    explicación humana a un programa.
+    <br><br>
+    Pero tiene una consecuencia que conviene tener presente: <b>el indicador no
+    va a implementar «el CRT». Va a implementar esta versión concreta del CRT</b>,
+    con estas trece decisiones dentro. Si alguna está mal, el indicador estará
+    midiendo otra cosa — y por eso van todas escritas y numeradas, para poder
+    cambiarlas una a una y ver qué pasa.</div>
+  </div>
+</section>
+
+<footer style="padding:40px 0 0;color:var(--tenue);font-family:'IBM Plex Mono',monospace;font-size:12px">
+  <div class="col">
+    <p style="margin:0;line-height:1.7">Unifica: guía CRT de Rubén Villahermosa ·
+    ~250 publicaciones de @bctrades__ y su respuesta directa sobre reinicios ·
+    @trader.derivados · vídeo de las 4 confirmaciones · vídeo de fondeo ·
+    indicadores de nico66fx · lista de correlaciones.</p>
+  </div>
+</footer>
+</div>

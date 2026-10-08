@@ -1,0 +1,185 @@
+//@version=6
+// ─────────────────────────────────────────────────────────────────────────────
+//  CRT · Fibonacci M5  —  mejor configuracion medida en el backtest propio
+//
+//  PONER EL GRAFICO EN M5. La vela de referencia se pide aparte.
+//
+//  Patron (guia de Candle Range Theory):
+//     Vela 1  define el rango (maximo y minimo)
+//     Vela 2  liquida un extremo de la Vela 1 y cierra de vuelta DENTRO
+//     Vela 3  es donde se opera: se espera un retroceso de Fibonacci en M5
+//  Entrada  orden LIMITADA en el retroceso del impulso A->B
+//     A = extremo del barrido de la Vela 2
+//     B = maximo (o minimo) acumulado en M5 desde que abrio la Vela 3
+//     nivel = B - fib*(B-A)  en largos
+//  Stop     detras de la mecha de manipulacion (A), como manda la guia
+//  Objetivo extremo opuesto del rango de la Vela 1
+//
+//  AJUSTES PARA QUE EL TEST SEA COMPARABLE (pestaña Properties):
+//     Commission: el spread de tu broker, ida y vuelta
+//     Slippage:   1 tick
+//     Recalculate: DESACTIVAR "on every tick" y "after order is filled"
+// ─────────────────────────────────────────────────────────────────────────────
+strategy("CRT Fibonacci M5 [Fondeo]", overlay = true,
+     initial_capital       = 10000,
+     default_qty_type      = strategy.fixed,
+     default_qty_value     = 1,
+     pyramiding            = 0,
+     calc_on_every_tick    = false,
+     process_orders_on_close = false,
+     max_labels_count      = 500,
+     max_lines_count       = 500,
+     max_boxes_count       = 500)
+
+// ── entradas ────────────────────────────────────────────────────────────────
+grpP = "Patron CRT"
+tfRef    = input.timeframe("D",  "Vela de referencia", options = ["60","240","D"], group = grpP)
+estricto = input.bool(true,  "La Vela 2 debe cerrar dentro del rango",  group = grpP)
+
+grpE = "Entrada por Fibonacci en M5"
+fib      = input.float(0.50, "Retroceso", minval = 0.20, maxval = 0.95, step = 0.005, group = grpE)
+minLeg   = input.float(0.20, "Impulso minimo (fraccion del rango)", minval = 0.0, step = 0.05, group = grpE)
+
+grpG = "Gestion"
+buffer   = input.float(1.0,  "Colchon del stop (ticks)", minval = 0.0, group = grpG)
+minRR    = input.float(1.5,  "R:R minimo", minval = 0.5, step = 0.1, group = grpG)
+maxRR    = input.float(15.0, "R:R maximo", minval = 2.0, step = 0.5, group = grpG)
+minRiesgoT = input.float(3.0, "Riesgo minimo (ticks)", minval = 0.0, group = grpG)
+minRiesgoR = input.float(0.05,"Riesgo minimo (fraccion del rango)", minval = 0.0, step = 0.01, group = grpG)
+riesgoPct  = input.float(1.0, "Riesgo por operacion (% del capital)", minval = 0.05, step = 0.05, group = grpG)
+topeDia    = input.int(3,     "Maximo de operaciones al dia", minval = 1, group = grpG)
+maxHoras   = input.int(48,    "Vida maxima de la operacion (horas)", minval = 1, group = grpG)
+
+grpH = "Horario · killzones en hora española"
+usarKZ = input.bool(true, "Filtrar por killzones", group = grpH)
+kz1    = input.session("0800-1100", "Killzone de Londres",          group = grpH)
+kz2    = input.session("1300-1800", "Killzone de NY + London Close", group = grpH)
+tzOper = input.string("Europe/Madrid", "Huso horario", group = grpH)
+
+grpV = "Visual"
+verNiv = input.bool(true, "Dibujar niveles", group = grpV)
+
+// ── velas de referencia: Vela 1 y Vela 2, ambas YA CERRADAS ─────────────────
+// Durante la Vela 3 en curso, [1] es la Vela 2 y [2] es la Vela 1.
+[v1h, v1l, v2h, v2l, v2c] = request.security(syminfo.tickerid, tfRef,
+     [high[2], low[2], high[1], low[1], close[1]],
+     lookahead = barmerge.lookahead_off)
+
+rango = v1h - v1l
+
+// ── deteccion del patron ────────────────────────────────────────────────────
+barreLo = not na(v1l) and not na(v2l) and v2l < v1l
+barreHi = not na(v1h) and not na(v2h) and v2h > v1h
+unSolo  = barreLo != barreHi                          // uno de los dos, no ambos
+cierreOk = not estricto or (not na(v2c) and v2c >= v1l and v2c <= v1h)
+hayCRT  = unSolo and cierreOk and not na(rango) and rango > 0
+esLargo = barreLo
+
+A = esLargo ? v2l : v2h                               // extremo del barrido
+
+// ── B: extremo acumulado en M5 desde que abrio la Vela 3 ───────────────────
+nuevaRef = ta.change(time(tfRef)) != 0
+var float B = na
+if nuevaRef
+    B := na
+if hayCRT
+    B := na(B) ? (esLargo ? high : low) :
+     (esLargo ? math.max(B, high) : math.min(B, low))
+
+// ── contadores y estado ─────────────────────────────────────────────────────
+nuevoDia = ta.change(time("D")) != 0
+var int opsHoy = 0
+var bool hechoRef = false
+var int barraEntrada = na
+if nuevoDia
+    opsHoy := 0
+if nuevaRef
+    hechoRef := false
+
+// ── killzone en hora local ──────────────────────────────────────────────────
+enKZ1 = not na(time(timeframe.period, kz1, tzOper))
+enKZ2 = not na(time(timeframe.period, kz2, tzOper))
+enKZ  = not usarKZ or enKZ1 or enKZ2
+
+// ── calculo del nivel de entrada, stop y objetivo ───────────────────────────
+tick   = syminfo.mintick
+leg    = na(B) ? na : (esLargo ? B - A : A - B)
+legOk  = not na(leg) and leg >= minLeg * rango
+nivel  = na(leg) ? na : (esLargo ? B - fib * leg : B + fib * leg)
+sl     = esLargo ? A - buffer * tick : A + buffer * tick
+tp     = esLargo ? v1h : v1l
+riesgo = na(nivel) ? na : math.abs(nivel - sl)
+premio = na(nivel) ? na : math.abs(tp - nivel)
+rr     = (na(riesgo) or riesgo <= 0) ? na : premio / riesgo
+
+riesgoMin = math.max(minRiesgoT * tick, minRiesgoR * rango)
+coherente = not na(nivel) and not na(riesgo) and riesgo >= riesgoMin and
+     not na(rr) and rr >= minRR and rr <= maxRR and
+     (esLargo ? (nivel > sl and tp > nivel) : (nivel < sl and tp < nivel))
+
+puedeEntrar = hayCRT and legOk and coherente and enKZ and
+     not hechoRef and opsHoy < topeDia and strategy.position_size == 0
+
+// ── tamaño por riesgo fijo ──────────────────────────────────────────────────
+valorTick = syminfo.pointvalue * tick
+qty = (na(riesgo) or riesgo <= 0) ? 0.0 :
+     (strategy.equity * riesgoPct / 100.0) / (riesgo / tick * valorTick)
+
+// ── ordenes ─────────────────────────────────────────────────────────────────
+if puedeEntrar and qty > 0
+    if esLargo
+        strategy.entry("CRT", strategy.long, qty = qty, limit = nivel)
+    else
+        strategy.entry("CRT", strategy.short, qty = qty, limit = nivel)
+
+// la orden pendiente muere con la Vela 3
+if nuevaRef and strategy.position_size == 0
+    strategy.cancel("CRT")
+
+if strategy.position_size != 0
+    strategy.exit("Salida", from_entry = "CRT", stop = sl, limit = tp)
+
+// contabilidad y vida maxima
+if strategy.position_size != 0 and na(barraEntrada)
+    barraEntrada := bar_index
+    opsHoy   += 1
+    hechoRef := true
+if strategy.position_size == 0
+    barraEntrada := na
+if strategy.position_size != 0 and not na(barraEntrada) and
+     bar_index - barraEntrada >= math.round(maxHoras * 3600 / timeframe.in_seconds())
+    strategy.close("CRT", comment = "tiempo")
+
+// ── dibujo ──────────────────────────────────────────────────────────────────
+plot(verNiv and hayCRT ? v1h : na, "Vela 1 max", color.new(color.gray, 40),
+     style = plot.style_linebr)
+plot(verNiv and hayCRT ? v1l : na, "Vela 1 min", color.new(color.gray, 40),
+     style = plot.style_linebr)
+plot(verNiv and puedeEntrar ? nivel : na, "Nivel de entrada", color.orange, 2,
+     style = plot.style_linebr)
+plot(verNiv and hayCRT ? A : na, "Barrido (A)", color.new(color.red, 30),
+     style = plot.style_linebr)
+plot(verNiv and hayCRT and not na(B) ? B : na, "Impulso (B)", color.new(color.teal, 30),
+     style = plot.style_linebr)
+bgcolor(usarKZ and enKZ ? color.new(color.blue, 94) : na, title = "Killzone")
+
+// ── panel de control, para verificar que el patron se detecta ──────────────
+var table tb = table.new(position.top_right, 2, 7, border_width = 1)
+if barstate.islast
+    table.cell(tb, 0, 0, "CRT",       bgcolor = color.new(color.gray, 70), text_size = size.small)
+    table.cell(tb, 1, 0, hayCRT ? (esLargo ? "ALCISTA" : "BAJISTA") : "no",
+         bgcolor = color.new(hayCRT ? color.green : color.gray, 70), text_size = size.small)
+    table.cell(tb, 0, 1, "Rango V1",  text_size = size.small)
+    table.cell(tb, 1, 1, str.tostring(v1l, format.mintick) + " / " +
+         str.tostring(v1h, format.mintick), text_size = size.small)
+    table.cell(tb, 0, 2, "A barrido", text_size = size.small)
+    table.cell(tb, 1, 2, str.tostring(A, format.mintick), text_size = size.small)
+    table.cell(tb, 0, 3, "B impulso", text_size = size.small)
+    table.cell(tb, 1, 3, str.tostring(B, format.mintick), text_size = size.small)
+    table.cell(tb, 0, 4, "Nivel fib", text_size = size.small)
+    table.cell(tb, 1, 4, str.tostring(nivel, format.mintick), text_size = size.small)
+    table.cell(tb, 0, 5, "R:R",       text_size = size.small)
+    table.cell(tb, 1, 5, na(rr) ? "-" : str.tostring(rr, "#.##"), text_size = size.small)
+    table.cell(tb, 0, 6, "Killzone",  text_size = size.small)
+    table.cell(tb, 1, 6, enKZ ? "SI" : "no",
+         bgcolor = color.new(enKZ ? color.blue : color.gray, 70), text_size = size.small)

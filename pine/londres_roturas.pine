@@ -1,0 +1,235 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// at https://mozilla.org/MPL/2.0/
+//
+//  Londres · roturas del cuerpo de M5
+//
+//  LA REGLA, medida sobre sus 223 operaciones:
+//    el cuerpo de la ultima vela de M5 CERRADA, roto por el CIERRE de una vela
+//    de M1. Cubre el 83 % de sus entradas (z +4,88 contra los minutos de
+//    control) y explica por que entra en minutos sueltos y no en cierres de M5.
+//
+//  LO QUE HAY QUE SABER ANTES DE USARLO
+//    La flecha sola PIERDE. Operada a ciegas la rotura da:
+//        la primera del dia    37,9 %   R neta -0,255   (164 ops)
+//        las tres primeras     33,0 %   R neta -0,348   (478 ops)
+//        todas                 30,8 %   R neta -0,346   (930 ops)
+//    Sus 223 elegidas dan 64,8 % y +0,682. La diferencia es SU eleccion, medida
+//    a ciegas y preregistrada en +16,1 puntos (z +2,65, p = 0,004).
+//
+//    Por eso esto NO es un sistema de señales: es un detector de candidatas.
+//    La flecha dice donde mirar. Quien decide sigue siendo el.
+//
+//  LOS TRES FILTROS, todos medidos y todos apagables
+//    1 cuerpo de la vela de M5 por debajo del 80 % del rango
+//      (>= 80 % da 38,9 % de acierto en 37 operaciones suyas, contra 70,1 %)
+//    2 stop entre 4 y 10 pips
+//      (entre 5 y 8 su eleccion separa 50,0 % contra 13,0 %)
+//    3 ventana horaria; entre las 09:00 y las 10:00 separa 46,2 % contra 17,9 %
+//
+//  Y EL CONTADOR, que es la mitad de su ventaja
+//    En el examen de las roturas acepto 145 de 250 y perdio dinero. Operando de
+//    verdad toma UNA DE CADA 28. Elegir poco no es prudencia: esta medido que es
+//    parte de lo que le hace ganar. La tabla lleva la cuenta del dia.
+//
+//  Escrito sin poder compilarlo. Si TradingView se queja, pega el error.
+//@version=6
+indicator("Londres · roturas del cuerpo de M5", overlay = true,
+     max_labels_count = 300, max_lines_count = 20)
+
+// ─── ventana ──────────────────────────────────────────────────────────────
+gV = "Ventana"
+tz    = input.string("Europe/Madrid", "Huso horario", group = gV,
+     options = ["Europe/Madrid", "Europe/London", "America/New_York", "UTC"])
+vIniH = input.int(8,  "Empiezas a las",  0, 23, group = gV, inline = "a")
+vIniM = input.int(0,  ":",               0, 59, group = gV, inline = "a")
+vFinH = input.int(11, "Dejas de operar", 0, 23, group = gV, inline = "b")
+vFinM = input.int(30, ":",               0, 59, group = gV, inline = "b")
+oroH1 = input.int(9,  "Tu mejor hora, de", 0, 23, group = gV, inline = "c")
+oroH2 = input.int(10, "a",                 0, 23, group = gV, inline = "c",
+     tooltip = "Entre las 09:00 y las 10:00 tu eleccion separo 46,2 % contra " +
+     "17,9 % en el examen de las roturas.")
+
+// ─── filtros ──────────────────────────────────────────────────────────────
+gF = "Los filtros medidos"
+fCuerpo = input.bool(true, "Descartar si el cuerpo de M5 llena la vela", group = gF)
+umbCuerpo = input.float(80, "…a partir de este % del rango", 40, 100, step = 5, group = gF,
+     tooltip = "Con el cuerpo por encima del 80 % acierta el 38,9 % en 37 " +
+     "operaciones, contra el 70,1 % del resto. Fisher p = 0,00054 sobre cinco bloques.")
+fStop = input.bool(true, "Descartar por anchura del stop", group = gF)
+stopMin = input.float(4,  "stop mínimo (pips)",  0.5, 50, step = 0.5, group = gF, inline = "s")
+stopMax = input.float(10, "máximo",              1,  100, step = 0.5, group = gF, inline = "s")
+fVent = input.bool(true, "Descartar fuera de la ventana", group = gF)
+verDesc = input.bool(true, "Enseñar también las descartadas, en gris", group = gF)
+
+// ─── stop, objetivo y lotaje ──────────────────────────────────────────────
+gS = "Stop y lotaje"
+retroMin = input.int(10, "El stop es el extremo de los últimos (minutos)", 3, 60, group = gS,
+     tooltip = "Es donde lo pone el: mediana 5,9 p contra sus 6,0 reales, con " +
+     "1,3 p de error mediano sobre 150 operaciones.")
+ratio    = input.float(2.0, "Objetivo (R)", 0.5, 10, step = 0.5, group = gS)
+capital  = input.float(10000, "Capital", 100, 10000000, group = gS)
+riesgoPc = input.float(1.0, "Riesgo por operación (%)", 0.05, 5, step = 0.05, group = gS)
+valorPip = input.float(10.0, "Valor del pip por lote estándar", 0.01, 1000, group = gS)
+
+// ─── disciplina ───────────────────────────────────────────────────────────
+gD = "Disciplina"
+maxDia = input.int(2, "Candidatas al día a partir de las cuales te aviso", 1, 20, group = gD,
+     tooltip = "Operando de verdad tomas una de cada 28 roturas. En el examen " +
+     "aceptaste 145 de 250 y perdiste dinero aun eligiendo bien.")
+
+// ─── aspecto ──────────────────────────────────────────────────────────────
+gA = "Aspecto"
+cAlza = input.color(#23735A, "Compra", group = gA)
+cBaja = input.color(#A8382C, "Venta",  group = gA)
+cGris = input.color(#8A94A0, "Descartada", group = gA)
+verTab= input.bool(true, "Tabla", group = gA)
+
+// ─── pip ──────────────────────────────────────────────────────────────────
+dig = math.round(-math.log10(syminfo.mintick))
+pip = (dig == 5 or dig == 3) ? syminfo.mintick * 10 : syminfo.mintick
+
+// ─── reloj ────────────────────────────────────────────────────────────────
+h    = hour(time, tz)
+mi   = minute(time, tz)
+mDia = h * 60 + mi
+vIni = vIniH * 60 + vIniM
+vFin = vFinH * 60 + vFinM
+enVentana = mDia >= vIni and mDia < vFin
+enOro     = h >= oroH1 and h < oroH2
+
+// ─── la vela de M5 anterior, armada desde el gráfico ──────────────────────
+//  A mano y no con request.security: con lookahead_off el valor de M5 llega con
+//  hasta cinco minutos de retraso en un grafico de M1, y aqui el cuerpo de la
+//  vela ANTERIOR tiene que estar disponible en el minuto en que se rompe.
+var float o5 = na
+var float h5 = na
+var float l5 = na
+var float p5o = na
+var float p5h = na
+var float p5l = na
+var float p5c = na
+b5 = math.floor(mDia / 5)
+nuevo5 = na(b5[1]) or b5 != b5[1]
+if nuevo5
+    p5o := o5
+    p5h := h5
+    p5l := l5
+    p5c := nz(close[1])
+    o5 := open
+    h5 := high
+    l5 := low
+else
+    h5 := math.max(nz(h5, high), high)
+    l5 := math.min(nz(l5, low),  low)
+
+hayRef = not na(p5o) and not na(p5c)
+cuerpoA = hayRef ? math.min(p5o, p5c) : na
+cuerpoB = hayRef ? math.max(p5o, p5c) : na
+rangoP  = hayRef ? math.max(p5h - p5l, syminfo.mintick) : na
+cuerpoPct = hayRef ? math.abs(p5c - p5o) / rangoP * 100 : na
+
+// ─── la rotura ────────────────────────────────────────────────────────────
+roto = not hayRef ? 0 : close > cuerpoB ? 1 : close < cuerpoA ? -1 : 0
+// una rotura NUEVA: pasa de no roto a roto, o cambia de lado
+nueva = roto != 0 and roto != nz(roto[1], 0)
+
+int nBar = math.max(1, retroMin * 60 / timeframe.in_seconds())
+tfAlto = timeframe.in_seconds() > 300
+
+stopL = ta.lowest(low,   nBar)
+stopC = ta.highest(high, nBar)
+stp = roto > 0 ? stopL : stopC
+rgo = math.abs(close - stp)
+pips = rgo / pip
+obj = close + roto * ratio * rgo
+
+lotes = pips <= 0 ? 0.0 : (capital * riesgoPc / 100) / (pips * valorPip)
+
+// ─── los filtros ──────────────────────────────────────────────────────────
+okCuerpo = not fCuerpo or (hayRef and cuerpoPct < umbCuerpo)
+okStop   = not fStop   or (pips >= stopMin and pips <= stopMax)
+okVent   = not fVent   or enVentana
+pasa     = nueva and okCuerpo and okStop and okVent and not tfAlto
+descarta = nueva and not pasa
+
+// ─── contador del día ─────────────────────────────────────────────────────
+var int nDia = 0
+var int diaAnt = na
+diaHoy = dayofmonth(time, tz)
+if na(diaAnt) or diaHoy != diaAnt
+    nDia := 0
+    diaAnt := diaHoy
+if pasa
+    nDia += 1
+
+// ─── dibujo ───────────────────────────────────────────────────────────────
+plotshape(pasa and roto > 0, "COMPRA", shape.labelup, location.belowbar, cAlza,
+     text = "COMPRA", textcolor = color.white, size = size.small)
+plotshape(pasa and roto < 0, "VENTA", shape.labeldown, location.abovebar, cBaja,
+     text = "VENTA", textcolor = color.white, size = size.small)
+plotshape(verDesc and descarta and roto > 0, "descartada arriba", shape.triangleup,
+     location.belowbar, color.new(cGris, 45), size = size.tiny)
+plotshape(verDesc and descarta and roto < 0, "descartada abajo", shape.triangledown,
+     location.abovebar, color.new(cGris, 45), size = size.tiny)
+
+plot(hayRef and enVentana ? cuerpoA : na, "Cuerpo de M5 · abajo",
+     color = color.new(#2A4A7F, 30), style = plot.style_linebr)
+plot(hayRef and enVentana ? cuerpoB : na, "Cuerpo de M5 · arriba",
+     color = color.new(#2A4A7F, 30), style = plot.style_linebr)
+bgcolor(enVentana ? color.new(#2A4A7F, enOro ? 93 : 96) : na, title = "Ventana")
+
+//  Solo se dibujan el stop y el objetivo de la ultima candidata: las viejas se
+//  borran para no llenar el grafico de lineas muertas.
+var line lSt = na
+var line lOb = na
+if pasa
+    line.delete(lSt)
+    line.delete(lOb)
+    lSt := line.new(bar_index, stp, bar_index + 30, stp, color = cBaja, width = 1,
+         style = line.style_dashed)
+    lOb := line.new(bar_index, obj, bar_index + 30, obj, color = cAlza, width = 1,
+         style = line.style_dashed)
+
+// ─── tabla ────────────────────────────────────────────────────────────────
+var table T = table.new(position.top_right, 2, 10, border_width = 1,
+     frame_width = 1, frame_color = color.new(color.gray, 60))
+fila(int r, string a, string b, color k) =>
+    table.cell(T, 0, r, a, text_size = size.small, text_halign = text.align_left,  text_color = k)
+    table.cell(T, 1, r, b, text_size = size.small, text_halign = text.align_right, text_color = k)
+f5(float x) => str.tostring(x, format.mintick)
+f1(float x) => str.tostring(x, "#.0")
+
+if verTab and barstate.islast
+    gris  = color.new(color.gray, 20)
+    tinta = chart.fg_color
+    reloj = (h < 10 ? "0" : "") + str.tostring(h) + ":" + (mi < 10 ? "0" : "") + str.tostring(mi)
+    fila(0, "LONDRES", reloj + (enOro ? "  ·  tu mejor hora" : ""), enOro ? cAlza : tinta)
+    fila(1, "candidatas hoy", str.tostring(nDia) + (nDia >= maxDia ? "  ·  YA VAS SOBRADO" : ""),
+         nDia >= maxDia ? cBaja : tinta)
+    fila(2, "cuerpo de la M5 anterior",
+         na(cuerpoPct) ? "—" : str.tostring(cuerpoPct, "#") + " %"
+         + (not na(cuerpoPct) and cuerpoPct >= umbCuerpo ? "  LLENO" : ""),
+         not na(cuerpoPct) and cuerpoPct >= umbCuerpo ? cBaja : cAlza)
+    fila(3, "estado", roto == 0 ? "dentro del cuerpo"
+         : roto > 0 ? "roto por ARRIBA" : "roto por ABAJO",
+         roto == 0 ? gris : roto > 0 ? cAlza : cBaja)
+    fila(4, "stop", f5(stp) + "  (" + f1(pips) + " p)", cBaja)
+    fila(5, "objetivo", f5(obj) + "  (" + str.tostring(ratio, "#.#") + " R)", cAlza)
+    fila(6, str.tostring(riesgoPc, "#.##") + " % de " + str.tostring(capital, "#"),
+         str.tostring(lotes, "#.##") + " lotes", tinta)
+    est = tfAlto ? "gráfico por encima de M5: no vale"
+        : not okVent ? "fuera de tu ventana"
+        : not okCuerpo ? "la M5 es todo cuerpo · tu peor caja"
+        : not okStop ? "stop de " + f1(pips) + " p, fuera de tu rango"
+        : roto == 0 ? "esperando rotura"
+        : "CANDIDATA · decides tú"
+    fila(7, est, "", tfAlto or not okCuerpo or not okStop ? cBaja
+                     : roto == 0 ? gris : cAlza)
+    fila(8, "la flecha sola acierta el 31-38 %", "tu elección vale +16 pt", gris)
+    fila(9, "una o dos al día · nunca dieciséis", "", gris)
+
+// ─── alertas ──────────────────────────────────────────────────────────────
+alertcondition(pasa and roto > 0, "Candidata de COMPRA",
+     "Londres: rotura del cuerpo de M5 por arriba, filtros pasados")
+alertcondition(pasa and roto < 0, "Candidata de VENTA",
+     "Londres: rotura del cuerpo de M5 por abajo, filtros pasados")

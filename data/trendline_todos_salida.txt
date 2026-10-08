@@ -1,0 +1,24 @@
+instrumento  stop  k      n   acierto     dif    stop   R neta       z
+--------------------------------------------------------------------
+     EURUSD     A  2   6496     31.7%   -1.6pt    4.2   -0.373  -22.42
+     EURUSD     B  1   3221     50.2%   +0.2pt   14.3   -0.140  -10.01
+     GBPUSD     A  2   6706     32.5%   -0.9pt    5.7   -0.361  -21.90
+     GBPUSD     B  1   3153     50.6%   +0.6pt   19.8   -0.128   -9.08
+     USDJPY     A  2   6268     32.2%   -1.1pt    4.9   -0.350  -20.65
+     USDJPY     B  1   3076     49.1%   -0.9pt   17.0   -0.141   -9.96
+     XAUUSD     A  2   3752     32.2%   -1.1pt   15.8   -0.448  -19.36
+     XAUUSD     B  1   1590     49.7%   -0.3pt   68.6   -0.145   -7.41
+     NSXUSD     A  2   6643     33.1%   -0.2pt    9.7   -0.250  -15.02
+     NSXUSD     B  1   2831     50.8%   +0.8pt   40.5   -0.089   -6.32
+     SPXUSD     A  2   4619     30.4%   -2.9pt    3.0   -0.296  -15.49
+     SPXUSD     B  1   2772     49.2%   -0.8pt    9.7   -0.134   -9.49
+     GRXEUR     A  2   3551     33.5%   +0.1pt   12.5   -0.207   -9.01
+     GRXEUR     B  1   1812     48.2%   -1.8pt   40.0   -0.128   -6.63
+
+signo de la R neta por celda, sobre los siete instrumentos:
+  stop A k=1:  negativa en 7 de 7 instrumentos  ·  media -0.342
+  stop A k=2:  negativa en 7 de 7 instrumentos  ·  media -0.328
+  stop A k=3:  negativa en 7 de 7 instrumentos  ·  media -0.326
+  stop B k=1:  negativa en 7 de 7 instrumentos  ·  media -0.129
+  stop B k=2:  negativa en 7 de 7 instrumentos  ·  media -0.114
+  stop B k=3:  negativa en 7 de 7 instrumentos  ·  media -0.114

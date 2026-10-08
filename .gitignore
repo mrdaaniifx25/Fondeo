@@ -1,0 +1,10 @@
+data/raw/
+data/*.parquet
+data/raw2/
+data/raw3/
+__pycache__/
+data/simulador_casos.json
+data/ctrl_apertura.log
+data/crt_9am.csv
+data/ema_fibo_esto_ops.csv
+data/barrido_m15_esto_m1.csv

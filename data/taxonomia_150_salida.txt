@@ -1,0 +1,28 @@
+139 de 150 con contexto completo
+
+==========================================================================
+TAXONOMÍA · en qué se apoya cada entrada
+==========================================================================
+  dentro del rango de Asia, sin nivel cerca   32 (23.0 %)  acierto  56.2 %
+  extremo de la sesión (no de Asia)           51 (36.7 %)  acierto  73.5 %
+  fuera del rango de Asia, sin nivel cerca    12 ( 8.6 %)  acierto  81.8 %
+  rechazo del nivel de Asia                   34 (24.5 %)  acierto  75.0 %
+  rotura del nivel de Asia                    10 ( 7.2 %)  acierto  33.3 %
+
+==========================================================================
+¿VA A FAVOR O EN CONTRA DEL IMPULSO DE LOS 15 MINUTOS ANTERIORES?
+==========================================================================
+  a favor del impulso       83 (59.7 %)  acierto  69.2 %  ·  impulso mediano 3.4 p
+  EN CONTRA del impulso     56 (40.3 %)  acierto  65.5 %  ·  impulso mediano 2.5 p
+
+==========================================================================
+¿DÓNDE ESTÁ EL PRECIO EN LA SESIÓN CUANDO ENTRA?
+==========================================================================
+  distancia mediana al máximo de la sesión: 4.9 p
+  distancia mediana al mínimo de la sesión: -6.8 p
+  COMPRAS:  89  ·  entra más cerca del máximo de la sesión en el 73 % de los casos
+      pegado al bajo  de la sesión:  24  acierto  65.2 %
+      pegado al alto  de la sesión:  65  acierto  74.6 %
+  VENTAS:  50  ·  entra más cerca del mínimo de la sesión en el 64 % de los casos
+      pegado al bajo  de la sesión:  32  acierto  62.1 %
+      pegado al alto  de la sesión:  18  acierto  55.6 %
