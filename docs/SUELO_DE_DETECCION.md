@@ -3,6 +3,22 @@
 El usuario lleva tres meses sin creerse los resultados. Tiene razón en una parte
 y conviene escribirla antes de seguir discutiendo.
 
+## Antes: el motor ya estaba calibrado
+
+Conviene decirlo porque yo mismo lo olvidé y afirmé lo contrario en el chat. La
+calibración del instrumento está hecha desde el **5 de septiembre**, en las dos
+direcciones, y está en `docs/VALIDACION_motor.md`:
+
+- **No fabrica ventajas** (`bt/valida_motor.py`): 128.000 entradas al azar, 32
+  celdas, ninguna pasa de |z| = 1,6. La esperanza del azar sale cero, que es lo
+  que tiene que salir.
+- **No las destruye** (`bt/control_positivo.py`): inyectando una deriva conocida,
+  la recupera de forma monótona — 5 pips en el 60 % de los días dan z +2,99;
+  20 pips en el 90 %, z +17,90.
+
+Así que el problema no es que el aparato esté roto. Es que **tiene un suelo**, y
+eso es otra cosa.
+
 ## Lo que NO he probado
 
 `t = Sharpe × √años`. Para que un resultado salga significativo (t > 2) hace
