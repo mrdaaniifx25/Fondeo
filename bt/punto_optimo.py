@@ -7,6 +7,15 @@ siempre sale) sino si la mejor supera E[maximo de 220 celdas de ruido].
 Se precalculan los MINIMOS y MAXIMOS acumulados del camino de cada operacion,
 asi cada celda se evalua vectorizada en vez de con un bucle por operacion.
 
+ERROR CORREGIDO (ver docs/RESULTADOS_punto_optimo.md): la primera version
+detectaba el relleno de las ordenes LIMITE a nivel de vela M15 y luego media
+el camino desde la APERTURA de esa vela. Como el limite esta por debajo de la
+apertura (en compras), eso media el camino desde un instante ANTERIOR a la
+entrada, y con stops minusculos el objetivo quedaba por debajo de la apertura:
+se daba por alcanzado en el indice 0, antes de haber entrado. Producia
+z +4,98 y neta +0,0666 de la nada. Ahora el relleno se detecta MINUTO a
+minuto y el camino empieza en el minuto del relleno.
+
   python3 bt/punto_optimo.py
 """
 import numpy as np, pandas as pd
@@ -59,19 +68,18 @@ def prepara(nom, ruta, U, coste):
     return D, HH, LL, OO
 
 
-def camino(HH, LL, e):
-    """minimos y maximos acumulados de HOR minutos desde cada e (n x HOR)."""
-    n = len(e)
-    ix = e[:, None] + np.arange(HOR)[None, :]
-    ix = np.clip(ix, 0, len(HH)-1)
+def camino(HH, LL, e, hor=None):
+    """minimos y maximos acumulados de hor minutos desde cada e (n x hor)."""
+    hor = hor or HOR
+    ix = np.clip(e[:, None] + np.arange(hor)[None, :], 0, len(HH)-1)
     return np.minimum.accumulate(LL[ix], axis=1), np.maximum.accumulate(HH[ix], axis=1)
 
 
-def primera(run, umbral, mayor):
-    """primer indice donde run cruza el umbral; HOR si nunca."""
+def primera(run, umbral, mayor, hor=None):
+    """primer indice donde run cruza el umbral; hor si nunca."""
+    hor = hor or HOR
     hit = (run >= umbral[:, None]) if mayor else (run <= umbral[:, None])
-    tiene = hit.any(axis=1)
-    return np.where(tiene, hit.argmax(axis=1), HOR)
+    return np.where(hit.any(axis=1), hit.argmax(axis=1), hor)
 
 
 def z(x, gr):
@@ -102,16 +110,18 @@ for et_e, tipo, par in ENTRADAS:
             k = int(par); pe = OO[D[f"e{k}"].to_numpy()]
             me = D[f"e{k}"].to_numpy(); viva = np.ones(len(D), bool)
         else:
-            # limite al retroceso par del tramo mecha->cierre, valida 8 velas
+            # limite al retroceso par del tramo mecha->cierre, valida 120 minutos.
+            # El relleno se busca MINUTO a minuto y el camino empieza EN el minuto
+            # del relleno, no en la apertura de la vela.
             niv = D.cierre.to_numpy() - lado*par*(D.cierre.to_numpy()-D.mecha.to_numpy())
-            me = np.full(len(D), -1); viva = np.zeros(len(D), bool)
-            for k in range(1, 9):
-                lo, hi = D[f"l{k}"].to_numpy(), D[f"h{k}"].to_numpy()
-                toca = (~viva) & ((lo <= niv) if lado[0] >= 0 else (hi >= niv))
-                toca = (~viva) & np.where(lado > 0, lo <= niv, hi >= niv)
-                me = np.where(toca, D[f"e{k}"].to_numpy(), me); viva |= toca
+            e0 = D.e1.to_numpy()
+            rmin0, rmax0 = camino(HH, LL, e0, 120)
+            k = np.where(lado > 0, primera(rmin0, niv, False, 120),
+                                   primera(rmax0, niv, True, 120))
+            viva = k < 120
+            me = e0 + np.where(viva, k, 0)
             pe = niv
-        ENT.append((pe, np.where(me < 0, 0, me), viva))
+        ENT.append((pe, me, viva))
     for et_s, ks in STOPS:
         for et_o, ko in OBJETIVOS:
             R, CR, GR = [], [], []
@@ -122,7 +132,9 @@ for et_e, tipo, par in ENTRADAS:
                 sl = ent - lado*ks*np.abs(ent-mecha) if ks > 0 else opu*0 + np.where(
                     lado > 0, D.oq.to_numpy()[viva], D.op.to_numpy()[viva])
                 rgo = (ent-sl)*lado
-                ok = rgo > 0
+                # el coste no puede superar el riesgo: un stop mas estrecho que
+                # la horquilla no es una operacion, es una comision
+                ok = (rgo > 0) & (D.coste.iloc[0]/np.maximum(rgo/D.U.iloc[0], 1e-9) <= 1.0)
                 if ok.sum() < 50: continue
                 tp = (ent + lado*ko*rgo) if ko > 0 else opu
                 rec = (tp-ent)*lado
