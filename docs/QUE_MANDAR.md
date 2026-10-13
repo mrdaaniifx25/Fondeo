@@ -63,7 +63,12 @@ vuelve a la media más de lo que cuesta esperarlo.
 
 ---
 
-## Casilla 4 · Coste de financiación, swap o carry
+## Casilla 4 · Coste de financiación, swap o carry — **CERRADA, 13-oct-2026**
+
+> Medida en `docs/RESULTADOS_swap.md`. El carry aguanta como máximo **1 punto
+> porcentual** de recargo del bróker, y los recargos reales en minoristas van
+> de 1 a 3. Con 2 pp el tramo 2013-2026 da t −0,77. Y sin swap, t −4,55: el
+> 100 % del rendimiento era el interés cobrado. **No hace falta la tabla.**
 
 **Cómo se reconoce**: habla de swap positivo, de «cobrar por mantener», de
 diferenciales de tipos, de carry trade.
@@ -121,6 +126,6 @@ Lo que las hace valer la pena no es que vayan a funcionar, es que **su respuesta
 no la sé**, y hasta ahora todo lo que he podido predecir de antemano lo he
 acertado.
 
-La casilla 4 es la única donde apostaría algo a que hay algo. Y aun así no daría
-300 €/mes sobre 10.000 €: ese número no lo arregla ninguna estrategia, lo arregla
-el tamaño de la cuenta.
+Escribí que la casilla 4 era la única donde apostaría algo. **Me equivoqué, y por
+un error mío de modelado**: está cerrada y en negativo. Quedan abiertas la 1, la
+2 y la 5.

@@ -1,5 +1,28 @@
 # Resultados · carry en divisas, y la mezcla con el momento
 
+> ## ⚠ RETRACTADO EN PARTE · 13 de octubre de 2026
+>
+> **El modelo del recargo del bróker estaba mal.** Se restaba al diferencial
+> (`(C - recargo)`) y luego se multiplicaba por la señal, así que en las
+> posiciones **cortas** el recargo entraba como un **ingreso**. Media cartera
+> recibía un abono donde debía pagar una comisión.
+>
+> Con el modelo correcto (el recargo cuesta en los dos lados):
+>
+> | | publicado aquí | corregido |
+> |---|---|---|
+> | recargo 1,5 pp/año | t **+2,95** | t ≈ **0** |
+> | recargo 3,0 pp/año | t **+2,69** | t **−3,32** |
+> | 2013-2026 con recargo | t **+2,46** | t **−0,77** |
+>
+> **El carry aguanta como máximo 1 punto porcentual de recargo**, no 1,5 con
+> holgura. Y el 100 % del rendimiento es el interés cobrado: sin swap la
+> estrategia da t **−4,55**.
+>
+> Lo medido **sin** recargo (t +3,21) sigue en pie. Todo lo que afirma robustez
+> frente al bróker, no. Detalle y números en `docs/RESULTADOS_swap.md`.
+
+
 Pre-registro: `docs/PREREGISTRO_carry.md`, subido en `f108653` **antes** de
 medir. Código: `bt/carry.py` y `bt/cartera_mixta.py`. **20 divisas, 623 meses,
 1971-2026.**

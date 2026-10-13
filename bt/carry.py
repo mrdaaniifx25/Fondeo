@@ -53,13 +53,21 @@ OK = (VOL >= VOL_MIN) & R.abs().le(RET_MAX) & R.notna() & VOL.notna() & C.notna(
 print(f"observaciones utiles: {int(OK.sum().sum()):,}\n")
 
 def rend(recargo=0.0):
-    """rendimiento mensual de estar LARGO en la divisa, financiado en dolares."""
-    interes = (C - recargo).div(12) / 100.0        # en logaritmo aproximado
+    """rendimiento mensual de estar LARGO en la divisa, financiado en dolares.
+
+    OJO: el recargo NO se resta aqui. Restarlo a C y multiplicar luego por la
+    senial lo convierte en un INGRESO para las posiciones cortas. Se aplica en
+    cartera(), sobre |sig|, para que cueste en los dos lados. Ver docs/
+    RESULTADOS_swap.md: el error valia 0,066 de efecto.
+    """
+    interes = C.div(12) / 100.0                    # en logaritmo aproximado
     return (interes - R).where(OK)                 # -R porque subir = debilitarse
 
 def cartera(sig, recargo=0.0, con_coste=True):
-    x = (rend(recargo) / VOL).where(OK)
+    x = (rend() / VOL).where(OK)
     p = (sig * x).where(OK)
+    if recargo:
+        p = p - (sig.abs() * (recargo/1200.0) / VOL).where(OK)
     if con_coste:
         flip = (sig != sig.shift(1)) & OK & OK.shift(1).fillna(False)
         p = p - flip.astype(float) * COSTE_RUIDO

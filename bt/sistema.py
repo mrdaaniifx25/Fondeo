@@ -54,21 +54,23 @@ def sig_carry():
     r = C.where(OKc).rank(axis=1, pct=True)
     return (r > 2/3).astype(float) - (r < 1/3).astype(float)
 
-def serie(sig, ok, rend, coste=True):
+def serie(sig, ok, rend, coste=True, recargo=0.0):
     x = (rend/VOL).where(ok)
     p = (sig*x).where(ok)
     if coste:
         flip = (np.sign(sig) != np.sign(sig).shift(1)) & ok & ok.shift(1).fillna(False)
         p = p - flip.astype(float)*COSTE_RUIDO
+    if recargo:
+        p = p - (np.abs(sig)*(recargo/1200.0)/VOL).where(ok)
     n = p.notna().sum(axis=1)
     return p.mean(axis=1)[n >= 6].dropna()
 
 rend_mom = -R                                    # largo = apostar a que sube el dolar? no:
 rend_mom = R.copy()                              # el signo lo pone la senial sobre la serie
-rend_car = ((C - RECARGO).div(12)/100.0 - R)
+rend_car = (C.div(12)/100.0 - R)   # el recargo va en serie(), sobre |sig|
 
 M = serie(sig_mom(), OKm, rend_mom)
-K = serie(sig_carry(), OKc, rend_car)
+K = serie(sig_carry(), OKc, rend_car, recargo=RECARGO)
 
 def ficha(et, x):
     t = x.mean()/(x.std(ddof=1)/sqrt(len(x))); sh = x.mean()/x.std(ddof=1)*sqrt(12)
