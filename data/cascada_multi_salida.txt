@@ -1,0 +1,9 @@
+LA CASCADA EN SIETE INSTRUMENTOS · TODO EN BRUTO, sin suponer ningún coste
+                n   desde     %TP     R/op  bruta/d      z    stop mediano   c* (equilibrio)
+  EURUSD    1.557    2020   35.2%   +0.085   +0.085  +2.35        5.2 pips         0.37 pips
+  GBPUSD    1.531    2020   33.6%   +0.026   +0.026  +0.71        6.1 pips         0.13 pips
+  USDJPY    1.539    2020   30.0%   -0.051   -0.051  -1.47        6.8 pips        -0.29 pips
+  XAUUSD      722    2023   30.6%   -0.043   -0.043  -0.83      190.2 centavos        -4.59 centavos
+  DAX         691    2023   32.6%   -0.000   -0.000  -0.00       11.0 puntos        -0.00 puntos
+  NAS100    1.563    2020   32.6%   -0.003   -0.003  -0.08       15.2 puntos        -0.03 puntos
+  SP500     1.575    2020   33.5%   +0.021   +0.021  +0.60        4.0 puntos         0.07 puntos

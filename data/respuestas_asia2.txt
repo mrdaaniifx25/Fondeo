@@ -1,0 +1,92 @@
+# barrido de asia · baraja v2 · 90 cortes
+S01 | opero | compra | 1.17983 | 1.17914 | 1.18233
+S02 | paso
+S03 | paso
+S04 | paso
+S05 | paso
+S06 | paso
+S07 | opero | venta | 1.16393 | 1.16463 | 1.16270
+S08 | opero | venta | 1.16570 | 1.16653 | 1.16418
+S09 | opero | venta | 1.15443 | 1.15499 | 1.15302
+S10 | paso
+S11 | paso
+S12 | paso
+S13 | opero | venta | 1.14105 | 1.14201 | 1.13889
+S14 | paso
+S15 | paso
+S16 | paso
+S17 | paso
+S18 | paso
+S19 | paso
+S20 | opero | venta | 1.13875 | 1.13928 | 1.13751
+S21 | paso
+S22 | paso
+S23 | paso
+S24 | opero | venta | 1.13986 | 1.14126 | 1.13812
+S25 | opero | venta | 1.16888 | 1.16960 | 1.16640
+S26 | paso
+S27 | opero | compra | 1.14479 | 1.14273 | 1.15284
+S28 | paso
+S29 | paso
+S30 | opero | venta | 1.15578 | 1.15714 | 1.15289
+S31 | opero | venta | 1.14513 | 1.14607 | 1.14207
+S32 | opero | venta | 1.16899 | 1.16971 | 1.16766
+S33 | paso
+S34 | opero | venta | 1.14302 | 1.14370 | 1.14192
+S35 | paso
+S36 | paso
+S37 | paso
+S38 | paso
+S39 | paso
+S40 | opero | compra | 1.15527 | 1.15459 | 1.15705
+S41 | opero | compra | 1.16846 | 1.16748 | 1.17013
+S42 | opero | venta | 1.14335 | 1.14504 | 1.14093
+S43 | opero | venta | 1.15224 | 1.15298 | 1.15008
+S44 | opero | compra | 1.15241 | 1.15144 | 1.15482
+S45 | paso
+S46 | paso
+S47 | paso
+S48 | paso
+S49 | opero | venta | 1.14205 | 1.14248 | 1.14090
+S50 | paso
+S51 | opero | venta | 1.17930 | 1.17970 | 1.17842
+S52 | paso
+S53 | opero | compra | 1.15579 | 1.15480 | 1.15774
+S54 | paso
+S55 | opero | compra | 1.16260 | 1.16123 | 1.16700
+S56 | opero | compra | 1.16343 | 1.16289 | 1.16608
+S57 | paso
+S58 | opero | compra | 1.15086 | 1.15004 | 1.15234
+S59 | paso
+S60 | opero | venta | 1.17063 | 1.17222 | 1.16737
+S61 | paso
+S62 | paso
+S63 | opero | compra | 1.13567 | 1.13501 | 1.13792
+S64 | paso
+S65 | paso
+S66 | paso
+S67 | paso
+S68 | opero | compra | 1.17073 | 1.17002 | 1.17260
+S69 | opero | compra | 1.17306 | 1.16917 | 1.17940
+S70 | paso
+S71 | opero | venta | 1.13671 | 1.13741 | 1.13528
+S72 | opero | compra | 1.16988 | 1.16956 | 1.17187
+S73 | paso
+S74 | paso
+S75 | opero | compra | 1.15093 | 1.14964 | 1.15383
+S76 | paso
+S77 | paso
+S78 | paso
+S79 | paso
+S80 | paso
+S81 | opero | compra | 1.16029 | 1.15952 | 1.16186
+S82 | paso
+S83 | paso
+S84 | opero | venta | 1.17604 | 1.17698 | 1.17462
+S85 | paso
+S86 | opero | venta | 1.17404 | 1.17481 | 1.17231
+S87 | opero | venta | 1.14703 | 1.14822 | 1.14431
+S88 | paso
+S89 | opero | venta | 1.14828 | 1.15071 | 1.14511
+S90 | opero | venta | 1.16043 | 1.16144 | 1.15796
+# respondidas 90 de 90

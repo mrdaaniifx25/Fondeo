@@ -1,0 +1,15 @@
+S01 · 08:15 COMPRA ent 1.18732 sl 1.18672 (6p) tp 1.18852 -> TP +2 R a las 09:09 [t+0m T1] | por: rechazo+favor | falló: precipitada · mecha larga y cuerpo pequeño
+S01 · 09:20 VENTA ent 1.18800 sl 1.18850 (5p) tp 1.18700 -> SL -1 R a las 09:31 [t+3m T1] | por: barrido | falló: stopcorto+nada
+S02 · SIN OPERACIONES
+S03 · 08:02 COMPRA ent 1.09000 sl 1.08950 (5p) tp 1.09100 -> cierre +0.35 R a las 11:30 [t+45m T2] | por: segunda
+S04 · 10:10 VENTA ent 1.07000 sl 1.07070 (7p) tp 1.06860 -> TP +2 R a las 10:44 [t+61m T2]
+S05 · 08:30 COMPRA ent 1.05000 sl 1.04940 (6p) tp 1.05120 -> SL -1 R a las 08:44 [t+70m T2] | por: rompe+contra · no me gustaba pero entré
+S06 · 08:11 VENTA ent 1.12000 sl 1.12080 (8p) tp 1.11840 -> TP +2 R a las 09:02 · sin etiquetas, solo nota
+
+TOTAL 6 operaciones · 4 en objetivo · 4.35 R brutos
+
+CUENTAS
+  intento 1: REVIENTA con 9.400 € en la sesión 3
+  intento 2: PASA con 10.850 € en la sesión 5
+  intento 3: en curso con 10.120 €
+  1 superados · 1 reventados

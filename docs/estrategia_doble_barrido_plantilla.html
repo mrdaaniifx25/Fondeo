@@ -1,0 +1,314 @@
+<title>El doble barrido, en el gráfico</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --fondo:#f2f5f8; --panel:#fdfdfe; --panel2:#f6f8fb;
+  --tinta:#12161c; --tinta2:#4e5864; --tinta3:#8b95a1;
+  --linea:#dde3ea; --linea2:#eaeff4;
+  --s1:#2a78d6; --s2:#eb6834; --ok:#0ca30c; --mal:#d03b3b;
+  --okw:rgba(12,163,12,.10); --malw:rgba(208,59,59,.10);
+  --sombra:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme: dark;
+  --fondo:#10131a; --panel:#181c24; --panel2:#1d222b;
+  --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
+  --linea:#29303a; --linea2:#20262f;
+  --s1:#3987e5; --s2:#d95926; --ok:#22b422; --mal:#e05555;
+  --okw:rgba(34,180,34,.14); --malw:rgba(224,85,85,.14);
+  --sombra:0 1px 2px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --fondo:#10131a; --panel:#181c24; --panel2:#1d222b;
+  --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
+  --linea:#29303a; --linea2:#20262f;
+  --s1:#3987e5; --s2:#d95926; --ok:#22b422; --mal:#e05555;
+  --okw:rgba(34,180,34,.14); --malw:rgba(224,85,85,.14);
+  --sombra:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--fondo); color:var(--tinta); margin:0;
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif; font-size:15px; line-height:1.55}
+.env{max-width:1060px; margin:0 auto; padding-block:24px 60px;
+  padding-left:16px; padding-right:16px}
+h1{font-family:Archivo,system-ui,sans-serif; font-size:27px; font-weight:700;
+  letter-spacing:-.025em; margin:0 0 6px; text-wrap:balance}
+.sub{color:var(--tinta2); font-size:14.5px; margin:0 0 16px; max-width:66ch}
+
+.pasos{display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:1px;
+  background:var(--linea2); border:1px solid var(--linea); border-radius:10px;
+  overflow:hidden; margin-bottom:18px}
+.pasos > div{background:var(--panel); padding:12px 14px}
+.pasos .n{font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:700;
+  color:var(--s2); letter-spacing:.06em}
+.pasos b{display:block; font-size:14px; margin:2px 0 2px}
+.pasos p{margin:0; font-size:12.5px; color:var(--tinta2); line-height:1.5}
+
+.caja{background:var(--panel); border:1px solid var(--linea); border-radius:11px;
+  box-shadow:var(--sombra); overflow:hidden; margin-bottom:14px}
+.mandos{display:flex; gap:9px; align-items:center; flex-wrap:wrap;
+  padding:12px 15px; border-bottom:1px solid var(--linea2); background:var(--panel2)}
+.mandos button{font:inherit; font-size:14px; font-weight:600; padding:8px 14px;
+  border:1px solid var(--linea); border-radius:8px; background:var(--panel);
+  color:var(--tinta); cursor:pointer}
+.mandos button:hover{background:var(--linea2)}
+.mandos button:disabled{opacity:.35; cursor:default}
+.mandos button[aria-pressed="true"]{background:var(--s1); border-color:var(--s1); color:#fff}
+.mandos .cuenta{font-family:"IBM Plex Mono",monospace; font-size:13px;
+  color:var(--tinta2); margin-left:auto}
+.lienzo{overflow-x:auto; -webkit-overflow-scrolling:touch}
+svg{display:block; width:100%; min-width:820px; height:auto}
+
+.pie{display:grid; grid-template-columns:repeat(auto-fit,minmax(122px,1fr)); gap:1px;
+  background:var(--linea2); border-top:1px solid var(--linea2)}
+.pie > div{background:var(--panel); padding:11px 14px}
+.pie .k{font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--tinta3); font-weight:600}
+.pie .v{font-family:"IBM Plex Mono",monospace; font-size:16px; font-weight:600;
+  font-variant-numeric:tabular-nums; margin-top:1px}
+.pos{color:var(--ok)} .neg{color:var(--mal)}
+
+.leyenda{display:flex; flex-wrap:wrap; gap:14px; padding:12px 15px; font-size:12.5px;
+  color:var(--tinta2); border-top:1px solid var(--linea2); background:var(--panel2)}
+.leyenda span{display:flex; align-items:center; gap:6px}
+.leyenda i{width:16px; height:3px; border-radius:2px; display:block}
+.res{margin-top:26px}
+.res h2{font-family:Archivo,system-ui,sans-serif; font-size:20px; font-weight:700;
+  letter-spacing:-.02em; margin:0 0 4px}
+.res .sub2{color:var(--tinta2); font-size:14px; margin:0 0 14px; max-width:66ch}
+.envt{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.tabla{width:100%; min-width:560px; border-collapse:collapse; font-size:13.5px;
+  font-variant-numeric:tabular-nums}
+.tabla th{text-align:right; font-size:10.5px; letter-spacing:.06em; font-weight:600;
+  text-transform:uppercase; color:var(--tinta3); padding:8px 10px;
+  border-bottom:1px solid var(--linea)}
+.tabla th:first-child{text-align:left}
+.tabla td{text-align:right; padding:9px 10px; border-bottom:1px solid var(--linea2);
+  font-family:"IBM Plex Mono",monospace}
+.tabla td:first-child{text-align:left; font-family:inherit; font-weight:500}
+.tabla tr.mio td{background:var(--panel2); font-weight:600}
+.tabla tr.tot td{border-top:1px solid var(--linea); border-bottom:none}
+.verd{border-left:3px solid var(--mal); background:var(--panel2);
+  border-radius:0 9px 9px 0; padding:13px 16px; margin-top:16px; font-size:14px}
+.verd b{color:var(--mal)}
+.res ul{margin:10px 0 0; padding-left:20px; font-size:13.5px; color:var(--tinta2)}
+.res li{margin-bottom:5px}
+.nota{font-size:13px; color:var(--tinta3); line-height:1.6; margin-top:18px}
+:focus-visible{outline:2px solid var(--s1); outline-offset:2px}
+</style>
+
+<div class="env">
+  <h1>El doble barrido, en el gráfico</h1>
+  <p class="sub">Veinticuatro operaciones reales de EURUSD, de las 1.001 que da la
+     estrategia entre 2020 y 2026. Doce ganadoras y doce perdedoras, elegidas al azar.
+     Todo lo que ves es lo que el código midió.</p>
+
+  <div class="pasos">
+    <div><div class="n">PASO 1</div><b>Barrido en 12h</b>
+      <p>La vela de 12h se lleva el extremo de la anterior y cierra dentro.</p></div>
+    <div><div class="n">PASO 2</div><b>Y en 4h a la vez</b>
+      <p>La de 4h hace lo mismo, del mismo lado. Ése es el doble barrido.</p></div>
+    <div><div class="n">PASO 3</div><b>Envolvente en M15</b>
+      <p>La primera vela cuyo cuerpo engulle al anterior, a favor del giro.</p></div>
+    <div><div class="n">PASO 4</div><b>Entra y espera</b>
+      <p>Stop donde llegó el barrido de 4h. Objetivo al doble.</p></div>
+  </div>
+
+  <div class="caja">
+    <div class="mandos">
+      <button type="button" id="ant">← Anterior</button>
+      <button type="button" id="sig">Siguiente →</button>
+      <button type="button" id="f-gana" aria-pressed="false">Sólo ganadoras</button>
+      <button type="button" id="f-pierde" aria-pressed="false">Sólo perdedoras</button>
+      <span class="cuenta" id="cuenta"></span>
+    </div>
+    <div class="lienzo">
+      <svg id="g" viewBox="0 0 1040 520" preserveAspectRatio="xMidYMid meet"
+           role="img" aria-label="Una operación del doble barrido"></svg>
+    </div>
+    <div class="pie" id="pie"></div>
+    <div class="leyenda">
+      <span><i style="background:var(--s1)"></i> extremos de la vela de 12h anterior</span>
+      <span><i style="background:var(--s2)"></i> extremos de la de 4h anterior</span>
+      <span><i style="background:var(--tinta)"></i> hasta dónde llegó el barrido = tu stop</span>
+      <span><i style="background:var(--ok)"></i> objetivo 1:2</span>
+    </div>
+  </div>
+
+  <div class="res">
+    <h2>Y esto, ¿qué da?</h2>
+    <p class="sub2">Los ejemplos de arriba son una muestra al azar de esta tabla. No
+       son los mejores casos: son los que salieron.</p>
+
+    <div class="envt">
+    <table class="tabla">
+      <thead><tr><th>instrumento</th><th>n</th><th>acierto</th><th>riesgo</th>
+        <th>coste %R</th><th>bruta</th><th>neta</th></tr></thead>
+      <tbody>
+        <tr><td>NAS100</td><td>482</td><td>—</td><td>41,6 p</td><td>3,6 %</td>
+            <td>+0,220</td><td class="pos">+0,170</td></tr>
+        <tr><td>USDJPY</td><td>875</td><td>—</td><td>17,2 p</td><td>8,7 %</td>
+            <td>+0,142</td><td class="pos">+0,020</td></tr>
+        <tr><td>GBPUSD</td><td>1.000</td><td>—</td><td>18,9 p</td><td>8,5 %</td>
+            <td>+0,125</td><td class="pos">+0,014</td></tr>
+        <tr><td>SPX500</td><td>608</td><td>—</td><td>9,4 p</td><td>6,4 %</td>
+            <td>+0,066</td><td class="neg">−0,027</td></tr>
+        <tr class="mio"><td>EURUSD</td><td>1.001</td><td>36,6 %</td><td>13,0 p</td>
+            <td>11,0 %</td><td>+0,097</td><td class="neg">−0,045</td></tr>
+        <tr class="tot"><td>los cinco juntos</td><td>3.966</td><td>37,5 %</td>
+            <td>16,3 p</td><td>8,2 %</td><td>+0,124</td><td class="pos">+0,013</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="verd">
+      <b>En EURUSD, que es tu par, la estrategia pierde.</b> La ventaja bruta existe
+      —+0,097 R, la mayor que hemos medido en todo el proyecto— pero el stop es
+      estrecho (13 pips) y el peaje se lleva el 11 % de cada riesgo. Con 150 € por
+      operación, eso son unos <b>−6,80 € de media</b> por trade.
+    </div>
+
+    <ul>
+      <li><b>El agregado sale positivo por primera vez</b> (+0,013 R), pero es
+        indistinguible de cero: el intervalo va de −0,040 a +0,067.</li>
+      <li><b>Todo el positivo lo pone NAS100.</b> Sin él, los cuatro restantes dan
+        −0,009.</li>
+      <li>Para saber si ese +0,013 es real harían falta <b>38.467 operaciones</b>.
+        Hay 3.966 en seis años.</li>
+      <li>Lo que sí queda probado: la ventaja bruta <b>no cambió</b> al triplicar el
+        stop (de 6,8 a 16,3 pips). El patrón es real y no depende de la escala. Lo
+        que no aguanta es el coste.</li>
+    </ul>
+  </div>
+
+  <p class="nota">Velas de 15 minutos. Los niveles de 12h y 4h son los de la vela
+     <em>anterior</em> ya cerrada — los que el precio va a barrer. Las velas de 12h y 4h
+     están ancladas a medianoche UTC, no a la rejilla de TradingView.</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var EJ = __EJ__;
+var $ = function(s){ return document.querySelector(s); };
+var pr = function(v){ return v.toFixed(5).replace(".", ","); };
+var es = function(v,d){ return v.toLocaleString("es-ES",
+    {minimumFractionDigits:d, maximumFractionDigits:d}); };
+var filtro = 0, idx = 0;
+var W=1040, H=520, ML=12, MR=104, MT=22, MB=26;
+
+function lista(){
+  return EJ.filter(function(e){
+    return filtro === 0 || (filtro === 1 ? e.gana : !e.gana); });
+}
+function pinta(){
+  var L = lista(); if (!L.length) return;
+  idx = Math.max(0, Math.min(L.length-1, idx));
+  var E = L[idx], n = E.c.length, i;
+  var lo=Infinity, hi=-Infinity;
+  for (i=0;i<n;i++){ if(E.l[i]<lo) lo=E.l[i]; if(E.h[i]>hi) hi=E.h[i]; }
+  [E.h12,E.l12,E.h4,E.l4,E.stop,E.tp,E.ent].forEach(function(v){
+    if (v<lo) lo=v; if (v>hi) hi=v; });
+  var pad=(hi-lo)*0.06; lo-=pad; hi+=pad;
+  var pw=(W-ML-MR)/n;
+  var X=function(i){ return ML+(i+0.5)*pw; };
+  var Y=function(v){ return MT+(hi-v)/(hi-lo)*(H-MT-MB); };
+  var s=[];
+
+  // banda de riesgo y de objetivo, desde la entrada hasta el cierre
+  var x0=X(E.i), x1=X(E.ifin);
+  s.push('<rect x="'+x0.toFixed(1)+'" y="'+Math.min(Y(E.ent),Y(E.stop)).toFixed(1)
+    +'" width="'+Math.max(2,x1-x0).toFixed(1)+'" height="'
+    +Math.abs(Y(E.stop)-Y(E.ent)).toFixed(1)+'" fill="var(--malw)"/>');
+  s.push('<rect x="'+x0.toFixed(1)+'" y="'+Math.min(Y(E.ent),Y(E.tp)).toFixed(1)
+    +'" width="'+Math.max(2,x1-x0).toFixed(1)+'" height="'
+    +Math.abs(Y(E.tp)-Y(E.ent)).toFixed(1)+'" fill="var(--okw)"/>');
+
+  // horas
+  for (i=0;i<n;i+=8){
+    s.push('<text x="'+X(i).toFixed(1)+'" y="'+(H-MB+16)+'" font-size="11"'
+      +' fill="var(--tinta3)" text-anchor="middle"'
+      +' font-family="IBM Plex Mono, monospace">'+E.hm[i]+'</text>');
+  }
+  // velas
+  var w=Math.max(1.4, pw*0.62);
+  for (i=0;i<n;i++){
+    var col = E.c[i]>=E.o[i] ? "var(--ok)" : "var(--mal)";
+    var esEnv = (i === E.i);
+    s.push('<line x1="'+X(i).toFixed(1)+'" y1="'+Y(E.h[i]).toFixed(1)+'" x2="'
+      +X(i).toFixed(1)+'" y2="'+Y(E.l[i]).toFixed(1)+'" stroke="'+col
+      +'" stroke-width="'+Math.max(.9,pw*.15).toFixed(2)+'"/>');
+    var y0=Y(Math.max(E.o[i],E.c[i])), y1=Y(Math.min(E.o[i],E.c[i]));
+    s.push('<rect x="'+(X(i)-w/2).toFixed(1)+'" y="'+y0.toFixed(1)+'" width="'
+      +w.toFixed(1)+'" height="'+Math.max(1,y1-y0).toFixed(1)+'" fill="'+col+'"'
+      +(esEnv ? ' stroke="var(--tinta)" stroke-width="2"' : '')+'/>');
+  }
+  // niveles. Las etiquetas se apartan entre si para que no se solapen
+  var etq=[];
+  function nivel(v, col, txt, gordo){
+    var y=Y(v);
+    s.push('<line x1="'+ML+'" y1="'+y.toFixed(1)+'" x2="'+(W-MR)+'" y2="'+y.toFixed(1)
+      +'" stroke="'+col+'" stroke-width="'+(gordo?2:1.3)+'"'
+      +(gordo?'':' stroke-dasharray="5 4"')+'/>');
+    etq.push({y:y, col:col, txt:txt});
+  }
+  function etiquetas(){
+    var GAP=14, j;
+    etq.sort(function(a,b){ return a.y - b.y; });
+    for (j=0;j<etq.length;j++){ etq[j].ye = etq[j].y; }
+    for (j=1;j<etq.length;j++){
+      if (etq[j].ye - etq[j-1].ye < GAP) etq[j].ye = etq[j-1].ye + GAP;
+    }
+    var sobra = etq.length ? etq[etq.length-1].ye - (H-MB) : 0;
+    if (sobra > 0){ for (j=0;j<etq.length;j++){ etq[j].ye -= sobra; } }
+    for (j=0;j<etq.length;j++){
+      var e=etq[j];
+      if (Math.abs(e.ye - e.y) > 2){
+        s.push('<line x1="'+(W-MR).toFixed(1)+'" y1="'+e.y.toFixed(1)+'" x2="'
+          +(W-MR+5)+'" y2="'+e.ye.toFixed(1)+'" stroke="'+e.col
+          +'" stroke-width="1" opacity=".55"/>');
+      }
+      s.push('<text x="'+(W-MR+7)+'" y="'+(e.ye+4).toFixed(1)+'" font-size="11.5"'
+        +' fill="'+e.col+'" font-family="IBM Plex Mono, monospace" font-weight="600">'
+        +e.txt+'</text>');
+    }
+  }
+  var arriba = E.lado < 0;
+  nivel(arriba ? E.h12 : E.l12, "var(--s1)", "12h "+pr(arriba?E.h12:E.l12), false);
+  nivel(arriba ? E.h4  : E.l4,  "var(--s2)", "4h "+pr(arriba?E.h4:E.l4),   false);
+  nivel(E.stop, "var(--tinta)", "stop "+pr(E.stop), true);
+  nivel(E.tp,   "var(--ok)",    "obj "+pr(E.tp),    true);
+  nivel(E.ent,  "var(--tinta2)","entra "+pr(E.ent), false);
+  etiquetas();
+  // marca de la envolvente
+  s.push('<text x="'+X(E.i).toFixed(1)+'" y="'+(MT+13)+'" font-size="12"'
+    +' fill="var(--tinta)" text-anchor="middle" font-weight="700">envolvente</text>');
+  $("#g").innerHTML = s.join("");
+
+  var t=function(k,v,cl){ return '<div><div class="k">'+k+'</div><div class="v '
+    +(cl||"")+'">'+v+'</div></div>'; };
+  $("#pie").innerHTML =
+    t("Fecha", E.t.slice(0,10)) + t("Hora", E.t.slice(11)) +
+    t("Lado", E.lado>0 ? "compra" : "venta") +
+    t("Riesgo", es(E.rgo,1)+" p") +
+    t("El coste se lleva", es(E.coste,1)+" %", E.coste>12 ? "neg" : "") +
+    t("Resultado", E.gana ? "+2,00 R" : "−1,00 R", E.gana ? "pos" : "neg") +
+    t("Con el coste", (E.gana ? "+"+es(2-E.coste/100,2) : "−"+es(1+E.coste/100,2))+" R",
+      E.gana ? "pos" : "neg");
+  $("#cuenta").textContent = (idx+1)+" de "+L.length;
+  $("#ant").disabled = idx === 0;
+  $("#sig").disabled = idx === L.length-1;
+}
+$("#ant").onclick = function(){ idx--; pinta(); };
+$("#sig").onclick = function(){ idx++; pinta(); };
+function marca(){
+  $("#f-gana").setAttribute("aria-pressed", String(filtro===1));
+  $("#f-pierde").setAttribute("aria-pressed", String(filtro===2));
+}
+$("#f-gana").onclick = function(){ filtro = filtro===1?0:1; idx=0; marca(); pinta(); };
+$("#f-pierde").onclick = function(){ filtro = filtro===2?0:2; idx=0; marca(); pinta(); };
+marca(); pinta();
+})();
+</script>
