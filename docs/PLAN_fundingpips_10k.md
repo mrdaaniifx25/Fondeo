@@ -48,6 +48,28 @@ despacio *y* pequeño es la peor combinación.
 Tres al día, no cuatro. Su demo venía haciendo 4,4. **Baje a 3 y tendrá el doble
 de colchón con la misma probabilidad.**
 
+### Cuánto tarda
+
+La simulación grande (`bt/fundingpips_10k.py`, 120.000 carreras, límite de 400
+días) da para la mejor celda a esperanza cero:
+
+```
+  mediana de días hasta pasar LAS DOS fases:  70 días hábiles  (~3,5 meses)
+```
+
+**No son dos semanas.** Si alguien le dice que pasó un challenge en 24 horas,
+eso es la cola derecha de esta misma distribución, no el caso típico.
+
+### La alternativa, y por qué no la elijo
+
+La celda que sale mejor en la simulación grande es **0,75 % con 3 al día**:
+36,3 % contra 35,2 %. **Un punto más.** Pero su peor día pasa de 1,50 % a
+**2,25 %** — tres cuartas partes del límite.
+
+Con un acantilado que va de 35 % a 5 % al tocar el 3 %, **no cambio medio punto
+de probabilidad por un tercio del colchón de seguridad.** Si usted prefiere la
+otra, es defendible; se lo digo para que lo sepa.
+
 ## 3 · Tamaño de posición, ya calculado
 
 `lotes = 50 $ / (stop en pips × 10)` para EUR/USD:
