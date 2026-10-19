@@ -325,7 +325,9 @@ geometría de ejecución que garantiza que no se pueda cobrar.
 |---|---|---|
 | **Romeo TP** (YouTube) | el origen y el patrón de tres velas | `CRT_resumen.md` |
 | **Guía de Rubén Villahermosa** (35 pág.) | la versión canónica, killzones, el «error nº1» | `RESULTADOS_crt_canonico.md` |
-| **@bctrades__** (32 publicaciones de Instagram) + **@trader.derivados** | el modelo completo y ejecutable | `CRT_ampliacion.md`, 25-ago-2026 |
+| **@bctrades__** · 32 publicaciones de Instagram + **@trader.derivados** | el modelo completo y ejecutable | `CRT_ampliacion.md`, 25-ago-2026 |
+| **@bctrades__** · 16 capturas (tanda 1) | PO3 de 12H, cadena de ejecución | `BC_01_material.md`, 26-ago-2026 |
+| **Nueve transcripciones de YouTube** (~31.000 palabras) | la metodología entera, entradas, salidas, gestión, challenges | `docs/transcripciones/CRT_1..9.txt` |
 | **SmartRisk** (4º vídeo) | rango dinámico por sesión | `RESULTADOS_crt_sesion.md` |
 | **Alex Ruiz** · curso gratuito de CRT | la cascada D1→H4→H1→M15 | `RESULTADOS_crt_cascada_video.md` |
 | **Alex Ruiz** · review semanal | el timing con la dirección dada | `RESULTADOS_timing_crt.md` |
@@ -358,8 +360,143 @@ No cambia lo que ya está medido: con bruta +0,082 y coste 0,10-0,20, repartir l
 salida no crea ventaja donde no la hay. Pero **sí puede cambiar la varianza**, y
 eso en una cuenta de fondeo con límite de caída no es irrelevante.
 
-## 8.3 · Una fuente que no aparece
+## 8.3 · Las nueve transcripciones de YouTube
 
-**No hay ni una mención a «Cluty» en los 310 documentos ni en los 339 guiones
-del repositorio.** Si ese material llegó a pasarse, no quedó registrado y por
-tanto **no está medido**. Si existe, hay que volver a traerlo.
+Están guardadas en `docs/transcripciones/`, unas **31.000 palabras** del mismo
+canal. Por contenido:
+
+```
+  CRT_1   el gráfico y los conceptos base
+  CRT_2   semana de resultados: múltiples payouts, challenge en menos de 24 h
+  CRT_3   "mi secreto": cómo toma las entradas, a qué espera
+  CRT_4   cómo SALIR del trade (la gestión)
+  CRT_5   el CRT explicado simple, para aplicar día a día
+  CRT_6   la operativa a tiempo real, respondiendo dudas
+  CRT_7   cómo pasar los challenges rápido
+  CRT_8   repaso de los mejores trades de la semana
+  CRT_9   la estrategia paso a paso para 2026
+```
+
+Tres de las nueve —**CRT_2, CRT_7 y CRT_8**— no son metodología: son
+**resultados anunciados**. Pagos, un challenge pasado en 24 horas, los mejores
+trades de la semana. Es el mismo material que `RESULTADOS_concurso.md` y
+`RESULTADOS_payouts.md` analizan: números que pueden ser exactos y aun así no
+demostrar ventaja, porque **falta el denominador** — cuántos lo intentaron,
+cuántas operaciones hubo, qué hizo la mediana.
+
+Y **CRT_4 es la que importa y la que peor se ha aprovechado**: es la de la
+gestión de la salida, y es exactamente la dimensión que el proyecto no ha
+medido (§8.2).
+
+---
+
+# PARTE 9 · EL MODELO DE @bctrades, MEDIDO APARTE
+
+A petición suya se trató como si no hubiéramos probado nada antes: once
+documentos, `BC_00` a `BC_10`, con material transcrito **sin juicio ninguno**
+antes de especificar nada.
+
+## 9.1 · Qué es, en sus palabras
+
+> *«En la activación del **PO3 de 12H** tenemos dos formas de ejecutar. Primera:
+> entramos en el primer rango de **15M**, buscando después la confirmación con el
+> **cierre de 1H**. Segunda: esperamos directamente al cierre de 1H y, una vez
+> confirmado, buscamos la creación del **rango de 1H** para ejecutar.»*
+
+Es decir: **PO3 de 12H activado → creación de rango → confirmación → ejecución**,
+con la regla del **reinicio** (cuándo un rango se da por descartado) como pieza
+propia.
+
+## 9.2 · Lo que salió
+
+| documento | qué midió | resultado |
+|---|---|---|
+| `BC_04` | la especificación completa, 12 celdas | **0 de 12**, las doce medias recortadas en negativo |
+| `BC_06` | la regla del reinicio | el intervalo excluye el cero **por el lado negativo** |
+| `BC_10` | la temporalidad de ejecución | acierto 13,3 % → 10,9 % → 10,6 % → **9,0 %**; la bruta **prácticamente desaparece** |
+
+## 9.3 · Y dos fallos más míos, encontrados aquí
+
+`BC_07_correcciones.md` documenta **dos fallos del motor**, encontrados al
+traducir la máquina de estados a Pine. Uno de ellos era grave en su implicación:
+
+> **«la máquina de estados no ha influido nunca en ningún resultado»** — se
+> estaba midiendo algo más simple de lo que se creía medir.
+
+Corregidos, el volumen cayó de **39.064 operaciones a 13.789** y el veredicto de
+`BC_04` **no cambió**. Pero suma: con los tres de esta semana (§6) van **cinco
+errores míos documentados** en el proyecto. Ninguno cambió una conclusión; todos
+cambiaron números.
+
+---
+
+# PARTE 10 · SU PARTE · LA LIQUIDEZ POR SESIONES
+
+**61 documentos y 41 guiones.** Es, con diferencia, el cuerpo de trabajo más
+grande del proyecto, y el único que nace de una idea suya y no de un vídeo.
+
+## 10.1 · La idea
+
+Que el precio barre la liquidez que dejan los extremos de una sesión —Asia,
+Londres, Nueva York— y que la sesión siguiente va a buscarla. Con variantes
+suyas: niveles sin mitigar de sesiones anteriores, doble y triple barrido,
+anchura del rango asiático, contexto del día previo.
+
+## 10.2 · Su especificación de 17 artículos
+
+La escribió usted entera y se implementó literalmente (`SPEC_liquidez_sesiones_v2.md`).
+El resultado, con los placebos:
+
+```
+                              n      acierto     NETA
+  lados barajados           167       29,3 %   -0,1433
+  SIN la cadena H4+H1       794       27,1 %   -0,1942
+  la señal completa         167       22,2 %   -0,3769
+```
+
+**La señal completa es peor que los dos placebos.** Barajar la dirección al azar
+acierta más (29,3 %) que aplicar la regla (22,2 %), contra un azar geométrico del
+33,3 %.
+
+## 10.3 · El documento que cerró la línea entera
+
+`RESULTADOS_reloj.md` hizo **la pregunta que nadie había hecho en 34 guiones de
+sesiones**: ¿qué hace el precio en cada hora, *sin condición ninguna*?
+
+```
+  El reloj no tiene dirección. Cada sesión se lleva exactamente la parte de la
+  deriva del instrumento que le toca POR HORAS, ni más ni menos.
+```
+
+El mayor exceso de todas las celdas —la sesión de Asia en oro, que parecía
+cruzar— es **t = +1,21**. Y lo que parecía señal era la deriva del instrumento
+repartida por el día: el euro cayendo en el periodo, el oro subiendo un 40 %.
+
+**Eso explica por qué los 34 guiones anteriores salieron planos: no había nada
+debajo que condicionar.** El control proporcional —comparar contra
+`deriva_diaria × (horas_sesión / horas_día)` en vez de contra cero— es la
+aportación metodológica más importante del proyecto, y salió de aquí.
+
+## 10.4 · Y la retractación
+
+`RESULTADOS_asia_contexto.md` fue **el resultado más firme que tuvo el proyecto**:
++0,071 R por operación con z +9,92. Está retractado:
+
+> **RETRACTADO (21/09/2026).** Con los datos actuales no se reproduce: la bruta
+> de +0,071 sale **−0,022** y la diferencia baja de z +9,92 a z +3,03.
+
+La causa es de datos: el parquet se reconstruyó desde sus ZIP (otro feed, 1.720
+contra 2.080 configuraciones para la misma etiqueta). **No se puede separar «la
+ventaja vivía en 2020» de «los feeds no son comparables»**, porque el fichero de
+2020 ya no existe.
+
+## 10.5 · Lo que queda de su parte
+
+- **La idea de las sesiones es correcta como descripción**: el precio sí barre
+  los extremos de la sesión anterior, y a menudo.
+- **El control proporcional del reloj es suyo**, nació de insistir en esto, y es
+  lo que cerró la línea con honestidad en vez de dejarla en «no encontré nada».
+- **Su instinto de Londres está respaldado**: `RESULTADOS_su_patron.md` mide
+  bruta +0,0835 (z +2,12) en 08:00-11:00 y **−0,0464 (z −2,60) en Nueva York**.
+- **Lo que no está es la ventaja**: 61 documentos y el mejor exceso del reloj es
+  t +1,21.
