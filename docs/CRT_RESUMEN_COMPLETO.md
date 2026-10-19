@@ -314,3 +314,52 @@ operación con z −0,53**: indistinguible de cero, no por encima.
 
 El CRT es una descripción correcta de algo que el mercado hace, envuelta en una
 geometría de ejecución que garantiza que no se pueda cobrar.
+
+---
+
+# PARTE 8 · LAS FUENTES, Y LO QUE AÚN NO ESTÁ MEDIDO
+
+## 8.1 · De dónde sale todo lo anterior
+
+| fuente | qué aportó | dónde |
+|---|---|---|
+| **Romeo TP** (YouTube) | el origen y el patrón de tres velas | `CRT_resumen.md` |
+| **Guía de Rubén Villahermosa** (35 pág.) | la versión canónica, killzones, el «error nº1» | `RESULTADOS_crt_canonico.md` |
+| **@bctrades__** (32 publicaciones de Instagram) + **@trader.derivados** | el modelo completo y ejecutable | `CRT_ampliacion.md`, 25-ago-2026 |
+| **SmartRisk** (4º vídeo) | rango dinámico por sesión | `RESULTADOS_crt_sesion.md` |
+| **Alex Ruiz** · curso gratuito de CRT | la cascada D1→H4→H1→M15 | `RESULTADOS_crt_cascada_video.md` |
+| **Alex Ruiz** · review semanal | el timing con la dirección dada | `RESULTADOS_timing_crt.md` |
+| **Brad Gould** | dos reglas de entrada y stop | `RESULTADOS_crt_9am.md` |
+| **«CRT Turtle Soup»** (dos `.ex4` de una formación) | verificación de los binarios | `EX4_crt_turtle_soup.md` |
+| **Sus propias respuestas** | cómo opera él, preguntado y contestado | `CRT_H4_especificacion.md` |
+| **Sus capturas de demo** (oct-2026) | su patrón real de Londres | `RESULTADOS_su_patron.md` |
+
+## 8.2 · Lo que está transcrito pero NUNCA se ha medido
+
+De `CRT_ampliacion.md` §3, el material de `@bctrades__`. Son **seis piezas
+documentadas y sin medir**, y dos de ellas tocan la única dimensión que no se ha
+explorado en todo el proyecto: **la gestión de la posición.**
+
+| pieza | por qué sigue abierta |
+|---|---|
+| **Cierre dentro del CUERPO, no del rango** | cambia la definición de confirmación: es una regla distinta, no un filtro |
+| **Liquidez doble y triple** | barridos de dos o tres niveles a la vez; nunca se ha condicionado por eso |
+| **Rango reiniciado / descartado** | cuándo un rango deja de valer. Es la regla que hace al CRT irrefutable si se usa a posteriori — medirla la congelaría |
+| **Temporalidad 2H** | **sin usar nunca**. Está entre H1 y H4, las dos medidas |
+| **Dos objetivos escalonados** (TP1 en 2H, TP2 en 4H) | **no es una variante del motor: es gestión.** Nunca se ha salido en dos tramos |
+| **PO3 con dos entradas** | lo mismo: dos entradas en vez de una |
+
+**Esto es una laguna real de este resumen y del proyecto.** Las 220 celdas de
+`RESULTADOS_punto_optimo.md` recorrieron el instante de entrada, el ancho del
+stop y la distancia del objetivo — pero **siempre con una entrada y una salida**.
+Salir en dos tramos o entrar en dos no está medido en ningún sitio.
+
+No cambia lo que ya está medido: con bruta +0,082 y coste 0,10-0,20, repartir la
+salida no crea ventaja donde no la hay. Pero **sí puede cambiar la varianza**, y
+eso en una cuenta de fondeo con límite de caída no es irrelevante.
+
+## 8.3 · Una fuente que no aparece
+
+**No hay ni una mención a «Cluty» en los 310 documentos ni en los 339 guiones
+del repositorio.** Si ese material llegó a pasarse, no quedó registrado y por
+tanto **no está medido**. Si existe, hay que volver a traerlo.
