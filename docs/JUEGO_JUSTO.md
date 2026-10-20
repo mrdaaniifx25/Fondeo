@@ -1,3 +1,9 @@
+> **SUPERADO por `docs/LA_ESTRATEGIA.md`.** Este documento dejaba la dirección
+> abierta («la que tú veas»), que era precisamente la pieza que no había que
+> dejar abierta. La versión cerrada y con el modelo del P&L diario arreglado
+> está en `LA_ESTRATEGIA.md`. Lo de aquí sigue valiendo para entender *por qué*
+> el juego es justo.
+
 # El juego justo · la rutina diaria
 
 Números: `docs/RESULTADOS_juego_justo.md`. Veinte minutos al día.
