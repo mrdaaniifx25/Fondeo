@@ -1,0 +1,145 @@
+94 ganadoras · 48 perdedoras · 8 cerradas a las 11:30
+3,400 velas de control
+
+============================================================================================
+LOS 16 PATRONES · en la vela de M5 en la que entra
+============================================================================================
+  patrón                          TP      SL  control    TP vs SL   suyas vs control
+  ----------------------------------------------------------------------------------------
+  martillo                     2    2%   1    2%     2.6%   p=  1.000     -0.6pt z=-0.49
+  martillo invertido           1    1%   1    2%     2.4%   p=  1.000     -0.4pt z=-0.34
+  envolvente alcista          12   13%   7   15%     8.2%   p=  0.797     +5.1pt z=+2.21
+  penetrante                   0    0%   0    0%     2.1%   p=  1.000     -2.1pt z=-1.79
+  estrella de la mañana        2    2%   1    2%     3.0%   p=  1.000     -0.3pt z=-0.23
+  tres soldados blancos        0    0%   1    2%     1.3%   p=  0.338     +0.0pt z=+0.01
+  triple formación alcista     0    0%   0    0%     0.2%   p=  1.000     -0.2pt z=-0.56
+  hombre colgado               1    1%   0    0%     3.1%   p=  1.000     -2.4pt z=-1.71
+  estrella fugaz               3    3%   2    4%     2.8%   p=  1.000     +0.5pt z=+0.37
+  envolvente bajista           6    6%   7   15%     7.2%   p=  0.130     +2.2pt z=+1.00
+  cubierta de nube oscura      4    4%   1    2%     2.2%   p=  0.663     +1.2pt z=+0.94
+  estrella del atardecer       2    2%   1    2%     3.9%   p=  1.000     -1.9pt z=-1.17
+  tres cuervos negros          1    1%   0    0%     1.1%   p=  1.000     -0.5pt z=-0.52
+  triple formación bajista     0    0%   0    0%     0.2%   p=  1.000     -0.2pt z=-0.56
+  doji                         5    5%   0    0%     4.4%   p=  0.167     -1.0pt z=-0.60
+  trompo                      11   12%   1    2%     9.6%   p=  0.060     -1.6pt z=-0.67
+
+============================================================================================
+¿EL PATRÓN VA EN SU MISMA DIRECCIÓN?
+============================================================================================
+  ganadoras        a favor  25 (26.6 %) · en contra   9 ( 9.6 %) · sin patrón direccional  60 (63.8 %)
+  perdedoras       a favor  14 (29.2 %) · en contra   6 (12.5 %) · sin patrón direccional  28 (58.3 %)
+  todas las suyas  a favor  43 (28.7 %) · en contra  15 (10.0 %) · sin patrón direccional  92 (61.3 %)
+
+============================================================================================
+EL TIPO DE CIERRE DE LA VELA
+============================================================================================
+                               TP       SL   control     TP vs SL
+  ------------------------------------------------------------------
+  cierra arriba             30.9%    39.6%     29.2%   p=   0.350
+  cierra en medio           42.6%    29.2%     41.0%   p=   0.145
+  cierra abajo              26.6%    31.2%     29.8%   p=   0.561
+  cuerpo lleno              31.9%    62.5%     37.7%   p=   0.001
+  cuerpo medio              40.4%    22.9%     33.8%   p=   0.042
+  cuerpo pequeño            27.7%    14.6%     28.4%   p=   0.095
+
+  el cierre VISTO DESDE SU DIRECCIÓN (a favor = cierra en su extremo):
+    ganadoras            mediana 0.72  ·  cierra en el tercio a su favor: 61 %
+    perdedoras           mediana 0.78  ·  cierra en el tercio a su favor: 65 %
+    control              mediana 0.50 por construcción (la vela no tiene dirección elegida)
+    todas las suyas      mediana 0.74  ·  tercio a favor 62 %
+    la vela va en su misma dirección (verde y compra, roja y venta): 65 % de las suyas · TP 66 % · SL 62 %
+
+============================================================================================
+EL CONTEXTO: M15 Y M5 EN EL MOMENTO DE LA ENTRADA
+============================================================================================
+                                           TP       SL          p
+  --------------------------------------------------------------
+  la última M15 cerrada va con él       45.7%    43.8%   p=   0.860
+  la tendencia de M15 va con él         38.3%    25.0%   p=   0.135
+  la tendencia de M5 va con él          46.8%    33.3%   p=   0.152
+  la vela de M5 va con él               66.0%    62.5%   p=   0.713
+  está en el tercio alto de la M15      34.0%    35.4%   p=   1.000
+  está en el tercio bajo de la M15      38.3%    39.6%   p=   1.000
+
+  donde queda el precio dentro de la vela de M15 en curso, desde su dirección:
+    ganadoras    mediana 0.61  ·  en el tercio a su favor 46 %  ·  en contra 27 %
+    perdedoras   mediana 0.61  ·  en el tercio a su favor 46 %  ·  en contra 29 %
+
+============================================================================================
+EL ÚNICO HALLAZGO: EL TAMAÑO DEL CUERPO DE LA VELA EN LA QUE ENTRA
+============================================================================================
+  emparejadas 150 de 150 con su stop real
+
+  cuerpo de la vela         n   acierto    R neta    stop bloque 1-2-3-4
+  ----------------------------------------------------------------------------
+  cuerpo lleno             64     50.0%    +0.280    6.3p
+  cuerpo medio             52     77.6%    +1.048    5.8p
+  cuerpo pequeño           34     78.8%    +1.097    5.8p
+
+  CUERPO LLENO             64     50.0%    +0.280
+  todo lo demás            86     78.0%    +1.067
+  Fisher: p = 0.0006   (28 contrastes en este informe · Bonferroni pide p < 0,0018)
+
+  ¿aguanta en los cuatro bloques por separado?
+    bloque 1:  cuerpo lleno 15 ops  53.3 %   ·   resto  8 ops  71.4 %
+    bloque 2:  cuerpo lleno 12 ops  44.4 %   ·   resto 18 ops  55.6 %
+    bloque 3:  cuerpo lleno  8 ops  37.5 %   ·   resto 25 ops  95.8 %
+    bloque 4:  cuerpo lleno 29 ops  53.6 %   ·   resto 35 ops  78.8 %
+
+  ¿es solo que el stop cambia? (si el cuerpo es grande, el stop se aleja)
+    cuerpo lleno     stop mediano  6.3 p  ·  coste sobre riesgo 25.9 %  ·  R bruta +0.538
+    cuerpo medio     stop mediano  5.8 p  ·  coste sobre riesgo 25.6 %  ·  R bruta +1.304
+    cuerpo pequeño   stop mediano  5.8 p  ·  coste sobre riesgo 27.2 %  ·  R bruta +1.368
+==============================================================================
+LA CURVA COMPLETA · no un corte elegido a dedo
+==============================================================================
+  cuerpo / rango        n   acierto    R neta
+  --------------------------------------------
+  0%-20%             26     80.8%    +1.133
+  20%-40%            24     77.3%    +1.029
+  40%-60%            36     76.5%    +1.045
+  60%-80%            40     56.8%    +0.493
+  80%-100%           24     39.1%    -0.076
+
+  y todos los cortes posibles, para que se vea que no hay dedo:
+     corte  n arriba   acierto   n abajo   acierto         p
+  ------------------------------------------------------------
+      0.40       100     59.6%        50     79.2%    0.0243
+      0.50        80     59.2%        70     74.2%    0.0755
+      0.55        71     55.2%        79     76.0%    0.0126
+      0.60        64     50.0%        86     78.0%    0.0006
+      0.65        51     44.7%        99     76.8%    0.0003
+      0.70        41     36.8%       109     76.9%    0.0000
+      0.80        24     39.1%       126     71.4%    0.0040
+
+==============================================================================
+¿PERSIGUE O COMPRA EL RETROCESO? · cuerpo grande, a favor o en contra
+==============================================================================
+  cuerpo lleno EN SU DIRECCIÓN (persigue)       48  acierto  53.3 %  R neta +0.374
+  cuerpo lleno EN CONTRA (compra el retroceso)  16  acierto  40.0 %  R neta -0.004
+  cuerpo no lleno, en su dirección              50  acierto  80.9 %  R neta +1.130
+  cuerpo no lleno, en contra                    36  acierto  74.3 %  R neta +0.979
+
+==============================================================================
+¿ES LO MISMO QUE YA SABÍAMOS? · cruce con las cajas de ayer
+==============================================================================
+  caja                                  n   lleno  acierto lleno  acierto resto
+  ----------------------------------------------------------------------------
+  toca el nivel de Asia                45     49%          65.0%          68.2%
+  solo mecha (rechazo)                 35     49%          75.0%          76.5%
+  cuerpo fuera del nivel (rotura)      10     50%          25.0%          40.0%
+  no toca ningún nivel                105     40%          42.5%          81.7%
+  primera hora y media                130     41%          50.0%          78.7%
+  después de las 09:30                 20     55%          50.0%          71.4%
+
+  el hallazgo del cuerpo NO es la caja de la rotura: son 64 operaciones
+  contra 10, y aparece dentro de todas las cajas por igual.
+
+==============================================================================
+QUÉ PASA SI SIMPLEMENTE NO TOMA LAS DE CUERPO LLENO
+==============================================================================
+  las 150 tal cual           150 operaciones  acierto  66.2 %  R neta/op +0.731  suma +109.7 R
+  sin las de cuerpo lleno     86 operaciones  acierto  78.0 %  R neta/op +1.067  suma  +91.8 R
+
+  operaciones por sesión: 1.32 -> 0.75
+  equilibrio con stop de 6 p: 41,3 %

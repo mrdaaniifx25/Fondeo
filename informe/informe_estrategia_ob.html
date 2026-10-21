@@ -1,0 +1,425 @@
+<title>Turtle Soup y Order Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F5F6F7; --panel:#FFFFFF; --panel-2:#EDEFF2;
+  --ink:#171A1F; --ink-2:#4B535F; --ink-3:#79828F;
+  --rule:#DDE1E6; --rule-2:#C8CED6;
+  --r1:#7FA9DC; --r2:#3F71B4; --r3:#153A6B; --acc:#A66A18;
+  --flag:#9C2F2F; --flag-soft:rgba(156,47,47,.09);
+  --ok:#1F6B4A; --ok-soft:rgba(31,107,74,.09);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --panel:#1B1E24; --panel-2:#22262E;
+    --ink:#E7E9ED; --ink-2:#A8B0BC; --ink-3:#79828F;
+    --rule:#2C313A; --rule-2:#3B424D;
+    --r1:#2A5286; --r2:#5590CE; --r3:#A7C9F0; --acc:#BE8630;
+    --flag:#D97A7A; --flag-soft:rgba(217,122,122,.12);
+    --ok:#6FBF95; --ok-soft:rgba(111,191,149,.12);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --panel:#1B1E24; --panel-2:#22262E;
+  --ink:#E7E9ED; --ink-2:#A8B0BC; --ink-3:#79828F;
+  --rule:#2C313A; --rule-2:#3B424D;
+  --r1:#2A5286; --r2:#5590CE; --r3:#A7C9F0; --acc:#BE8630;
+  --flag:#D97A7A; --flag-soft:rgba(217,122,122,.12);
+  --ok:#6FBF95; --ok-soft:rgba(111,191,149,.12);
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-size:16.5px; line-height:1.65; -webkit-font-smoothing:antialiased}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px}
+.col{max-width:64ch}
+h1,h2,h3{font-family:Newsreader,Georgia,serif; font-weight:600; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.4rem,6vw,3.6rem); line-height:1.06; letter-spacing:-.015em}
+h2{font-size:clamp(1.45rem,3.2vw,1.9rem); line-height:1.2; margin-bottom:.5rem}
+h3{font-size:1.08rem; font-weight:600; margin-bottom:.3rem}
+p{margin:0 0 1.05em}
+.eyebrow{font-family:"IBM Plex Mono",monospace; font-size:.7rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); margin:0 0 1.1rem}
+header{padding:76px 0 8px; border-bottom:1px solid var(--rule)}
+.lede{font-size:1.16rem; color:var(--ink-2); margin-top:1.4rem}
+.meta{display:flex; flex-wrap:wrap; gap:8px 26px; margin:26px 0 30px;
+  font-family:"IBM Plex Mono",monospace; font-size:.74rem; color:var(--ink-3)}
+section{padding-top:56px}
+.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.verdict{margin:38px 0 0; padding:30px 32px; background:var(--panel);
+  border:1px solid var(--rule); border-left:3px solid var(--acc); border-radius:3px}
+.vgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:26px 30px; margin-top:22px}
+.stat .k{font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3); display:block; margin-bottom:5px}
+.stat .v{font-family:Newsreader,Georgia,serif; font-size:2.1rem; line-height:1; font-variant-numeric:tabular-nums}
+.stat .n{font-size:.8rem; color:var(--ink-3); display:block; margin-top:5px}
+.good{color:var(--ok)} .bad{color:var(--flag)}
+figure{margin:30px 0 0; padding:24px 22px 18px; background:var(--panel);
+  border:1px solid var(--rule); border-radius:3px}
+figcaption{font-size:.84rem; color:var(--ink-2); margin-top:16px; padding-top:14px; border-top:1px solid var(--rule)}
+.legend{display:flex; flex-wrap:wrap; gap:18px; margin-bottom:14px; font-size:.82rem; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.sw{width:15px; height:2.5px; border-radius:2px; display:inline-block}
+.chart{width:100%; height:auto; display:block; overflow:visible}
+.grid line{stroke:var(--rule)}
+.axis text{fill:var(--ink-3); font-family:"IBM Plex Mono",monospace; font-size:10.5px}
+.endlab{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:500}
+.scroll{overflow-x:auto; margin-top:26px}
+table{border-collapse:collapse; width:100%; font-size:.9rem; min-width:480px}
+th,td{text-align:right; padding:9px 12px; border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:400; border-bottom:1px solid var(--rule-2)}
+td.num{font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--panel-2)}
+tr.hi td{background:var(--ok-soft)}
+caption{caption-side:top; text-align:left; font-size:.84rem; color:var(--ink-2); padding-bottom:12px}
+.steps{list-style:none; margin:26px 0 0; padding:0}
+.steps li{display:grid; grid-template-columns:1fr auto; gap:16px; align-items:baseline;
+  padding:13px 0; border-bottom:1px solid var(--rule)}
+.steps .cnt{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:.95rem}
+.note{background:var(--panel-2); border:1px solid var(--rule); border-radius:3px;
+  padding:20px 22px; margin-top:28px; font-size:.93rem; color:var(--ink-2)}
+.note strong{color:var(--ink)}
+.warn{border-left:3px solid var(--flag)}
+.tip{position:fixed; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--panel); border:1px solid var(--rule-2); border-radius:3px;
+  padding:7px 10px; font-family:"IBM Plex Mono",monospace; font-size:11.5px;
+  color:var(--ink); box-shadow:0 4px 16px rgba(0,0,0,.14); z-index:9;
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+footer{margin-top:70px; padding-top:22px; border-top:1px solid var(--rule);
+  font-size:.82rem; color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Backtest · EURUSD · 2020-2026 · estrategia 3</p>
+  <h1>La ventaja empieza en el segundo R</h1>
+  <p class="lede col">Tercera estrategia CRT: turtle soup en H4, confirmación en H1 y order block
+  en M15. Es la primera de las tres que no aterriza en cero — pero solo si el objetivo está
+  lejos. En el primer R no hay nada, y a partir del segundo aparece algo. Algo pequeño,
+  no confirmado, y que el spread se come casi entero.</p>
+  <div class="meta">
+    <span>2.397.463 velas M1</span><span>M15 · rejilla H4 anclada a 01:00 UTC−4</span>
+    <span>ene 2020 — jul 2026</span><span>SL/TP resueltos a granularidad M1</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <h3>Veredicto</h3>
+  <p style="margin:0; color:var(--ink-2)">Con objetivo de 3R hay ventaja bruta de
+  <span class="num">+0,1134</span> R por operación, con <span class="num">p = 0,024</span>.
+  Es real en magnitud y consistente en las dos mitades de la muestra. Pero no supera la
+  corrección por el número de configuraciones probadas, y de los
+  <span class="num">144</span> R brutos el spread se lleva <span class="num">120</span>.</p>
+  <div class="vgrid">
+    <div class="stat"><span class="k">Operaciones</span><span class="v" id="v-ops"></span><span class="n">objetivo 3R</span></div>
+    <div class="stat"><span class="k">R bruto</span><span class="v good" id="v-rb"></span><span class="n">sin coste</span></div>
+    <div class="stat"><span class="k">R neto</span><span class="v" id="v-rn"></span><span class="n">con 1,2 pips</span></div>
+    <div class="stat"><span class="k">Significación</span><span class="v" id="v-p"></span><span class="n">z = <span id="v-z"></span> · sin corregir</span></div>
+  </div>
+</div>
+
+<section>
+  <h2>El gráfico que lo explica todo</h2>
+  <div class="col">
+  <p>Cada línea es la misma estrategia con una capa más de filtro. El eje horizontal es el
+  objetivo, en múltiplos de R. El vertical, la ventaja bruta por operación: cuánto se separa
+  el resultado del punto de equilibrio, ya descontado el efecto del propio R:R.</p>
+  <p>Las cuatro líneas arrancan pegadas al cero en 1R. Es el hallazgo de los dos informes
+  anteriores, otra vez: <strong>a un R de distancia, ninguna versión del CRT sabe nada</strong>.
+  Lo nuevo empieza después. A partir de 2R las tres versiones del método del vídeo se separan
+  hacia arriba, y lo hacen en orden: cada filtro añadido casi duplica la separación. La
+  estrategia 2, que es CRT sin order block y con otra rejilla, se queda plana.</p>
+  </div>
+  <figure>
+    <div class="legend" id="lg-esc"></div>
+    <svg id="esc" class="chart" viewBox="0 0 780 330" role="img"
+         aria-label="Ventaja bruta por operación según el objetivo, para cuatro variantes"></svg>
+    <figcaption>Ventaja bruta por operación frente al objetivo. Muestra propia de cada punto
+    (entre 900 y 3.900 operaciones). Los valores están en R, así que ya son comparables entre
+    objetivos distintos.</figcaption>
+  </figure>
+  <div class="scroll">
+    <table>
+      <caption>Los mismos datos con su significación. Ningún valor de p aguanta una corrección
+      por comparaciones múltiples; lo que sostiene la lectura es el patrón, no cada celda.</caption>
+      <thead><tr><th>Variante</th><th>1R</th><th>2R</th><th>3R</th><th>4R</th></tr></thead>
+      <tbody id="t-esc"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>De quién es el mérito</h2>
+  <div class="col">
+  <p>La pregunta que importaba al comparar esta estrategia con la anterior era si el order
+  block aporta algo o es adorno. La respuesta está en el orden de las líneas: aporta, y es
+  la capa que más aporta. A 3R, el CRT desnudo da <span class="num">+0,038</span> y con order
+  block da <span class="num">+0,113</span>: tres veces más.</p>
+  <p>Pero el mecanismo no es el que vende el vídeo. El order block no acierta más la dirección
+  —el espejo de la estrategia, que invierte cada señal, pierde
+  <span class="num" id="p-esp"></span> R, así que algo de información direccional hay, pero
+  poca—. Lo que hace es <strong>descartar los setups cuyo stop es demasiado estrecho</strong>.
+  Sin order block hay más de mil operaciones con stop por debajo de 8 pips que sangran a
+  <span class="num">−0,123</span> R cada una; con order block quedan 164 y dan
+  <span class="num">+0,012</span>. Al esperar a la confirmación, el precio se aleja del
+  extremo del barrido y el stop nace más ancho.</p>
+  </div>
+  <div class="note col">
+    <strong>Esto es lo que hay que llevarse para combinar las dos estrategias.</strong> El CRT
+    Trade Planner pone el objetivo en el extremo opuesto del rango, lo que da un R:R medio de
+    1,47 — justo la zona donde el gráfico de arriba dice que no hay nada. El método del vídeo
+    apunta a 3R. No son dos formas de hacer lo mismo: una apunta al tramo sin ventaja y la
+    otra al tramo donde parece haberla. Si te quedas con una sola pieza de todo este informe,
+    que sea ésa.
+  </div>
+</section>
+
+<section>
+  <h2>La curva, y lo que se lleva el spread</h2>
+  <figure>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--r2)"></i>Con coste de 1,2 pips</span>
+      <span><i class="sw" style="background:var(--acc)"></i>Sin coste (ventaja bruta)</span>
+    </div>
+    <svg id="eq" class="chart" viewBox="0 0 780 330" role="img"
+         aria-label="Capital con y sin coste, objetivo 3R"></svg>
+    <figcaption id="eq-cap"></figcaption>
+  </figure>
+  <div class="note col warn">
+    <strong>Ésta es la parte incómoda.</strong> La ventaja bruta existe y da
+    <span class="num" id="p-mult"></span> veces el capital en seis años y medio. Con un coste
+    realista de 1,2 pips queda en <span class="num" id="p-neto"></span> %. No es una
+    estrategia rentable: es una estrategia con una ventaja tan pequeña que el peaje se la
+    come. Con el riesgo medio de 16,2 pips, esos 1,2 pips son el 7,4 % de cada operación.
+  </div>
+</section>
+
+<section>
+  <h2>Las pruebas que sí pasa, y las que no</h2>
+  <div class="scroll">
+    <table>
+      <caption>Batería completa aplicada a la configuración de 3R.</caption>
+      <thead><tr><th>Prueba</th><th>Resultado</th><th>Lectura</th></tr></thead>
+      <tbody id="t-pru"></tbody>
+    </table>
+  </div>
+  <div class="note col warn">
+    <strong>Por qué no puedo llamar a esto una ventaja confirmada.</strong> A lo largo de esta
+    investigación he probado más de cincuenta configuraciones entre las tres estrategias.
+    Con ese número de intentos, encontrar un <span class="num">p = 0,024</span> es lo esperable
+    por azar aunque no hubiera nada. La corrección de Bonferroni solo para las catorce variantes
+    de esta estrategia exigiría <span class="num">p &lt; 0,0036</span>. Lo que salva parcialmente
+    la lectura no es el valor de p aislado, sino que el patrón sea ordenado —crece con el filtro
+    y con el objetivo— y que se repita en las dos mitades de la muestra. Eso es indicio, no prueba.
+  </div>
+</section>
+
+<section>
+  <h2>Por año</h2>
+  <div class="scroll">
+    <table>
+      <caption>El bruto es positivo en cinco de siete años, pero la dispersión es enorme:
+      2020 y 2023 sostienen buena parte del resultado.</caption>
+      <thead><tr><th>Año</th><th>Ops</th><th>Win rate</th><th>R neto</th><th>Bruto / op</th></tr></thead>
+      <tbody id="t-ano"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>El embudo</h2>
+  <ul class="steps" id="embudo"></ul>
+</section>
+
+<section>
+  <h2>Las tres estrategias</h2>
+  <div class="scroll">
+    <table>
+      <caption>Ventaja bruta por operación, que es la única cifra comparable entre modelos
+      con distinto R:R y distinto tamaño de stop.</caption>
+      <thead><tr><th></th><th>Cuatro confirmaciones</th><th>CRT Planner</th><th>Turtle soup + OB</th></tr></thead>
+      <tbody>
+        <tr><td>Objetivo</td><td class="num">1R fijo</td><td class="num">extremo del rango</td><td class="num">3R fijo</td></tr>
+        <tr><td>Operaciones</td><td class="num">1.237</td><td class="num">1.343</td><td class="num">1.274</td></tr>
+        <tr><td>Riesgo medio</td><td class="num">11,7 pips</td><td class="num">21,3 pips</td><td class="num">16,2 pips</td></tr>
+        <tr><td>Profit factor neto</td><td class="num">0,749</td><td class="num">0,889</td><td class="num">1,019</td></tr>
+        <tr class="hi"><td><b>Bruto por operación</b></td><td class="num"><b>+0,0010</b></td><td class="num"><b>−0,0033</b></td><td class="num"><b>+0,1134</b></td></tr>
+        <tr><td>p del bruto</td><td class="num">0,98</td><td class="num">0,97</td><td class="num">0,024</td></tr>
+        <tr><td>Distancia del azar</td><td class="num">+0,29 σ</td><td class="num">−0,30 σ</td><td class="num" id="p-sig"></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Qué haría yo ahora</h2>
+  <div class="col">
+  <p><strong>Probarlo en índices, antes que nada.</strong> Las tres estrategias están pensadas
+  para NAS100 y US500, y las tres se han medido sobre EURUSD. Con una ventaja bruta de 0,11 R
+  y un coste que se lleva 0,09, el margen depende por completo del spread relativo. En un índice
+  con stops de cien puntos, ese mismo coste pesa una fracción de lo que pesa aquí.</p>
+  <p><strong>Y si se queda en forex, atacar el coste, no los filtros.</strong> La ventaja bruta
+  no cambia si sigues moviendo parámetros: eso ya está probado cincuenta veces. Lo que cambia
+  el resultado neto es operar con menos spread o con stops más anchos. Subir el colchón del SL
+  ya mejoraba el profit factor en la estrategia 2 por esa vía exacta.</p>
+  <p><strong>Lo que no haría es dar esto por bueno y ponerlo en un reto de fondeo.</strong>
+  Un <span class="num">p = 0,024</span> sin corregir, después de cincuenta intentos, y con un
+  neto de <span class="num">+4</span> % en seis años y medio, no es una base sobre la que
+  arriesgar una cuenta. Es una hipótesis que merece una prueba limpia en datos que no he tocado.</p>
+  </div>
+</section>
+
+<footer>
+  Datos de HistData.com, corregido el desfase de una hora en el 65 % de la muestra. Reglas
+  extraídas de nueve transcripciones de vídeo; la zona horaria (UTC−4) y la rejilla H4 anclada
+  a las 01:00 están tomadas literalmente del material. Código y operaciones en el repositorio.
+</footer>
+</div>
+
+<div class="tip" id="tip"></div>
+<script>
+const D = {"escalera":[{"nom":"CRT desnudo","pts":[{"r":1.0,"b":-0.0069,"p":0.665,"n":3899},{"r":2.0,"b":0.0096,"p":0.7,"n":3211},{"r":3.0,"b":0.0377,"p":0.263,"n":2706},{"r":4.0,"b":0.0332,"p":0.425,"n":2360}]},{"nom":"+ confirmacion H1","pts":[{"r":1.0,"b":-0.008,"p":0.675,"n":2760},{"r":2.0,"b":0.023,"p":0.429,"n":2393},{"r":3.0,"b":0.0596,"p":0.121,"n":2110},{"r":4.0,"b":0.0989,"p":0.036,"n":1914}]},{"nom":"+ order block M15","pts":[{"r":1.0,"b":-0.0012,"p":0.961,"n":1668},{"r":2.0,"b":0.0626,"p":0.097,"n":1445},{"r":3.0,"b":0.1134,"p":0.024,"n":1274},{"r":4.0,"b":0.1377,"p":0.026,"n":1142}]},{"nom":"Estrategia 2 (CRT Planner)","pts":[{"r":1.0,"b":-0.014,"p":0.596,"n":1424},{"r":2.0,"b":-0.0066,"p":0.87,"n":1231},{"r":3.0,"b":-0.0006,"p":0.991,"n":1028},{"r":4.0,"b":0.0415,"p":0.537,"n":908}],"ref":true}],"serie":[{"f":"2020-01","n":1,"con":9886.8,"sin":9900.0},{"f":"2020-01","n":6,"con":9349.4,"sin":9414.8},{"f":"2020-01","n":11,"con":9183.9,"sin":9315.1},{"f":"2020-01","n":16,"con":9011.4,"sin":9216.5},{"f":"2020-01","n":21,"con":9203.0,"sin":9487.4},{"f":"2020-02","n":26,"con":9798.3,"sin":10160.8},{"f":"2020-02","n":31,"con":9608.0,"sin":10053.3},{"f":"2020-02","n":36,"con":9820.3,"sin":10348.7},{"f":"2020-03","n":41,"con":9693.2,"sin":10239.2},{"f":"2020-03","n":46,"con":10362.3,"sin":10966.0},{"f":"2020-03","n":51,"con":10651.4,"sin":11288.3},{"f":"2020-04","n":56,"con":10505.9,"sin":11168.8},{"f":"2020-04","n":61,"con":11664.8,"sin":12444.8},{"f":"2020-04","n":66,"con":12946.8,"sin":13866.7},{"f":"2020-05","n":71,"con":13282.3,"sin":14274.3},{"f":"2020-05","n":76,"con":13632.0,"sin":14693.8},{"f":"2020-05","n":81,"con":12893.8,"sin":13973.6},{"f":"2020-05","n":86,"con":12699.3,"sin":13825.7},{"f":"2020-06","n":91,"con":12526.0,"sin":13679.4},{"f":"2020-06","n":96,"con":11868.6,"sin":13008.9},{"f":"2020-06","n":101,"con":12178.2,"sin":13391.3},{"f":"2020-06","n":106,"con":11544.2,"sin":12735.0},{"f":"2020-07","n":111,"con":12310.8,"sin":13638.9},{"f":"2020-07","n":116,"con":13147.8,"sin":14607.0},{"f":"2020-08","n":121,"con":15187.8,"sin":16933.5},{"f":"2020-08","n":126,"con":16222.7,"sin":18135.5},{"f":"2020-08","n":131,"con":16006.4,"sin":17943.5},{"f":"2020-09","n":136,"con":15795.3,"sin":17753.6},{"f":"2020-09","n":141,"con":14982.5,"sin":16883.5},{"f":"2020-09","n":146,"con":14753.7,"sin":16704.7},{"f":"2020-09","n":151,"con":14534.6,"sin":16527.9},{"f":"2020-10","n":156,"con":14312.4,"sin":16352.9},{"f":"2020-10","n":161,"con":14672.0,"sin":16833.6},{"f":"2020-10","n":166,"con":14436.2,"sin":16655.4},{"f":"2020-11","n":171,"con":15396.5,"sin":17837.6},{"f":"2020-11","n":176,"con":15175.8,"sin":17648.8},{"f":"2020-11","n":181,"con":16826.4,"sin":19665.2},{"f":"2020-12","n":186,"con":17239.7,"sin":20243.2},{"f":"2020-12","n":191,"con":16317.2,"sin":19251.0},{"f":"2020-12","n":196,"con":16072.6,"sin":19047.2},{"f":"2020-12","n":201,"con":15214.0,"sin":18113.7},{"f":"2021-01","n":206,"con":14420.3,"sin":17226.0},{"f":"2021-01","n":211,"con":14210.6,"sin":17043.6},{"f":"2021-01","n":216,"con":15160.9,"sin":18253.4},{"f":"2021-02","n":221,"con":14329.2,"sin":17358.8},{"f":"2021-02","n":226,"con":14095.3,"sin":17175.1},{"f":"2021-02","n":231,"con":13877.6,"sin":16993.2},{"f":"2021-03","n":236,"con":14237.4,"sin":17492.7},{"f":"2021-03","n":241,"con":14593.2,"sin":18006.8},{"f":"2021-03","n":246,"con":14365.5,"sin":17816.2},{"f":"2021-04","n":251,"con":14718.0,"sin":18339.8},{"f":"2021-04","n":256,"con":14498.2,"sin":18145.6},{"f":"2021-04","n":261,"con":14269.3,"sin":17953.5},{"f":"2021-05","n":266,"con":15214.0,"sin":19227.9},{"f":"2021-05","n":271,"con":14988.7,"sin":19024.4},{"f":"2021-05","n":276,"con":14765.5,"sin":18823.0},{"f":"2021-06","n":281,"con":14551.4,"sin":18623.7},{"f":"2021-06","n":286,"con":13775.8,"sin":17711.0},{"f":"2021-06","n":291,"con":13557.7,"sin":17523.5},{"f":"2021-07","n":296,"con":12830.7,"sin":16664.7},{"f":"2021-07","n":301,"con":12138.9,"sin":15847.9},{"f":"2021-07","n":306,"con":12438.4,"sin":16313.7},{"f":"2021-07","n":311,"con":11775.4,"sin":15514.2},{"f":"2021-08","n":316,"con":12039.9,"sin":15970.1},{"f":"2021-08","n":321,"con":12320.2,"sin":16439.5},{"f":"2021-08","n":326,"con":12587.1,"sin":16922.6},{"f":"2021-08","n":331,"con":12393.5,"sin":16743.5},{"f":"2021-08","n":336,"con":12676.3,"sin":17235.6},{"f":"2021-09","n":341,"con":12477.5,"sin":17053.1},{"f":"2021-09","n":346,"con":13274.7,"sin":18263.6},{"f":"2021-10","n":351,"con":12565.7,"sin":17368.5},{"f":"2021-10","n":356,"con":12371.2,"sin":17184.6},{"f":"2021-10","n":361,"con":12665.6,"sin":17689.7},{"f":"2021-10","n":366,"con":11978.5,"sin":16822.7},{"f":"2021-11","n":371,"con":11339.4,"sin":15998.2},{"f":"2021-11","n":376,"con":10725.6,"sin":15214.2},{"f":"2021-11","n":381,"con":10973.7,"sin":15661.3},{"f":"2021-11","n":386,"con":10381.0,"sin":14893.8},{"f":"2021-11","n":391,"con":10235.4,"sin":14736.1},{"f":"2021-12","n":396,"con":10493.8,"sin":15169.2},{"f":"2021-12","n":401,"con":11176.7,"sin":16245.9},{"f":"2021-12","n":406,"con":10520.3,"sin":15449.7},{"f":"2022-01","n":411,"con":10337.5,"sin":15286.2},{"f":"2022-01","n":416,"con":10572.7,"sin":15735.4},{"f":"2022-01","n":421,"con":10393.8,"sin":15568.8},{"f":"2022-02","n":426,"con":9817.4,"sin":14805.8},{"f":"2022-02","n":431,"con":9292.3,"sin":14080.2},{"f":"2022-02","n":436,"con":9156.5,"sin":13931.1},{"f":"2022-02","n":441,"con":9030.6,"sin":13783.7},{"f":"2022-03","n":446,"con":8567.7,"sin":13108.1},{"f":"2022-03","n":451,"con":8447.5,"sin":12969.4},{"f":"2022-04","n":456,"con":8664.6,"sin":13350.5},{"f":"2022-04","n":461,"con":8878.3,"sin":13742.9},{"f":"2022-05","n":466,"con":9116.3,"sin":14146.8},{"f":"2022-05","n":471,"con":8646.0,"sin":13453.5},{"f":"2022-05","n":476,"con":8529.4,"sin":13311.1},{"f":"2022-06","n":481,"con":8080.7,"sin":12658.7},{"f":"2022-06","n":486,"con":8293.3,"sin":13030.7},{"f":"2022-06","n":491,"con":8185.4,"sin":12892.8},{"f":"2022-06","n":496,"con":8396.4,"sin":13271.7},{"f":"2022-07","n":501,"con":8284.0,"sin":13131.2},{"f":"2022-07","n":506,"con":7858.8,"sin":12487.6},{"f":"2022-07","n":511,"con":8066.3,"sin":12854.7},{"f":"2022-07","n":516,"con":7964.6,"sin":12718.6},{"f":"2022-08","n":521,"con":8491.9,"sin":13621.4},{"f":"2022-08","n":526,"con":9426.9,"sin":15177.7},{"f":"2022-08","n":531,"con":9295.6,"sin":15017.0},{"f":"2022-09","n":536,"con":9402.3,"sin":15221.4},{"f":"2022-09","n":541,"con":9270.5,"sin":15060.3},{"f":"2022-09","n":546,"con":9144.8,"sin":14900.9},{"f":"2022-10","n":551,"con":9390.0,"sin":15338.8},{"f":"2022-10","n":556,"con":8909.7,"sin":14587.0},{"f":"2022-10","n":561,"con":8795.7,"sin":14432.6},{"f":"2022-11","n":566,"con":8680.2,"sin":14279.8},{"f":"2022-11","n":571,"con":8912.7,"sin":14699.5},{"f":"2022-11","n":576,"con":8450.1,"sin":13979.1},{"f":"2022-12","n":581,"con":8671.5,"sin":14390.0},{"f":"2022-12","n":586,"con":8897.7,"sin":14812.9},{"f":"2022-12","n":591,"con":9124.7,"sin":15248.2},{"f":"2023-01","n":596,"con":9004.7,"sin":15086.8},{"f":"2023-02","n":601,"con":9229.0,"sin":15530.2},{"f":"2023-02","n":606,"con":9469.4,"sin":15986.7},{"f":"2023-02","n":611,"con":9335.1,"sin":15817.4},{"f":"2023-03","n":616,"con":9959.1,"sin":16940.2},{"f":"2023-03","n":621,"con":9819.3,"sin":16760.8},{"f":"2023-03","n":626,"con":10058.3,"sin":17253.4},{"f":"2023-04","n":631,"con":10307.7,"sin":17760.5},{"f":"2023-04","n":636,"con":10156.3,"sin":17572.5},{"f":"2023-05","n":641,"con":11279.1,"sin":19580.2},{"f":"2023-05","n":646,"con":11558.3,"sin":20155.7},{"f":"2023-05","n":651,"con":10938.6,"sin":19167.9},{"f":"2023-06","n":656,"con":11215.1,"sin":19731.2},{"f":"2023-06","n":661,"con":11036.1,"sin":19522.3},{"f":"2023-06","n":666,"con":10441.0,"sin":18565.6},{"f":"2023-07","n":671,"con":10292.7,"sin":18369.0},{"f":"2023-07","n":676,"con":10982.8,"sin":19672.9},{"f":"2023-08","n":681,"con":11256.0,"sin":20251.1},{"f":"2023-08","n":686,"con":11530.6,"sin":20846.3},{"f":"2023-08","n":691,"con":11346.6,"sin":20625.6},{"f":"2023-09","n":696,"con":11631.2,"sin":21231.8},{"f":"2023-09","n":701,"con":11452.2,"sin":21007.0},{"f":"2023-09","n":706,"con":10829.7,"sin":19977.4},{"f":"2023-09","n":711,"con":11088.3,"sin":20564.6},{"f":"2023-10","n":716,"con":10919.8,"sin":20346.9},{"f":"2023-10","n":721,"con":10758.9,"sin":20131.5},{"f":"2023-10","n":726,"con":11937.5,"sin":22431.6},{"f":"2023-10","n":731,"con":12217.6,"sin":23090.9},{"f":"2023-10","n":736,"con":12042.6,"sin":22846.4},{"f":"2023-11","n":741,"con":11846.4,"sin":22604.6},{"f":"2023-11","n":746,"con":11657.5,"sin":22365.3},{"f":"2023-11","n":751,"con":11482.1,"sin":22128.5},{"f":"2023-11","n":756,"con":11290.7,"sin":21894.3},{"f":"2023-12","n":761,"con":11581.5,"sin":22537.7},{"f":"2023-12","n":766,"con":11394.2,"sin":22299.1},{"f":"2023-12","n":771,"con":11656.0,"sin":22954.5},{"f":"2024-01","n":776,"con":11472.7,"sin":22711.5},{"f":"2024-01","n":781,"con":11766.6,"sin":23379.0},{"f":"2024-01","n":786,"con":11137.9,"sin":22233.2},{"f":"2024-01","n":791,"con":10957.4,"sin":21997.9},{"f":"2024-02","n":796,"con":10769.7,"sin":21765.0},{"f":"2024-02","n":801,"con":10585.1,"sin":21534.6},{"f":"2024-02","n":806,"con":10812.1,"sin":22167.5},{"f":"2024-03","n":811,"con":11076.8,"sin":22819.0},{"f":"2024-03","n":816,"con":10883.1,"sin":22577.4},{"f":"2024-03","n":821,"con":10702.6,"sin":22338.4},{"f":"2024-03","n":826,"con":10945.9,"sin":22994.9},{"f":"2024-04","n":831,"con":11194.2,"sin":23670.8},{"f":"2024-04","n":836,"con":11001.6,"sin":23420.2},{"f":"2024-04","n":841,"con":11264.0,"sin":24108.5},{"f":"2024-04","n":846,"con":10660.2,"sin":22927.0},{"f":"2024-05","n":851,"con":11327.3,"sin":24554.4},{"f":"2024-05","n":856,"con":11126.4,"sin":24294.4},{"f":"2024-05","n":861,"con":11371.6,"sin":25008.4},{"f":"2024-05","n":866,"con":11174.0,"sin":24743.7},{"f":"2024-06","n":871,"con":11424.5,"sin":25470.9},{"f":"2024-06","n":876,"con":10790.2,"sin":24222.6},{"f":"2024-06","n":881,"con":11504.3,"sin":25941.9},{"f":"2024-07","n":886,"con":10876.8,"sin":24670.5},{"f":"2024-07","n":891,"con":11117.5,"sin":25395.6},{"f":"2024-07","n":896,"con":10500.6,"sin":24151.0},{"f":"2024-07","n":901,"con":9928.9,"sin":22967.3},{"f":"2024-08","n":906,"con":9769.6,"sin":22724.2},{"f":"2024-08","n":911,"con":10401.6,"sin":24337.2},{"f":"2024-08","n":916,"con":10655.2,"sin":25052.5},{"f":"2024-09","n":921,"con":10474.2,"sin":24787.3},{"f":"2024-09","n":926,"con":11146.1,"sin":26546.7},{"f":"2024-09","n":931,"con":10964.8,"sin":26265.7},{"f":"2024-09","n":936,"con":11230.4,"sin":27037.6},{"f":"2024-10","n":941,"con":11057.5,"sin":26751.4},{"f":"2024-10","n":946,"con":10457.6,"sin":25440.3},{"f":"2024-10","n":951,"con":10281.0,"sin":25171.0},{"f":"2024-10","n":956,"con":10116.9,"sin":24904.6},{"f":"2024-10","n":961,"con":9957.3,"sin":24640.9},{"f":"2024-11","n":966,"con":10188.3,"sin":25365.1},{"f":"2024-11","n":971,"con":9655.2,"sin":24122.0},{"f":"2024-12","n":976,"con":9518.0,"sin":23866.6},{"f":"2024-12","n":981,"con":9002.4,"sin":22696.9},{"f":"2024-12","n":986,"con":9212.1,"sin":23364.0},{"f":"2025-01","n":991,"con":9437.0,"sin":24050.6},{"f":"2025-01","n":996,"con":9677.3,"sin":24757.5},{"f":"2025-01","n":1001,"con":10735.6,"sin":27586.1},{"f":"2025-02","n":1006,"con":10576.0,"sin":27294.1},{"f":"2025-02","n":1011,"con":10842.3,"sin":28096.3},{"f":"2025-02","n":1016,"con":10241.6,"sin":26719.3},{"f":"2025-03","n":1021,"con":9691.9,"sin":25409.8},{"f":"2025-03","n":1026,"con":9192.9,"sin":24164.4},{"f":"2025-03","n":1031,"con":9422.2,"sin":24874.6},{"f":"2025-04","n":1036,"con":9664.9,"sin":25605.7},{"f":"2025-04","n":1041,"con":10329.7,"sin":27423.3},{"f":"2025-04","n":1046,"con":10194.4,"sin":27132.9},{"f":"2025-05","n":1051,"con":9660.8,"sin":25803.2},{"f":"2025-05","n":1056,"con":9913.6,"sin":26561.5},{"f":"2025-05","n":1061,"con":9784.3,"sin":26280.3},{"f":"2025-06","n":1066,"con":9265.2,"sin":24992.3},{"f":"2025-06","n":1071,"con":9882.7,"sin":26766.3},{"f":"2025-06","n":1076,"con":9732.6,"sin":26483.0},{"f":"2025-07","n":1081,"con":9978.8,"sin":27261.3},{"f":"2025-07","n":1086,"con":11076.0,"sin":30376.0},{"f":"2025-08","n":1091,"con":10504.6,"sin":28887.3},{"f":"2025-08","n":1096,"con":9949.8,"sin":27471.5},{"f":"2025-08","n":1101,"con":9797.8,"sin":27180.7},{"f":"2025-09","n":1106,"con":10036.5,"sin":27979.6},{"f":"2025-09","n":1111,"con":9884.3,"sin":27683.4},{"f":"2025-09","n":1116,"con":9733.1,"sin":27390.3},{"f":"2025-10","n":1121,"con":9584.7,"sin":27100.4},{"f":"2025-10","n":1126,"con":10636.3,"sin":30196.7},{"f":"2025-10","n":1131,"con":10881.0,"sin":31084.2},{"f":"2025-11","n":1136,"con":10288.5,"sin":29560.7},{"f":"2025-11","n":1141,"con":10527.9,"sin":30429.5},{"f":"2025-11","n":1146,"con":10800.2,"sin":31323.9},{"f":"2025-11","n":1151,"con":10634.2,"sin":30992.3},{"f":"2025-12","n":1156,"con":10884.1,"sin":31903.1},{"f":"2025-12","n":1161,"con":11121.6,"sin":32840.8},{"f":"2025-12","n":1166,"con":10942.2,"sin":32493.1},{"f":"2026-01","n":1171,"con":10770.2,"sin":32149.1},{"f":"2026-01","n":1176,"con":11475.1,"sin":34431.1},{"f":"2026-01","n":1181,"con":11299.8,"sin":34066.7},{"f":"2026-02","n":1186,"con":12057.8,"sin":36484.8},{"f":"2026-02","n":1191,"con":11403.0,"sin":34696.6},{"f":"2026-02","n":1196,"con":12135.7,"sin":37159.5},{"f":"2026-03","n":1201,"con":11943.5,"sin":36766.1},{"f":"2026-03","n":1206,"con":11773.7,"sin":36376.9},{"f":"2026-03","n":1211,"con":12079.6,"sin":37446.0},{"f":"2026-04","n":1216,"con":12382.3,"sin":38546.6},{"f":"2026-04","n":1221,"con":12699.9,"sin":39679.5},{"f":"2026-04","n":1226,"con":12496.5,"sin":39259.4},{"f":"2026-04","n":1231,"con":11795.5,"sin":37335.3},{"f":"2026-05","n":1236,"con":11160.7,"sin":35505.5},{"f":"2026-05","n":1241,"con":10557.3,"sin":33765.4},{"f":"2026-05","n":1246,"con":10385.4,"sin":33407.9},{"f":"2026-06","n":1251,"con":10226.3,"sin":33054.3},{"f":"2026-06","n":1256,"con":10058.0,"sin":32704.4},{"f":"2026-07","n":1261,"con":10299.3,"sin":33665.5},{"f":"2026-07","n":1266,"con":10132.8,"sin":33309.2},{"f":"2026-07","n":1271,"con":10365.7,"sin":34288.1},{"f":"2026-07","n":1274,"con":10425.0,"sin":34614.0}],"ops":1274,"wr":27.86,"Rtot":24.42,"Rbruto":144.42,"b_op":0.1134,"z":2.26,"p":0.024,"eq_con":10425.0,"eq_sin":34614.0,"riesgo":16.2,"mitades":[{"nom":"Primera mitad","n":637,"wr":27.79,"R":14.51,"b":0.109,"p":0.124},{"nom":"Segunda mitad","n":637,"wr":27.94,"R":9.91,"b":0.1177,"p":0.098}],"espejo":-125.2,"azar":[-87.8,-18.4,-146.7,-67.7,-141.2,-16.8,-92.4,-135.6,-99.3,-54.3,-64.7,-230.7,-147.3,-85.7,-175.1,-116.7,13.3,-50.7,-86.5,-148.0,-94.4,34.3,-68.5,-9.7,-15.5,-106.2,-135.2,-62.1,-104.2,-122.4],"azar_media":-87.9,"azar_sd":58.6,"embudo":{"velas":160703,"en_horario":63373,"ts_h4":22846,"ts_h4_h1":7460,"con_ob":1817,"senales":1816},"por_ano":[{"a":2020,"n":203,"wr":32.5,"R":43.4,"b":0.3},{"a":2021,"n":204,"wr":24.0,"R":-28.9,"b":-0.039},{"a":2022,"n":184,"wr":25.0,"R":-14.4,"b":-0.009},{"a":2023,"n":184,"wr":31.0,"R":27.1,"b":0.239},{"a":2024,"n":212,"wr":25.9,"R":-17.1,"b":0.038},{"a":2025,"n":183,"wr":29.5,"R":17.0,"b":0.18},{"a":2026,"n":104,"wr":26.9,"R":-2.8,"b":0.077}]};
+const $ = s => document.querySelector(s);
+const fmt = (n,d=0) => n.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});
+const tip = $('#tip');
+function showTip(e,h){ tip.innerHTML=h; tip.style.opacity=1;
+  const r=tip.getBoundingClientRect();
+  tip.style.left=Math.min(e.clientX+14, innerWidth-r.width-10)+'px';
+  tip.style.top=Math.max(e.clientY-r.height-12, 8)+'px'; }
+function hideTip(){ tip.style.opacity=0; }
+
+$('#v-ops').textContent=fmt(D.ops);
+$('#v-rb').textContent='+'+fmt(D.Rbruto,1);
+$('#v-rn').textContent='+'+fmt(D.Rtot,1);
+$('#v-p').textContent=fmt(D.p,3);
+$('#v-z').textContent='+'+fmt(D.z,2);
+$('#p-esp').textContent=fmt(D.espejo,1);
+const sig=((D.Rtot-D.azar_media)/D.azar_sd);
+$('#p-sig').textContent=(sig>0?'+':'')+fmt(sig,2)+' σ';
+$('#p-mult').textContent=fmt(D.eq_sin/10000,2);
+$('#p-neto').textContent=fmt(100*(D.eq_con/10000-1),1);
+
+const COLS=['var(--r1)','var(--r2)','var(--r3)','var(--acc)'];
+
+/* escalera */
+(function(){
+  const W=780,H=330,L=62,R=168,T=18,B=44, e=D.escalera;
+  const rs=[1,2,3,4];
+  const vals=e.flatMap(s=>s.pts.map(p=>p.b));
+  const lo=Math.min(-0.03,Math.floor(Math.min(...vals)*50)/50), hi=Math.ceil(Math.max(...vals)*50)/50;
+  const X=r=>L+(r-1)/3*(W-L-R), Y=v=>T+(1-(v-lo)/(hi-lo))*(H-T-B);
+  let g='',ax='';
+  for(let v=Math.ceil(lo*50)/50; v<=hi+1e-9; v+=0.02){
+    g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+    ax+=`<text x="${L-9}" y="${Y(v)+3.5}" text-anchor="end">${v>0?'+':''}${v.toFixed(2)}</text>`;
+  }
+  rs.forEach(r=>ax+=`<text x="${X(r)}" y="${H-16}" text-anchor="middle">objetivo ${r}R</text>`);
+  let paths='', dots='', labs=''; const lbl=[];
+  e.forEach((s,i)=>{
+    const c=COLS[i];
+    paths+=`<path d="${s.pts.map((p,j)=>(j?'L':'M')+X(p.r)+' '+Y(p.b).toFixed(1)).join(' ')}"
+      fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"
+      ${s.ref?'stroke-dasharray="5 4"':''}/>`;
+    s.pts.forEach(p=>{
+      dots+=`<circle class="d" data-n="${s.nom}" data-r="${p.r}" data-b="${p.b}" data-p="${p.p}"
+        data-ops="${p.n}" cx="${X(p.r)}" cy="${Y(p.b)}" r="4.5" fill="${c}"
+        stroke="var(--panel)" stroke-width="2"/>`;
+    });
+    const last=s.pts[s.pts.length-1];
+    const corto = s.nom.length>22 ? s.nom.replace(/ \(.*\)/,'') : s.nom;
+    lbl.push({y:Y(last.b), c, t:corto});
+  });
+  lbl.sort((a,b)=>a.y-b.y);
+  for(let i=1;i<lbl.length;i++) if(lbl[i].y-lbl[i-1].y<14) lbl[i].y=lbl[i-1].y+14;
+  labs = lbl.map(o=>`<text class="endlab" x="${W-R+10}" y="${o.y+4}" fill="${o.c}">${o.t}</text>`).join('');
+  $('#esc').innerHTML=`<g class="grid">${g}</g>
+    <line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--rule-2)" stroke-width="1.5"/>
+    <text class="axis" x="${L-9}" y="${Y(0)+3.5}" text-anchor="end" fill="var(--ink-3)"></text>
+    ${paths}${dots}${labs}<g class="axis">${ax}</g>`;
+  $('#lg-esc').innerHTML=e.map((s,i)=>
+    `<span><i class="sw" style="background:${COLS[i]}"></i>${s.nom}</span>`).join('');
+  $('#esc').querySelectorAll('.d').forEach(c=>{
+    c.addEventListener('mouseenter',ev=>showTip(ev,
+      `<b>${c.dataset.n}</b><br>objetivo ${c.dataset.r}R · ${fmt(+c.dataset.ops)} ops<br>
+       bruto/op <b>${(+c.dataset.b>0?'+':'')}${c.dataset.b}</b> · p ${c.dataset.p}`));
+    c.addEventListener('mouseleave',hideTip); });
+})();
+
+/* equity */
+(function(){
+  const W=780,H=330,L=56,R=112,T=14,B=32, s=D.serie, n=s.length;
+  const ymax=Math.ceil(Math.max(...s.map(p=>p.sin))/5000)*5000;
+  const X=i=>L+i*(W-L-R)/(n-1), Y=v=>T+(1-v/ymax)*(H-T-B);
+  let g='',ax='';
+  for(let v=0;v<=ymax;v+=5000){
+    g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+    ax+=`<text x="${L-9}" y="${Y(v)+3.5}" text-anchor="end">${fmt(v/1000)}k</text>`;
+  }
+  [...new Set(s.map(p=>p.f.slice(0,4)))].forEach(y=>{
+    const i=s.findIndex(p=>p.f.slice(0,4)===y);
+    ax+=`<text x="${X(i)}" y="${H-10}" text-anchor="middle">${y}</text>`; });
+  const path=k=>s.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(p[k]).toFixed(1)).join(' ');
+  const last=s[n-1];
+  $('#eq').innerHTML=`<g class="grid">${g}</g><g class="axis">${ax}</g>
+    <line x1="${L}" x2="${W-R}" y1="${Y(10000)}" y2="${Y(10000)}" stroke="var(--rule-2)" stroke-dasharray="3 3"/>
+    <path d="${path('sin')}" fill="none" stroke="var(--acc)" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${path('con')}" fill="none" stroke="var(--r2)" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="${X(n-1)}" cy="${Y(last.sin)}" r="3.5" fill="var(--acc)" stroke="var(--panel)" stroke-width="2"/>
+    <circle cx="${X(n-1)}" cy="${Y(last.con)}" r="3.5" fill="var(--r2)" stroke="var(--panel)" stroke-width="2"/>
+    <text class="endlab" x="${X(n-1)+9}" y="${Y(last.sin)+4}" fill="var(--acc)">${fmt(last.sin)} €</text>
+    <text class="endlab" x="${X(n-1)+9}" y="${Y(last.con)+4}" fill="var(--r2)">${fmt(last.con)} €</text>
+    <line id="cr2" x1="0" x2="0" y1="${T}" y2="${H-B}" stroke="var(--rule-2)" opacity="0"/>
+    <rect id="h2" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/>`;
+  const svg=$('#eq'), cr=svg.querySelector('#cr2');
+  svg.querySelector('#h2').addEventListener('mousemove',ev=>{
+    const bb=svg.getBoundingClientRect(), px=(ev.clientX-bb.left)/bb.width*W;
+    let i=Math.max(0,Math.min(n-1,Math.round((px-L)/((W-L-R)/(n-1)))));
+    cr.setAttribute('x1',X(i)); cr.setAttribute('x2',X(i)); cr.setAttribute('opacity','1');
+    showTip(ev,`<b>${s[i].f}</b> · op. ${fmt(s[i].n)}<br>
+      <span style="color:var(--r2)">■</span> con coste ${fmt(s[i].con)} €<br>
+      <span style="color:var(--acc)">■</span> sin coste ${fmt(s[i].sin)} €`);
+  });
+  svg.querySelector('#h2').addEventListener('mouseleave',()=>{cr.setAttribute('opacity','0');hideTip();});
+  $('#eq-cap').innerHTML=`Capital desde 10.000 € arriesgando el 1 % por operación, objetivo 3R.
+    Sin coste termina en <span class="num">${fmt(D.eq_sin)} €</span>; con 1,2 pips de coste,
+    en <span class="num">${fmt(D.eq_con)} €</span>. La distancia entre las dos curvas es
+    íntegramente el spread.`;
+})();
+
+/* tablas */
+$('#t-esc').innerHTML=D.escalera.map(s=>`<tr${s.ref?' style="opacity:.72"':''}><td>${s.nom}</td>`+
+  s.pts.map(p=>`<td class="num">${p.b>0?'+':''}${fmt(p.b,4)}<br>
+    <span style="color:var(--ink-3);font-size:.78em">p ${fmt(p.p,3)}</span></td>`).join('')+
+  '</tr>').join('');
+
+const pru=[
+ ['Ventaja bruta distinta de cero', `+${fmt(D.b_op,4)} R/op · z +${fmt(D.z,2)} · p ${fmt(D.p,3)}`, 'Pasa sin corregir'],
+ ['Corrección por comparaciones múltiples', `exige p &lt; 0,0036`, 'NO pasa'],
+ ['Primera mitad de la muestra', `${D.mitades[0].b>0?'+':''}${fmt(D.mitades[0].b,4)} R/op · p ${fmt(D.mitades[0].p,3)}`, 'Mismo signo'],
+ ['Segunda mitad de la muestra', `${D.mitades[1].b>0?'+':''}${fmt(D.mitades[1].b,4)} R/op · p ${fmt(D.mitades[1].p,3)}`, 'Mismo signo'],
+ ['Espejo (dirección invertida)', `${fmt(D.espejo,1)} R frente a +${fmt(D.Rtot,1)} R`, 'Pasa: el espejo es peor'],
+ ['30 corridas con entradas aleatorias', `media ${fmt(D.azar_media,1)} R · real +${fmt(D.Rtot,1)} R`, `${sig>0?'+':''}${fmt(sig,2)} σ · rozando`],
+ ['Escalera ordenada por filtro y objetivo', 'monótona en las dos direcciones', 'Coherente'],
+ ['Rentabilidad neta', `+${fmt(100*(D.eq_con/10000-1),1)} % en 6 años y medio`, 'Insuficiente']];
+$('#t-pru').innerHTML=pru.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td>
+  <td style="text-align:left;color:var(--ink-2)">${r[2]}</td></tr>`).join('');
+
+$('#t-ano').innerHTML=D.por_ano.map(r=>`<tr><td>${r.a}</td><td class="num">${fmt(r.n)}</td>
+  <td class="num">${fmt(r.wr,1)} %</td><td class="num">${r.R>0?'+':''}${fmt(r.R,1)}</td>
+  <td class="num">${r.b>0?'+':''}${fmt(r.b,3)}</td></tr>`).join('');
+
+const E=D.embudo;
+$('#embudo').innerHTML=
+ `<li><span>Velas M15 en la muestra</span><span class="cnt">${fmt(E.velas)}</span></li>
+  <li><span>Dentro del horario operativo (06:30–16:00 UTC)</span><span class="cnt">${fmt(E.en_horario)}</span></li>
+  <li><span>Turtle soup en H4</span><span class="cnt">${fmt(E.ts_h4)}</span></li>
+  <li><span>…confirmado también en H1</span><span class="cnt">${fmt(E.ts_h4_h1)}</span></li>
+  <li><span>…con order block en M15</span><span class="cnt">${fmt(E.con_ob)}</span></li>
+  <li><span><b>Señales</b></span><span class="cnt"><b>${fmt(E.senales)}</b></span></li>
+  <li><span>Operaciones tras «una a la vez»</span><span class="cnt">${fmt(D.ops)}</span></li>`;
+</script>

@@ -1,0 +1,228 @@
+<title>Calculadora de lotaje</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --fondo:#f2f5f8; --panel:#fdfdfe; --panel2:#f6f8fb;
+  --tinta:#12161c; --tinta2:#4e5864; --tinta3:#8b95a1;
+  --linea:#dde3ea; --linea2:#eaeff4;
+  --s1:#2a78d6; --s2:#eb6834; --ok:#0ca30c; --mal:#d03b3b;
+  --okw:rgba(12,163,12,.10); --malw:rgba(208,59,59,.10);
+  --sombra:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme: dark;
+  --fondo:#10131a; --panel:#181c24; --panel2:#1d222b;
+  --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
+  --linea:#29303a; --linea2:#20262f;
+  --s1:#3987e5; --s2:#d95926; --ok:#22b422; --mal:#e05555;
+  --okw:rgba(34,180,34,.14); --malw:rgba(224,85,85,.14);
+  --sombra:0 1px 2px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --fondo:#10131a; --panel:#181c24; --panel2:#1d222b;
+  --tinta:#f0f3f7; --tinta2:#aab4c0; --tinta3:#6b7683;
+  --linea:#29303a; --linea2:#20262f;
+  --s1:#3987e5; --s2:#d95926; --ok:#22b422; --mal:#e05555;
+  --okw:rgba(34,180,34,.14); --malw:rgba(224,85,85,.14);
+  --sombra:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--fondo); color:var(--tinta); margin:0;
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif; font-size:15px; line-height:1.5}
+.env{max-width:520px; margin:0 auto; padding-block:24px 56px;
+  padding-left:16px; padding-right:16px}
+h1{font-family:Archivo,system-ui,sans-serif; font-size:25px; font-weight:700;
+  letter-spacing:-.025em; margin:0 0 4px; text-wrap:balance}
+.sub{color:var(--tinta2); font-size:14px; margin:0 0 20px}
+
+.caja{background:var(--panel); border:1px solid var(--linea); border-radius:12px;
+  box-shadow:var(--sombra); padding:16px; margin-bottom:14px}
+
+label.tit{display:block; font-size:12.5px; font-weight:600; color:var(--tinta2);
+  margin-bottom:6px; letter-spacing:.01em}
+input[type=number]{width:100%; font-family:"IBM Plex Mono",monospace; font-size:26px;
+  font-weight:500; font-variant-numeric:tabular-nums; padding:12px 13px;
+  border:1px solid var(--linea); border-radius:9px; background:var(--panel2);
+  color:var(--tinta); -webkit-appearance:none; appearance:none}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+input[type=number]{-moz-appearance:textfield}
+::placeholder{color:var(--tinta3); opacity:.55}
+.dos{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+
+.chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:4px}
+.chips button{font:inherit; font-size:15px; font-weight:600; padding:10px 0; flex:1 1 0;
+  min-width:74px; border:1px solid var(--linea); border-radius:9px;
+  background:var(--panel2); color:var(--tinta2); cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--s1); border-color:var(--s1); color:#fff}
+
+/* resultado */
+.res{border-radius:12px; padding:20px 18px; text-align:center;
+  border:1px solid var(--linea); background:var(--panel); box-shadow:var(--sombra);
+  margin-bottom:14px}
+.res.ok{background:var(--okw); border-color:var(--ok)}
+.res.no{background:var(--malw); border-color:var(--mal)}
+.res .eti{font-size:11.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--tinta3); font-weight:600}
+.res .gordo{font-family:"IBM Plex Mono",monospace; font-size:66px; font-weight:600;
+  line-height:1.02; letter-spacing:-.04em; font-variant-numeric:tabular-nums;
+  margin:4px 0 2px}
+.res.ok .gordo{color:var(--ok)} .res.no .gordo{color:var(--mal)}
+.res .pie{font-size:14px; color:var(--tinta2)}
+.res .aviso{font-size:14.5px; color:var(--mal); font-weight:600; margin-top:8px;
+  line-height:1.4}
+
+.lista{background:var(--panel); border:1px solid var(--linea); border-radius:12px;
+  box-shadow:var(--sombra); overflow:hidden; margin-bottom:14px}
+.lista .f{display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+  padding:12px 16px; border-bottom:1px solid var(--linea2); font-size:14.5px}
+.lista .f:last-child{border-bottom:0}
+.lista .f span{color:var(--tinta2)}
+.lista .f b{font-family:"IBM Plex Mono",monospace; font-size:18px; font-weight:600;
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+.pos{color:var(--ok)} .neg{color:var(--mal)}
+
+details{font-size:13.5px; color:var(--tinta2)}
+summary{cursor:pointer; font-weight:600; color:var(--s1); padding:6px 0}
+details .cuerpo{padding:6px 0 2px; line-height:1.55}
+details code{font-family:"IBM Plex Mono",monospace; font-size:13px}
+.nota{font-size:12.5px; color:var(--tinta3); line-height:1.5; margin-top:18px}
+:focus-visible{outline:2px solid var(--s1); outline-offset:2px}
+</style>
+
+<div class="env">
+  <h1>Calculadora de lotaje</h1>
+  <p class="sub">Metes el precio de entrada y el del stop. Te dice cuántos lotes poner
+     en MT5 y dónde va el objetivo.</p>
+
+  <div class="caja">
+    <div class="dos">
+      <div>
+        <label class="tit" for="ent">Entrada</label>
+        <input type="number" id="ent" step="0.00001" inputmode="decimal" placeholder="1,16400">
+      </div>
+      <div>
+        <label class="tit" for="stp">Stop</label>
+        <input type="number" id="stp" step="0.00001" inputmode="decimal" placeholder="1,16470">
+      </div>
+    </div>
+  </div>
+
+  <div class="caja">
+    <label class="tit">Cuánto arriesgas</label>
+    <div class="chips" id="chips">
+      <button type="button" data-r="50">50 €</button>
+      <button type="button" data-r="100">100 €</button>
+      <button type="button" data-r="150" aria-pressed="true">150 €</button>
+      <button type="button" data-r="200">200 €</button>
+    </div>
+  </div>
+
+  <div class="res" id="res">
+    <div class="eti">Lotes</div>
+    <div class="gordo" id="lotes">—</div>
+    <div class="pie" id="piegordo">Escribe los dos precios</div>
+    <div class="aviso" id="aviso" hidden></div>
+  </div>
+
+  <div class="lista" id="lista" hidden></div>
+
+  <details>
+    <summary>De dónde salen los números</summary>
+    <div class="cuerpo">
+      <p>Un lote de EURUSD mueve <b>8,60 €</b> por pip. Así que para arriesgar 150 €:</p>
+      <p><code>lotes = 150 ÷ 8,60 ÷ pips de stop = 17,4 ÷ pips</code></p>
+      <p>El objetivo se pone al doble de pips que el stop, que es el 1:2.</p>
+      <p><b>Ojo en MT5:</b> te da <b>puntos</b>, no pips. En EURUSD, 1 pip = 10 puntos.
+         Si MT5 dice 70 puntos, son 7 pips.</p>
+      <p>El coste aplicado son <b>1,43 pips</b> — 5 €/lote de comisión más 0,85 de spread,
+         medidos en tu cuenta el 28 de agosto.</p>
+    </div>
+  </details>
+
+  <p class="nota">Vale para EURUSD y GBPUSD, que mueven lo mismo por pip. Para el oro o
+     los índices los números son otros.</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $ = function(s){ return document.querySelector(s); };
+var EUR_PIP = 8.60, COM_LOTE = 5.00, SPREAD = 0.85, MINIMO = 7, RR = 2;
+var riesgo = 150;
+
+function es(v,d){ return v.toLocaleString("es-ES",
+    {minimumFractionDigits:d, maximumFractionDigits:d}); }
+
+function calcula(){
+  var ent = parseFloat($("#ent").value), stp = parseFloat($("#stp").value);
+  var res = $("#res"), lista = $("#lista"), aviso = $("#aviso");
+
+  if (!isFinite(ent) || !isFinite(stp) || ent === stp){
+    res.className = "res";
+    $("#lotes").textContent = "—";
+    $("#piegordo").textContent = "Escribe los dos precios";
+    aviso.hidden = true; lista.hidden = true;
+    return;
+  }
+
+  var lado  = stp > ent ? -1 : 1;                 // stop arriba = venta
+  var pips  = Math.abs(ent - stp) * 10000;
+  var lotes = riesgo / (pips * EUR_PIP);
+  var obj   = ent + lado * RR * pips / 10000;
+  var coste = lotes * COM_LOTE + SPREAD * lotes * EUR_PIP;
+  var gana  = RR * pips * lotes * EUR_PIP - coste;
+  var corto = pips < MINIMO;
+
+  res.className = "res " + (corto ? "no" : "ok");
+  $("#lotes").textContent = es(lotes, 2);
+  $("#piegordo").textContent = (lado > 0 ? "compra" : "venta")
+    + " · stop de " + es(pips,1) + " pips";
+
+  if (corto){
+    aviso.hidden = false;
+    aviso.textContent = "Stop de sólo " + es(pips,1) + " pips: el coste se lleva el "
+      + es(100*1.43/pips,0) + " % de tu riesgo. Busca al menos " + MINIMO + " pips o no la operes.";
+  } else {
+    aviso.hidden = true;
+  }
+
+  lista.hidden = false;
+  lista.innerHTML =
+    '<div class="f"><span>Pon el objetivo en</span><b>' + obj.toFixed(5).replace(".", ",")
+      + '</b></div>' +
+    '<div class="f"><span>Que son</span><b>' + es(RR*pips,1) + ' pips</b></div>' +
+    '<div class="f"><span>En MT5, stop a</span><b>' + es(pips*10,0) + ' puntos</b></div>' +
+    '<div class="f"><span>Si aciertas</span><b class="pos">+' + es(gana,0) + ' €</b></div>' +
+    '<div class="f"><span>Si fallas</span><b class="neg">−' + es(riesgo+coste,0) + ' €</b></div>' +
+    '<div class="f"><span>El coste se lleva</span><b class="' + (corto?"neg":"") + '">'
+      + es(100*1.43/pips,1) + ' % del riesgo</b></div>';
+}
+
+$("#chips").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-r]"); if (!b) return;
+  riesgo = parseFloat(b.dataset.r);
+  Array.prototype.forEach.call($("#chips").children, function(x){
+    x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+  try { localStorage.setItem("lotaje_riesgo", String(riesgo)); } catch (err) {}
+  calcula();
+});
+["ent","stp"].forEach(function(k){ $("#"+k).addEventListener("input", calcula); });
+
+try {
+  var g = localStorage.getItem("lotaje_riesgo");
+  if (g){
+    riesgo = parseFloat(g);
+    Array.prototype.forEach.call($("#chips").children, function(x){
+      x.setAttribute("aria-pressed", x.dataset.r === g ? "true" : "false"); });
+  }
+} catch (err) {}
+
+// arranca con el ejemplo del mensaje, para que se vea funcionando
+$("#ent").value = "1.16400";
+$("#stp").value = "1.16470";
+calcula();
+})();
+</script>

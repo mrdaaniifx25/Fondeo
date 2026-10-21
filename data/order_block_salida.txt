@@ -1,0 +1,29 @@
+7,052 velas de M5 en ventana · 164 sesiones
+223 entradas suyas con contexto · 4,965 velas de control
+
+==============================================================================
+1 · EL ORDER BLOCK DE M5
+==============================================================================
+
+  zona completa (mínimo-máximo)
+    entra dentro de un OB vigente ........  46.6 %   control  55.5 %   z = -2.61   p = 0.00900
+    y ademas en su misma direccion .......  20.6 % de sus entradas
+    acierto dentro de OB a favor .........  66.7 % (n=46)   fuera  64.3 % (n=177)   p = 0.8611
+
+  solo el cuerpo
+    entra dentro de un OB vigente ........  29.1 %   control  36.3 %   z = -2.18   p = 0.02962
+    y ademas en su misma direccion .......  14.3 % de sus entradas
+    acierto dentro de OB a favor .........  64.5 % (n=32)   fuera  64.8 % (n=191)   p = 1.0000
+
+==============================================================================
+2 · LA VELA DE M1 EN EL MINUTO EXACTO
+==============================================================================
+  es una envolvente en su direccion ......  11.7 % de sus entradas
+  rompe el extremo de la vela anterior ...  90.6 %
+  acierto con envolvente  84.0 % (n=26)  ·  sin ella  62.2 % (n=197)   p = 0.0433
+
+  el cuerpo de la vela de M1:
+    0-40 %  n= 31  acierto  46.7 %  R neta +0.169
+    40-60 %  n= 33  acierto  51.6 %  R neta +0.328
+    60-80 %  n= 64  acierto  80.3 %  R neta +1.110
+    80-100 %  n= 95  acierto  64.8 %  R neta +0.685

@@ -1,0 +1,40 @@
+fibo dibujado en M60
+  instr   fibo  objetivo      n   acierto   R bruta    R NETA     stop        z
+--------------------------------------------------------------------------------
+ XAUUSD  0.500       1:2   2835     30.3 %    -0.050    -0.089   650.4    -3.61
+ XAUUSD  0.500     nivel   2599     52.9 %    -0.123    -0.163   630.0    -8.26
+ XAUUSD  0.618       1:2   2490     32.0 %    -0.016    -0.066   508.3    -2.40
+ XAUUSD  0.618     nivel   2351     51.5 %    -0.100    -0.151   497.9    -6.55
+ XAUUSD  0.705       1:2   2210     33.6 %    +0.022    -0.041   399.0    -1.36
+ XAUUSD  0.705     nivel   2128     50.2 %    -0.111    -0.175   394.2    -6.84
+ XAUUSD  0.790       1:2   1963     33.5 %    +0.015    -0.067   294.8    -2.12
+ XAUUSD  0.790     nivel   1936     48.0 %    -0.135    -0.218   293.9    -8.34
+--------------------------------------------------------------------------------
+ GRXEUR  0.500       1:2   3104     29.8 %    -0.048    -0.103    39.7    -4.35
+ GRXEUR  0.500     nivel   2857     54.8 %    -0.143    -0.199    38.2   -10.78
+ GRXEUR  0.618       1:2   2728     30.7 %    -0.054    -0.123    30.3    -4.75
+ GRXEUR  0.618     nivel   2591     52.8 %    -0.150    -0.220    29.9   -10.62
+ GRXEUR  0.705       1:2   2478     31.8 %    -0.034    -0.120    24.4    -4.32
+ GRXEUR  0.705     nivel   2383     51.3 %    -0.149    -0.235    24.1   -10.40
+ GRXEUR  0.790       1:2   2253     34.5 %    +0.040    -0.070    18.6    -2.36
+ GRXEUR  0.790     nivel   2199     49.3 %    -0.145    -0.255    18.5   -10.01
+--------------------------------------------------------------------------------
+ SPXUSD  0.500       1:2   7075     30.4 %    -0.041    -0.100    11.6    -6.28
+ SPXUSD  0.500     nivel   6450     53.2 %    -0.143    -0.202    11.3   -16.03
+ SPXUSD  0.618       1:2   6254     32.7 %    +0.003    -0.071     9.1    -4.09
+ SPXUSD  0.618     nivel   5916     52.8 %    -0.129    -0.204     8.9   -14.83
+ SPXUSD  0.705       1:2   5686     33.3 %    +0.011    -0.081     7.3    -4.38
+ SPXUSD  0.705     nivel   5495     52.0 %    -0.122    -0.214     7.2   -14.49
+ SPXUSD  0.790       1:2   5143     34.9 %    +0.055    -0.065     5.6    -3.27
+ SPXUSD  0.790     nivel   5041     49.4 %    -0.127    -0.247     5.6   -15.57
+--------------------------------------------------------------------------------
+
+RESUMEN por celda, sobre los instrumentos
+  fibo 0.500 obj    1:2: R neta positiva en 0 de 3  ·  bruta media -0.046  ·  neta media -0.097  ·  acierto 30.2 %
+  fibo 0.500 obj  nivel: R neta positiva en 0 de 3  ·  bruta media -0.136  ·  neta media -0.188  ·  acierto 53.6 %
+  fibo 0.618 obj    1:2: R neta positiva en 0 de 3  ·  bruta media -0.022  ·  neta media -0.087  ·  acierto 31.8 %
+  fibo 0.618 obj  nivel: R neta positiva en 0 de 3  ·  bruta media -0.126  ·  neta media -0.192  ·  acierto 52.4 %
+  fibo 0.705 obj    1:2: R neta positiva en 0 de 3  ·  bruta media -0.000  ·  neta media -0.080  ·  acierto 32.9 %
+  fibo 0.705 obj  nivel: R neta positiva en 0 de 3  ·  bruta media -0.127  ·  neta media -0.208  ·  acierto 51.2 %
+  fibo 0.790 obj    1:2: R neta positiva en 0 de 3  ·  bruta media +0.037  ·  neta media -0.068  ·  acierto 34.3 %
+  fibo 0.790 obj  nivel: R neta positiva en 0 de 3  ·  bruta media -0.136  ·  neta media -0.240  ·  acierto 48.9 %
