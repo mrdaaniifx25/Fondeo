@@ -1,0 +1,147 @@
+//@version=6
+// ============================================================================
+//  RANGOS POR TEMPORALIDAD + BIAS DIARIO · EUR/USD
+//  Medicion: docs/RESULTADOS_rangos_bias.md · codigo: bt/rangos_bias.py
+//
+//  QUE DIBUJA
+//    El rango (alto y bajo) de la vela ANTERIOR de D1, H4, H1 y M15, en linea
+//    escalonada sobre todo el historico, mas el rango de la vela EN CURSO en
+//    trazo fino. Tabla con el tamaño de cada rango, su mediana historica, y a
+//    que distancia esta el precio de cada nivel.
+//
+//  NO REPINTA
+//    Todo sale de request.security con lookahead_off y de la vela [1] de cada
+//    temporalidad, que ya esta cerrada. El rango EN CURSO si se mueve mientras
+//    la vela se forma: eso no es repintado, es la vela viva.
+//
+//  LO QUE ESTO ES Y LO QUE NO ES
+//    Es un mapa de niveles. NO es una señal. Medido sobre 2021-2026 en EUR/USD:
+//      - barrer el alto de la vela anterior pasa el 47-49 % de las veces en
+//        TODAS las temporalidades, y cerrar otra vez dentro, el 50 %. Eso es
+//        exactamente lo que da la geometria de un paseo aleatorio.
+//      - tras barrer y cerrar dentro, la vela siguiente da t +1,42 en H4 y
+//        nada en el resto. Ninguna pasa de 2.
+//      - las cinco definiciones de bias diario dan |t| <= 1,29. Ninguna predice.
+//    Usalo para saber DONDE estas, no para saber hacia donde vas.
+// ============================================================================
+
+indicator("Rangos y bias · multitemporal", overlay = true, max_labels_count = 60)
+
+// ---------------------------------------------------------------- parametros
+gT       = "Temporalidades"
+verD     = input.bool(true,  "Diario",     group = gT)
+verH4    = input.bool(true,  "H4",         group = gT)
+verH1    = input.bool(true,  "H1",         group = gT)
+verM15   = input.bool(false, "M15",        group = gT, tooltip = "Mediana 5,3 pips: en un grafico de M15 o mayor casi no se ve.")
+verVivo  = input.bool(true,  "Dibujar tambien la vela EN CURSO", group = gT)
+
+gB       = "Bias diario"
+verBias  = input.bool(true,  "Mostrar el bloque de bias", group = gB)
+
+gV       = "Vista"
+verTabla = input.bool(true,  "Tabla",      group = gV)
+tamPip   = input.float(0.0001, "Tamaño del pip", group = gV, step = 0.0001, tooltip = "0,0001 en pares de 4-5 decimales. 0,01 con JPY.")
+cD       = input.color(#d08b00, "Color diario", group = gV)
+cH4      = input.color(#2a7fd4, "Color H4",     group = gV)
+cH1      = input.color(#13a07a, "Color H1",     group = gV)
+cM15     = input.color(#9b5fc0, "Color M15",    group = gV)
+
+// ------------------------------------------------- rangos de cada temporalidad
+// [1] = la vela ya cerrada. Sin [1] seria la viva.
+[dAnt, dBaj, dAltV, dBajV] = request.security(syminfo.tickerid, "D",   [high[1], low[1], high, low], lookahead = barmerge.lookahead_off)
+[h4A,  h4B,  h4AV,  h4BV]  = request.security(syminfo.tickerid, "240", [high[1], low[1], high, low], lookahead = barmerge.lookahead_off)
+[h1A,  h1B,  h1AV,  h1BV]  = request.security(syminfo.tickerid, "60",  [high[1], low[1], high, low], lookahead = barmerge.lookahead_off)
+[m15A, m15B, m15AV, m15BV] = request.security(syminfo.tickerid, "15",  [high[1], low[1], high, low], lookahead = barmerge.lookahead_off)
+
+// -------------------------------------------------------- datos para el bias
+[dApHoy, dApAyer, dCiAyer] = request.security(syminfo.tickerid, "D", [open, open[1], close[1]], lookahead = barmerge.lookahead_off)
+[dAlt2, dBaj2, dCi2, dEma] = request.security(syminfo.tickerid, "D", [high[2], low[2], close[2], ta.ema(close, 20)[1]], lookahead = barmerge.lookahead_off)
+
+// ------------------------------------------------------------------- dibujo
+// steplinebr da la linea escalonada de todo el historico sin gastar objetos
+plot(verD   ? dAnt  : na, "D1 alto",  color = cD,   style = plot.style_steplinebr, linewidth = 2)
+plot(verD   ? dBaj  : na, "D1 bajo",  color = cD,   style = plot.style_steplinebr, linewidth = 2)
+plot(verH4  ? h4A   : na, "H4 alto",  color = cH4,  style = plot.style_steplinebr, linewidth = 1)
+plot(verH4  ? h4B   : na, "H4 bajo",  color = cH4,  style = plot.style_steplinebr, linewidth = 1)
+plot(verH1  ? h1A   : na, "H1 alto",  color = cH1,  style = plot.style_steplinebr, linewidth = 1)
+plot(verH1  ? h1B   : na, "H1 bajo",  color = cH1,  style = plot.style_steplinebr, linewidth = 1)
+plot(verM15 ? m15A  : na, "M15 alto", color = cM15, style = plot.style_steplinebr, linewidth = 1)
+plot(verM15 ? m15B  : na, "M15 bajo", color = cM15, style = plot.style_steplinebr, linewidth = 1)
+
+plot((verD  and verVivo) ? dAltV : na, "D1 vivo alto",  color = color.new(cD, 62),  style = plot.style_steplinebr)
+plot((verD  and verVivo) ? dBajV : na, "D1 vivo bajo",  color = color.new(cD, 62),  style = plot.style_steplinebr)
+plot((verH4 and verVivo) ? h4AV  : na, "H4 vivo alto",  color = color.new(cH4, 68), style = plot.style_steplinebr)
+plot((verH4 and verVivo) ? h4BV  : na, "H4 vivo bajo",  color = color.new(cH4, 68), style = plot.style_steplinebr)
+
+// ------------------------------------------------- barridos de D1 y H4 (CRT)
+bool barreDAlto = high > dAnt and high[1] <= dAnt[1]
+bool barreDBajo = low  < dBaj and low[1]  >= dBaj[1]
+bool barreH4Alt = high > h4A  and high[1] <= h4A[1]
+bool barreH4Baj = low  < h4B  and low[1]  >= h4B[1]
+plotshape(barreDAlto, "Barrido del alto diario",  shape.triangledown, location.abovebar, cD,  size = size.tiny)
+plotshape(barreDBajo, "Barrido del bajo diario",  shape.triangleup,   location.belowbar, cD,  size = size.tiny)
+plotshape(barreH4Alt, "Barrido del alto de H4",   shape.circle,       location.abovebar, cH4, size = size.auto)
+plotshape(barreH4Baj, "Barrido del bajo de H4",   shape.circle,       location.belowbar, cH4, size = size.auto)
+
+// ------------------------------------------------------------- el bias, crudo
+float medAyer = (dAnt + dBaj) / 2.0
+float biasA = math.sign(dCiAyer - dApAyer)
+float biasB = dApHoy > dAnt ? 1.0 : (dApHoy < dBaj ? -1.0 : 0.0)
+float biasC = math.sign(dCiAyer - medAyer)
+float biasD = (dBaj < dBaj2 and dCiAyer > dBaj2) ? 1.0 : ((dAnt > dAlt2 and dCiAyer < dAlt2) ? -1.0 : 0.0)
+float biasE = math.sign(dCiAyer - dEma)
+float suma  = biasA + biasB + biasC + biasD + biasE
+
+// --------------------------------------------------------------------- tabla
+var table t = table.new(position.top_right, 5, 12, border_width = 1)
+if verTabla and barstate.islast
+    color fondo = color.new(color.black, 72)
+    color texto = color.white
+    table.cell(t, 0, 0, "TF",       bgcolor = fondo, text_color = texto, text_size = size.tiny)
+    table.cell(t, 1, 0, "rango",    bgcolor = fondo, text_color = texto, text_size = size.tiny)
+    table.cell(t, 2, 0, "mediana",  bgcolor = fondo, text_color = texto, text_size = size.tiny)
+    table.cell(t, 3, 0, "al alto",  bgcolor = fondo, text_color = texto, text_size = size.tiny)
+    table.cell(t, 4, 0, "al bajo",  bgcolor = fondo, text_color = texto, text_size = size.tiny)
+    // cada fila: nombre, alto, bajo, mediana historica medida, color
+    for i = 0 to 3
+        float a = i == 0 ? dAnt : (i == 1 ? h4A : (i == 2 ? h1A : m15A))
+        float b = i == 0 ? dBaj : (i == 1 ? h4B : (i == 2 ? h1B : m15B))
+        string nm = i == 0 ? "D1" : (i == 1 ? "H4" : (i == 2 ? "H1" : "M15"))
+        float md = i == 0 ? 67.0 : (i == 1 ? 22.3 : (i == 2 ? 10.9 : 5.3))
+        color cc = i == 0 ? cD : (i == 1 ? cH4 : (i == 2 ? cH1 : cM15))
+        float rg = (a - b) / tamPip
+        float da = (a - close) / tamPip
+        float db = (close - b) / tamPip
+        table.cell(t, 0, i + 1, nm, bgcolor = color.new(cc, 55), text_color = texto, text_size = size.tiny)
+        table.cell(t, 1, i + 1, str.tostring(rg, "#.0"), bgcolor = fondo, text_color = texto, text_size = size.tiny)
+        table.cell(t, 2, i + 1, str.tostring(md, "#.0"), bgcolor = fondo, text_color = color.new(texto, 45), text_size = size.tiny)
+        table.cell(t, 3, i + 1, (da >= 0 ? str.tostring(da, "#.0") : "BARRIDO"), bgcolor = fondo, text_color = (da >= 0 ? texto : cD), text_size = size.tiny)
+        table.cell(t, 4, i + 1, (db >= 0 ? str.tostring(db, "#.0") : "BARRIDO"), bgcolor = fondo, text_color = (db >= 0 ? texto : cD), text_size = size.tiny)
+    if verBias
+        table.cell(t, 0, 5, "BIAS", bgcolor = color.new(color.gray, 40), text_color = texto, text_size = size.tiny)
+        table.cell(t, 1, 5, "valor", bgcolor = color.new(color.gray, 40), text_color = texto, text_size = size.tiny)
+        table.cell(t, 2, 5, "t medido", bgcolor = color.new(color.gray, 40), text_color = texto, text_size = size.tiny)
+        table.cell(t, 3, 5, "", bgcolor = color.new(color.gray, 40), text_size = size.tiny)
+        table.cell(t, 4, 5, "", bgcolor = color.new(color.gray, 40), text_size = size.tiny)
+        for i = 0 to 4
+            float v = i == 0 ? biasA : (i == 1 ? biasB : (i == 2 ? biasC : (i == 3 ? biasD : biasE)))
+            string nm = i == 0 ? "vela de ayer" : (i == 1 ? "apertura vs rango" : (i == 2 ? "cierre vs medio" : (i == 3 ? "barrido CRT" : "cierre vs EMA20")))
+            string tt = i == 0 ? "+0,46" : (i == 1 ? "-1,29" : (i == 2 ? "-0,92" : (i == 3 ? "+0,47" : "-0,33")))
+            string vv = v > 0 ? "alcista" : (v < 0 ? "bajista" : "neutro")
+            color  vc = v > 0 ? color.new(#13a07a, 35) : (v < 0 ? color.new(#c0392b, 35) : fondo)
+            table.cell(t, 0, i + 6, nm, bgcolor = fondo, text_color = texto, text_size = size.tiny)
+            table.cell(t, 1, i + 6, vv, bgcolor = vc, text_color = texto, text_size = size.tiny)
+            table.cell(t, 2, i + 6, tt, bgcolor = fondo, text_color = color.new(texto, 45), text_size = size.tiny)
+            table.cell(t, 3, i + 6, "", bgcolor = fondo, text_size = size.tiny)
+            table.cell(t, 4, i + 6, "", bgcolor = fondo, text_size = size.tiny)
+        table.cell(t, 0, 11, "suma", bgcolor = fondo, text_color = color.new(texto, 40), text_size = size.tiny)
+        table.cell(t, 1, 11, str.tostring(suma, "#"), bgcolor = fondo, text_color = color.new(texto, 40), text_size = size.tiny)
+        table.cell(t, 2, 11, "sin valor", bgcolor = fondo, text_color = color.new(texto, 55), text_size = size.tiny)
+        table.cell(t, 3, 11, "", bgcolor = fondo, text_size = size.tiny)
+        table.cell(t, 4, 11, "", bgcolor = fondo, text_size = size.tiny)
+
+// ------------------------------------------------------------------- alertas
+alertcondition(barreDAlto, "Barrido del alto diario", "El precio ha barrido el maximo del dia anterior")
+alertcondition(barreDBajo, "Barrido del bajo diario", "El precio ha barrido el minimo del dia anterior")
+alertcondition(barreH4Alt, "Barrido del alto de H4",  "El precio ha barrido el maximo de la H4 anterior")
+alertcondition(barreH4Baj, "Barrido del bajo de H4",  "El precio ha barrido el minimo de la H4 anterior")
