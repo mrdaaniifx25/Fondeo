@@ -1,0 +1,459 @@
+<title>CRT Trade Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F5F6F7; --panel:#FFFFFF; --panel-2:#EDEFF2;
+  --ink:#171A1F; --ink-2:#4B535F; --ink-3:#79828F;
+  --rule:#DDE1E6; --rule-2:#C8CED6;
+  --s1:#2E5EAA; --s2:#A66A18;
+  --flag:#9C2F2F; --flag-soft:rgba(156,47,47,.09);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --panel:#1B1E24; --panel-2:#22262E;
+    --ink:#E7E9ED; --ink-2:#A8B0BC; --ink-3:#79828F;
+    --rule:#2C313A; --rule-2:#3B424D;
+    --s1:#4E8BE0; --s2:#BE8630;
+    --flag:#D97A7A; --flag-soft:rgba(217,122,122,.12);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --panel:#1B1E24; --panel-2:#22262E;
+  --ink:#E7E9ED; --ink-2:#A8B0BC; --ink-3:#79828F;
+  --rule:#2C313A; --rule-2:#3B424D;
+  --s1:#4E8BE0; --s2:#BE8630;
+  --flag:#D97A7A; --flag-soft:rgba(217,122,122,.12);
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16.5px; line-height:1.65; -webkit-font-smoothing:antialiased}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px}
+.col{max-width:64ch}
+h1,h2,h3{font-family:Newsreader,Georgia,serif; font-weight:600; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.4rem,6vw,3.6rem); line-height:1.06; letter-spacing:-.015em}
+h2{font-size:clamp(1.45rem,3.2vw,1.9rem); line-height:1.2; margin-bottom:.5rem}
+h3{font-size:1.08rem; font-weight:600; margin-bottom:.3rem}
+p{margin:0 0 1.05em}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:.7rem;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); margin:0 0 1.1rem}
+header{padding:76px 0 8px; border-bottom:1px solid var(--rule)}
+.lede{font-size:1.16rem; color:var(--ink-2); margin-top:1.4rem}
+.meta{display:flex; flex-wrap:wrap; gap:8px 26px; margin:26px 0 30px;
+  font-family:"IBM Plex Mono",monospace; font-size:.74rem; color:var(--ink-3); letter-spacing:.03em}
+section{padding-top:56px}
+.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.verdict{margin:38px 0 0; padding:30px 32px; background:var(--panel);
+  border:1px solid var(--rule); border-left:3px solid var(--flag); border-radius:3px}
+.vgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:26px 30px; margin-top:22px}
+.stat .k{font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3); display:block; margin-bottom:5px}
+.stat .v{font-family:Newsreader,Georgia,serif; font-size:2.1rem; line-height:1; font-variant-numeric:tabular-nums}
+.stat .n{font-size:.8rem; color:var(--ink-3); display:block; margin-top:5px}
+.bad{color:var(--flag)}
+figure{margin:30px 0 0; padding:24px 22px 18px; background:var(--panel);
+  border:1px solid var(--rule); border-radius:3px}
+figcaption{font-size:.84rem; color:var(--ink-2); margin-top:16px; padding-top:14px; border-top:1px solid var(--rule)}
+.legend{display:flex; flex-wrap:wrap; gap:18px; margin-bottom:14px; font-size:.82rem; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.sw{width:15px; height:2.5px; border-radius:2px; display:inline-block}
+.sw.box{height:11px; width:11px; border-radius:2px}
+.chart{width:100%; height:auto; display:block; overflow:visible}
+.grid line{stroke:var(--rule)}
+.axis text{fill:var(--ink-3); font-family:"IBM Plex Mono",monospace; font-size:10.5px}
+.endlab{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:500}
+.scroll{overflow-x:auto; margin-top:26px}
+table{border-collapse:collapse; width:100%; font-size:.9rem; min-width:460px}
+th,td{text-align:right; padding:9px 12px; border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:400; border-bottom:1px solid var(--rule-2)}
+td.num{font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--panel-2)}
+tr.hi td{background:var(--flag-soft)}
+caption{caption-side:top; text-align:left; font-size:.84rem; color:var(--ink-2); padding-bottom:12px}
+.steps{list-style:none; margin:26px 0 0; padding:0}
+.steps li{display:grid; grid-template-columns:1fr auto; gap:16px; align-items:baseline;
+  padding:13px 0; border-bottom:1px solid var(--rule)}
+.steps .cnt{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:.95rem}
+.note{background:var(--panel-2); border:1px solid var(--rule); border-radius:3px;
+  padding:20px 22px; margin-top:28px; font-size:.93rem; color:var(--ink-2)}
+.note strong{color:var(--ink)}
+.tip{position:fixed; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--panel); border:1px solid var(--rule-2); border-radius:3px;
+  padding:7px 10px; font-family:"IBM Plex Mono",monospace; font-size:11.5px;
+  color:var(--ink); box-shadow:0 4px 16px rgba(0,0,0,.14); z-index:9;
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+footer{margin-top:70px; padding-top:22px; border-top:1px solid var(--rule);
+  font-size:.82rem; color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Backtest · EURUSD · 2020-2026 · estrategia 2 de 2</p>
+  <h1>El mismo cero, por otro camino</h1>
+  <p class="lede col">El CRT Trade Planner no se parece en nada a la estrategia del barrido de
+  liquidez: aquí no hay objetivo fijo, el R:R lo decide dónde caiga el cierre dentro del rango.
+  Y aun así aterriza exactamente en el mismo sitio — ventaja bruta cero, indistinguible de
+  entradas al azar.</p>
+  <div class="meta">
+    <span>2.397.463 velas M1</span><span>gráfico M15 · rango H4</span>
+    <span>ene 2020 — jul 2026</span><span>SL/TP resueltos a granularidad M1</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <h3>Veredicto</h3>
+  <p style="margin:0; color:var(--ink-2)">Pierde menos que la estrategia 1 —profit factor 0,889
+  frente a 0,749— pero por la misma razón por la que pierde: sus stops son más anchos, así que
+  el spread pesa menos. Sin costes, el resultado vuelve a ser cero.</p>
+  <div class="vgrid">
+    <div class="stat"><span class="k">Operaciones</span><span class="v" id="v-ops"></span><span class="n">en 6 años y medio</span></div>
+    <div class="stat"><span class="k">Win rate</span><span class="v" id="v-wr"></span><span class="n">equilibrio: <span id="v-eq"></span></span></div>
+    <div class="stat"><span class="k">Resultado</span><span class="v bad" id="v-r"></span><span class="n">R acumulados</span></div>
+    <div class="stat"><span class="k">Sin coste</span><span class="v" id="v-rs"></span><span class="n">R acumulados</span></div>
+  </div>
+</div>
+
+<section>
+  <h2>Aquí el win rate no basta para juzgar</h2>
+  <div class="col">
+  <p>En la estrategia 1 el objetivo era siempre 1R, así que bastaba comparar el win rate con
+  el 50 %. Aquí el objetivo es el extremo opuesto del rango, de modo que cada operación nace con
+  un R:R distinto —la mediana es 1,32 y la cola llega a 4— y el umbral de equilibrio cambia
+  en cada una.</p>
+  <p>La comparación correcta es contra la media de <span class="num">1/(1+R:R)</span> de los
+  planes realmente ejecutados. Ese umbral sale en el <span class="num" id="p-eq"></span> y el
+  win rate observado en el <span class="num" id="p-wr"></span>. La diferencia es de
+  <span class="num">0,11</span> puntos, con <span class="num">p = 0,933</span>.</p>
+  </div>
+  <figure>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--s1)"></i>Con coste de 1,2 pips</span>
+      <span><i class="sw" style="background:var(--s2)"></i>Sin coste (ventaja bruta)</span>
+    </div>
+    <svg id="eq" class="chart" viewBox="0 0 780 330" role="img"
+         aria-label="Curvas de capital con y sin coste"></svg>
+    <figcaption>Capital desde 10.000 € arriesgando el 1 % por operación. Sin coste la curva
+    termina prácticamente donde empezó.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>La prueba: separa el coste del resultado</h2>
+  <div class="col">
+  <p>Ésta es la evidencia que cierra el caso, y sale de una observación que al principio parecía
+  esperanzadora: cuanto más ancho el stop, mejor va la estrategia. Es cierto en el resultado neto.
+  Deja de serlo en cuanto quitas el spread.</p>
+  <p>El resultado <strong>neto</strong> mejora sin excepción según crece el riesgo por operación.
+  El <strong>bruto</strong> no: es ruido alrededor de cero en los cinco tramos. Lo que mejora
+  cuando ensanchas el stop no es la estrategia, es el porcentaje del riesgo que se lleva el
+  spread.</p>
+  </div>
+  <figure>
+    <div class="legend">
+      <span><i class="sw box" style="background:var(--s1)"></i>Resultado neto</span>
+      <span><i class="sw box" style="background:var(--s2)"></i>Resultado bruto (sin coste)</span>
+    </div>
+    <svg id="tramos" class="chart" viewBox="0 0 780 300" role="img"
+         aria-label="Resultado neto y bruto por tramo de riesgo"></svg>
+    <figcaption>R acumulados por tramo de riesgo de la operación. El neto dibuja una escalera
+    ascendente; el bruto oscila en torno a cero sin dirección.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Los mismos dos controles, la misma respuesta</h2>
+  <div class="col">
+  <p>Idénticos a los de la estrategia 1, para que las dos sean comparables. El espejo invierte
+  la dirección de cada señal conservando riesgo y R:R. Las entradas aleatorias caen en la misma
+  ventana horaria, con la misma distribución de riesgos y de R:R, en velas elegidas a suerte.</p>
+  </div>
+  <figure>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--ink-3);height:9px;width:9px;border-radius:50%"></i>30 corridas aleatorias</span>
+      <span><i class="sw" style="background:var(--s1);height:11px;width:11px;border-radius:50%"></i>Estrategia real</span>
+      <span><i class="sw" style="background:var(--s2);height:11px;width:11px;border-radius:50%"></i>Espejo</span>
+    </div>
+    <svg id="ctl" class="chart" viewBox="0 0 780 150" role="img"
+         aria-label="Distribución aleatoria frente al resultado real"></svg>
+    <figcaption id="ctl-cap"></figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>El embudo</h2>
+  <div class="col">
+  <p>Como en el informe anterior, conviene descartar que el backtest no encuentre nada. Los
+  filtros muerden fuerte pero dejan 1.608 señales, unas 250 al año, que es el ritmo que cabe
+  esperar de un modelo con tope de dos señales diarias.</p>
+  </div>
+  <ul class="steps" id="embudo"></ul>
+</section>
+
+<section>
+  <h2>Dieciséis variantes</h2>
+  <div class="scroll">
+    <table>
+      <caption>Ninguna alcanza profit factor 1,0. Las que más se acercan son las de stop ancho.</caption>
+      <thead><tr><th>Variante</th><th>Ops</th><th>WR</th><th>R total</th><th>R:R</th><th>Riesgo</th><th>PF</th></tr></thead>
+      <tbody id="t-sens"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Multi Bias como filtro: tampoco</h2>
+  <div class="col">
+  <p>Los otros dos indicadores del pack no dan entradas —sus propios manuales lo dicen— así que
+  no se pueden backtestear como sistemas. Pero el motor estructural de Multi Bias sí se puede
+  probar como filtro sobre estas señales: quedarse solo con las que van a favor del sesgo de H4
+  y de D1.</p>
+  <p>El resultado no es que no ayude. Es más incómodo que eso: <strong>operar en contra del
+  sesgo sale ligeramente mejor que a favor</strong>, en los dos marcos temporales. Si el panel
+  tuviera información direccional, tendría que ocurrir justo lo contrario.</p>
+  </div>
+  <div class="scroll">
+    <table>
+      <caption>Filtro estructural aplicado a las mismas 1.343 operaciones.</caption>
+      <thead><tr><th>Filtro</th><th>Ops</th><th>Win rate</th><th>R total</th><th>R/op</th><th>PF</th></tr></thead>
+      <tbody id="t-bias"></tbody>
+    </table>
+  </div>
+  <div class="note col">
+    <strong>Cuidado con la fila de abajo del todo.</strong> «H4 y D1 alineados, en contra» sale
+    en 0,998, prácticamente equilibrio. Pero es la mejor de siete particiones probadas sobre la
+    misma muestra: encontrar una cerca de 1,0 es lo esperable por azar. Y es la partición
+    <em>contraria</em> al propósito de la herramienta. La diferencia entre ir a favor y en contra
+    del sesgo diario es de 0,053 R por operación, a 0,8 errores estándar. No es una señal.
+  </div>
+</section>
+
+<section>
+  <h2>Las dos estrategias, lado a lado</h2>
+  <div class="scroll">
+    <table>
+      <caption>Dos modelos sin nada en común que terminan en el mismo número.</caption>
+      <thead><tr><th></th><th>Cuatro confirmaciones</th><th>CRT Trade Planner</th></tr></thead>
+      <tbody>
+        <tr><td>Objetivo</td><td class="num">1R fijo</td><td class="num">extremo del rango</td></tr>
+        <tr><td>Operaciones</td><td class="num">1.237</td><td class="num">1.343</td></tr>
+        <tr><td>Riesgo medio</td><td class="num">11,7 pips</td><td class="num">21,3 pips</td></tr>
+        <tr><td>Win rate</td><td class="num">50,04 %</td><td class="num">41,85 %</td></tr>
+        <tr><td>Equilibrio teórico</td><td class="num">50,00 %</td><td class="num">41,69 %</td></tr>
+        <tr><td>Profit factor</td><td class="num">0,749</td><td class="num">0,889</td></tr>
+        <tr class="hi"><td><b>R total sin coste</b></td><td class="num"><b>+1,21</b></td><td class="num"><b>−4,46</b></td></tr>
+        <tr><td>Distancia del azar</td><td class="num">+0,29 σ</td><td class="num">−0,30 σ</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note col">
+    <strong>Que la diferencia de profit factor se explique enteramente por el tamaño del stop
+    es el hallazgo importante.</strong> El CRT no es «mejor» que la estrategia 1: es la misma
+    nada, arriesgando el doble de pips por operación, de modo que el mismo spread pesa la mitad.
+    Ordenar estrategias sin ventaja por su profit factor es ordenarlas por su coste relativo.
+  </div>
+</section>
+
+<section>
+  <h2>Qué cambiaría la respuesta</h2>
+  <div class="col">
+  <p><strong>Otro activo.</strong> Las dos se han probado sobre EURUSD. Las dos están pensadas
+  para índices, donde la apertura concentra el movimiento y el barrido de un extremo tiene un
+  significado distinto. Es la prueba pendiente más obvia, y la más barata: mándame datos de
+  NAS100 o US500 y las corro las dos.</p>
+  <p><strong>Un coste más bajo.</strong> Con spread cero las dos quedan en equilibrio. Eso no
+  las hace rentables, pero sitúa el listón: cualquier ventaja real, por pequeña que sea, se
+  nota antes en un modelo de stop ancho que en uno de stop estrecho. Si buscas por dónde seguir,
+  ese es el lado en el que el coste no te mata primero.</p>
+  <p><strong>Lo que no lo cambiaría</strong> es seguir ajustando filtros. Dieciséis variantes
+  aquí, catorce en el informe anterior, y siete particiones por sesgo: treinta y siete
+  configuraciones y ninguna cruza el 1,0. Cuando la ventaja bruta es cero, mover parámetros
+  redistribuye el resultado, no lo crea.</p>
+  </div>
+</section>
+
+<footer>
+  Datos de HistData.com, corregido el desfase de una hora en el 65 % de la muestra
+  (los sellos siguen el reloj de Nueva York con horario de verano, no EST fijo como documenta
+  el proveedor). Estrategia leída del Pine v6 «CRT Trade Planner [nico66fx]», modo Intra,
+  ajustes de fábrica. Código y operaciones en el repositorio.
+</footer>
+</div>
+
+<div class="tip" id="tip"></div>
+<script>
+const D = {"embudo":{"velas":160703,"rango_valido":135846,"barridos":10269,"cierres_dentro":47077,"en_kz":36936,"pasa_rr":1608,"senales":1608},"ops":1343,"wr":41.85,"Rtot":-92.14,"Rtot_sin":-4.46,"eq_con":3610.0,"eq_sin":8681.0,"serie":[{"f":"2020-01","n":1,"con":9890.7,"sin":9900.0},{"f":"2020-01","n":7,"con":9653.7,"sin":9712.6},{"f":"2020-01","n":13,"con":9947.6,"sin":10068.6},{"f":"2020-02","n":19,"con":9715.7,"sin":9905.7},{"f":"2020-02","n":25,"con":9314.1,"sin":9558.2},{"f":"2020-02","n":31,"con":9622.0,"sin":9938.1},{"f":"2020-03","n":37,"con":9238.9,"sin":9568.5},{"f":"2020-03","n":43,"con":9339.4,"sin":9688.2},{"f":"2020-03","n":49,"con":9443.8,"sin":9810.0},{"f":"2020-04","n":55,"con":9077.8,"sin":9448.2},{"f":"2020-04","n":61,"con":8745.6,"sin":9126.7},{"f":"2020-05","n":67,"con":8376.5,"sin":8771.5},{"f":"2020-05","n":73,"con":8294.6,"sin":8721.1},{"f":"2020-05","n":79,"con":8193.1,"sin":8646.2},{"f":"2020-06","n":85,"con":8066.8,"sin":8548.1},{"f":"2020-06","n":91,"con":8093.0,"sin":8597.5},{"f":"2020-06","n":97,"con":7933.9,"sin":8449.6},{"f":"2020-06","n":103,"con":7443.8,"sin":7955.1},{"f":"2020-07","n":109,"con":7548.0,"sin":8095.4},{"f":"2020-07","n":115,"con":7379.5,"sin":7943.5},{"f":"2020-07","n":121,"con":7601.4,"sin":8208.5},{"f":"2020-08","n":127,"con":7452.7,"sin":8065.1},{"f":"2020-08","n":133,"con":7164.2,"sin":7775.2},{"f":"2020-08","n":139,"con":7240.9,"sin":7883.0},{"f":"2020-08","n":145,"con":7425.8,"sin":8108.4},{"f":"2020-09","n":151,"con":7299.2,"sin":7994.9},{"f":"2020-09","n":157,"con":7135.8,"sin":7839.8},{"f":"2020-10","n":163,"con":7419.0,"sin":8178.6},{"f":"2020-10","n":169,"con":7440.2,"sin":8230.6},{"f":"2020-10","n":175,"con":7131.0,"sin":7916.2},{"f":"2020-11","n":181,"con":7170.5,"sin":7991.7},{"f":"2020-11","n":187,"con":6869.1,"sin":7677.5},{"f":"2020-11","n":193,"con":7220.7,"sin":8103.9},{"f":"2020-11","n":199,"con":7899.5,"sin":8899.5},{"f":"2020-12","n":205,"con":7563.4,"sin":8551.6},{"f":"2020-12","n":211,"con":7707.5,"sin":8743.1},{"f":"2020-12","n":217,"con":7739.3,"sin":8807.5},{"f":"2021-01","n":223,"con":7911.0,"sin":9033.3},{"f":"2021-01","n":229,"con":7891.6,"sin":9044.9},{"f":"2021-01","n":235,"con":7711.3,"sin":8873.4},{"f":"2021-02","n":241,"con":7911.3,"sin":9136.1},{"f":"2021-02","n":247,"con":7817.7,"sin":9068.4},{"f":"2021-02","n":253,"con":7529.8,"sin":8780.5},{"f":"2021-03","n":259,"con":7883.4,"sin":9228.5},{"f":"2021-03","n":265,"con":7599.0,"sin":8925.4},{"f":"2021-03","n":271,"con":7281.6,"sin":8582.8},{"f":"2021-04","n":277,"con":7469.5,"sin":8844.9},{"f":"2021-04","n":283,"con":7823.8,"sin":9306.7},{"f":"2021-04","n":289,"con":8068.7,"sin":9634.2},{"f":"2021-05","n":295,"con":7721.4,"sin":9262.6},{"f":"2021-05","n":301,"con":7572.3,"sin":9117.5},{"f":"2021-05","n":307,"con":7260.7,"sin":8768.7},{"f":"2021-06","n":313,"con":7113.7,"sin":8622.3},{"f":"2021-06","n":319,"con":7004.0,"sin":8530.2},{"f":"2021-06","n":325,"con":6700.8,"sin":8194.6},{"f":"2021-06","n":331,"con":6726.4,"sin":8255.9},{"f":"2021-07","n":337,"con":6647.5,"sin":8194.1},{"f":"2021-07","n":343,"con":6523.2,"sin":8077.3},{"f":"2021-07","n":349,"con":6749.8,"sin":8394.8},{"f":"2021-08","n":355,"con":6655.8,"sin":8316.9},{"f":"2021-08","n":361,"con":6791.4,"sin":8538.0},{"f":"2021-08","n":367,"con":6843.0,"sin":8647.9},{"f":"2021-09","n":373,"con":6673.3,"sin":8486.8},{"f":"2021-09","n":379,"con":6396.3,"sin":8176.1},{"f":"2021-10","n":385,"con":6578.2,"sin":8448.9},{"f":"2021-10","n":391,"con":6551.4,"sin":8453.9},{"f":"2021-10","n":397,"con":6820.2,"sin":8845.9},{"f":"2021-11","n":403,"con":6723.4,"sin":8757.9},{"f":"2021-11","n":409,"con":6305.3,"sin":8245.4},{"f":"2021-11","n":415,"con":6195.5,"sin":8135.7},{"f":"2021-12","n":421,"con":5940.6,"sin":7831.1},{"f":"2021-12","n":427,"con":5693.2,"sin":7535.3},{"f":"2022-01","n":433,"con":5462.4,"sin":7267.9},{"f":"2022-01","n":439,"con":5451.7,"sin":7284.3},{"f":"2022-01","n":445,"con":5327.3,"sin":7155.5},{"f":"2022-02","n":451,"con":5257.1,"sin":7085.5},{"f":"2022-02","n":457,"con":5295.0,"sin":7160.9},{"f":"2022-02","n":463,"con":5295.5,"sin":7183.3},{"f":"2022-03","n":469,"con":5261.0,"sin":7153.9},{"f":"2022-03","n":475,"con":5059.1,"sin":6895.7},{"f":"2022-03","n":481,"con":5325.8,"sin":7276.5},{"f":"2022-04","n":487,"con":4999.3,"sin":6850.7},{"f":"2022-04","n":493,"con":5037.4,"sin":6926.6},{"f":"2022-04","n":499,"con":4726.0,"sin":6521.2},{"f":"2022-05","n":505,"con":4753.3,"sin":6576.3},{"f":"2022-05","n":511,"con":4559.0,"sin":6321.4},{"f":"2022-05","n":517,"con":4673.8,"sin":6498.4},{"f":"2022-06","n":523,"con":4596.1,"sin":6411.1},{"f":"2022-06","n":529,"con":4599.1,"sin":6430.8},{"f":"2022-06","n":535,"con":4874.0,"sin":6833.3},{"f":"2022-07","n":541,"con":4798.8,"sin":6743.2},{"f":"2022-07","n":547,"con":4765.0,"sin":6710.4},{"f":"2022-08","n":553,"con":4658.7,"sin":6578.6},{"f":"2022-08","n":559,"con":4577.5,"sin":6486.6},{"f":"2022-08","n":565,"con":4522.0,"sin":6427.0},{"f":"2022-09","n":571,"con":4448.2,"sin":6336.9},{"f":"2022-09","n":577,"con":4603.9,"sin":6571.2},{"f":"2022-09","n":583,"con":4736.5,"sin":6773.8},{"f":"2022-10","n":589,"con":4752.6,"sin":6809.6},{"f":"2022-10","n":595,"con":4661.9,"sin":6695.3},{"f":"2022-11","n":601,"con":4579.8,"sin":6592.4},{"f":"2022-11","n":607,"con":4483.4,"sin":6464.2},{"f":"2022-12","n":613,"con":4699.9,"sin":6790.8},{"f":"2022-12","n":619,"con":4872.8,"sin":7061.7},{"f":"2022-12","n":625,"con":5013.6,"sin":7285.3},{"f":"2022-12","n":631,"con":5045.3,"sin":7355.1},{"f":"2023-01","n":637,"con":5066.9,"sin":7413.4},{"f":"2023-01","n":643,"con":5186.8,"sin":7610.6},{"f":"2023-01","n":649,"con":4866.3,"sin":7165.3},{"f":"2023-02","n":655,"con":5024.5,"sin":7424.3},{"f":"2023-02","n":661,"con":5054.4,"sin":7501.0},{"f":"2023-03","n":667,"con":5336.0,"sin":7944.9},{"f":"2023-03","n":673,"con":5282.5,"sin":7894.8},{"f":"2023-03","n":679,"con":5219.9,"sin":7824.7},{"f":"2023-04","n":685,"con":5132.2,"sin":7723.6},{"f":"2023-04","n":691,"con":5162.7,"sin":7798.8},{"f":"2023-05","n":697,"con":4967.6,"sin":7531.2},{"f":"2023-05","n":703,"con":4889.3,"sin":7445.9},{"f":"2023-05","n":709,"con":4810.6,"sin":7354.2},{"f":"2023-06","n":715,"con":4784.4,"sin":7343.9},{"f":"2023-06","n":721,"con":4819.3,"sin":7433.4},{"f":"2023-07","n":727,"con":4833.8,"sin":7485.0},{"f":"2023-07","n":733,"con":4736.9,"sin":7362.2},{"f":"2023-08","n":739,"con":4882.3,"sin":7616.2},{"f":"2023-08","n":745,"con":4900.6,"sin":7673.0},{"f":"2023-08","n":751,"con":5009.1,"sin":7874.9},{"f":"2023-08","n":757,"con":4991.1,"sin":7877.9},{"f":"2023-09","n":763,"con":4891.3,"sin":7750.7},{"f":"2023-09","n":769,"con":4782.0,"sin":7610.8},{"f":"2023-09","n":775,"con":4589.5,"sin":7336.7},{"f":"2023-10","n":781,"con":4534.4,"sin":7276.0},{"f":"2023-10","n":787,"con":4482.7,"sin":7222.6},{"f":"2023-10","n":793,"con":4514.2,"sin":7302.2},{"f":"2023-11","n":799,"con":4420.7,"sin":7175.8},{"f":"2023-11","n":805,"con":4462.0,"sin":7272.7},{"f":"2023-11","n":811,"con":4490.4,"sin":7348.2},{"f":"2023-12","n":817,"con":4299.6,"sin":7063.5},{"f":"2023-12","n":823,"con":4330.7,"sin":7143.1},{"f":"2023-12","n":829,"con":4283.6,"sin":7092.6},{"f":"2024-01","n":835,"con":4280.9,"sin":7120.6},{"f":"2024-01","n":841,"con":4282.5,"sin":7149.6},{"f":"2024-01","n":847,"con":4382.6,"sin":7352.7},{"f":"2024-02","n":853,"con":4651.0,"sin":7834.2},{"f":"2024-02","n":859,"con":4667.8,"sin":7899.5},{"f":"2024-02","n":865,"con":4459.1,"sin":7597.9},{"f":"2024-03","n":871,"con":4602.1,"sin":7881.6},{"f":"2024-03","n":877,"con":4680.8,"sin":8069.0},{"f":"2024-03","n":883,"con":4471.2,"sin":7760.0},{"f":"2024-04","n":889,"con":4276.3,"sin":7462.8},{"f":"2024-04","n":895,"con":4194.9,"sin":7357.4},{"f":"2024-04","n":901,"con":4185.3,"sin":7373.2},{"f":"2024-05","n":907,"con":4350.0,"sin":7703.1},{"f":"2024-05","n":913,"con":4065.0,"sin":7252.3},{"f":"2024-05","n":919,"con":3987.8,"sin":7149.5},{"f":"2024-06","n":925,"con":4107.5,"sin":7402.7},{"f":"2024-06","n":931,"con":4047.8,"sin":7329.5},{"f":"2024-07","n":937,"con":3870.7,"sin":7044.0},{"f":"2024-07","n":943,"con":3785.9,"sin":6941.6},{"f":"2024-07","n":949,"con":3874.9,"sin":7143.2},{"f":"2024-07","n":955,"con":3791.7,"sin":7032.3},{"f":"2024-08","n":961,"con":3739.6,"sin":6962.5},{"f":"2024-08","n":967,"con":3805.7,"sin":7127.7},{"f":"2024-09","n":973,"con":3737.1,"sin":7032.7},{"f":"2024-09","n":979,"con":3766.8,"sin":7124.5},{"f":"2024-09","n":985,"con":4073.3,"sin":7735.4},{"f":"2024-10","n":991,"con":4070.7,"sin":7762.7},{"f":"2024-10","n":997,"con":3988.2,"sin":7650.1},{"f":"2024-10","n":1003,"con":3986.3,"sin":7691.2},{"f":"2024-10","n":1009,"con":4029.5,"sin":7816.2},{"f":"2024-11","n":1015,"con":4157.9,"sin":8089.6},{"f":"2024-11","n":1021,"con":4009.0,"sin":7827.3},{"f":"2024-11","n":1027,"con":3953.7,"sin":7741.8},{"f":"2024-12","n":1033,"con":3895.4,"sin":7657.6},{"f":"2024-12","n":1039,"con":3654.5,"sin":7209.4},{"f":"2025-01","n":1045,"con":3785.4,"sin":7504.4},{"f":"2025-01","n":1051,"con":3812.5,"sin":7581.3},{"f":"2025-01","n":1057,"con":3731.4,"sin":7445.2},{"f":"2025-02","n":1063,"con":3820.3,"sin":7648.4},{"f":"2025-02","n":1069,"con":3680.8,"sin":7405.2},{"f":"2025-03","n":1075,"con":3866.8,"sin":7812.2},{"f":"2025-03","n":1081,"con":3792.5,"sin":7679.8},{"f":"2025-03","n":1087,"con":3799.8,"sin":7718.2},{"f":"2025-04","n":1093,"con":3766.3,"sin":7672.6},{"f":"2025-04","n":1099,"con":3818.2,"sin":7793.5},{"f":"2025-05","n":1105,"con":3996.5,"sin":8177.2},{"f":"2025-05","n":1111,"con":4064.4,"sin":8336.5},{"f":"2025-05","n":1117,"con":4066.2,"sin":8362.6},{"f":"2025-06","n":1123,"con":4256.7,"sin":8783.3},{"f":"2025-06","n":1129,"con":4346.7,"sin":8996.3},{"f":"2025-07","n":1135,"con":4164.5,"sin":8649.1},{"f":"2025-07","n":1141,"con":4107.8,"sin":8565.1},{"f":"2025-08","n":1147,"con":4135.1,"sin":8647.9},{"f":"2025-08","n":1153,"con":3967.5,"sin":8328.1},{"f":"2025-08","n":1159,"con":4072.7,"sin":8578.4},{"f":"2025-09","n":1165,"con":3901.5,"sin":8244.2},{"f":"2025-09","n":1171,"con":3773.7,"sin":8004.2},{"f":"2025-09","n":1177,"con":3861.0,"sin":8218.4},{"f":"2025-10","n":1183,"con":3996.2,"sin":8535.2},{"f":"2025-10","n":1189,"con":3928.2,"sin":8424.1},{"f":"2025-10","n":1195,"con":3942.7,"sin":8495.8},{"f":"2025-11","n":1201,"con":3982.9,"sin":8612.3},{"f":"2025-11","n":1207,"con":3818.6,"sin":8299.9},{"f":"2025-11","n":1213,"con":3997.9,"sin":8727.6},{"f":"2025-12","n":1219,"con":3826.0,"sin":8395.0},{"f":"2025-12","n":1225,"con":3655.2,"sin":8064.7},{"f":"2025-12","n":1231,"con":3576.0,"sin":7934.9},{"f":"2026-01","n":1237,"con":3745.4,"sin":8343.1},{"f":"2026-01","n":1243,"con":3750.3,"sin":8386.2},{"f":"2026-02","n":1249,"con":3771.3,"sin":8462.8},{"f":"2026-02","n":1255,"con":3796.7,"sin":8561.1},{"f":"2026-03","n":1261,"con":3927.8,"sin":8887.2},{"f":"2026-03","n":1267,"con":3887.9,"sin":8819.8},{"f":"2026-04","n":1273,"con":3923.4,"sin":8927.7},{"f":"2026-04","n":1279,"con":3860.6,"sin":8816.5},{"f":"2026-04","n":1285,"con":3720.8,"sin":8531.5},{"f":"2026-05","n":1291,"con":3670.5,"sin":8450.5},{"f":"2026-05","n":1297,"con":3583.7,"sin":8292.7},{"f":"2026-05","n":1303,"con":3580.3,"sin":8316.3},{"f":"2026-06","n":1309,"con":3741.9,"sin":8739.0},{"f":"2026-06","n":1315,"con":3870.0,"sin":9078.7},{"f":"2026-06","n":1321,"con":3784.4,"sin":8915.4},{"f":"2026-07","n":1327,"con":3841.6,"sin":9105.0},{"f":"2026-07","n":1333,"con":3764.3,"sin":8971.7},{"f":"2026-07","n":1339,"con":3684.6,"sin":8832.0},{"f":"2026-07","n":1343,"con":3609.9,"sin":8680.5}],"azar":[-66.7,-102.9,-130.0,-102.1,-144.2,-105.4,-93.3,-0.4,-75.1,-69.4,-97.5,-148.9,-22.8,-102.7,6.6,-77.5,-82.5,-94.2,-20.1,-58.6,-66.5,-92.7,-23.0,-106.9,-106.3,-71.3,-3.1,-156.9,-104.2,-64.6],"azar_media":-79.4,"azar_sd":42.9,"espejo":-86.3,"tramos":[{"t":"<12","ops":125,"neto":-21.8,"bruto":-7.2},{"t":"12-18","ops":452,"neto":-51.1,"bruto":-15.2},{"t":"18-25","ops":436,"neto":-21.2,"bruto":3.7},{"t":"25-35","ops":217,"neto":-3.0,"bruto":6.1},{"t":">35","ops":113,"neto":4.9,"bruto":8.1}],"rr_med":1.47,"rr_p50":1.32,"riesgo_med":21.3,"equilibrio":41.69,"por_ano":[{"a":2020,"n":219,"wr":39.7,"R":-24.2},{"a":2021,"n":212,"wr":39.2,"R":-33.5},{"a":2022,"n":200,"wr":43.0,"R":-6.2},{"a":2023,"n":200,"wr":41.0,"R":-15.0},{"a":2024,"n":212,"wr":43.4,"R":-10.6},{"a":2025,"n":189,"wr":43.4,"R":-3.3},{"a":2026,"n":111,"wr":45.0,"R":0.7}]};
+const $ = s => document.querySelector(s);
+const fmt = (n,d=0) => n.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});
+const tip = $('#tip');
+function showTip(e,h){ tip.innerHTML=h; tip.style.opacity=1;
+  const r=tip.getBoundingClientRect();
+  tip.style.left=Math.min(e.clientX+14, innerWidth-r.width-10)+'px';
+  tip.style.top=Math.max(e.clientY-r.height-12, 8)+'px'; }
+function hideTip(){ tip.style.opacity=0; }
+
+$('#v-ops').textContent=fmt(D.ops);
+$('#v-wr').textContent=fmt(D.wr,2)+' %';
+$('#v-eq').textContent=fmt(D.equilibrio,2)+' %';
+$('#v-r').textContent=fmt(D.Rtot,1);
+$('#v-rs').textContent=fmt(D.Rtot_sin,2);
+$('#p-eq').textContent=fmt(D.equilibrio,2)+' %';
+$('#p-wr').textContent=fmt(D.wr,2)+' %';
+
+/* curva de capital */
+(function(){
+  const W=780,H=330,L=52,R=112,T=14,B=32, s=D.serie, n=s.length;
+  const ys=s.flatMap(p=>[p.con,p.sin]);
+  const ymax=Math.ceil(Math.max(...ys)/2000)*2000;
+  const X=i=>L+i*(W-L-R)/(n-1), Y=v=>T+(1-v/ymax)*(H-T-B);
+  let g='',ax='';
+  for(let v=0;v<=ymax;v+=2000){
+    g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+    ax+=`<text x="${L-9}" y="${Y(v)+3.5}" text-anchor="end">${fmt(v/1000)}k</text>`;
+  }
+  [...new Set(s.map(p=>p.f.slice(0,4)))].forEach(y=>{
+    const i=s.findIndex(p=>p.f.slice(0,4)===y);
+    ax+=`<text x="${X(i)}" y="${H-10}" text-anchor="middle">${y}</text>`; });
+  const path=k=>s.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(p[k]).toFixed(1)).join(' ');
+  const last=s[n-1];
+  $('#eq').innerHTML=`<g class="grid">${g}</g><g class="axis">${ax}</g>
+    <line x1="${L}" x2="${W-R}" y1="${Y(10000)}" y2="${Y(10000)}" stroke="var(--rule-2)" stroke-dasharray="3 3"/>
+    <text class="axis" x="${W-R+6}" y="${Y(10000)-6}" fill="var(--ink-3)" font-family="IBM Plex Mono" font-size="10">capital inicial</text>
+    <path d="${path('sin')}" fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${path('con')}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="${X(n-1)}" cy="${Y(last.sin)}" r="3.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/>
+    <circle cx="${X(n-1)}" cy="${Y(last.con)}" r="3.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/>
+    <text class="endlab" x="${X(n-1)+9}" y="${Y(last.sin)+4}" fill="var(--s2)">${fmt(last.sin)} €</text>
+    <text class="endlab" x="${X(n-1)+9}" y="${Y(last.con)+4}" fill="var(--s1)">${fmt(last.con)} €</text>
+    <line id="cross" x1="0" x2="0" y1="${T}" y2="${H-B}" stroke="var(--rule-2)" opacity="0"/>
+    <rect id="hit" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/>`;
+  const svg=$('#eq'), cr=svg.querySelector('#cross');
+  svg.querySelector('#hit').addEventListener('mousemove',e=>{
+    const bb=svg.getBoundingClientRect(), px=(e.clientX-bb.left)/bb.width*W;
+    let i=Math.max(0,Math.min(n-1,Math.round((px-L)/((W-L-R)/(n-1)))));
+    cr.setAttribute('x1',X(i)); cr.setAttribute('x2',X(i)); cr.setAttribute('opacity','1');
+    showTip(e,`<b>${s[i].f}</b> · op. ${fmt(s[i].n)}<br>
+      <span style="color:var(--s1)">■</span> con coste ${fmt(s[i].con)} €<br>
+      <span style="color:var(--s2)">■</span> sin coste ${fmt(s[i].sin)} €`);
+  });
+  svg.querySelector('#hit').addEventListener('mouseleave',()=>{cr.setAttribute('opacity','0');hideTip();});
+})();
+
+/* tramos de riesgo */
+(function(){
+  const W=780,H=300,L=54,R=20,T=18,B=54, t=D.tramos, n=t.length;
+  const vals=t.flatMap(x=>[x.neto,x.bruto]);
+  const lo=Math.floor(Math.min(...vals,0)/10)*10-5, hi=Math.ceil(Math.max(...vals,0)/10)*10+5;
+  const Y=v=>T+(1-(v-lo)/(hi-lo))*(H-T-B);
+  const bw=(W-L-R)/n, gap=31, bar=(bw-gap*2)/2;
+  let g='',ax='';
+  for(let v=Math.ceil(lo/10)*10; v<=hi; v+=10){
+    g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+    ax+=`<text x="${L-9}" y="${Y(v)+3.5}" text-anchor="end">${v>0?'+':''}${v}</text>`;
+  }
+  const y0=Y(0);
+  let bars='';
+  t.forEach((x,i)=>{
+    const cx=L+i*bw+bw/2;
+    [['neto','var(--s1)',-1],['bruto','var(--s2)',1]].forEach(([k,c,side])=>{
+      const v=x[k], yv=Y(v), top=Math.min(yv,y0), h=Math.abs(yv-y0);
+      const bx=cx+(side<0?-bar-2:2);
+      const r=Math.min(4,h);
+      bars+=`<path class="bar" data-t="${x.t}" data-k="${k}" data-v="${v}" data-ops="${x.ops}"
+        d="${v>=0
+          ? `M${bx} ${y0} L${bx} ${top+r} Q${bx} ${top} ${bx+r} ${top} L${bx+bar-r} ${top} Q${bx+bar} ${top} ${bx+bar} ${top+r} L${bx+bar} ${y0} Z`
+          : `M${bx} ${y0} L${bx} ${top+h-r} Q${bx} ${top+h} ${bx+r} ${top+h} L${bx+bar-r} ${top+h} Q${bx+bar} ${top+h} ${bx+bar} ${top+h-r} L${bx+bar} ${y0} Z`}"
+        fill="${c}"/>`;
+    });
+    ax+=`<text x="${cx}" y="${H-30}" text-anchor="middle">${x.t} pips</text>`;
+    ax+=`<text x="${cx}" y="${H-14}" text-anchor="middle" opacity=".65">${x.ops} ops</text>`;
+  });
+  $('#tramos').innerHTML=`<g class="grid">${g}</g>${bars}
+    <line x1="${L}" x2="${W-R}" y1="${y0}" y2="${y0}" stroke="var(--rule-2)" stroke-width="1.5"/>
+    <g class="axis">${ax}</g>`;
+  $('#tramos').querySelectorAll('.bar').forEach(b=>{
+    b.addEventListener('mouseenter',e=>showTip(e,
+      `riesgo ${b.dataset.t} pips · ${b.dataset.ops} ops<br>${b.dataset.k}: <b>${b.dataset.v} R</b>`));
+    b.addEventListener('mouseleave',hideTip);
+  });
+})();
+
+/* control */
+(function(){
+  const W=780,H=150,L=24,R=24,T=26,B=34;
+  const all=[...D.azar,D.Rtot,D.espejo];
+  const lo=Math.floor(Math.min(...all)/20)*20-10, hi=Math.ceil(Math.max(...all)/20)*20+10;
+  const X=v=>L+(v-lo)/(hi-lo)*(W-L-R), base=T+42;
+  let g='',ax='';
+  for(let v=Math.ceil(lo/40)*40; v<=hi; v+=40){
+    g+=`<line x1="${X(v)}" x2="${X(v)}" y1="${T}" y2="${base+30}"/>`;
+    ax+=`<text x="${X(v)}" y="${base+48}" text-anchor="middle">${v>0?'+':''}${v}R</text>`;
+  }
+  let dots='';
+  D.azar.forEach((v,i)=>{ const y=base+((i%6)-2.5)*7.4;
+    dots+=`<circle class="rnd" data-v="${v}" cx="${X(v)}" cy="${y.toFixed(1)}" r="4"
+      fill="var(--ink-3)" fill-opacity=".55" stroke="var(--panel)" stroke-width="1.5"/>`; });
+  const mark=(v,c,lab,anchor,dx)=>`
+    <line x1="${X(v)}" x2="${X(v)}" y1="${T-4}" y2="${base+30}" stroke="${c}" stroke-width="1.5"/>
+    <circle cx="${X(v)}" cy="${base}" r="5.5" fill="${c}" stroke="var(--panel)" stroke-width="2"/>
+    <text class="endlab" x="${X(v)+dx}" y="${T-6}" text-anchor="${anchor}" fill="${c}">${lab}</text>`;
+  $('#ctl').innerHTML=`<g class="grid">${g}</g><g class="axis">${ax}</g>${dots}
+    ${mark(D.Rtot,'var(--s1)','real '+fmt(D.Rtot,1),'end',-7)}
+    ${mark(D.espejo,'var(--s2)','espejo '+fmt(D.espejo,1),'start',7)}`;
+  $('#ctl').querySelectorAll('.rnd').forEach(c=>{
+    c.addEventListener('mouseenter',e=>showTip(e,`corrida aleatoria<br><b>${c.dataset.v} R</b>`));
+    c.addEventListener('mouseleave',hideTip); });
+  const z=((D.Rtot-D.azar_media)/D.azar_sd).toFixed(2);
+  $('#ctl-cap').innerHTML=`Las 30 corridas promedian <span class="num">${fmt(D.azar_media,1)} R</span>
+    con desviación típica <span class="num">${fmt(D.azar_sd,1)}</span>. La real cae a
+    <span class="num">${z>0?'+':''}${z}</span> desviaciones: dentro del ruido, y del lado malo.`;
+})();
+
+/* tablas */
+const sens=[['BASE M15 · KZ UTC · coste 1,2',1343,41.85,-92.14,1.47,21.32,0.889,1],
+ ['Sin coste de operación',1343,41.85,-4.46,1.47,21.32,0.994,0],
+ ['Coste de 0,6 pips',1343,41.85,-48.30,1.47,21.32,0.940,0],
+ ['Sin filtro de kill zone',2073,39.12,-222.30,1.60,20.04,0.835,0],
+ ['Kill zone en hora de Nueva York',1269,39.32,-70.25,1.73,22.59,0.914,0],
+ ['Gráfico M5',1675,40.60,-138.53,1.52,20.20,0.870,0],
+ ['Gráfico M30',1019,42.39,-61.97,1.44,22.27,0.901,0],
+ ['Gráfico H1',621,39.94,-70.01,1.44,23.24,0.823,0],
+ ['Rango diario, gráfico H1',390,42.31,-16.08,1.54,51.06,0.924,0],
+ ['R:R mínimo 1,5',626,32.43,-85.32,1.93,20.39,0.811,0],
+ ['R:R mínimo 2,0',240,27.92,-32.40,2.43,20.31,0.825,0],
+ ['Colchón del SL 0,25 ATR',1912,36.09,-248.06,1.90,15.13,0.815,0],
+ ['Colchón del SL 1,00 ATR',411,45.99,-8.47,1.24,35.50,0.963,0],
+ ['Rango mínimo 0,8 ATR',1203,41.15,-82.05,1.52,21.75,0.891,0],
+ ['Sin tope diario',1363,41.75,-96.27,1.48,21.37,0.886,0],
+ ['Varias direcciones por rango',1290,42.17,-87.07,1.46,20.95,0.891,0]];
+$('#t-sens').innerHTML=sens.map(r=>`<tr class="${r[7]?'hi':''}"><td>${r[0]}</td>
+  <td class="num">${fmt(r[1])}</td><td class="num">${fmt(r[2],2)} %</td>
+  <td class="num">${fmt(r[3],2)}</td><td class="num">${fmt(r[4],2)}</td>
+  <td class="num">${fmt(r[5],1)}</td><td class="num">${fmt(r[6],3)}</td></tr>`).join('');
+
+const bias=[['Sin filtro',1343,41.85,-92.14,-0.0686,0.889],
+ ['A favor del sesgo H4',688,41.57,-50.19,-0.0730,0.883],
+ ['En contra del sesgo H4',655,42.14,-41.95,-0.0640,0.896],
+ ['A favor del sesgo D1',647,40.34,-62.39,-0.0964,0.848],
+ ['En contra del sesgo D1',685,43.21,-29.39,-0.0429,0.929],
+ ['H4 y D1 alineados, a favor',392,41.58,-19.87,-0.0507,0.919],
+ ['H4 y D1 alineados, en contra',397,44.33,-0.37,-0.0009,0.998]];
+$('#t-bias').innerHTML=bias.map(r=>`<tr><td>${r[0]}</td>
+  <td class="num">${fmt(r[1])}</td><td class="num">${fmt(r[2],2)} %</td>
+  <td class="num">${fmt(r[3],2)}</td><td class="num">${fmt(r[4],4)}</td>
+  <td class="num">${fmt(r[5],3)}</td></tr>`).join('');
+
+const E=D.embudo;
+$('#embudo').innerHTML=
+ `<li><span>Velas M15 en la muestra</span><span class="cnt">${fmt(E.velas)}</span></li>
+  <li><span>Con un rango H4 lo bastante grande (≥ 0,5 × ATR)</span><span class="cnt">${fmt(E.rango_valido)}</span></li>
+  <li><span>Dentro de la kill zone de Londres o de Nueva York</span><span class="cnt">${fmt(E.en_kz)}</span></li>
+  <li><span>Barridos de un extremo del rango</span><span class="cnt">${fmt(E.barridos)}</span></li>
+  <li><span>Cierres de vuelta dentro del rango</span><span class="cnt">${fmt(E.cierres_dentro)}</span></li>
+  <li><span><b>Planes que además superan el R:R mínimo — señal</b></span><span class="cnt"><b>${fmt(E.senales)}</b></span></li>
+  <li><span>Operaciones tras aplicar «una a la vez»</span><span class="cnt">${fmt(D.ops)}</span></li>`;
+</script>
